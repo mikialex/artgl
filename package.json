@@ -1,0 +1,25 @@
+{
+  "name": "artix",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node_modules/.bin/webpack-dev-server --port 8000"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "html-webpack-plugin": "^2.29.0",
+    "mocha": "^4.1.0",
+    "ts-loader": "^2.2.2",
+    "tslint": "^5.8.0",
+    "typescript": "^2.4.1",
+    "webpack": "^3.1.0",
+    "webpack-dev-server": "^2.5.1",
+    "webpack-glsl-loader": "^1.0.1"
+  },
+  "dependencies": {
+    "clean-webpack-plugin": "^0.1.18"
+  }
+}
