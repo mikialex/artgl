@@ -10,16 +10,35 @@ export class GLRenderer {
 }
 
 
+export class WebGLAttributes {
+  constructor(gl: WebGLRenderingContext) {
+    this.gl = gl;
+  }
+  gl: WebGLRenderingContext
+
+  createBuffer() {
+
+  }
+}
+
+
+
+
+
+
+
+
+
+
 
 export enum ShaderType{
   vertex,
-  program
+  fragment
 }
 
 export class GLShader {
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
-
   }
   renderer: GLRenderer
   shader: WebGLShader
@@ -41,4 +60,27 @@ export class GLShader {
     return shader;
   };
   
+}
+
+
+export class GLProgram {
+  constructor(renderer: GLRenderer) {
+    this.renderer = renderer;
+  }
+  renderer: GLRenderer
+  program: WebGLProgram
+
+  createProgram(vertexShader: GLShader, fragmentShader: GLShader) {
+    const gl = this.renderer.gl;
+    this.program = gl.createProgram();
+    gl.attachShader(this.program, vertexShader.shader);
+    gl.attachShader(this.program, fragmentShader.shader);
+    gl.linkProgram(this.program);
+    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+      let info = gl.getProgramInfoLog(this.program);
+      throw 'Could not compile WebGL program. \n\n' + info;
+    }
+  }
+
+
 }

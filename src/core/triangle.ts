@@ -7,6 +7,8 @@ export class TriangleFace{
   p1: Vector3
   p2: Vector3
   p3: Vector3
+
+  color: Vector3
   
 
 }
