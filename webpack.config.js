@@ -61,7 +61,7 @@ module.exports = {
   
   plugins: [
     new HtmlwebpackPlugin({
-      title: 'test',
+      title: 'artifact',
       template: path.resolve(__dirname, 'index.html'),
       filename: 'index.html',
       chunks: ['app', 'vendors'],
