@@ -8,13 +8,46 @@ export class Vector3 {
   y = 0;
   z = 0;
 
+  clone() {
+    return new Vector3(this.x, this.y, this.z);
+  }
+
+  copy(v: Vector3) {
+    this.x = v.x;
+    this.y = v.y;
+    this.z = v.z;
+    return this;
+  }
+
+  add(v: Vector3) {
+    this.x += v.x;
+    this.y += v.y;
+    this.z += v.z;
+    return this;
+  }
+  addScalar(scalar: number) {
+    this.x += scalar;
+    this.y += scalar;
+    this.z += scalar;
+    return this;
+  }
+
+
+
+  subtract(v: Vector3) {
+    this.x -= v.x;
+    this.y -= v.y;
+    this.z -= v.z;
+    return this;
+  }
+
+
   multiply(v: Vector3) {
     this.x *= v.x;
     this.y *= v.y;
     this.z *= v.z;
     return this;
   }
-
   multiplyScalar(scalar: number) {
     this.x *= scalar;
     this.y *= scalar;
