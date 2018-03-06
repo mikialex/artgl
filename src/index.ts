@@ -1,9 +1,8 @@
-import { GLRenderer, ShaderType, GLProgram } from "./core/webgl-renderer";
+import { GLRenderer, ShaderType, GLProgram, GLAttribute } from "./core/webgl-renderer";
 import { GLShader } from "./core/webgl-renderer";
+import { Geometry } from "./core/geometry";
 
 window.onload = function(){
-  let canv = document.querySelector('canvas');
-  let renderer = new GLRenderer(canv);
 
   var vertexShaderSource =
     "attribute vec4 position;\n" +
@@ -12,20 +11,27 @@ window.onload = function(){
     "}\n";
   
   var fragmentShaderSource =
-    "attribute vec4 position;\n" +
-    "void main() {\n" +
-    "  gl_Position = position;\n" +
-    "}\n";
+    `
+    void main() {
+      gl_FragColor = vec4(0,0,1,1);
+    }
+    `  
 
-  // var vertexShader = createShader(gl, vertexShaderSource, gl.VERTEX_SHADER)
+  let canv = document.querySelector('canvas');
+  let renderer = new GLRenderer(canv);
 
   let vertexShader = new GLShader(renderer);
   vertexShader.compileRawShader(vertexShaderSource, ShaderType.vertex);
 
   let fragShader = new GLShader(renderer);
-  vertexShader.compileRawShader(vertexShaderSource, ShaderType.fragment);
+  fragShader.compileRawShader(fragmentShaderSource, ShaderType.fragment);
 
-  let program = new GLProgram(renderer);
-  // program.createProgram()
+  let program = new GLProgram(renderer, vertexShader, fragShader);
   console.log(renderer);
+
+  let positionAtt = new GLAttribute(renderer, 'position', program);
+  let testGeo = new Geometry();
+  positionAtt.setData(testGeo.createTestVertices());
+
+  renderer.render();
 }
