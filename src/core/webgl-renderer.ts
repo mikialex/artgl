@@ -6,9 +6,10 @@ export class GLRenderer {
 
   program: GLProgram
   attributes: Array<GLAttribute> = [];
+  uniforms: Array<GLUniform> = [];
 
   render() {
-    this.gl.drawArrays(this.gl.LINE_LOOP, 0, 3);
+    this.gl.drawArrays(this.gl.TRIANGLES, 0, 3);
   }
   
 }
@@ -104,4 +105,29 @@ export class GLAttribute {
     gl.vertexAttribPointer(this.position, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(this.position);
   }
+}
+
+export class GLUniform {
+  constructor(renderer: GLRenderer, name: string, program: GLProgram) {
+    this.renderer = renderer;
+    renderer.uniforms.push(this);
+    this.name = name;
+    this.getUniformLocation(name, program);
+  }
+  renderer: GLRenderer;
+  buffer: WebGLBuffer;
+  name: string;
+  position: WebGLUniformLocation;
+
+  getUniformLocation(name: string, program: GLProgram) {
+    const gl = this.renderer.gl;
+    this.position = gl.getUniformLocation(program.program,name);
+  }
+
+  setData(data:number) {
+    const gl = this.renderer.gl;
+    gl.uniform1f(this.position, data);
+  }
+
+
 }

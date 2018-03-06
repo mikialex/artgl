@@ -1,4 +1,4 @@
-import { GLRenderer, ShaderType, GLProgram, GLAttribute } from "./core/webgl-renderer";
+import { GLRenderer, ShaderType, GLProgram, GLAttribute, GLUniform } from "./core/webgl-renderer";
 import { GLShader } from "./core/webgl-renderer";
 import { Geometry } from "./core/geometry";
 
@@ -12,8 +12,11 @@ window.onload = function(){
   
   var fragmentShaderSource =
     `
+    precision mediump float;
+    uniform float lineColor;
+    float blue = lineColor * 0.5;
     void main() {
-      gl_FragColor = vec4(0,0,1,1);
+      gl_FragColor = vec4(0,0,lineColor,1);
     }
     `  
 
@@ -32,6 +35,10 @@ window.onload = function(){
   let positionAtt = new GLAttribute(renderer, 'position', program);
   let testGeo = new Geometry();
   positionAtt.setData(testGeo.createTestVertices());
+
+  let lineColorUni = new GLUniform(renderer, 'lineColor', program);
+  lineColorUni.setData(0.8);
+
 
   renderer.render();
 }
