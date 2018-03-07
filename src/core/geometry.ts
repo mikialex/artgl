@@ -12,8 +12,17 @@ export class Geometry {
     return new Float32Array([
       1, 1,
       -1, -1,
-      1,0.5
+      1, 0.5
     ])
+  }
+
+  createVerticesBuffer() {
+    let tempVertices: Array<number> = [];
+    this.vertices.forEach(vertex => {
+      tempVertices.push(vertex.x);
+      tempVertices.push(vertex.y);
+      tempVertices.push(vertex.z);
+    })
   }
 
 

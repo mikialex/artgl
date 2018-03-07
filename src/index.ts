@@ -1,6 +1,7 @@
 import { GLRenderer, ShaderType, GLProgram, GLAttribute, GLUniform } from "./core/webgl-renderer";
 import { GLShader } from "./core/webgl-renderer";
 import { Geometry } from "./core/geometry";
+import { RenderObject } from "./core/render-object";
 
 window.onload = function(){
 
@@ -38,6 +39,10 @@ window.onload = function(){
 
   let lineColorUni = new GLUniform(renderer, 'lineColor', program);
   lineColorUni.setData(0.8);
+
+  let testObj = new RenderObject();
+  testObj.updateObjToWorldMatrix();
+  console.log(testObj);
 
 
   renderer.render();
