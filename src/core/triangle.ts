@@ -1,4 +1,4 @@
-import { Vector3 } from "../math/vector3";
+import { Vector3 } from "../math/math";
 
 export class TriangleFace{
   constructor(p1: Vector3, p2: Vector3, p3: Vector3) {
@@ -11,4 +11,4 @@ export class TriangleFace{
   color: Vector3
   
 
-}
+} 

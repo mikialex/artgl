@@ -97,12 +97,12 @@ export class GLAttribute {
     this.position = this.renderer.gl.getAttribLocation(program.program, name);
   }
 
-  setData(data: any) {
+  setData(data: any, stride:number) {
     const gl = this.renderer.gl;
     this.buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(this.position, 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(this.position, stride, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(this.position);
   }
 }

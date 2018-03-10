@@ -6,18 +6,24 @@ import { RenderObject } from "./core/render-object";
 window.onload = function(){
 
   var vertexShaderSource =
-    "attribute vec4 position;\n" +
-    "void main() {\n" +
-    "  gl_Position = position;\n" +
-    "}\n";
+    `
+    varying vec4 color;
+    attribute vec4 position;
+    attribute vec4 vertexColor;
+    void main() {
+      gl_Position = position;
+      color = vertexColor;
+    }
+    ` ;
   
   var fragmentShaderSource =
     `
     precision mediump float;
     uniform float lineColor;
+    varying vec4 color;
     float blue = lineColor * 0.5;
     void main() {
-      gl_FragColor = vec4(0,0,lineColor,1);
+      gl_FragColor = color * lineColor;
     }
     `  
 
@@ -33,9 +39,11 @@ window.onload = function(){
   let program = new GLProgram(renderer, vertexShader, fragShader);
   console.log(renderer);
 
-  let positionAtt = new GLAttribute(renderer, 'position', program);
   let testGeo = new Geometry();
-  positionAtt.setData(testGeo.createTestVertices());
+  let positionAtt = new GLAttribute(renderer, 'position', program);
+  positionAtt.setData(testGeo.createTestVertices(), 2);
+  let vertexColorAtt = new GLAttribute(renderer, 'vertexColor', program);
+  vertexColorAtt.setData(testGeo.createTestVerticesColors(), 3);
 
   let lineColorUni = new GLUniform(renderer, 'lineColor', program);
   lineColorUni.setData(0.8);
