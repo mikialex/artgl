@@ -2,6 +2,7 @@ import { GLRenderer, ShaderType, GLProgram, GLAttribute, GLUniform } from "./cor
 import { GLShader } from "./core/webgl-renderer";
 import { Geometry } from "./core/geometry";
 import { RenderObject } from "./core/render-object";
+import { SphereGeometry } from "./geometry/sphere-geometry";
 
 window.onload = function(){
 
@@ -52,6 +53,11 @@ window.onload = function(){
   testObj.updateObjToWorldMatrix();
   console.log(testObj);
 
+  let testBall = new SphereGeometry();
+  testBall.createVerticesBuffer(); 
 
   renderer.render();
+  // renderer.clear();
+
 }
+  

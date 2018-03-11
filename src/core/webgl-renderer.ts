@@ -11,6 +11,10 @@ export class GLRenderer {
   render() {
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 3);
   }
+
+  clear() {
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+  }
   
 }
 
