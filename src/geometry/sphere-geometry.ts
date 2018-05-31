@@ -1,6 +1,6 @@
 
 import { Geometry } from '../core/geometry';
-import { Vector3 } from '../math/math';
+import { Vector3 } from '../math';
 
 
 export class SphereGeometry extends Geometry {

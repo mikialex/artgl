@@ -1,4 +1,4 @@
-import { Vector3 } from "../math/math";
+import { Vector3 } from "../math";
 
 export class PerspectiveCamera {
   lookDirection: Vector3

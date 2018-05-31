@@ -1,8 +1,9 @@
-import { GLRenderer, GLProgram } from "./core/webgl-renderer";
+import { GLRenderer } from "./renderer/webgl-renderer";
 import { Geometry } from "./core/geometry";
-import { SceneNode } from "./core/scene-node";
+import { SceneNode } from "./scene/scene-node";
 import { SphereGeometry } from "./geometry/sphere-geometry";
-import { ShaderType, GLShader } from "./core/shader";
+import { ShaderType, GLShader } from "./webgl/shader";
+import { GLProgram } from "./renderer/webgl-program";
 
 window.onload = function(){
 

@@ -1,4 +1,4 @@
-import { Vector3 } from "../math/math";
+import { Vector3 } from "../math";
 
 export class SceneNode {
   position = new Vector3(0, 0, 0);
@@ -7,6 +7,8 @@ export class SceneNode {
 
   parent: SceneNode = null;
   children: Array<SceneNode> = [];
+
+  attribute: {};
 
   // objToWorldMatrix: Matrix
 

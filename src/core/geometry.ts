@@ -1,5 +1,4 @@
-import { Vector3 } from "../math/math";
-import { TriangleFace } from "./triangle";
+import { Vector3, TriangleFace } from "../math";
 
 export class Geometry {
   constructor() {

@@ -1,28 +1,23 @@
-import { GLShader, GLProgramConfig, ShaderType } from "./shader";
-import { GLInfo } from "./webgl/gl-info";
+import { GLRenderer } from "./webgl-renderer";
+import { GLShader, ShaderType } from "../webgl/shader";
 
-export class GLRenderer {
-  constructor(el: HTMLCanvasElement, options?: any) {
-    this.gl = el.getContext('webgl', options);
-    this.glInfo = new GLInfo(this);
-    this.glInfo.createAllExtension();
-  }
-  gl: WebGLRenderingContext;
-  glInfo: GLInfo;
-
-  program: GLProgram
-
-  render() {
-    this.gl.drawArrays(this.gl.TRIANGLES, 0, 3);
-  }
-
-  clear() {
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-  }
-  
+export interface AttributeDescriptor {
+  name: string,
+  stride: number
 }
 
+export interface UniformDescriptor {
+  name: string,
+  type: string
+}
 
+export interface GLProgramConfig {
+  attributes: AttributeDescriptor[];
+  uniforms: UniformDescriptor[];
+  vertexShaderString: string;
+  fragmentShaderString: string;
+  autoInjectHeader: boolean
+}
 
 
 export class GLProgram {

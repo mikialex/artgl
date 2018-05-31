@@ -1,26 +1,8 @@
-import { GLRenderer } from "./webgl-renderer";
+import { GLRenderer } from "../renderer/webgl-renderer";
 
 export enum ShaderType {
   vertex,
   fragment
-}
-
-export interface GLProgramConfig{
-  attributes: AttributeDescriptor[];
-  uniforms: UniformDescriptor[];
-  vertexShaderString: string;
-  fragmentShaderString: string;
-  autoInjectHeader:boolean
-}
-
-export interface AttributeDescriptor{
-  name: string,
-  stride: number
-}
-
-export interface UniformDescriptor {
-  name: string,
-  type: string
 }
 
 export class GLShader {

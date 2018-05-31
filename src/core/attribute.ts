@@ -1,5 +1,7 @@
-export class Point{
+export class Attribute{
   constructor() {
     
   }
+
+  
 }
