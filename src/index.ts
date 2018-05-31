@@ -1,8 +1,8 @@
-import { GLRenderer, ShaderType, GLProgram, GLAttribute, GLUniform } from "./core/webgl-renderer";
-import { GLShader } from "./core/webgl-renderer";
+import { GLRenderer, GLProgram } from "./core/webgl-renderer";
 import { Geometry } from "./core/geometry";
 import { RenderObject } from "./core/render-object";
 import { SphereGeometry } from "./geometry/sphere-geometry";
+import { ShaderType, GLShader } from "./core/shader";
 
 window.onload = function(){
 
@@ -30,31 +30,34 @@ window.onload = function(){
 
   let canv = document.querySelector('canvas');
   let renderer = new GLRenderer(canv);
+  console.log(renderer);
 
   let vertexShader = new GLShader(renderer);
   vertexShader.compileRawShader(vertexShaderSource, ShaderType.vertex);
-
   let fragShader = new GLShader(renderer);
-  fragShader.compileRawShader(fragmentShaderSource, ShaderType.fragment);
+  fragShader.compileRawShader(fragmentShaderSource, ShaderType.fragment );
 
-  let program = new GLProgram(renderer, vertexShader, fragShader);
-  console.log(renderer);
+
+  let program = new GLProgram(renderer, vertexShader, fragShader,
+    {
+      attributes: [
+        { name: 'position', stride: 2 },
+        { name:'vertexColor', stride: 3}
+      ],
+      uniforms: [
+        { name: 'lineColor', type: 'uniform1f' }
+      ]
+    }
+  );
+
+
 
   let testGeo = new Geometry();
-  let positionAtt = new GLAttribute(renderer, 'position', program);
-  positionAtt.setData(testGeo.createTestVertices(), 2);
-  let vertexColorAtt = new GLAttribute(renderer, 'vertexColor', program);
-  vertexColorAtt.setData(testGeo.createTestVerticesColors(), 3);
 
-  let lineColorUni = new GLUniform(renderer, 'lineColor', program);
-  lineColorUni.setData(0.8);
+  program.setAttribute('position', testGeo.createTestVertices());
+  program.setAttribute('vertexColor', testGeo.createTestVerticesColors());
 
-  let testObj = new RenderObject();
-  testObj.updateObjToWorldMatrix();
-  console.log(testObj);
-
-  let testBall = new SphereGeometry();
-  testBall.createVerticesBuffer(); 
+  program.setUniform('lineColor', 0.8);
 
   renderer.render();
   // renderer.clear();

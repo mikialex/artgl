@@ -1,3 +1,5 @@
+import { GLShader, ShaderConfig } from "./shader";
+
 export class GLRenderer {
   constructor(el: HTMLCanvasElement, options?: any) {
     this.gl = el.getContext('webgl', options);
@@ -5,8 +7,6 @@ export class GLRenderer {
   gl: WebGLRenderingContext
 
   program: GLProgram
-  attributes: Array<GLAttribute> = [];
-  uniforms: Array<GLUniform> = [];
 
   render() {
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 3);
@@ -19,48 +19,21 @@ export class GLRenderer {
 }
 
 
-export enum ShaderType{
-  vertex,
-  fragment
-}
-
-export class GLShader {
-  constructor(renderer: GLRenderer) {
-    this.renderer = renderer;
-  }
-  renderer: GLRenderer
-  shader: WebGLShader
-  compileRawShader = (source: string, type: ShaderType): WebGLShader => {
-    const gl = this.renderer.gl;
-    var shader = gl.createShader(type === ShaderType.vertex ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER);
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      let log = gl.getShaderInfoLog(shader);
-      if (log) {
-        throw new Error(log);
-      }
-    }
-    if (!shader) {
-      throw new Error("Something went wrong while compile the shader.");
-    }
-    this.shader = shader;
-    return shader;
-  };
-  
-}
 
 
 export class GLProgram {
-  constructor(renderer: GLRenderer, vertexShader: GLShader, fragmentShader: GLShader) {
+  constructor(renderer: GLRenderer, vertexShader: GLShader, fragmentShader: GLShader, config: ShaderConfig) {
     this.renderer = renderer;
     renderer.program = this;
-    this.createProgram(vertexShader,fragmentShader);
+    this.createProgram(vertexShader, fragmentShader);
+    this.populateDataSlot(config);
+    this.config = config;
   }
   renderer: GLRenderer
   program: WebGLProgram
+  config: ShaderConfig
 
-  createProgram(vertexShader: GLShader, fragmentShader: GLShader) {
+  private createProgram(vertexShader: GLShader, fragmentShader: GLShader) {
     const gl = this.renderer.gl;
     this.program = gl.createProgram();
     gl.attachShader(this.program, vertexShader.shader);
@@ -73,65 +46,51 @@ export class GLProgram {
       gl.useProgram(this.program);
     }
   }
-}
 
-
-
-export class GLBuffer{
-  constructor() {
-    
-  }
-}
-
-
-
-export class GLAttribute {
-  constructor(renderer: GLRenderer, name:string, program:GLProgram) {
-    this.renderer = renderer;
-    renderer.attributes.push(this);
-    this.name = name;
-    this.getAttributeLocation(name, program);
-  }
-  renderer: GLRenderer;
-  buffer: WebGLBuffer;
-  name: string;
-  position: number;
-  
-  getAttributeLocation(name: string, program: GLProgram) {
-    this.position = this.renderer.gl.getAttribLocation(program.program, name);
-  }
-
-  setData(data: any, stride:number) {
+  private populateDataSlot(config: ShaderConfig) {
     const gl = this.renderer.gl;
-    this.buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+    config.attributes.forEach(att => {
+      this.attributes[att.name] = {
+        name: att.name,
+        data: null,
+        position: gl.getAttribLocation(this.program, att.name),
+        discriptor: att
+      }
+    })
+    config.uniforms.forEach(uni => {
+      this.uniforms[uni.name] = {
+        name: uni.name,
+        data: null,
+        position: gl.getUniformLocation(this.program, uni.name),
+        discriptor: uni
+      }
+    })
+  }
+
+  private attributes = {};
+  private uniforms = {};
+
+  setAttribute(name: string, data: any) {
+    const conf = this.attributes[name];
+    if (!conf) {
+      throw 'try to set a none exist attribute';
+    }
+    const gl = this.renderer.gl;
+    const buffer = gl.createBuffer();
+    const position = conf.position;
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(this.position, stride, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(this.position);
+    gl.vertexAttribPointer(position, conf.discriptor.stride, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(position);
   }
-}
 
-export class GLUniform {
-  constructor(renderer: GLRenderer, name: string, program: GLProgram) {
-    this.renderer = renderer;
-    renderer.uniforms.push(this);
-    this.name = name;
-    this.getUniformLocation(name, program);
-  }
-  renderer: GLRenderer;
-  buffer: WebGLBuffer;
-  name: string;
-  position: WebGLUniformLocation;
-
-  getUniformLocation(name: string, program: GLProgram) {
+  setUniform(name: string, data: any) {
+    const conf = this.uniforms[name];
+    if (!conf) {
+      throw 'try to set a none exist unifrom';
+    }
     const gl = this.renderer.gl;
-    this.position = gl.getUniformLocation(program.program,name);
+    const position = conf.position;
+    gl.uniform1f(position, data);
   }
-
-  setData(data:number) {
-    const gl = this.renderer.gl;
-    gl.uniform1f(this.position, data);
-  }
-
-
 }
