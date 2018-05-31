@@ -37,6 +37,8 @@ export class Geometry {
     return new Float32Array(tempVertices);
   }
 
-
+  dispose() {
+    
+  }
 }
 

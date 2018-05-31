@@ -8,4 +8,6 @@ export class RenderObject{
 
   geometry: Geometry;
   material: Material;
+
+  renderOrder: number;
 }

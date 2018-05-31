@@ -3,7 +3,7 @@ import { Geometry } from "./core/geometry";
 import { SceneNode } from "./scene/scene-node";
 import { SphereGeometry } from "./geometry/sphere-geometry";
 import { ShaderType, GLShader } from "./webgl/shader";
-import { GLProgram } from "./renderer/webgl-program";
+import { GLProgram } from "./webgl/webgl-program";
 
 window.onload = function(){
 

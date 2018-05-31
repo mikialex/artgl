@@ -1,6 +1,12 @@
 import { Vector3 } from "../math";
+import { RenderObject } from "../core/render-object";
+import { Scene } from "./scene";
 
 export class SceneNode {
+  constructor(scene) {
+    this.scene = scene;
+  }
+  scene: Scene;
   position = new Vector3(0, 0, 0);
   // rotation = new Quaternion();
   scale = new Vector3(1, 1, 1);
@@ -8,6 +14,7 @@ export class SceneNode {
   parent: SceneNode = null;
   children: Array<SceneNode> = [];
 
+  object: RenderObject;
   attribute: {};
 
   // objToWorldMatrix: Matrix

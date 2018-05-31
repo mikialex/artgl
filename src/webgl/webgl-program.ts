@@ -1,4 +1,4 @@
-import { GLRenderer } from "./webgl-renderer";
+import { GLRenderer } from "../renderer/webgl-renderer";
 import { GLShader, ShaderType } from "../webgl/shader";
 
 export interface AttributeDescriptor {
