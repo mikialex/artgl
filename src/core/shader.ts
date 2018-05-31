@@ -5,9 +5,12 @@ export enum ShaderType {
   fragment
 }
 
-export interface ShaderConfig{
+export interface GLProgramConfig{
   attributes: AttributeDescriptor[];
   uniforms: UniformDescriptor[];
+  vertexShaderString: string;
+  fragmentShaderString: string;
+  autoInjectHeader:boolean
 }
 
 export interface AttributeDescriptor{

@@ -1,4 +1,4 @@
-import { GLShader, ShaderConfig } from "./shader";
+import { GLShader, GLProgramConfig, ShaderType } from "./shader";
 
 export class GLRenderer {
   constructor(el: HTMLCanvasElement, options?: any) {
@@ -22,16 +22,28 @@ export class GLRenderer {
 
 
 export class GLProgram {
-  constructor(renderer: GLRenderer, vertexShader: GLShader, fragmentShader: GLShader, config: ShaderConfig) {
+  constructor(renderer: GLRenderer, config: GLProgramConfig) {
     this.renderer = renderer;
     renderer.program = this;
-    this.createProgram(vertexShader, fragmentShader);
+    this.createShaders(config);
+    this.createProgram(this.vertexShader, this.fragmentShader);
     this.populateDataSlot(config);
     this.config = config;
   }
-  renderer: GLRenderer
-  program: WebGLProgram
-  config: ShaderConfig
+  private renderer: GLRenderer;
+  private program: WebGLProgram;
+  private config: GLProgramConfig;
+  private attributes = {};
+  private uniforms = {};
+  private vertexShader: GLShader;
+  private fragmentShader: GLShader;
+
+  private createShaders(conf: GLProgramConfig) {
+    this.vertexShader = new GLShader(this.renderer);
+    this.vertexShader.compileRawShader(conf.vertexShaderString, ShaderType.vertex);
+    this.fragmentShader = new GLShader(this.renderer);
+    this.fragmentShader.compileRawShader(conf.fragmentShaderString, ShaderType.fragment);
+  }
 
   private createProgram(vertexShader: GLShader, fragmentShader: GLShader) {
     const gl = this.renderer.gl;
@@ -47,7 +59,7 @@ export class GLProgram {
     }
   }
 
-  private populateDataSlot(config: ShaderConfig) {
+  private populateDataSlot(config: GLProgramConfig) {
     const gl = this.renderer.gl;
     config.attributes.forEach(att => {
       this.attributes[att.name] = {
@@ -66,9 +78,6 @@ export class GLProgram {
       }
     })
   }
-
-  private attributes = {};
-  private uniforms = {};
 
   setAttribute(name: string, data: any) {
     const conf = this.attributes[name];

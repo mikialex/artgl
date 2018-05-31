@@ -1,6 +1,6 @@
 import { GLRenderer, GLProgram } from "./core/webgl-renderer";
 import { Geometry } from "./core/geometry";
-import { RenderObject } from "./core/render-object";
+import { SceneNode } from "./core/scene-node";
 import { SphereGeometry } from "./geometry/sphere-geometry";
 import { ShaderType, GLShader } from "./core/shader";
 
@@ -22,7 +22,7 @@ window.onload = function(){
     precision mediump float;
     uniform float lineColor;
     varying vec4 color;
-    float blue = lineColor * 0.5;
+    float blue = lineColor * 0.2;
     void main() {
       gl_FragColor = color * lineColor;
     }
@@ -32,21 +32,19 @@ window.onload = function(){
   let renderer = new GLRenderer(canv);
   console.log(renderer);
 
-  let vertexShader = new GLShader(renderer);
-  vertexShader.compileRawShader(vertexShaderSource, ShaderType.vertex);
-  let fragShader = new GLShader(renderer);
-  fragShader.compileRawShader(fragmentShaderSource, ShaderType.fragment );
 
-
-  let program = new GLProgram(renderer, vertexShader, fragShader,
+  let program = new GLProgram(renderer, 
     {
       attributes: [
-        { name: 'position', stride: 2 },
+        { name: 'position', stride: 3 },
         { name:'vertexColor', stride: 3}
       ],
       uniforms: [
         { name: 'lineColor', type: 'uniform1f' }
-      ]
+      ],
+      vertexShaderString: vertexShaderSource,
+      fragmentShaderString: fragmentShaderSource,
+      autoInjectHeader:false,
     }
   );
 

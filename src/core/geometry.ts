@@ -9,11 +9,14 @@ export class Geometry {
   colors: Array<Vector3> = [];
   faces: Array<TriangleFace> = [];
 
+  // vertices: Float32Array
+  // colors
+
   createTestVertices() {
     return new Float32Array([
-      1, 1,
-      -1, -1,
-      1, 0.5
+      1, 1,0,
+      -1, -1,0,
+      1, 0.5,0,
     ])
   }
 
