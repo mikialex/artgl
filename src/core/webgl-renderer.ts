@@ -1,10 +1,14 @@
 import { GLShader, GLProgramConfig, ShaderType } from "./shader";
+import { GLInfo } from "./webgl/gl-info";
 
 export class GLRenderer {
   constructor(el: HTMLCanvasElement, options?: any) {
     this.gl = el.getContext('webgl', options);
+    this.glInfo = new GLInfo(this);
+    this.glInfo.createAllExtension();
   }
-  gl: WebGLRenderingContext
+  gl: WebGLRenderingContext;
+  glInfo: GLInfo;
 
   program: GLProgram
 

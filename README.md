@@ -1,8 +1,14 @@
 ## About
 
-webgl renderer for learning .
+mordern webgl renderer .
 
-## Design purpose
+## Design Aim
+
+simple
+
+extensible
+
+powerful
 
 ....
 
