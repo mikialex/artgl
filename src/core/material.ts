@@ -1,5 +1,12 @@
+import { generateUUID } from "../math";
+
+const defaultMaterialconfig = {
+
+}
+
 export class Material{
   name: string;
+  uuid = generateUUID();
 
   // uuid = _Math.generateUUID();
 

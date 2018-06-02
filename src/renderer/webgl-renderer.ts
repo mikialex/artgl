@@ -8,12 +8,19 @@ export class GLRenderer {
   constructor(el: HTMLCanvasElement, options?: any) {
     this.gl = el.getContext('webgl', options);
     this.el = el;
+    this.width = this.el.width;
+    this.height = this.el.height;
     this.glInfo = new GLInfo(this);
     this.glInfo.createAllExtension();
   }
   gl: WebGLRenderingContext;
   el: HTMLCanvasElement;
+  width= 100;
+  height = 100;
+  devicePixelRatio = 1;
   glInfo: GLInfo;
+  
+
   renderList: RenderList = new RenderList();
   lightList: LightList = new LightList();
 
@@ -21,6 +28,10 @@ export class GLRenderer {
 
   render() {
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 3);
+  }
+
+  resize() {
+    
   }
 
   clear() {
