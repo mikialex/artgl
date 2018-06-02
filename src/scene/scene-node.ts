@@ -12,10 +12,10 @@ export class SceneNode {
   scale = new Vector3(1, 1, 1);
 
   parent: SceneNode = null;
-  children: Array<SceneNode> = [];
+  children: SceneNode[] = [];
 
   object: RenderObject;
-  attribute: {};
+  property: {};
 
   // objToWorldMatrix: Matrix
 
@@ -28,7 +28,7 @@ export class SceneNode {
     this.children.push(obj);
   }
 
-  removeChildren(obj: SceneNode) {
+  removeChild(obj: SceneNode) {
     let index = this.children.indexOf(obj);
     if (index !== - 1) {
       obj.parent = null;

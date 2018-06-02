@@ -25,7 +25,7 @@ export class SphereGeometry extends Geometry {
   thetaLength = Math.PI * 2;
   thetaEnd: number;
 
-  createVerticesBuffer() {
+  populate() {
     console.log(this);
     let ix, iy;
     let index = 0;

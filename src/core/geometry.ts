@@ -1,40 +1,49 @@
 import { Vector3, TriangleFace } from "../math";
+import { Attribute, AttributeType } from "./attribute";
+
+type GeometryParameterValueType = 'number' | 'boolean'
+
+interface GeometryParameterDescriptor{
+  name: string;
+  type: GeometryParameterValueType;
+}
+
+interface GeometryConfig{
+  name: string;
+  parameters: GeometryParameterDescriptor[];
+
+}
+
+export class GeometryFactory {
+
+  createGeometry(config: GeometryConfig) {
+    // return function () {
+    //   this.type = 'BoxBufferGeometry';
+    // }
+  }
+}
+
 
 export class Geometry {
   constructor() {
-    
   }
-  vertices: Array<Vector3> = [];
-  colors: Array<Vector3> = [];
-  faces: Array<TriangleFace> = [];
+  position: Attribute;
+  normal: Attribute;
+  uv: Attribute;
 
-  // vertices: Float32Array
-  // colors
+  needUpdate: boolean = true;
+  parameters: any;
 
-  createTestVertices() {
-    return new Float32Array([
-      1, 1,0,
-      -1, -1,0,
-      1, 0.5,0,
-    ])
-  }
-
-  createTestVerticesColors() {
-    return new Float32Array([
-      0.5, 0.2, 0.1,
-      0.1, 0.1,1,
-      1, 0.5,1,
-    ])
-  }
-
-  createVerticesBuffer() {
-    let tempVertices: Array<number> = [];
-    this.vertices.forEach(vertex => {
-      tempVertices.push(vertex.x);
-      tempVertices.push(vertex.y);
-      tempVertices.push(vertex.z);
-    })
-    return new Float32Array(tempVertices);
+  /**
+   * creat or update the geometry's data
+   * 
+   * @memberof Geometry
+   */
+  populate() {
+    this.position = new Attribute(AttributeType.float32, 3, 0);
+    this.normal = new Attribute(AttributeType.float32, 3, 0);
+    this.uv = new Attribute(AttributeType.float32, 3, 0);
+    this.needUpdate = false;
   }
 
   dispose() {

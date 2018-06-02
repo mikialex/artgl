@@ -3,5 +3,8 @@ export class Camera{
     
   }
 
+  getMVP() {
+    
+  }
   
 }
