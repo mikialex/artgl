@@ -1,4 +1,4 @@
-import { Vector3 } from "../math";
+import { Vector3, Matrix4 } from "../math";
 import { RenderObject } from "../core/render-object";
 import { Scene } from "./scene";
 
@@ -16,6 +16,9 @@ export class SceneNode {
 
   object: RenderObject;
   property: {};
+
+  isMatrixNeedUpdate = false;
+  matrix = new Matrix4();
 
   // objToWorldMatrix: Matrix
 
