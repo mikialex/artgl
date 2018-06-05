@@ -3,6 +3,13 @@ export enum AttributeType{
   int32
 }
 
+export enum AttributeUsage{
+  position,
+  normal,
+  color,
+  uv
+}
+
 export class Attribute{
   constructor(type: AttributeType, stride: number, size:number) {
     this.data = new Float32Array(size);

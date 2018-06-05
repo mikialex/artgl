@@ -1,39 +1,56 @@
 import { Vector3, TriangleFace } from "../math";
-import { Attribute, AttributeType } from "./attribute";
+import { Attribute, AttributeType, AttributeUsage } from "./attribute";
 
 type GeometryParameterValueType = 'number' | 'boolean'
 
-interface GeometryParameterDescriptor{
-  name: string;
-  type: GeometryParameterValueType;
+// interface GeometryParameterDescriptor{
+//   name: string;
+//   type: GeometryParameterValueType;
+// }
+
+// interface GeometryConfig{
+//   name: string;
+//   parameters: GeometryParameterDescriptor[];
+
+// }
+
+// export class GeometryFactory {
+
+//   createGeometry(config: GeometryConfig) {
+//     // return function () {
+//     //   this.type = 'BoxBufferGeometry';
+//     // }
+//   }
+// }
+
+export interface AttributesConfig{
+  attributeList: { usage: AttributeUsage}[]
 }
 
-interface GeometryConfig{
-  name: string;
-  parameters: GeometryParameterDescriptor[];
+export class Geometry {
+  constructor(conf) {
+    this.attributesConfig = conf;
+    this.attributesConfig.attributeList.forEach(attConf => {
+      switch (attConf.usage) {
+        case AttributeUsage.position:
+          this.attributes.position = new Attribute(AttributeType.float32, 3, 0);
+          break;
 
-}
+        case AttributeUsage.normal:
+          this.attributes.normal = new Attribute(AttributeType.float32, 3, 0);
+          break;
+        
+        case AttributeUsage.uv:
+          this.attributes.uv = new Attribute(AttributeType.float32, 3, 0);
+          break;
 
-export class GeometryFactory {
-
-  createGeometry(config: GeometryConfig) {
-    // return function () {
-    //   this.type = 'BoxBufferGeometry';
-    // }
+        default:
+          break;
+      }
+    })
   }
-}
-
-
-export abstract class Geometry {
-  constructor() {
-    this.position = new Attribute(AttributeType.float32, 3, 0);
-    this.normal = new Attribute(AttributeType.float32, 3, 0);
-    this.uv = new Attribute(AttributeType.float32, 3, 0);
-    this.needUpdate = false;
-  }
-  position: Attribute;
-  normal: Attribute;
-  uv: Attribute;
+  attributesConfig: AttributesConfig
+  attributes:any = {};
 
   needUpdate: boolean = true;
   parameters: any;
@@ -43,10 +60,14 @@ export abstract class Geometry {
    * 
    * @memberof Geometry
    */
-  abstract populate();
+  populate() {
+
+  }
 
   dispose() {
-    
+
   }
+
+
 }
 

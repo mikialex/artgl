@@ -1,16 +1,22 @@
 import { Geometry } from "../core/geometry";
-import { Attribute, AttributeType } from "../core/attribute";
+import { Attribute, AttributeType, AttributeUsage } from "../core/attribute";
+
+const TestGeometryConfig = {
+  attributeList: [{
+    type: AttributeUsage.position
+  }]
+}
 
 export class TestGeometry extends Geometry {
   constructor() {
-    super(); 
+    super(TestGeometryConfig); 
   }
 
   populate() {
-    this.position.setData(new Float32Array(
+    this.attributes.position.setData(new Float32Array(
       [0, 0, 0,
         1, 0, 0,
-      1,1,0]
+        1,1,0]
     ))
   }
 
