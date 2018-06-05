@@ -24,8 +24,12 @@ export class GeometryFactory {
 }
 
 
-export class Geometry {
+export abstract class Geometry {
   constructor() {
+    this.position = new Attribute(AttributeType.float32, 3, 0);
+    this.normal = new Attribute(AttributeType.float32, 3, 0);
+    this.uv = new Attribute(AttributeType.float32, 3, 0);
+    this.needUpdate = false;
   }
   position: Attribute;
   normal: Attribute;
@@ -39,12 +43,7 @@ export class Geometry {
    * 
    * @memberof Geometry
    */
-  populate() {
-    this.position = new Attribute(AttributeType.float32, 3, 0);
-    this.normal = new Attribute(AttributeType.float32, 3, 0);
-    this.uv = new Attribute(AttributeType.float32, 3, 0);
-    this.needUpdate = false;
-  }
+  abstract populate();
 
   dispose() {
     

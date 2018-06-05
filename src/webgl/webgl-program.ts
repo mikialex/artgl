@@ -1,5 +1,6 @@
 import { GLRenderer } from "../renderer/webgl-renderer";
 import { GLShader, ShaderType } from "../webgl/shader";
+import { generateUUID } from "../math";
 
 export interface AttributeDescriptor {
   name: string,
@@ -23,12 +24,14 @@ export interface GLProgramConfig {
 export class GLProgram {
   constructor(renderer: GLRenderer, config: GLProgramConfig) {
     this.renderer = renderer;
-    renderer.program = this;
+    this.id = generateUUID();
     this.createShaders(config);
     this.createProgram(this.vertexShader, this.fragmentShader);
     this.populateDataSlot(config);
     this.config = config;
+    renderer.addProgram(this);
   }
+  id: number;
   private renderer: GLRenderer;
   private program: WebGLProgram;
   private config: GLProgramConfig;

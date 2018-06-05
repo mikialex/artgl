@@ -1,9 +1,9 @@
 import { GLRenderer } from "./renderer/webgl-renderer";
-import { Geometry } from "./core/geometry";
 import { SceneNode } from "./scene/scene-node";
 import { SphereGeometry } from "./geometry/sphere-geometry";
 import { ShaderType, GLShader } from "./webgl/shader";
 import { GLProgram } from "./webgl/webgl-program";
+import { TestGeometry } from "./geometry/test-geometery";
 
 window.onload = function(){
 
@@ -51,13 +51,14 @@ window.onload = function(){
 
 
 
-  let testGeo = new Geometry();
+  let testGeo = new TestGeometry();
 
   program.setAttribute('position', testGeo.createTestVertices());
   program.setAttribute('vertexColor', testGeo.createTestVerticesColors());
 
   program.setUniform('lineColor', 0.8);
 
+  renderer.useProgram(program);
   renderer.render();
   // renderer.clear();
 

@@ -15,23 +15,31 @@ export class GLRenderer {
   }
   gl: WebGLRenderingContext;
   el: HTMLCanvasElement;
-  width= 100;
-  height = 100;
+
   devicePixelRatio = 1;
   glInfo: GLInfo;
-  
 
   renderList: RenderList = new RenderList();
   lightList: LightList = new LightList();
 
-  program: GLProgram
+  private width = 100;
+  private height = 100;
+  resize(width: number, height: number) {
+    this.width = width;
+    this.height = height;
+  }
+
+  private activeProgram: GLProgram;
+  private programs: GLProgram[];
+  addProgram(program: GLProgram) {
+    this.programs.push(program);
+  }
+  useProgram(program: GLProgram) {
+    this.activeProgram = program;
+  }
 
   render() {
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 3);
-  }
-
-  resize() {
-    
   }
 
   clear() {
