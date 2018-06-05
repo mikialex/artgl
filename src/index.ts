@@ -11,10 +11,9 @@ window.onload = function(){
     `
     varying vec4 color;
     attribute vec4 position;
-    attribute vec4 vertexColor;
     void main() {
       gl_Position = position;
-      color = vertexColor;
+      color = vec4(0,1,0,1);
     }
     ` ;
   
@@ -38,11 +37,11 @@ window.onload = function(){
     {
       attributes: [
         { name: 'position', stride: 3 },
-        { name:'vertexColor', stride: 3}
       ],
       uniforms: [
         { name: 'lineColor', type: 'uniform1f' }
       ],
+      usageMap:{position:'position'},
       vertexShaderString: vertexShaderSource,
       fragmentShaderString: fragmentShaderSource,
       autoInjectHeader:false,
@@ -53,8 +52,7 @@ window.onload = function(){
 
   let testGeo = new TestGeometry();
 
-  program.setAttribute('position', testGeo.createTestVertices());
-  program.setAttribute('vertexColor', testGeo.createTestVerticesColors());
+  program.setGeometryData(testGeo);
 
   program.setUniform('lineColor', 0.8);
 

@@ -28,7 +28,7 @@ export interface AttributesConfig{
 }
 
 export class Geometry {
-  constructor(conf) {
+  constructor(conf: AttributesConfig) {
     this.attributesConfig = conf;
     this.attributesConfig.attributeList.forEach(attConf => {
       switch (attConf.usage) {

@@ -4,18 +4,18 @@ import { Vector3 } from '../math';
 
 
 export class SphereGeometry extends Geometry {
-  constructor(radius?: number, widthSegments?: number, heightSegments?: number,
-    phiStart?: number, phiLength?: number, thetaStart?: number, thetaLength?: number) {
-    super();
-    this.radius = radius !== undefined ? radius : 1;
-    this.widthSegments = Math.max(3, Math.floor(widthSegments) || 8);
-    this.heightSegments = Math.max(2, Math.floor(heightSegments) || 6);
-    this.phiStart = phiStart !== undefined ? phiStart : 0;
-    this.phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
-    this.thetaStart = thetaStart !== undefined ? thetaStart : 0;
-    this.thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
-    this.thetaEnd = this.thetaStart + this.thetaLength;
-  }
+  // constructor(radius?: number, widthSegments?: number, heightSegments?: number,
+  //   phiStart?: number, phiLength?: number, thetaStart?: number, thetaLength?: number) {
+  //   super();
+  //   this.radius = radius !== undefined ? radius : 1;
+  //   this.widthSegments = Math.max(3, Math.floor(widthSegments) || 8);
+  //   this.heightSegments = Math.max(2, Math.floor(heightSegments) || 6);
+  //   this.phiStart = phiStart !== undefined ? phiStart : 0;
+  //   this.phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
+  //   this.thetaStart = thetaStart !== undefined ? thetaStart : 0;
+  //   this.thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
+  //   this.thetaEnd = this.thetaStart + this.thetaLength;
+  // }
   radius = 1;
   widthSegments = 10;
   heightSegments = 10;

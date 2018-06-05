@@ -19,7 +19,7 @@ export class Attribute{
       throw 'size dont match stride'
     }
   }
-  private data: any;
+  data: any;
   count: number = 0;
   stride: number = 1;
 

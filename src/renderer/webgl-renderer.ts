@@ -30,7 +30,7 @@ export class GLRenderer {
   }
 
   private activeProgram: GLProgram;
-  private programs: GLProgram[];
+  private programs: GLProgram[] = [];
   addProgram(program: GLProgram) {
     this.programs.push(program);
   }

@@ -9,15 +9,15 @@ interface CubeGeometryParam {
   depthSegments: number,
 }
 export class CubeGeometry extends Geometry {
-  constructor(width?: number, height?: number, depth?: number) {
-    super();
-    if (width !== undefined) { this.parameters.width = width; }
-    if (height !== undefined) { this.parameters.height = height; }
-    if (depth !== undefined) { this.parameters.depth = depth; }
-    if (width !== undefined) { this.parameters.width = width; }
-    if (height !== undefined) { this.parameters.height = height; }
-    if (depth !== undefined) { this.parameters.depth = depth; }
-  }
+  // constructor(width?: number, height?: number, depth?: number) {
+  //   super();
+  //   if (width !== undefined) { this.parameters.width = width; }
+  //   if (height !== undefined) { this.parameters.height = height; }
+  //   if (depth !== undefined) { this.parameters.depth = depth; }
+  //   if (width !== undefined) { this.parameters.width = width; }
+  //   if (height !== undefined) { this.parameters.height = height; }
+  //   if (depth !== undefined) { this.parameters.depth = depth; }
+  // }
 
   parameters: CubeGeometryParam = {
     width: 1,

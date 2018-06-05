@@ -1,10 +1,12 @@
 import { GLRenderer } from "../renderer/webgl-renderer";
 import { GLShader, ShaderType } from "../webgl/shader";
 import { generateUUID } from "../math";
+import { Geometry } from "../core/geometry";
+import { AttributeUsage } from "../core/attribute";
 
 export interface AttributeDescriptor {
   name: string,
-  stride: number
+  stride: number,
 }
 
 export interface UniformDescriptor {
@@ -15,6 +17,7 @@ export interface UniformDescriptor {
 export interface GLProgramConfig {
   attributes: AttributeDescriptor[];
   uniforms: UniformDescriptor[];
+  usageMap?: { [index: string]: string}
   vertexShaderString: string;
   fragmentShaderString: string;
   autoInjectHeader: boolean
@@ -93,6 +96,31 @@ export class GLProgram {
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
     gl.vertexAttribPointer(position, conf.discriptor.stride, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(position);
+  }
+
+  setGeometryData(geometry: Geometry) {
+    const map = this.config.usageMap;
+    if (!map) {
+      throw 'cant use geometry data on a program that not set usageMap'
+    }
+    geometry.attributesConfig.attributeList.forEach(att => {
+      switch (att.usage) {
+        case AttributeUsage.position:
+          this.setAttribute(map.position, geometry.attributes.position.data);  
+          break;
+
+        case AttributeUsage.normal:
+          this.setAttribute(map.normal, geometry.attributes.normal.data);  
+          break;
+
+        case AttributeUsage.uv:
+          this.setAttribute(map.uv, geometry.attributes.uv.data);  
+          break;
+
+        default:
+          break;
+      }
+    });
   }
 
   setUniform(name: string, data: any) {
