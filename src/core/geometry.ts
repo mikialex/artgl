@@ -3,28 +3,33 @@ import { Attribute, AttributeType, AttributeUsage } from "./attribute";
 
 type GeometryParameterValueType = 'number' | 'boolean'
 
-// interface GeometryParameterDescriptor{
-//   name: string;
-//   type: GeometryParameterValueType;
-// }
 
-// interface GeometryConfig{
-//   name: string;
-//   parameters: GeometryParameterDescriptor[];
+export const StandradAttributeConfig = [
+  {
+    usage: AttributeUsage.position,
+    stride: 3
+  },
+  {
+    usage: AttributeUsage.normal,
+    stride: 3
+  },
+  {
+    usage: AttributeUsage.color,
+    stride: 3
+  },
+  {
+    usage: AttributeUsage.uv,
+    stride: 2
+  },
+]
 
-// }
-
-// export class GeometryFactory {
-
-//   createGeometry(config: GeometryConfig) {
-//     // return function () {
-//     //   this.type = 'BoxBufferGeometry';
-//     // }
-//   }
-// }
+export interface AttributeListItem{
+  usage: AttributeUsage,
+  stride: number
+}
 
 export interface AttributesConfig{
-  attributeList: { usage: AttributeUsage}[]
+  attributeList: AttributeListItem[]
 }
 
 export class Geometry {
@@ -33,15 +38,19 @@ export class Geometry {
     this.attributesConfig.attributeList.forEach(attConf => {
       switch (attConf.usage) {
         case AttributeUsage.position:
-          this.attributes.position = new Attribute(AttributeType.float32, 3, 0);
+          this.attributes.position = new Attribute(AttributeType.float, attConf.stride, 0);
           break;
 
         case AttributeUsage.normal:
-          this.attributes.normal = new Attribute(AttributeType.float32, 3, 0);
+          this.attributes.normal = new Attribute(AttributeType.float, attConf.stride, 0);
+          break;
+        
+        case AttributeUsage.color:
+          this.attributes.color = new Attribute(AttributeType.float, attConf.stride, 0);
           break;
         
         case AttributeUsage.uv:
-          this.attributes.uv = new Attribute(AttributeType.float32, 3, 0);
+          this.attributes.uv = new Attribute(AttributeType.float, attConf.stride, 0);
           break;
 
         default:

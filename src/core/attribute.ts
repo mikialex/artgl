@@ -1,9 +1,9 @@
-export enum AttributeType{
-  float32,
-  int32
+export const enum AttributeType{
+  float,
+  int
 }
 
-export enum AttributeUsage{
+export const enum AttributeUsage{
   position,
   normal,
   color,
