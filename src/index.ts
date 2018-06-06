@@ -9,8 +9,6 @@ window.onload = function(){
 
   var vertexShaderSource =
     `
-    varying vec4 color;
-    attribute vec4 position;
     void main() {
       gl_Position = position;
       color = vec4(0,1,0,1);
@@ -19,9 +17,6 @@ window.onload = function(){
   
   var fragmentShaderSource =
     `
-    precision mediump float;
-    uniform float lineColor;
-    varying vec4 color;
     float blue = lineColor * 0.2;
     void main() {
       gl_FragColor = color * lineColor;
@@ -41,10 +36,13 @@ window.onload = function(){
       uniforms: [
         { name: 'lineColor', type: 'uniform1f' }
       ],
+      varyings: [
+        { name: 'color', type: 'vec4'}
+      ],
       usageMap:{position:'position'},
       vertexShaderString: vertexShaderSource,
       fragmentShaderString: fragmentShaderSource,
-      autoInjectHeader:false,
+      autoInjectHeader:true,
     }
   );
 

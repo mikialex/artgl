@@ -3,6 +3,7 @@ import { GLShader, ShaderType } from "../webgl/shader";
 import { generateUUID } from "../math";
 import { Geometry } from "../core/geometry";
 import { AttributeUsage } from "../core/attribute";
+import { injectVertexShaderHeaders, injectFragmentShaderHeaders } from "./shader-util";
 
 export interface AttributeDescriptor {
   name: string,
@@ -14,20 +15,33 @@ export interface UniformDescriptor {
   type: string
 }
 
+export interface VaryingDescriptor {
+  name: string,
+  type: string
+}
+
 export interface GLProgramConfig {
   attributes: AttributeDescriptor[];
-  uniforms: UniformDescriptor[];
+  uniforms?: UniformDescriptor[];
+  varyings?: VaryingDescriptor[];
   usageMap?: { [index: string]: string}
   vertexShaderString: string;
   fragmentShaderString: string;
   autoInjectHeader: boolean
 }
 
-
 export class GLProgram {
   constructor(renderer: GLRenderer, config: GLProgramConfig) {
     this.renderer = renderer;
     this.id = generateUUID();
+    console.log(this);
+    if (config.autoInjectHeader) {
+      config.vertexShaderString = injectVertexShaderHeaders(config, config.vertexShaderString);
+      config.fragmentShaderString = injectFragmentShaderHeaders(config, config.fragmentShaderString);
+    }
+    console.log(config.vertexShaderString);
+    console.log(config.fragmentShaderString);
+
     this.createShaders(config);
     this.createProgram(this.vertexShader, this.fragmentShader);
     this.populateDataSlot(config);
