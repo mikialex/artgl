@@ -58,8 +58,10 @@ export class Geometry {
       }
     })
   }
-  attributesConfig: AttributesConfig
-  attributes:any = {};
+  attributesConfig: AttributesConfig;
+  attributes: any = {};
+  drawFrom = 0;
+  drawCount = 0;
 
   needUpdate: boolean = true;
   parameters: any;

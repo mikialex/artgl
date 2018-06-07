@@ -1,6 +1,8 @@
 var path = require('path');
 var webpack = require('webpack');
 var HtmlwebpackPlugin = require('html-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 
 var ROOT_PATH = path.resolve(__dirname);
 var APP_PATH = path.resolve(ROOT_PATH, 'src');
@@ -18,7 +20,8 @@ module.exports = {
   devtool: 'eval-source-map',
   devServer: {
     // contentBase: path.resolve(__dirname, 'dist'),    
-    hot: true
+    hot: true,
+    quiet: true,
   },
   output: {
     filename: '[name].bundle.js',
@@ -68,6 +71,10 @@ module.exports = {
       inject: 'head'
     }),
     new webpack.NamedModulesPlugin(),
-    new webpack.HotModuleReplacementPlugin()
+    new webpack.HotModuleReplacementPlugin(),
+    new BundleAnalyzerPlugin({
+      openAnalyzer: false,
+    }),
+    new FriendlyErrorsWebpackPlugin()
   ]
 };

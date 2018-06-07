@@ -39,7 +39,7 @@ export class GLRenderer {
   }
 
   render() {
-    this.gl.drawArrays(this.gl.TRIANGLES, 0, 3);
+    this.gl.drawArrays(this.gl.TRIANGLES, this.activeProgram.drawFrom, this.activeProgram.drawCount);
   }
 
   clear() {

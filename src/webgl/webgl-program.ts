@@ -56,6 +56,8 @@ export class GLProgram {
   private uniforms = {};
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
+  drawFrom: number;
+  drawCount: number;
 
   private createShaders(conf: GLProgramConfig) {
     this.vertexShader = new GLShader(this.renderer);
@@ -117,6 +119,8 @@ export class GLProgram {
     if (!map) {
       throw 'cant use geometry data on a program that not set usageMap'
     }
+    this.drawCount = geometry.drawCount;
+    this.drawFrom = geometry.drawFrom;
     geometry.attributesConfig.attributeList.forEach(att => {
       switch (att.usage) {
         case AttributeUsage.position:
@@ -135,6 +139,11 @@ export class GLProgram {
           break;
       }
     });
+  }
+
+  setDrawCount(start:number, count:number) {
+    this.drawFrom = start;
+    this.drawCount = count;
   }
 
   setUniform(name: string, data: any) {
