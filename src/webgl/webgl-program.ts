@@ -8,6 +8,7 @@ import { injectVertexShaderHeaders, injectFragmentShaderHeaders } from "./shader
 export interface AttributeDescriptor {
   name: string,
   stride: number,
+  usage?: AttributeUsage
 }
 
 export interface UniformDescriptor {
@@ -24,7 +25,6 @@ export interface GLProgramConfig {
   attributes: AttributeDescriptor[];
   uniforms?: UniformDescriptor[];
   varyings?: VaryingDescriptor[];
-  usageMap?: { [index: string]: string}
   vertexShaderString: string;
   fragmentShaderString: string;
   autoInjectHeader: boolean
@@ -47,6 +47,12 @@ export class GLProgram {
     this.populateDataSlot(config);
     this.config = config;
     renderer.addProgram(this);
+
+    config.attributes.forEach(att => {
+      if (att.usage !== undefined) {
+        this.attributeMap[att.usage] = att.name;
+      }
+    });
   }
   id: number;
   private renderer: GLRenderer;
@@ -56,6 +62,7 @@ export class GLProgram {
   private uniforms = {};
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
+  private attributeMap = {};
   drawFrom: number;
   drawCount: number;
 
@@ -115,24 +122,23 @@ export class GLProgram {
   }
 
   setGeometryData(geometry: Geometry) {
-    const map = this.config.usageMap;
-    if (!map) {
-      throw 'cant use geometry data on a program that not set usageMap'
-    }
     this.drawCount = geometry.drawCount;
     this.drawFrom = geometry.drawFrom;
     geometry.attributesConfig.attributeList.forEach(att => {
       switch (att.usage) {
         case AttributeUsage.position:
-          this.setAttribute(map.position, geometry.attributes.position.data);  
+          this.setAttribute(this.attributeMap[AttributeUsage.position],
+            geometry.attributes.position.data);  
           break;
 
         case AttributeUsage.normal:
-          this.setAttribute(map.normal, geometry.attributes.normal.data);  
+          this.setAttribute(this.attributeMap[AttributeUsage.position],
+            geometry.attributes.normal.data);  
           break;
 
         case AttributeUsage.uv:
-          this.setAttribute(map.uv, geometry.attributes.uv.data);  
+          this.setAttribute(this.attributeMap[AttributeUsage.position],
+            geometry.attributes.uv.data);  
           break;
 
         default:
@@ -141,7 +147,7 @@ export class GLProgram {
     });
   }
 
-  setDrawCount(start:number, count:number) {
+  setDrawRange(start:number, count:number) {
     this.drawFrom = start;
     this.drawCount = count;
   }

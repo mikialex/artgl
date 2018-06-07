@@ -8,6 +8,14 @@ export class Material{
   name: string;
   uuid = generateUUID();
 
+  createProgram() {
+    
+  }
+
+  dispose() {
+
+  }
+
   // uuid = _Math.generateUUID();
 
   // fog = true;

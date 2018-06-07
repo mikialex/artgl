@@ -4,6 +4,7 @@ import { SphereGeometry } from "./geometry/sphere-geometry";
 import { ShaderType, GLShader } from "./webgl/shader";
 import { GLProgram } from "./webgl/webgl-program";
 import { TestGeometry } from "./geometry/test-geometery";
+import { AttributeUsage } from "./core/attribute";
 
 window.onload = function(){
 
@@ -11,7 +12,7 @@ window.onload = function(){
     `
     void main() {
       gl_Position = position;
-      color = vec4(0,1,0,1);
+      color = vec4(0.5,0.5,0.5,1);
     }
     ` ;
   
@@ -31,7 +32,7 @@ window.onload = function(){
   let program = new GLProgram(renderer, 
     {
       attributes: [
-        { name: 'position', stride: 3 },
+        { name: 'position', stride: 3, usage: AttributeUsage.position},
       ],
       uniforms: [
         { name: 'lineColor', type: 'uniform1f' }
@@ -39,7 +40,6 @@ window.onload = function(){
       varyings: [
         { name: 'color', type: 'vec4'}
       ],
-      usageMap:{position:'position'},
       vertexShaderString: vertexShaderSource,
       fragmentShaderString: fragmentShaderSource,
       autoInjectHeader:true,
@@ -52,11 +52,22 @@ window.onload = function(){
 
   program.setGeometryData(testGeo);
 
-  program.setUniform('lineColor', 0.8);
+  program.setUniform('lineColor', 0.1);
 
   renderer.useProgram(program);
   renderer.render();
   // renderer.clear();
 
+
+  window.requestAnimationFrame(tick);
+  let frame = 0;
+  function tick() {
+    frame++;
+    program.setUniform('lineColor', Math.sin(frame/10));
+    renderer.render();
+    window.requestAnimationFrame(tick);
+  }
+
 }
+
   
