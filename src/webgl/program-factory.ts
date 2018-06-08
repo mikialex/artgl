@@ -1,9 +1,11 @@
+import { AttributeUsage } from "../core/attribute";
+
 function generateStandradProgramConfig() {
   return {
     attributes: [
-      { name: 'position', stride: 3 },
-      { name: 'normal', stride: 3 },
-      { name: 'uv', stride: 2 },
+      { name: 'position', stride: 3 , usage:AttributeUsage.position},
+      { name: 'normal', stride: 3, usage: AttributeUsage.normal},
+      { name: 'uv', stride: 2, usage: AttributeUsage.uv},
     ],
     uniforms: [
       { name: 'matrix', type: 'uniform1f' }
@@ -11,10 +13,6 @@ function generateStandradProgramConfig() {
     varyings: [
       { name: 'color', type: 'vec4' }
     ],
-    usageMap: {
-      position: 'position',
-      normal: 'normal'
-    },
     vertexShaderString:
       `
           void main() {

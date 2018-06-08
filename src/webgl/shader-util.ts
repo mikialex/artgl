@@ -1,5 +1,19 @@
 import { GLProgramConfig } from "./webgl-program";
 
+export const enum GLDataType{
+  float,
+  floatVec2,
+  floatVec3,
+  floatVec4,
+  int,
+  intVec2,
+  intVec3,
+  intVec4,
+  Mat2,
+  Mat3,
+  Mat4
+}
+
 export function injectVertexShaderHeaders(config: GLProgramConfig, shaderText: string) {
   let injectText = '';
   injectText += generateAttributeString(config);

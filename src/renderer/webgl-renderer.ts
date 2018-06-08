@@ -1,8 +1,23 @@
-import { GLShader, ShaderType } from "../webgl/shader";
 import { GLInfo } from "../webgl/gl-info";
-import { RenderList } from "./render-list";
 import { GLProgram } from "../webgl/webgl-program";
-import { LightList } from "./light-list";
+import { Matrix4, Vector3 } from "../math";
+import { Attribute } from "../core/attribute";
+
+type unifromValue = number | Matrix4 | Vector3;
+
+export interface UniformGroup{
+  [index: string]: unifromValue;
+}
+
+export interface AttributesGroup {
+  [index: string]: Attribute;
+}
+
+export interface GLRenderable{
+  uniforms: UniformGroup;
+  attributs: AttributesGroup;
+  program: GLProgram;
+}
 
 export class GLRenderer {
   constructor(el: HTMLCanvasElement, options?: any) {
@@ -17,10 +32,8 @@ export class GLRenderer {
   el: HTMLCanvasElement;
 
   devicePixelRatio = 1;
+  projectionMatrix = new Matrix4();
   glInfo: GLInfo;
-
-  renderList: RenderList = new RenderList();
-  lightList: LightList = new LightList();
 
   private width = 100;
   private height = 100;

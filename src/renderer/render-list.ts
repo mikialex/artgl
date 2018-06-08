@@ -1,3 +1,12 @@
+import { Geometry } from "../core/geometry";
+import { Material } from "../core/material";
+import { RenderObject } from "../core/render-object";
+
+export interface RenderListItem{
+  // transform:
+  object: RenderObject,
+}
+
 export class RenderList{
   constructor() {
     

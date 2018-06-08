@@ -132,12 +132,12 @@ export class GLProgram {
           break;
 
         case AttributeUsage.normal:
-          this.setAttribute(this.attributeMap[AttributeUsage.position],
+          this.setAttribute(this.attributeMap[AttributeUsage.normal],
             geometry.attributes.normal.data);  
           break;
 
         case AttributeUsage.uv:
-          this.setAttribute(this.attributeMap[AttributeUsage.position],
+          this.setAttribute(this.attributeMap[AttributeUsage.uv],
             geometry.attributes.uv.data);  
           break;
 

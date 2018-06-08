@@ -1,7 +1,11 @@
 import { Vector3, Matrix4, MathUtil} from "../math";
 
 export class PerspectiveCamera {
-  
+  constructor(near?: number, far?: number,
+    fov?: number, aspect?: number, zoom?:number) {
+    
+  }
+
   near: number;
   far: number;
 
