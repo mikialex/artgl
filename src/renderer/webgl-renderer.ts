@@ -3,10 +3,10 @@ import { GLProgram } from "../webgl/webgl-program";
 import { Matrix4, Vector3 } from "../math";
 import { Attribute } from "../core/attribute";
 
-type unifromValue = number | Matrix4 | Vector3;
+type uniformValueType = number | Matrix4 | Vector3;
 
 export interface UniformGroup{
-  [index: string]: unifromValue;
+  [index: string]: uniformValueType;
 }
 
 export interface AttributesGroup {
@@ -27,6 +27,7 @@ export class GLRenderer {
     this.height = this.el.height;
     this.glInfo = new GLInfo(this);
     this.glInfo.createAllExtension();
+    this.devicePixelRatio = window.devicePixelRatio;
   }
   gl: WebGLRenderingContext;
   el: HTMLCanvasElement;

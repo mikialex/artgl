@@ -28,12 +28,12 @@ export interface AttributeListItem{
   stride: number
 }
 
-export interface AttributesConfig{
+export interface GeometryConfig{
   attributeList: AttributeListItem[]
 }
 
 export class Geometry {
-  constructor(conf: AttributesConfig) {
+  constructor(conf: GeometryConfig) {
     this.attributesConfig = conf;
     this.attributesConfig.attributeList.forEach(attConf => {
       switch (attConf.usage) {
@@ -58,7 +58,7 @@ export class Geometry {
       }
     })
   }
-  attributesConfig: AttributesConfig;
+  attributesConfig: GeometryConfig;
   attributes: any = {};
   drawFrom = 0;
   drawCount = 0;

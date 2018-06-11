@@ -1,6 +1,6 @@
 import { AttributeUsage } from "../core/attribute";
 
-function generateStandradProgramConfig() {
+export function generateStandradProgramConfig() {
   return {
     attributes: [
       { name: 'position', stride: 3 , usage:AttributeUsage.position},
@@ -10,21 +10,17 @@ function generateStandradProgramConfig() {
     uniforms: [
       { name: 'matrix', type: 'uniform1f' }
     ],
-    varyings: [
-      { name: 'color', type: 'vec4' }
-    ],
+    varyings: [],
     vertexShaderString:
       `
           void main() {
             gl_Position = position;
-            color = vec4(0.5,0.5,0.5,1);
           }
         `,
     fragmentShaderString:
       `
-          float blue = lineColor * 0.2;
           void main() {
-            gl_FragColor = color * lineColor;
+            gl_FragColor = vec4(0.5,0.5,0.5,1);
           }
         `
     ,

@@ -1,4 +1,4 @@
-import { Geometry } from "../core/geometry";
+import { Geometry } from "../../core/geometry";
 
 interface CubeGeometryParam {
   width: number,

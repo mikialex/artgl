@@ -1,6 +1,8 @@
-import { GLRenderer } from "./renderer/webgl-renderer";
-import { GLProgram } from "./webgl/webgl-program";
-import { TestGeometry } from "./geometry/test-geometery";
+# lowest level usage demo
+
+create a program, set attributes, uniforms, draw it.
+
+```ts
 
 var vertexShaderSource =
   `
@@ -26,7 +28,6 @@ var fragmentShaderSource =
 
 let canv = document.querySelector('canvas');
 let renderer = new GLRenderer(canv);
-console.log(renderer);
 
 
 let program = new GLProgram(renderer,
@@ -53,6 +54,4 @@ program.setUniform('lineColor', 0.8);
 renderer.useProgram(program);
 renderer.render();
 
-
-/// lowest level usage demo
-// create a program, set attributes, uniforms, draw.
+```
