@@ -33,11 +33,11 @@ let renderer = new GLRenderer(canv);
 let program = new GLProgram(renderer,
   {
     attributes: [
-      { name: 'position', stride: 3 },
-      { name: 'vertexColor', stride: 3 }
+      { name: 'position', stride: 3 , type: GLDataType.floatVec3 },
+      { name: 'vertexColor', stride: 3, type: GLDataType.floatVec3 }
     ],
     uniforms: [
-      { name: 'lineColor', type: 'uniform1f' }
+      { name: 'lineColor', type: GLDataType.float }
     ],
     vertexShaderString: vertexShaderSource,
     fragmentShaderString: fragmentShaderSource,

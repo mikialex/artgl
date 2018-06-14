@@ -23,14 +23,33 @@ const shaderStringMap: { [index: string]: GLDataType } = {
   'mat3': GLDataType.Mat3,
   'mat4': GLDataType.Mat4,
 }
-
 let reverseShaderStringMap: { [index: number]: string };
 Object.keys(shaderStringMap).forEach(key => {
   reverseShaderStringMap[shaderStringMap[key]] = key
 })
 
+const shaderAttributStringInfo: { [index: string]: { type: GLDataType, stride: number} } = {
+  'float': { type: GLDataType.float, stride: 1 },
+  'vec2': { type: GLDataType.floatVec2, stride: 2 },
+  'vec3': { type: GLDataType.floatVec3, stride: 3 },
+  'vec4': { type: GLDataType.floatVec4, stride: 4 },
+}
+let reverseShaderAttributStringInfo: { [index: number]: { name: string, stride: number } };
+Object.keys(shaderAttributStringInfo).forEach(key => {
+  reverseShaderAttributStringInfo[shaderAttributStringInfo[key].type] =
+    { name: key, stride: shaderAttributStringInfo[key].stride }
+})
+
 function GLDataType2ShaderString(type: GLDataType) {
   return reverseShaderStringMap[type];
+}
+
+function getAttributeStride(type: GLDataType) {
+  return reverseShaderAttributStringInfo[type].stride;
+}
+
+function AttrivbuteGLDataType2ShaderString(type: GLDataType) {
+  return reverseShaderAttributStringInfo[type].name;
 }
 
 
@@ -55,7 +74,8 @@ function generateAttributeString(config: GLProgramConfig) {
   let text = '';
   if (config.attributes !== undefined) {
     config.attributes.forEach(att => {
-      const type = GLDataType2ShaderString(att.type);
+      att.stride = getAttributeStride(att.type);
+      const type = AttrivbuteGLDataType2ShaderString(att.type);
       text = text + 'attribute ' + type + ' ' + att.name + ';\n';
     })
   }
