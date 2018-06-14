@@ -35,28 +35,7 @@ export interface GeometryConfig{
 export class Geometry {
   constructor(conf: GeometryConfig) {
     this.attributesConfig = conf;
-    this.attributesConfig.attributeList.forEach(attConf => {
-      switch (attConf.usage) {
-        case AttributeUsage.position:
-          this.attributes.position = new Attribute(AttributeType.float, attConf.stride, 0);
-          break;
-
-        case AttributeUsage.normal:
-          this.attributes.normal = new Attribute(AttributeType.float, attConf.stride, 0);
-          break;
-        
-        case AttributeUsage.color:
-          this.attributes.color = new Attribute(AttributeType.float, attConf.stride, 0);
-          break;
-        
-        case AttributeUsage.uv:
-          this.attributes.uv = new Attribute(AttributeType.float, attConf.stride, 0);
-          break;
-
-        default:
-          break;
-      }
-    })
+    generateAttributes(conf, this.attributes);
   }
   attributesConfig: GeometryConfig;
   attributes: any = {};
@@ -81,4 +60,30 @@ export class Geometry {
 
 
 }
+
+function generateAttributes(attributesConfig, attributes) { 
+  attributesConfig.attributeList.forEach(attConf => {
+    switch (attConf.usage) {
+      case AttributeUsage.position:
+        attributes.position = new Attribute(AttributeType.float, attConf.stride, 0);
+        break;
+
+      case AttributeUsage.normal:
+        attributes.normal = new Attribute(AttributeType.float, attConf.stride, 0);
+        break;
+
+      case AttributeUsage.color:
+        attributes.color = new Attribute(AttributeType.float, attConf.stride, 0);
+        break;
+
+      case AttributeUsage.uv:
+        attributes.uv = new Attribute(AttributeType.float, attConf.stride, 0);
+        break;
+
+      default:
+        break;
+    }
+  })
+}
+
 

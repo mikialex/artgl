@@ -31,8 +31,14 @@ export class ARTEngine {
     this.adaptor = adaptor;
   }
 
+  // render renderList
   render() {
     
+  }
+
+  // render a single Object
+  renderDirect() {
+
   }
 
 

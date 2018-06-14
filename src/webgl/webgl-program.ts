@@ -3,7 +3,7 @@ import { GLShader, ShaderType } from "../webgl/shader";
 import { generateUUID } from "../math";
 import { Geometry } from "../core/geometry";
 import { AttributeUsage } from "../core/attribute";
-import { injectVertexShaderHeaders, injectFragmentShaderHeaders } from "./shader-util";
+import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType } from "./shader-util";
 
 export interface AttributeDescriptor {
   name: string,
@@ -13,12 +13,12 @@ export interface AttributeDescriptor {
 
 export interface UniformDescriptor {
   name: string,
-  type: string
+  type: GLDataType
 }
 
 export interface VaryingDescriptor {
   name: string,
-  type: string
+  type: GLDataType
 }
 
 export interface GLProgramConfig {

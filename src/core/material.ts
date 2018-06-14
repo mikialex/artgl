@@ -1,4 +1,5 @@
 import { generateUUID } from "../math";
+import { UniformDescriptor } from "../webgl/webgl-program";
 
 const defaultMaterialconfig = {
 
@@ -7,6 +8,10 @@ const defaultMaterialconfig = {
 export class Material{
   name: string;
   uuid = generateUUID();
+
+  isTransparent = false;
+
+  params: UniformDescriptor;
 
   createProgram() {
     
