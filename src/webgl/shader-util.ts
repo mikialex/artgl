@@ -14,6 +14,27 @@ export const enum GLDataType{
   Mat4
 }
 
+const shaderStringMap: { [index: string]: GLDataType } = {
+  'float': GLDataType.float,
+  'vec2': GLDataType.floatVec2,
+  'vec3': GLDataType.floatVec3,
+  'vec4': GLDataType.floatVec4,
+  'mat2': GLDataType.Mat2,
+  'mat3': GLDataType.Mat3,
+  'mat4': GLDataType.Mat4,
+}
+
+let reverseShaderStringMap: { [index: number]: string };
+Object.keys(shaderStringMap).forEach(key => {
+  reverseShaderStringMap[shaderStringMap[key]] = key
+})
+
+function GLDataType2ShaderString(type: GLDataType) {
+  return reverseShaderStringMap[type];
+}
+
+
+
 export function injectVertexShaderHeaders(config: GLProgramConfig, shaderText: string) {
   let injectText = '';
   injectText += generateAttributeString(config);
@@ -29,11 +50,13 @@ export function injectFragmentShaderHeaders(config: GLProgramConfig, shaderText:
   return injectText + shaderText;
 }
 
+
 function generateAttributeString(config: GLProgramConfig) {
   let text = '';
   if (config.attributes !== undefined) {
     config.attributes.forEach(att => {
-      text = text + 'attribute vec4 ' + att.name + ';\n';
+      const type = GLDataType2ShaderString(att.type);
+      text = text + 'attribute ' + type + ' ' + att.name + ';\n';
     })
   }
   return text;
@@ -43,15 +66,7 @@ function generateUnifromString(config: GLProgramConfig) {
   let text = '';
   if (config.uniforms !== undefined) {
     config.uniforms.forEach(uni => {
-      let type;
-      switch (uni.type) {
-        case 'uniform1f':
-          type = 'float'
-          break;
-
-        default:
-          break;
-      }
+      const type = GLDataType2ShaderString(uni.type);
       text = text + 'uniform ' + type + ' ' + uni.name + ';\n';
     })
   }
@@ -61,17 +76,9 @@ function generateUnifromString(config: GLProgramConfig) {
 function generateVaryingString(config: GLProgramConfig) {
   let text = '';
   if (config.varyings !== undefined) {
-    config.varyings.forEach(uni => {
-      let type;
-      switch (uni.type) {
-        case 'vec4':
-          type = 'vec4'
-          break;
-
-        default:
-          break;
-      }
-      text = text + 'varying ' + type + ' ' + uni.name + ';\n';
+    config.varyings.forEach(vary => {
+      const type = GLDataType2ShaderString(vary.type);
+      text = text + 'varying ' + type + ' ' + vary.name + ';\n';
     })
   }
   return text;
