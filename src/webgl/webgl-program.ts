@@ -122,6 +122,12 @@ export class GLProgram {
     gl.enableVertexAttribArray(position);
   }
 
+  /**
+   * set a stardard geometry's data to this program's attribute
+   *
+   * @param {Geometry} geometry
+   * @memberof GLProgram
+   */
   setGeometryData(geometry: Geometry) {
     this.drawCount = geometry.drawCount;
     this.drawFrom = geometry.drawFrom;

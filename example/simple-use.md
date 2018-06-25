@@ -1,6 +1,6 @@
 # lowest level usage demo
 
-create a program, set attributes, uniforms, draw it.
+create a renderer and a program, set attributes, uniforms, draw it.
 
 ```ts
 
@@ -33,8 +33,8 @@ let renderer = new GLRenderer(canv);
 let program = new GLProgram(renderer,
   {
     attributes: [
-      { name: 'position', stride: 3 , type: GLDataType.floatVec3 },
-      { name: 'vertexColor', stride: 3, type: GLDataType.floatVec3 }
+      { name: 'position', type: GLDataType.floatVec3 },
+      { name: 'vertexColor', type: GLDataType.floatVec3 }
     ],
     uniforms: [
       { name: 'lineColor', type: GLDataType.float }

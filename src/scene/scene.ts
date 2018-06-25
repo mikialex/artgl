@@ -7,4 +7,12 @@ export class Scene {
   
   objectList: RenderObject[];
   lightList: Light[];
+
+  addEntity(node: SceneNode) {
+
+  }
+
+  removeEntity(node: SceneNode) {
+
+  }
 }

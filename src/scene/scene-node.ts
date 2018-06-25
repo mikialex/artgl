@@ -27,11 +27,13 @@ export class SceneNode {
   // }
 
   addChild(obj: SceneNode) {
+    this.scene.addEntity(obj);
     obj.parent = this;
     this.children.push(obj);
   }
 
   removeChild(obj: SceneNode) {
+    this.scene.removeEntity(obj);
     let index = this.children.indexOf(obj);
     if (index !== - 1) {
       obj.parent = null;
