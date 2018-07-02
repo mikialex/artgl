@@ -13,15 +13,15 @@ export class RenderList{
     
   }
 
-  private opaqueList = [];
-  private transparent = [];
+  opaqueList = [];
+  transparentList = [];
 
-  private opaqueCount = 0;
-  private transparentCount = 0;
+  opaqueCount = 0;
+  transparentCount = 0;
 
   addRenderItem(object: RenderObject, transformation: Matrix4) {
     if (object.material.isTransparent) {
-      this.transparent.push({ object, transformation});
+      this.transparentList.push({ object, transformation});
       this.transparentCount++;
     } else {
       if (this.opaqueCount < this.opaqueList.length) {

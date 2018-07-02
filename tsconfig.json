@@ -7,6 +7,8 @@
     "jsx": "react",
     "allowJs": true,
     "lib": [
+      "webworker",
+      "scripthost",
       "es6",
       "dom"
     ]

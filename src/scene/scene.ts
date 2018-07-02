@@ -8,6 +8,11 @@ export class Scene {
   objectList: RenderObject[];
   lightList: Light[];
 
+  flattenList: number[];
+  flattenTreeToList() {
+    
+  }
+
   addEntity(node: SceneNode) {
 
   }
