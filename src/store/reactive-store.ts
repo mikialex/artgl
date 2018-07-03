@@ -1,14 +1,14 @@
 
-interface ObserverConfig{
-  name: string,
-  isGetter: boolean,
-  getterFunc?: Function,
+interface ObserverConfig {
+  name: string;
+  isGetter: boolean;
+  getterFunc?: Function;
 }
 
-interface ReactiveStoreConfig{
-  states: { [index: string]: any },
-  getters: { [index: string]: any },
-  watchers: any
+interface ReactiveStoreConfig {
+  states: { [index: string]: any };
+  getters: { [index: string]: any };
+  watchers: { [index: string]: Function };
 }
 
 class DataObserver {
@@ -43,15 +43,16 @@ class DataObserver {
 
   setValue(value) {
     if (value !== this.realValue) {
+      const oldValue = this.realValue;
       this.realValue = value;
       this.watchers.forEach(watchCallback => {
-        watchCallback(value);
+        watchCallback(value, oldValue);
       });
     }
   }
   updateValue() {
     if (this.isGetter) {
-      console.log('eval getter ' + this.name)
+      console.log('eval getter ' + this.name);
       this.realValue = this.getterFunc();
       this.isDirty = false;
     }
@@ -86,7 +87,7 @@ export class ReactiveStore {
         set: function (value) {
           self.observers[stateKey].setValue(value);
         }
-      })
+      });
     });
 
     Object.keys(storeConfig.getters).forEach(getterKey => {
@@ -105,8 +106,8 @@ export class ReactiveStore {
           }
           return observer.getValue();
         }
-      })
-    })
+      });
+    });
 
     // merge env
     this.env = {};
@@ -118,16 +119,15 @@ export class ReactiveStore {
         set: function (value) {
           self.states[key] = value;
         }
-      })
-    })
-    let i = 1;
+      });
+    });
     Object.keys(this.getters).forEach(key => {
       Object.defineProperty(this.env, key, {
         get: function () {
           return self.getters[key];
         },
-      })
-    })
+      });
+    });
 
     // rebind
     Object.keys(this.observers).forEach(key => {
@@ -137,14 +137,24 @@ export class ReactiveStore {
       }
     });
 
-    Object.keys(storeConfig.getters).forEach(getterKey => { 
+    Object.keys(storeConfig.getters).forEach(getterKey => {
       this.collectDependency(this.observers[getterKey]);
-    })
+    });
+
+    Object.keys(storeConfig.watchers).forEach(watcherKey => {
+      const watcher = storeConfig.watchers[watcherKey];
+      Object.keys(this.observers).forEach(key => {
+        const obs = this.observers[key];
+        if (obs.name === watcherKey) {
+          obs.watch(watcher.bind(this.env));
+        }
+      });
+    });
 
   }
 
   collectDependency(dataOb: DataObserver) {
-    if (!dataOb.isGetter) return;
+    if (!dataOb.isGetter) { return; }
     this.isCollectDenpendency = true;
     this.dependencyList = [];
     dataOb.updateValue();
@@ -161,8 +171,7 @@ export class ReactiveStore {
   observers: { [index: string]: DataObserver } = {};
   states = {};
   getters = {};
-  env: any = {a:1};
-
+  env: any = { a: 1 };
 
 }
 
