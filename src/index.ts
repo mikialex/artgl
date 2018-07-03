@@ -8,7 +8,7 @@ import { ReactiveStore } from './store/reactive-store';
 
 window.onload = function () {
   (window as any).store = new ReactiveStore({
-    state: {
+    states: {
       targetFps: 60,
       fps: 30,
     },
@@ -19,10 +19,12 @@ window.onload = function () {
       cullingRatio() {
         if (this.enableCulling) {
           return this.targetFps - this.fps;
+        } else {
+          return 0;
         }
       }
     },
-    watcher: {
+    watchers: {
       enableCulling(newVal, oldVal) {
         // ...
       }

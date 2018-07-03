@@ -1,13 +1,33 @@
 
+interface ObserverConfig{
+  name: string,
+  isGetter: boolean,
+  getterFunc?: Function,
+}
+
+interface ReactiveStoreConfig{
+  states: { [index: string]: any },
+  getters: { [index: string]: any },
+  watchers: any
+}
+
 class DataObserver {
-  constructor(store, name) {
+  constructor(store: ReactiveStore, conf: ObserverConfig) {
     this.store = store;
-    this.name = name;
+    this.name = conf.name;
+    this.isGetter = conf.isGetter;
+    if (this.isGetter) {
+      this.getterFunc = conf.getterFunc;
+    }
   }
   name;
   realValue;
   store: ReactiveStore;
   watchers = [];
+
+  isGetter = false;
+  getterFunc;
+  isDirty = false;
 
   watch(callBack) {
     if (this.watchers.indexOf(callBack) === -1) {
@@ -29,24 +49,37 @@ class DataObserver {
       });
     }
   }
+  updateValue() {
+    if (this.isGetter) {
+      console.log('eval getter ' + this.name)
+      this.realValue = this.getterFunc();
+      this.isDirty = false;
+    }
+    return this.realValue;
+  }
   getValue() {
+    if (this.isDirty) {
+      this.updateValue();
+    }
     return this.realValue;
   }
 }
 
 export class ReactiveStore {
-  constructor(storeConfig) {
-    let isCollectDenpendency = false;
-    let dependencyList = [];
+  constructor(storeConfig: ReactiveStoreConfig) {
     const self = this;
-    Object.keys(storeConfig.state).forEach(stateKey => {
-      const observer = new DataObserver(this, stateKey);
-      observer.setValue(storeConfig.state[stateKey]);
+    Object.keys(storeConfig.states).forEach(stateKey => {
+      const observer = new DataObserver(this, {
+        name: stateKey,
+        isGetter: false
+      });
+      observer.setValue(storeConfig.states[stateKey]);
       this.observers[stateKey] = observer;
       Object.defineProperty(this.states, stateKey, {
+        enumerable: true,
         get: function () {
-          if (isCollectDenpendency && dependencyList.indexOf(stateKey) === -1) {
-            dependencyList.push(stateKey);
+          if (self.isCollectDenpendency && self.dependencyList.indexOf(stateKey) === -1) {
+            self.dependencyList.push(stateKey);
           }
           return self.observers[stateKey].getValue();
         },
@@ -56,45 +89,79 @@ export class ReactiveStore {
       })
     });
 
-    isCollectDenpendency = true;
     Object.keys(storeConfig.getters).forEach(getterKey => {
-      const getterhandlers = {
-        isDirty: false,
-        value: undefined,
-        func: storeConfig.getters[getterKey].bind(this.states)
-      }
-      this.getterhandlers[getterKey] = getterhandlers;
-      dependencyList = [];
-      this.getterhandlers[getterKey].value = getterhandlers.func();
-      dependencyList.forEach(depName => {
-        this.observers[depName].watch(() => {
-          this.getterhandlers[getterKey].isDirty = true;
-        });
+      const observer = new DataObserver(this, {
+        name: getterKey,
+        isGetter: true,
+        getterFunc: storeConfig.getters[getterKey]
       });
+      this.observers[getterKey] = observer;
 
       Object.defineProperty(this.getters, getterKey, {
+        enumerable: true,
         get: function () {
-          if (getterhandlers.isDirty) {
-            console.log('eval getters' + getterKey);
-            getterhandlers.value = getterhandlers.func();
-            getterhandlers.isDirty = false;
+          if (self.isCollectDenpendency && self.dependencyList.indexOf(getterKey) === -1) {
+            self.dependencyList.push(getterKey);
           }
-          return getterhandlers.value;
+          return observer.getValue();
         }
       })
     })
-    isCollectDenpendency = false;
+
+    // merge env
+    this.env = {};
+    Object.keys(this.states).forEach(key => {
+      Object.defineProperty(this.env, key, {
+        get: function () {
+          return self.states[key];
+        },
+        set: function (value) {
+          self.states[key] = value;
+        }
+      })
+    })
+    let i = 1;
+    Object.keys(this.getters).forEach(key => {
+      Object.defineProperty(this.env, key, {
+        get: function () {
+          return self.getters[key];
+        },
+      })
+    })
+
+    // rebind
+    Object.keys(this.observers).forEach(key => {
+      const obs = this.observers[key];
+      if (obs.isGetter) {
+        obs.getterFunc = obs.getterFunc.bind(this.env);
+      }
+    });
+
+    Object.keys(storeConfig.getters).forEach(getterKey => { 
+      this.collectDependency(this.observers[getterKey]);
+    })
 
   }
 
-  collectDependency(name: string) {
-
+  collectDependency(dataOb: DataObserver) {
+    if (!dataOb.isGetter) return;
+    this.isCollectDenpendency = true;
+    this.dependencyList = [];
+    dataOb.updateValue();
+    this.dependencyList.forEach(depName => {
+      this.observers[depName].watch(() => {
+        dataOb.isDirty = true;
+      });
+    });
+    this.isCollectDenpendency = false;
   }
 
+  isCollectDenpendency = false;
+  dependencyList = [];
   observers: { [index: string]: DataObserver } = {};
   states = {};
   getters = {};
-  getterhandlers = {};
+  env: any = {a:1};
 
 
 }
