@@ -4,8 +4,37 @@ import { TestGeometry } from "./geometry/test-geometery";
 import { AttributeUsage } from "./core/attribute";
 import { generateStandradProgramConfig } from "./webgl/program-factory";
 import { ARTEngine } from "./renderer/render-engine";
+import { ReactiveStore } from './store/reactive-store';
 
-window.onload = function(){
+window.onload = function () {
+  (window as any).store = new ReactiveStore({
+    state: {
+      targetFps: 60,
+      fps: 30,
+    },
+    getters: {
+      enableCulling() {
+        return this.fps < this.targetFps;
+      },
+      cullingRatio() {
+        if (this.enableCulling) {
+          return this.targetFps - this.fps;
+        }
+      }
+    },
+    watcher: {
+      enableCulling(newVal, oldVal) {
+        // ...
+      }
+    },
+    // mutation: {
+    //   updateFps(val) {
+    //     this.state.fps = val;
+    //   }
+    // }
+  });
+
+
   // var worker = new Worker()
   // let canv = document.querySelector('canvas');
   // let renderer = new GLRenderer(canv);
