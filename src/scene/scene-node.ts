@@ -1,6 +1,8 @@
 import { Vector3, Matrix4 } from "../math";
 import { RenderObject } from "../core/render-object";
 import { Scene } from "./scene";
+import { Camera } from "../core/camera";
+import { Light } from "../core/light";
 
 export class SceneNode {
   constructor(scene) {
@@ -15,6 +17,8 @@ export class SceneNode {
   children: SceneNode[] = [];
 
   object: RenderObject;
+  light: Light;
+  camera: Camera;
   property: {};
 
   isMatrixNeedUpdate = false;
@@ -26,17 +30,18 @@ export class SceneNode {
   //   this.objToWorldMatrix = Matrix.Compose(this.scale, this.rotation, this.position);
   // }
 
-  addChild(obj: SceneNode) {
-    this.scene.addEntity(obj);
-    obj.parent = this;
-    this.children.push(obj);
+  addChild(node: SceneNode) {
+    // if()
+    // this.scene.addEntity(obj);
+    node.parent = this;
+    this.children.push(node);
   }
 
-  removeChild(obj: SceneNode) {
-    this.scene.removeEntity(obj);
-    let index = this.children.indexOf(obj);
+  removeChild(node: SceneNode) {
+    // this.scene.removeEntity(obj);
+    let index = this.children.indexOf(node);
     if (index !== - 1) {
-      obj.parent = null;
+      node.parent = null;
       this.children.splice(index, 1);
     }
   }

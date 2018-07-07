@@ -38,5 +38,9 @@ export class RenderList{
     this.transparentCount = 0;
   }
 
+  sort(){
+    
+  }
+
 
 }

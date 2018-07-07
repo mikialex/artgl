@@ -175,6 +175,36 @@ export class ReactiveStore {
 
 }
 
+(window as any).store = new ReactiveStore({
+  states: {
+    targetFps: 60,
+    fps: 30,
+  },
+  getters: {
+    enableCulling() {
+      return this.fps < this.targetFps;
+    },
+    cullingRatio() {
+      if (this.enableCulling) {
+        return this.targetFps - this.fps;
+      } else {
+        return 0;
+      }
+    }
+  },
+  watchers: {
+    enableCulling(newVal, oldVal) {
+      // ...
+      console.log('enable changed');
+    }
+  },
+  // mutation: {
+  //   updateFps(val) {
+  //     this.state.fps = val;
+  //   }
+  // }
+});
+
 // const store = new ReactiveStore({
 //   state: {
 //     targetFps: 60,

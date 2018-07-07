@@ -23,7 +23,7 @@ const shaderStringMap: { [index: string]: GLDataType } = {
   'mat3': GLDataType.Mat3,
   'mat4': GLDataType.Mat4,
 }
-let reverseShaderStringMap: { [index: number]: string };
+let reverseShaderStringMap: { [index: number]: string } = {};
 Object.keys(shaderStringMap).forEach(key => {
   reverseShaderStringMap[shaderStringMap[key]] = key
 })
@@ -34,7 +34,7 @@ const shaderAttributStringInfo: { [index: string]: { type: GLDataType, stride: n
   'vec3': { type: GLDataType.floatVec3, stride: 3 },
   'vec4': { type: GLDataType.floatVec4, stride: 4 },
 }
-let reverseShaderAttributStringInfo: { [index: number]: { name: string, stride: number } };
+let reverseShaderAttributStringInfo: { [index: number]: { name: string, stride: number } } = {};
 Object.keys(shaderAttributStringInfo).forEach(key => {
   reverseShaderAttributStringInfo[shaderAttributStringInfo[key].type] =
     { name: key, stride: shaderAttributStringInfo[key].stride }
