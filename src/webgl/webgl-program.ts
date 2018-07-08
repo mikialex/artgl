@@ -8,8 +8,8 @@ import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType } fr
 export interface AttributeDescriptor {
   name: string,
   type: GLDataType,
-  stride?: number,
-  usage?: AttributeUsage
+  stride: number,
+  usage: AttributeUsage
 }
 
 export interface UniformDescriptor {

@@ -2,6 +2,7 @@ import { GLRenderer } from "./webgl-renderer";
 import { RenderList } from "./render-list";
 import { LightList } from "./light-list";
 import { RenderObject } from "../core/render-object";
+import { Camera } from "../core/camera";
 
 export class ARTEngineAdaptor {
   constructor(engine: ARTEngine) {
@@ -17,7 +18,7 @@ export class ARTEngineAdaptor {
 
 
 export class ARTEngine {
-  constructor(renderer:GLRenderer) {
+  constructor(renderer: GLRenderer) {
     this.renderer = renderer;
   }
 
@@ -25,11 +26,16 @@ export class ARTEngine {
 
   renderList: RenderList = new RenderList();
   lightList: LightList = new LightList();
+  activeCamera: Camera;
 
   adaptor: ARTEngineAdaptor;
 
   useAdaptor(adaptor: ARTEngineAdaptor) {
     this.adaptor = adaptor;
+  }
+
+  setCamera(camera: Camera) {
+    this.activeCamera = camera;
   }
 
   // render renderList

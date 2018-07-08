@@ -1,11 +1,29 @@
 import { generateUUID } from "../math";
-import { UniformDescriptor } from "../webgl/webgl-program";
+import { UniformDescriptor, AttributeDescriptor } from "../webgl/webgl-program";
+import { AttributeUsage } from "./attribute";
+import { GLDataType } from "../webgl/shader-util";
 
 const defaultMaterialconfig = {
 
 }
 
+
+export const standradMeshAttributeLayout = [
+  { name:'position',type:GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
+  { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal, stride: 3 },
+  { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
+]
+
+export interface MaterialConfig{
+  attributeLayout: AttributeDescriptor[];
+  uniforms: UniformDescriptor[];
+}
+
 export class Material{
+  constructor(config: MaterialConfig) {
+    
+  }
+
   name: string;
   uuid = generateUUID();
 
@@ -20,8 +38,6 @@ export class Material{
   dispose() {
 
   }
-
-  // uuid = _Math.generateUUID();
 
   // fog = true;
   // lights = true;

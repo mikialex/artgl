@@ -1,9 +1,10 @@
 import { Vector3, Matrix4, MathUtil} from "../math";
+import { Camera } from "../core/camera";
 
-export class PerspectiveCamera {
+export class PerspectiveCamera extends Camera{
   constructor(near?: number, far?: number,
     fov?: number, aspect?: number, zoom?:number) {
-    
+    super();
   }
 
   near: number;

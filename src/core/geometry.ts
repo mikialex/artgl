@@ -4,29 +4,19 @@ import { Attribute, AttributeType, AttributeUsage } from "./attribute";
 type GeometryParameterValueType = 'number' | 'boolean'
 
 
-export const StandradAttributeConfig = [
-  {
-    usage: AttributeUsage.position,
-    stride: 3
-  },
-  {
-    usage: AttributeUsage.normal,
-    stride: 3
-  },
-  {
-    usage: AttributeUsage.color,
-    stride: 3
-  },
-  {
-    usage: AttributeUsage.uv,
-    stride: 2
-  },
+export const MeshAttributeConfig = [
+  { usage: AttributeUsage.position, stride: 3 },
+  { usage: AttributeUsage.normal, stride: 3 },
+  { usage: AttributeUsage.color, stride: 3 },
+  { usage: AttributeUsage.uv, stride: 2 },
 ]
+
 
 export interface AttributeListItem{
   usage: AttributeUsage,
   stride: number
 }
+
 
 export interface GeometryConfig{
   attributeList: AttributeListItem[]
@@ -46,13 +36,15 @@ export class Geometry {
   parameters: any;
 
   /**
-   * creat or update the geometry's data
+   * creat or update the geometry's data in attributes
    * 
    * @memberof Geometry
    */
   populate() {
 
   }
+
+
 
   dispose() {
 
