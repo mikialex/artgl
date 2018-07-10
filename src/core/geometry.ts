@@ -1,5 +1,6 @@
 import { Vector3, TriangleFace } from "../math";
-import { Attribute, AttributeType, AttributeUsage } from "./attribute";
+import { Attribute, AttributeUsage } from "./attribute";
+import { GLDataType } from "../webgl/shader-util";
 
 type GeometryParameterValueType = 'number' | 'boolean'
 
@@ -41,7 +42,7 @@ export class Geometry {
    * @memberof Geometry
    */
   populate() {
-
+    throw 'geometry not implemented'
   }
 
 
@@ -57,19 +58,19 @@ function generateAttributes(attributesConfig, attributes) {
   attributesConfig.attributeList.forEach(attConf => {
     switch (attConf.usage) {
       case AttributeUsage.position:
-        attributes.position = new Attribute(AttributeType.float, attConf.stride, 0);
+        attributes.position = new Attribute(GLDataType.float, attConf.stride, 0);
         break;
 
       case AttributeUsage.normal:
-        attributes.normal = new Attribute(AttributeType.float, attConf.stride, 0);
+        attributes.normal = new Attribute(GLDataType.float, attConf.stride, 0);
         break;
 
       case AttributeUsage.color:
-        attributes.color = new Attribute(AttributeType.float, attConf.stride, 0);
+        attributes.color = new Attribute(GLDataType.float, attConf.stride, 0);
         break;
 
       case AttributeUsage.uv:
-        attributes.uv = new Attribute(AttributeType.float, attConf.stride, 0);
+        attributes.uv = new Attribute(GLDataType.float, attConf.stride, 0);
         break;
 
       default:

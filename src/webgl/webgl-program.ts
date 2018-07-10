@@ -123,7 +123,7 @@ export class GLProgram {
   }
 
   /**
-   * set a stardard geometry's data to this program's attribute
+   * set a giving geometry's data to this program's attribute
    *
    * @param {Geometry} geometry
    * @memberof GLProgram

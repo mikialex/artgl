@@ -48,6 +48,7 @@ export class GLRenderer {
   addProgram(program: GLProgram) {
     this.programs.push(program);
   }
+  
   useProgram(program: GLProgram) {
     this.activeProgram = program;
   }

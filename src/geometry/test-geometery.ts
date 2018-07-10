@@ -1,5 +1,5 @@
 import { Geometry } from "../core/geometry";
-import { Attribute, AttributeType, AttributeUsage } from "../core/attribute";
+import { Attribute, AttributeUsage } from "../core/attribute";
 
 const TestGeometryConfig = {
   attributeList: [{

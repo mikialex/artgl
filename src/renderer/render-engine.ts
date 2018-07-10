@@ -54,8 +54,9 @@ export class ARTEngine {
 
   }
 
-  renderObject(object:RenderObject) {
-
+  renderObject(object: RenderObject) {
+    const material = object.material;
+    this.renderer.useProgram(material.program)
   }
 
 }

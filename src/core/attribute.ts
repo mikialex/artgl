@@ -1,7 +1,4 @@
-export const enum AttributeType{
-  float,
-  int
-}
+import { GLDataType } from "../webgl/shader-util";
 
 export const enum AttributeUsage{
   position,
@@ -11,7 +8,7 @@ export const enum AttributeUsage{
 }
 
 export class Attribute{
-  constructor(type: AttributeType, stride: number, size:number) {
+  constructor(type: GLDataType, stride: number, size:number) {
     this.data = new Float32Array(size);
     this.count = size / stride;
     this.stride = stride;
@@ -20,6 +17,7 @@ export class Attribute{
     }
   }
   data: any;
+  type: GLDataType;
   count: number = 0;
   stride: number = 1;
 
