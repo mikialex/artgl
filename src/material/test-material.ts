@@ -7,15 +7,14 @@ import { GLRenderer } from "../renderer/webgl-renderer";
 const vertexShaderSource =
   `
     void main() {
-      gl_Position = position;
-      color = vertexColor;
+      vec4 worldPosition = worldMatrix * vec4(position, 1.0);
+      gl_Position = vec4(position, 1.0);
     }
     ` 
 const fragmentShaderSource =
   `
-    float blue = lineColor * 0.2;
     void main() {
-      gl_FragColor = color * lineColor;
+      gl_FragColor = vec4(0.5,0.5,0.5,1.0);
     }
     `
 
@@ -26,19 +25,20 @@ export class TestMaterial extends Material{
   }
 
   createProgram(renderer: GLRenderer) {
-    this.programInstance = new GLProgram(renderer, {
+    this.program = new GLProgram(renderer, {
       attributes: [
         { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
-        { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal, stride: 3 },
-        { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
+        // { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal, stride: 3 },
+        // { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
       ],
       uniforms: [
-        { name: 'lineColor', type: GLDataType.float }
+        { name: 'worldMatrix', type: GLDataType.Mat4 },
+        { name: 'viewProjectMatrix', type: GLDataType.Mat4 },
       ],
       vertexShaderString: vertexShaderSource,
       fragmentShaderString: fragmentShaderSource,
       autoInjectHeader: true,
     });
-    return this.programInstance;
+    return this.program;
   }
 }

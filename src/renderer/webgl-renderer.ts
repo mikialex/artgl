@@ -48,13 +48,14 @@ export class GLRenderer {
   addProgram(program: GLProgram) {
     this.programs.push(program);
   }
-  
+
   useProgram(program: GLProgram) {
     this.activeProgram = program;
   }
 
   render() {
     this.gl.drawArrays(this.gl.TRIANGLES, this.activeProgram.drawFrom, this.activeProgram.drawCount);
+    console.log('render')
   }
 
   clear() {

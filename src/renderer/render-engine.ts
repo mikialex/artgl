@@ -3,6 +3,7 @@ import { RenderList } from "./render-list";
 import { LightList } from "./light-list";
 import { RenderObject } from "../core/render-object";
 import { Camera } from "../core/camera";
+import { Matrix4 } from "../math";
 
 export class ARTEngineAdaptor {
   constructor(engine: ARTEngine) {
@@ -43,20 +44,26 @@ export class ARTEngine {
     const opaqueList = this.renderList.opaqueList;
     const transparentList = this.renderList.transparentList;
     for (let i = 0; i < opaqueList.length; i++) {
-      const object = opaqueList[i];
-      this.renderObject(object);
+      const renderCall = opaqueList[i];
+      this.renderObject(renderCall.object, renderCall.matrix);
     }
 
     for (let i = 0; i < transparentList.length; i++) {
-      const object = transparentList[i];
-      this.renderObject(object);
+      const renderCall = transparentList[i];
+      this.renderObject(renderCall.object, renderCall.matrix);
     }
 
   }
 
-  renderObject(object: RenderObject) {
+  renderObject(object: RenderObject, matrix:Matrix4) {
     const material = object.material;
-    this.renderer.useProgram(material.program)
+    material.createProgram(this.renderer);
+    const program = material.program;
+    program.setUniform('worldMatrix', matrix);
+    program.setUniform('viewProjectMatrix', this.activeCamera.projectionMatrix);
+    program.setGeometryData(object.geometry);
+    this.renderer.useProgram(program);
+    this.renderer.render();
   }
 
 }

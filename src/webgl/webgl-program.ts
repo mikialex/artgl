@@ -90,35 +90,39 @@ export class GLProgram {
 
   private populateDataSlot(config: GLProgramConfig) {
     const gl = this.renderer.gl;
-    config.attributes.forEach(att => {
-      this.attributes[att.name] = {
-        name: att.name,
-        data: null,
-        position: gl.getAttribLocation(this.program, att.name),
-        discriptor: att
-      }
-    })
-    config.uniforms.forEach(uni => {
-      this.uniforms[uni.name] = {
-        name: uni.name,
-        data: null,
-        position: gl.getUniformLocation(this.program, uni.name),
-        discriptor: uni
-      }
-    })
+    if (config.attributes !== undefined) {
+      config.attributes.forEach(att => {
+        this.attributes[att.name] = {
+          name: att.name,
+          data: null,
+          position: gl.getAttribLocation(this.program, att.name),
+          discriptor: att
+        }
+      })
+    }
+    if (config.uniforms !== undefined) {
+      config.uniforms.forEach(uni => {
+        this.uniforms[uni.name] = {
+          name: uni.name,
+          data: null,
+          position: gl.getUniformLocation(this.program, uni.name),
+          discriptor: uni
+        }
+      })
+    }
   }
 
   setAttribute(name: string, data: any) {
-    const conf = this.attributes[name];
-    if (!conf) {
+    const attribute = this.attributes[name];
+    if (!attribute) {
       throw 'try to set a none exist attribute';
     }
     const gl = this.renderer.gl;
     const buffer = gl.createBuffer();
-    const position = conf.position;
+    const position = attribute.position;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(position, conf.discriptor.stride, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(position, attribute.discriptor.stride, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(position);
   }
 

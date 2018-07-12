@@ -57,13 +57,14 @@ function AttrivbuteGLDataType2ShaderString(type: GLDataType) {
 export function injectVertexShaderHeaders(config: GLProgramConfig, shaderText: string) {
   let injectText = '';
   injectText += generateAttributeString(config);
-  // injectText += generateUnifromString(config);
+  injectText += generateUnifromString(config);
   injectText += generateVaryingString(config);
   return injectText + shaderText;
 }
 
 export function injectFragmentShaderHeaders(config: GLProgramConfig, shaderText: string) {
-  let injectText = 'precision mediump float;\n';
+  let injectText = '';
+  injectText += 'precision highp float;\n';
   injectText = injectText + generateUnifromString(config);
   injectText = injectText + generateVaryingString(config);
   return injectText + shaderText;
