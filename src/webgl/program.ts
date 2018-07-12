@@ -1,9 +1,10 @@
 import { GLRenderer } from "../renderer/webgl-renderer";
-import { GLShader, ShaderType } from "../webgl/shader";
+import { GLShader, ShaderType } from "./shader";
 import { generateUUID } from "../math";
 import { Geometry } from "../core/geometry";
 import { AttributeUsage } from "../core/attribute";
-import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType } from "./shader-util";
+import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
+import { findUnifromSetter } from "./uniform-util";
 
 export interface AttributeDescriptor {
   name: string,
@@ -29,6 +30,14 @@ export interface GLProgramConfig {
   vertexShaderString: string;
   fragmentShaderString: string;
   autoInjectHeader: boolean
+}
+
+interface UniformInfo {
+  name: string;
+  data: GLData;
+  position: WebGLUniformLocation;
+  setter: (gl, data) => void;
+  discriptor: UniformDescriptor;
 }
 
 export class GLProgram {
@@ -60,7 +69,7 @@ export class GLProgram {
   private program: WebGLProgram;
   private config: GLProgramConfig;
   private attributes = {};
-  private uniforms = {};
+  private uniforms: { [index: string]: UniformInfo } = {};
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
   private attributeMap = {};
@@ -105,6 +114,7 @@ export class GLProgram {
         this.uniforms[uni.name] = {
           name: uni.name,
           data: null,
+          setter: findUnifromSetter(uni.type),
           position: gl.getUniformLocation(this.program, uni.name),
           discriptor: uni
         }
@@ -163,13 +173,13 @@ export class GLProgram {
     this.drawCount = count;
   }
 
-  setUniform(name: string, data: any) {
+  setUniform(name: string, data: GLData) {
     const conf = this.uniforms[name];
     if (!conf) {
       throw 'try to set a none exist unifrom';
     }
     const gl = this.renderer.gl;
     const position = conf.position;
-    gl.uniform1f(position, data);
+    gl.uniform1f(position, data as any);
   }
 }

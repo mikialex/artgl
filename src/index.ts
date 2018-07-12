@@ -1,5 +1,5 @@
 import { GLRenderer } from "./renderer/webgl-renderer";
-import { GLProgram } from "./webgl/webgl-program";
+import { GLProgram } from "./webgl/program";
 import { TestGeometry } from "./geometry/test-geometery";
 import { AttributeUsage } from "./core/attribute";
 import { generateStandradProgramConfig } from "./webgl/program-factory";

@@ -1,13 +1,13 @@
 import { Material, standradMeshAttributeLayout } from "../core/material";
 import { GLDataType } from "../webgl/shader-util";
 import { AttributeUsage } from "../core/attribute";
-import { GLProgram } from "../webgl/webgl-program";
+import { GLProgram } from "../webgl/program";
 import { GLRenderer } from "../renderer/webgl-renderer";
 
 const vertexShaderSource =
   `
     void main() {
-      vec4 worldPosition = worldMatrix * vec4(position, 1.0);
+      vec4 worldPosition = MVPMatrix * worldMatrix * vec4(position, 1.0);
       gl_Position = vec4(position, 1.0);
     }
     ` 
@@ -33,7 +33,7 @@ export class TestMaterial extends Material{
       ],
       uniforms: [
         { name: 'worldMatrix', type: GLDataType.Mat4 },
-        { name: 'viewProjectMatrix', type: GLDataType.Mat4 },
+        { name: 'MVPMatrix', type: GLDataType.Mat4 },
       ],
       vertexShaderString: vertexShaderSource,
       fragmentShaderString: fragmentShaderSource,

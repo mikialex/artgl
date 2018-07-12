@@ -29,6 +29,7 @@ export class ARTEngine {
   lightList: LightList = new LightList();
   activeCamera: Camera;
   activeCameraMatrixRerverse = new Matrix4();
+  MVPMatrix = new Matrix4();
 
   adaptor: ARTEngineAdaptor;
 
@@ -38,6 +39,8 @@ export class ARTEngine {
 
   setCamera(camera: Camera, matrix: Matrix4) {
     this.activeCameraMatrixRerverse.getInverse(matrix, true);
+    camera.updateProjectionMatrix();
+    this.MVPMatrix.multiplyMatrices(camera.projectionMatrix, this.activeCameraMatrixRerverse);
     this.activeCamera = camera;
   }
 
@@ -62,7 +65,7 @@ export class ARTEngine {
     material.createProgram(this.renderer);
     const program = material.program;
     program.setUniform('worldMatrix', matrix);
-    program.setUniform('viewProjectMatrix', this.activeCamera.projectionMatrix);
+    program.setUniform('MVPMatrix', this.MVPMatrix);
     program.setGeometryData(object.geometry);
     this.renderer.useProgram(program);
     this.renderer.render();

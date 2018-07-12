@@ -1,4 +1,7 @@
-import { GLProgramConfig } from "./webgl-program";
+import { GLProgramConfig } from "./program";
+import { Matrix4 } from "../math";
+
+export type GLData = number | Matrix4 
 
 export const enum GLDataType{
   float,

@@ -1,5 +1,5 @@
 import { generateUUID } from "../math";
-import { UniformDescriptor, GLProgramConfig, GLProgram } from "../webgl/webgl-program";
+import { UniformDescriptor, GLProgramConfig, GLProgram } from "../webgl/program";
 import { AttributeUsage } from "./attribute";
 import { GLDataType } from "../webgl/shader-util";
 import { GLRenderer } from "../renderer/webgl-renderer";
