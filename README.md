@@ -17,14 +17,19 @@ Artix 是下一代先进的webGL的渲染框架。为下一代webGL创意工具�
 
 * 清晰和易于扩展的架构。
 * 提供不同层次的抽象和封装，方便不同目的不同层次的使用。
-* 通过配置，声明式的定义渲染流程。
+* 通过独创的renderGraph架构，使得渲染流程配置化，声明式的定义管线逻辑。
 
 
 ### Powerful
 
-* 整合多种优化算法，并配置化。根据不同场景特性开启不同的优化策略。
-* 选择使用webgl2以提供更强大的渲染功能，更好的渲染性能，同时使用webgl1兼容。
-* 支持deferred lighting
+* 基于renderGraph架构，整合多种优化算法，，使得开发者能够针对不同场景特性，配置出不同的优化策略
+* 基于renderGraph架构，整合多种特效算法，，使得开发者能够针对不同业务需求，配置出不同的渲染效果
+* 同时整合 webgl1 和 webgl2；
+* 尝试支持deferred lighting
 
 ....
 
+## DevDesigns
+
+[材质系统](./src/material/dev-design.md)
+[renderGraph](./src/render-graph/dev-design.md)

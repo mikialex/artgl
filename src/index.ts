@@ -19,7 +19,7 @@ window.onload = function () {
   let renderer = new GLRenderer(canv);
   const engine = new ARTEngine(renderer);
   const camera = new PerspectiveCamera();
-  engine.setCamera(camera);
+  engine.setCamera(camera, new Matrix4());
 
 
   let testGeo = new TestGeometry();

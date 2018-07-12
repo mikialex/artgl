@@ -28,6 +28,7 @@ export class ARTEngine {
   renderList: RenderList = new RenderList();
   lightList: LightList = new LightList();
   activeCamera: Camera;
+  activeCameraMatrixRerverse = new Matrix4();
 
   adaptor: ARTEngineAdaptor;
 
@@ -35,7 +36,8 @@ export class ARTEngine {
     this.adaptor = adaptor;
   }
 
-  setCamera(camera: Camera) {
+  setCamera(camera: Camera, matrix: Matrix4) {
+    this.activeCameraMatrixRerverse.getInverse(matrix, true);
     this.activeCamera = camera;
   }
 
