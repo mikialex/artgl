@@ -36,7 +36,7 @@ interface UniformInfo {
   name: string;
   data: GLData;
   position: WebGLUniformLocation;
-  setter: (gl, data) => void;
+  setter: (gl, localtion, data) => void;
   discriptor: UniformDescriptor;
 }
 
@@ -180,6 +180,6 @@ export class GLProgram {
     }
     const gl = this.renderer.gl;
     const position = conf.position;
-    gl.uniform1f(position, data as any);
+    conf.setter(gl, position, data);
   }
 }

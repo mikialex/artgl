@@ -21,8 +21,8 @@ export function findUnifromSetter(type:GLDataType) {
   }
 }
 
-function setValue1f(gl, v) { gl.uniform1f(this.addr, v) }
-function setValue1i(gl, v) { gl.uniform1i(this.addr, v) }
+function setValue1f(gl, location, v) { gl.uniform1f(location, v) }
+function setValue1i(gl, location, v) { gl.uniform1i(location, v) }
 // // Array of vectors 
 // function setValueV2a(gl, v) {
 //   gl.uniform2fv(this.addr, flatten(v, this.size, 2));
