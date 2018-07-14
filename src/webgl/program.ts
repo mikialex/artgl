@@ -4,18 +4,13 @@ import { generateUUID } from "../math";
 import { Geometry } from "../core/geometry";
 import { AttributeUsage } from "../core/attribute";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
-import { findUnifromSetter } from "./uniform-util";
+import { GLUniform, UniformDescriptor } from "./uniform";
 
 export interface AttributeDescriptor {
   name: string,
   type: GLDataType,
   stride: number,
   usage: AttributeUsage
-}
-
-export interface UniformDescriptor {
-  name: string,
-  type: GLDataType
 }
 
 export interface VaryingDescriptor {
@@ -25,20 +20,13 @@ export interface VaryingDescriptor {
 
 export interface GLProgramConfig {
   attributes: AttributeDescriptor[];
-  uniforms?: UniformDescriptor[];
+  uniforms?: UniformDescriptor<any>[];
   varyings?: VaryingDescriptor[];
   vertexShaderString: string;
   fragmentShaderString: string;
   autoInjectHeader: boolean
 }
 
-interface UniformInfo {
-  name: string;
-  data: GLData;
-  position: WebGLUniformLocation;
-  setter: (gl, localtion, data) => void;
-  discriptor: UniformDescriptor;
-}
 
 export class GLProgram {
   constructor(renderer: GLRenderer, config: GLProgramConfig) {
@@ -66,10 +54,11 @@ export class GLProgram {
   }
   id: number;
   private renderer: GLRenderer;
+  getRenderer() { return this.renderer };
   private program: WebGLProgram;
   private config: GLProgramConfig;
   private attributes = {};
-  private uniforms: { [index: string]: UniformInfo } = {};
+  private uniforms: { [index: string]: GLUniform<any> } = {};
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
   private attributeMap = {};
@@ -111,13 +100,7 @@ export class GLProgram {
     }
     if (config.uniforms !== undefined) {
       config.uniforms.forEach(uni => {
-        this.uniforms[uni.name] = {
-          name: uni.name,
-          data: null,
-          setter: findUnifromSetter(uni.type),
-          position: gl.getUniformLocation(this.program, uni.name),
-          discriptor: uni
-        }
+        this.uniforms[uni.name] = new GLUniform(this, uni)
       })
     }
   }
@@ -174,12 +157,6 @@ export class GLProgram {
   }
 
   setUniform(name: string, data: GLData) {
-    const conf = this.uniforms[name];
-    if (!conf) {
-      throw 'try to set a none exist unifrom';
-    }
-    const gl = this.renderer.gl;
-    const position = conf.position;
-    conf.setter(gl, position, data);
+    this.uniforms[name].set(data);
   }
 }

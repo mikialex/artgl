@@ -1,7 +1,13 @@
 import { GLProgramConfig } from "./program";
-import { Matrix4 } from "../math";
+import { Matrix4, Vector3 } from "../math";
 
-export type GLData = number | Matrix4 
+export type GLData = number | Matrix4;
+
+export type float = number;
+// export type floatVec2 = Vector2;
+export type floatVec3 = Vector3;
+// export type floatVec4 = Vector4;
+export type int = number;
 
 export const enum GLDataType{
   float,
@@ -60,7 +66,7 @@ function AttrivbuteGLDataType2ShaderString(type: GLDataType) {
 export function injectVertexShaderHeaders(config: GLProgramConfig, shaderText: string) {
   let injectText = '';
   injectText += generateAttributeString(config);
-  injectText += generateUnifromString(config);
+  injectText += generateUniformString(config);
   injectText += generateVaryingString(config);
   return injectText + shaderText;
 }
@@ -68,7 +74,7 @@ export function injectVertexShaderHeaders(config: GLProgramConfig, shaderText: s
 export function injectFragmentShaderHeaders(config: GLProgramConfig, shaderText: string) {
   let injectText = '';
   injectText += 'precision highp float;\n';
-  injectText = injectText + generateUnifromString(config);
+  injectText = injectText + generateUniformString(config);
   injectText = injectText + generateVaryingString(config);
   return injectText + shaderText;
 }
@@ -86,13 +92,15 @@ function generateAttributeString(config: GLProgramConfig) {
   return text;
 }
 
-function generateUnifromString(config: GLProgramConfig) {
+function generateUniformString(config: GLProgramConfig) {
   let text = '';
   if (config.uniforms !== undefined) {
-    config.uniforms.forEach(uni => {
+
+    for (const key in config.uniforms) {
+      const uni = config.uniforms[key];
       const type = GLDataType2ShaderString(uni.type);
       text = text + 'uniform ' + type + ' ' + uni.name + ';\n';
-    })
+    }
   }
   return text;
 }

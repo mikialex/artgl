@@ -3,6 +3,7 @@ import { GLDataType } from "../webgl/shader-util";
 import { AttributeUsage } from "../core/attribute";
 import { GLProgram } from "../webgl/program";
 import { GLRenderer } from "../renderer/webgl-renderer";
+import { Matrix4 } from "../math";
 
 const vertexShaderSource =
   `
@@ -32,8 +33,8 @@ export class TestMaterial extends Material{
         // { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
       ],
       uniforms: [
-        { name: 'worldMatrix', type: GLDataType.Mat4 },
-        { name: 'MVPMatrix', type: GLDataType.Mat4 },
+        { name: 'worldMatrix', type: GLDataType.Mat4 , default: new Matrix4()},
+        { name: 'MVPMatrix', type: GLDataType.Mat4, default: new Matrix4()},
       ],
       vertexShaderString: vertexShaderSource,
       fragmentShaderString: fragmentShaderSource,
