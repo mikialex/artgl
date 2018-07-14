@@ -48,7 +48,7 @@ export class GLUniform<T>{
 // })
 // uni.set(1);
 
-class test<T, K extends keyof T, M extends keyof K, N extends keyof M>{
+class test<T, K extends keyof T>{
   constructor(conf: T, names:K[]) {
     
   }
