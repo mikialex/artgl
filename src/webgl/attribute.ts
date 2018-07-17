@@ -1,14 +1,21 @@
-import { GLDataType } from "../webgl/shader-util";
+import { GLDataType } from "./shader-util";
 
-export const enum AttributeUsage{
+export const enum AttributeUsage {
   position,
   normal,
   color,
   uv
 }
 
-export class Attribute{
-  constructor(type: GLDataType, stride: number, size:number) {
+export interface AttributeDescriptor {
+  name: string,
+  type: GLDataType,
+  stride: number,
+  usage: AttributeUsage
+}
+
+export class Attribute {
+  constructor(type: GLDataType, stride: number, size: number) {
     this.data = new Float32Array(size);
     this.count = size / stride;
     this.stride = stride;
@@ -21,12 +28,16 @@ export class Attribute{
   count: number = 0;
   stride: number = 1;
 
-  setIndex(index:number, value:number) {
+  setIndex(index: number, value: number) {
     this.data[index * this.stride] = value;
   }
 
-  setData(data:any) {
+  setData(data: any) {
     this.data = data;
   }
-  
+
+  updateData() {
+    
+  }
+
 }

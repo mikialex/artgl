@@ -1,6 +1,6 @@
 import { Vector3, TriangleFace } from "../math";
-import { Attribute, AttributeUsage } from "./attribute";
 import { GLDataType } from "../webgl/shader-util";
+import { AttributeUsage, Attribute } from "../webgl/attribute";
 
 type GeometryParameterValueType = 'number' | 'boolean'
 

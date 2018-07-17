@@ -1,8 +1,8 @@
 import { generateUUID } from "../math";
-import { UniformDescriptor, GLProgramConfig, GLProgram } from "../webgl/program";
-import { AttributeUsage } from "./attribute";
+import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { GLDataType } from "../webgl/shader-util";
 import { GLRenderer } from "../renderer/webgl-renderer";
+import { AttributeUsage } from "../webgl/attribute";
 
 export const standradMeshAttributeLayout = [
   { name:'position',type:GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
@@ -18,19 +18,11 @@ export class Material{
   constructor() {
   }
 
-  setUniform(key:string, value:any) {
-    this.uniforms[key] = value;
-  }
-
-  uniforms: any;
-
   config;
   name: string;
   uuid = generateUUID();
 
   isTransparent = false;
-
-  params: UniformDescriptor;
 
   createProgram(renderer: GLRenderer): GLProgram {
     throw 'material not implemented';

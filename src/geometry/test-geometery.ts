@@ -1,5 +1,6 @@
 import { Geometry } from "../core/geometry";
-import { Attribute, AttributeUsage } from "../core/attribute";
+import { AttributeUsage } from "../webgl/attribute";
+
 
 const TestGeometryConfig = {
   attributeList: [{

@@ -2,16 +2,9 @@ import { GLRenderer } from "../renderer/webgl-renderer";
 import { GLShader, ShaderType } from "./shader";
 import { generateUUID } from "../math";
 import { Geometry } from "../core/geometry";
-import { AttributeUsage } from "../core/attribute";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
-import { GLUniform, UniformDescriptor } from "./uniform";
-
-export interface AttributeDescriptor {
-  name: string,
-  type: GLDataType,
-  stride: number,
-  usage: AttributeUsage
-}
+import { GLUniform, UniformDescriptor } from "./uniform/uniform";import { AttributeDescriptor, AttributeUsage } from "./attribute";
+;
 
 export interface VaryingDescriptor {
   name: string,

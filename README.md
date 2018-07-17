@@ -35,7 +35,7 @@ Artix 是下一代先进的webGL的渲染框架。为下一代webGL创意工具�
 
 [renderGraph](./src/render-graph/dev-design.md)
 
-[uniform静态检查](./src/webgl/uniform-dev-design.md)
+[uniform静态检查](./src/webgl/uniform/uniform-dev-design.md)
 
 ## 编码风格
 

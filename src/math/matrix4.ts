@@ -3,6 +3,10 @@ export class Matrix4 {
 
   }
 
+  static flatten(v:Matrix4) {
+    return new Float32Array([0])
+  }
+
   elements: number[] = [
     1, 0, 0, 0,
     0, 1, 0, 0,

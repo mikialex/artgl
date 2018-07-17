@@ -1,7 +1,7 @@
 import { GLInfo } from "../webgl/gl-info";
 import { GLProgram } from "../webgl/program";
 import { Matrix4, Vector3 } from "../math";
-import { Attribute } from "../core/attribute";
+import { Attribute } from "../webgl/attribute";
 
 type uniformValueType = number | Matrix4 | Vector3;
 

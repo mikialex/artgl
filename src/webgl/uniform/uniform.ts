@@ -1,6 +1,6 @@
-import { GLProgram } from "./program";
+import { GLProgram } from "../program";
 import { findUnifromSetter, findUnifromFlattener } from "./uniform-util";
-import { GLDataType } from "./shader-util";
+import { GLDataType } from "../shader-util";
 
 export type uniformUploadType = number | Float32Array 
 
@@ -48,23 +48,25 @@ export class GLUniform<T>{
 // })
 // uni.set(1);
 
-class test<T, K extends keyof T>{
-  constructor(conf: T, names:K[]) {
+// class test<T, K extends keyof T>{
+//   constructor(conf: T, names:K[]) {
     
-  }
-  conf: T
+//   }
+//   conf: T
   
-  set(key:K, value: T[K]) {
-    this.conf[key] = value;
-  }
+//   set(key:K, value: T[K]) {
+//     this.conf[key] = value;
+//   }
 
-}
+// }
 
-interface inter{
-  a: string;
-  b: number
-}
+// interface inter{
+//   a: string;
+//   b: number
+// }
 
-const a = new test({a:'', b:123}, ['a'])
+// const a = new test({a:'', b:123}, ['a', 'b'])
 
-a.set('a', 'sdsf')
+// a.set('a', 23)
+
+// a.set('b', 2)

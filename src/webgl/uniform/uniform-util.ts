@@ -1,4 +1,5 @@
-import { GLDataType } from "./shader-util";
+import { GLDataType } from "../shader-util";
+import { Matrix4 } from "../../math";
 
 export function findUnifromSetter(type:GLDataType) {
   switch (type) {
@@ -53,13 +54,13 @@ function setValue1i(gl, location, v) { gl.uniform1i(location, v) }
 export function findUnifromFlattener(type: GLDataType) {
   switch (type) {
     case GLDataType.float: return flattenFloat; // FLOAT
-    // case 0x8b50: return setValue2fv; // _VEC2
-    // case 0x8b51: return setValue3fv; // _VEC3
-    // case 0x8b52: return setValue4fv; // _VEC4
+    case GLDataType.floatVec2: return flattenFloat; // _VEC2
+    case GLDataType.floatVec3: return flattenFloat; // _VEC3
+    case GLDataType.floatVec4: return flattenFloat; // _VEC4
 
-    // case 0x8b5a: return setValue2fm; // _MAT2
-    // case 0x8b5b: return setValue3fm; // _MAT3
-    // case 0x8b5c: return setValue4fm; // _MAT4
+    case GLDataType.Mat2: return flattenFloat; // _MAT2
+    case GLDataType.Mat3: return flattenFloat; // _MAT3
+    case GLDataType.Mat4: return Matrix4.flatten // _MAT4
 
     // case 0x8b5e: case 0x8d66: return setValueT1; // SAMPLER_2D, SAMPLER_EXTERNAL_OES
     // case 0x8b60: return setValueT6; // SAMPLER_CUBE
@@ -69,8 +70,21 @@ export function findUnifromFlattener(type: GLDataType) {
     // case 0x8b54: case 0x8b58: return setValue3iv; // _VEC3
     // case 0x8b55: case 0x8b59: return setValue4iv; // _VEC4
   }
+  throw 'uniform falttener not found'
 }
 
 function flattenFloat(v) {
   return v;
+}
+
+function flattenVector2(v) {
+
+}
+
+function flattenVector3(v) {
+  
+}
+
+function flattenVector4(v) {
+
 }
