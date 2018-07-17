@@ -1,4 +1,5 @@
 import { GLDataType } from "./shader-util";
+import { GLProgram } from "./program";
 
 export const enum AttributeUsage {
   position,
@@ -14,30 +15,29 @@ export interface AttributeDescriptor {
   usage: AttributeUsage
 }
 
-export class Attribute {
-  constructor(type: GLDataType, stride: number, size: number) {
-    this.data = new Float32Array(size);
-    this.count = size / stride;
-    this.stride = stride;
-    if (this.count !== Math.ceil(this.count)) {
-      throw 'size dont match stride'
-    }
+export class GLAttribute {
+  constructor(program: GLProgram, descriptor: AttributeDescriptor) {
+    this.descriptor = descriptor;
+    this.program = program;
+    this.gl = program.getRenderer().gl;
+    this.location = this.gl.getAttribLocation(this.program, descriptor.name);
   }
+  private gl: WebGLRenderingContext;
+  program: GLProgram;
+  location: number; // location type 
+  descriptor: AttributeDescriptor;
   data: any;
   type: GLDataType;
   count: number = 0;
   stride: number = 1;
 
-  setIndex(index: number, value: number) {
-    this.data[index * this.stride] = value;
-  }
-
-  setData(data: any) {
-    this.data = data;
-  }
-
-  updateData() {
-    
+  updateData(data: any) {
+    const gl = this.gl;
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(this.location, this.descriptor.stride, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(this.location);
   }
 
 }

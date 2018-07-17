@@ -1,43 +1,37 @@
-import { Vector3, TriangleFace } from "../math";
 import { GLDataType } from "../webgl/shader-util";
-import { AttributeUsage, Attribute } from "../webgl/attribute";
+import { BufferData } from "./buffer-data";
+import { AttributeUsage } from "../webgl/attribute";
 
-type GeometryParameterValueType = 'number' | 'boolean'
-
-
-export const MeshAttributeConfig = [
-  { usage: AttributeUsage.position, stride: 3 },
-  { usage: AttributeUsage.normal, stride: 3 },
-  { usage: AttributeUsage.color, stride: 3 },
-  { usage: AttributeUsage.uv, stride: 2 },
-]
+// export const MeshAttributeConfig = [
+//   { usage: AttributeUsage.position, stride: 3 },
+//   { usage: AttributeUsage.normal, stride: 3 },
+//   { usage: AttributeUsage.color, stride: 3 },
+//   { usage: AttributeUsage.uv, stride: 2 },
+// ]
 
 
-export interface AttributeListItem{
+interface lauoutInfo{
   usage: AttributeUsage,
-  stride: number
+  stride: number,
+  drawFrom: number;
+  drawCount: number;
 }
 
-
-export interface GeometryConfig{
-  attributeList: AttributeListItem[]
+export interface GeometryDataLayout {
+  [index: string]: lauoutInfo;
 }
 
 export class Geometry {
-  constructor(conf: GeometryConfig) {
-    this.attributesConfig = conf;
-    generateAttributes(conf, this.attributes);
+  constructor() {
   }
-  attributesConfig: GeometryConfig;
-  attributes: any = {};
-  drawFrom = 0;
-  drawCount = 0;
+  bufferDatas: { [index: string]: BufferData } = {};
+  layout: GeometryDataLayout;
 
   needUpdate: boolean = true;
   parameters: any;
 
   /**
-   * creat or update the geometry's data in attributes
+   * creat or update the geometry's data in bufferdatas
    * 
    * @memberof Geometry
    */
@@ -54,7 +48,7 @@ export class Geometry {
 
 }
 
-function generateAttributes(attributesConfig, attributes) { 
+function generateAttributes(attributesConfig, attributes) {
   attributesConfig.attributeList.forEach(attConf => {
     switch (attConf.usage) {
       case AttributeUsage.position:

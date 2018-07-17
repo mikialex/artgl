@@ -1,23 +1,6 @@
 import { GLInfo } from "../webgl/gl-info";
 import { GLProgram } from "../webgl/program";
-import { Matrix4, Vector3 } from "../math";
-import { Attribute } from "../webgl/attribute";
-
-type uniformValueType = number | Matrix4 | Vector3;
-
-export interface UniformGroup{
-  [index: string]: uniformValueType;
-}
-
-export interface AttributesGroup {
-  [index: string]: Attribute;
-}
-
-export interface GLRenderable{
-  uniforms: UniformGroup;
-  attributs: AttributesGroup;
-  program: GLProgram;
-}
+import { Matrix4 } from "../math";
 
 export class GLRenderer {
   constructor(el: HTMLCanvasElement, options?: any) {

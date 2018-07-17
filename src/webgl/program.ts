@@ -3,7 +3,8 @@ import { GLShader, ShaderType } from "./shader";
 import { generateUUID } from "../math";
 import { Geometry } from "../core/geometry";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
-import { GLUniform, UniformDescriptor } from "./uniform/uniform";import { AttributeDescriptor, AttributeUsage } from "./attribute";
+import { GLUniform, UniformDescriptor } from "./uniform/uniform";
+import { AttributeDescriptor, GLAttribute } from "./attribute";
 ;
 
 export interface VaryingDescriptor {
@@ -35,7 +36,7 @@ export class GLProgram {
 
     this.createShaders(config);
     this.createProgram(this.vertexShader, this.fragmentShader);
-    this.populateDataSlot(config);
+    this.createGLResource(config);
     this.config = config;
     renderer.addProgram(this);
 
@@ -50,7 +51,7 @@ export class GLProgram {
   getRenderer() { return this.renderer };
   private program: WebGLProgram;
   private config: GLProgramConfig;
-  private attributes = {};
+  private attributes: { [index: string]: GLAttribute }= {};
   private uniforms: { [index: string]: GLUniform<any> } = {};
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
@@ -79,16 +80,10 @@ export class GLProgram {
     }
   }
 
-  private populateDataSlot(config: GLProgramConfig) {
-    const gl = this.renderer.gl;
+  private createGLResource(config: GLProgramConfig) {
     if (config.attributes !== undefined) {
       config.attributes.forEach(att => {
-        this.attributes[att.name] = {
-          name: att.name,
-          data: null,
-          position: gl.getAttribLocation(this.program, att.name),
-          discriptor: att
-        }
+        this.attributes[att.name] = new GLAttribute(this, att)
       })
     }
     if (config.uniforms !== undefined) {
@@ -98,51 +93,45 @@ export class GLProgram {
     }
   }
 
-  setAttribute(name: string, data: any) {
+  updateAttribute(name: string, data: any) {
     const attribute = this.attributes[name];
     if (!attribute) {
       throw 'try to set a none exist attribute';
     }
-    const gl = this.renderer.gl;
-    const buffer = gl.createBuffer();
-    const position = attribute.position;
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(position, attribute.discriptor.stride, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(position);
+    attribute.updateData(data);
   }
 
-  /**
-   * set a giving geometry's data to this program's attribute
-   *
-   * @param {Geometry} geometry
-   * @memberof GLProgram
-   */
-  setGeometryData(geometry: Geometry) {
-    this.drawCount = geometry.drawCount;
-    this.drawFrom = geometry.drawFrom;
-    geometry.attributesConfig.attributeList.forEach(att => {
-      switch (att.usage) {
-        case AttributeUsage.position:
-          this.setAttribute(this.attributeMap[AttributeUsage.position],
-            geometry.attributes.position.data);  
-          break;
+  // /**
+  //  * set a giving geometry's data to this program's attribute
+  //  *
+  //  * @param {Geometry} geometry
+  //  * @memberof GLProgram
+  //  */
+  // setGeometryData(geometry: Geometry) {
+  //   this.drawCount = geometry.drawCount;
+  //   this.drawFrom = geometry.drawFrom;
+  //   geometry.attributesConfig.attributeList.forEach(att => {
+  //     switch (att.usage) {
+  //       case AttributeUsage.position:
+  //         this.setAttribute(this.attributeMap[AttributeUsage.position],
+  //           geometry.attributes.position.data);  
+  //         break;
 
-        case AttributeUsage.normal:
-          this.setAttribute(this.attributeMap[AttributeUsage.normal],
-            geometry.attributes.normal.data);  
-          break;
+  //       case AttributeUsage.normal:
+  //         this.setAttribute(this.attributeMap[AttributeUsage.normal],
+  //           geometry.attributes.normal.data);  
+  //         break;
 
-        case AttributeUsage.uv:
-          this.setAttribute(this.attributeMap[AttributeUsage.uv],
-            geometry.attributes.uv.data);  
-          break;
+  //       case AttributeUsage.uv:
+  //         this.setAttribute(this.attributeMap[AttributeUsage.uv],
+  //           geometry.attributes.uv.data);  
+  //         break;
 
-        default:
-          break;
-      }
-    });
-  }
+  //       default:
+  //         break;
+  //     }
+  //   });
+  // }
 
   setDrawRange(start:number, count:number) {
     this.drawFrom = start;

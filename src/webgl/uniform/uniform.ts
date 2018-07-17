@@ -27,7 +27,7 @@ export class GLUniform<T>{
     }
 
   }
-  private gl
+  private gl: WebGLRenderingContext;
   program: GLProgram;
   location: WebGLUniformLocation;
   value: T;
