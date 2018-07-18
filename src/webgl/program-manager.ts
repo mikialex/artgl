@@ -11,12 +11,15 @@ export class GLProgramManager{
     this.programs[program.id] = program;
   }
 
-  getProgram() {
+  getProgramByMaterial() {
     
   }
 
   dispose() {
-    
+    Object.keys(this.programs).forEach(programKey => {
+      const program = this.programs[programKey];
+      program.dispose();
+    })
   }
 
 }

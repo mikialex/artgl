@@ -112,4 +112,8 @@ export class GLProgram {
   setUniform(name: string, data: GLData) {
     this.uniforms[name].set(data);
   }
+
+  dispose() {
+    
+  }
 }
