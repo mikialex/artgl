@@ -4,6 +4,8 @@ import { LightList } from "./light-list";
 import { RenderObject } from "../core/render-object";
 import { Camera } from "../core/camera";
 import { Matrix4 } from "../math";
+import { GLProgram } from "../webgl/program";
+import { Geometry } from "../core/geometry";
 
 export class ARTEngineAdaptor {
   constructor(engine: ARTEngine) {
@@ -66,9 +68,17 @@ export class ARTEngine {
     const program = material.program;
     program.setUniform('worldMatrix', matrix);
     program.setUniform('MVPMatrix', this.MVPMatrix);
-    program.setGeometryData(object.geometry);
+    this.connectGeometryData(object.geometry, program);
     this.renderer.useProgram(program);
     this.renderer.render();
+  }
+
+  connectGeometryData(geometry: Geometry, program: GLProgram) {
+    for (const infoKey in geometry.layout.dataInfo) {
+      const info = geometry.layout.dataInfo[infoKey];
+      program.getAttributeByUsage(info.usage).updateData(geometry.bufferDatas[infoKey]);
+    }
+
   }
 
 }

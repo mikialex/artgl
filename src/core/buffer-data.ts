@@ -9,6 +9,9 @@ export class BufferData{
   setIndex(index: number, value: number) {
     this.data[index] = value;
   }
+  setData(data: BufferDataType) {
+    this.data = data;
+  }
 }
 
 export class Float32BufferData extends BufferData{
