@@ -2,6 +2,10 @@
 
 create a renderer and a program, set attributes, uniforms, draw it.
 
+最低层次的用法，仅仅是对webgl底层的简单封装。
+
+通过简单的config，创建一个program，包含两个shader，若干attribute和unifrom等资源，创建一个渲染器，指定一个目标，指定一堆数据，一些参数，然后渲染，得到结果。
+
 ```ts
 
 var vertexShaderSource =

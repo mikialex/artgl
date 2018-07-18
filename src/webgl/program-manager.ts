@@ -1,7 +1,7 @@
 import { GLRenderer } from "../renderer/webgl-renderer";
 import { GLProgram } from "./program";
 
-export class ProgramManager{
+export class GLProgramManager{
   constructor(renderer:GLRenderer) {
     
   }

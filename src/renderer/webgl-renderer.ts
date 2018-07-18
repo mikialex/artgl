@@ -1,6 +1,7 @@
 import { GLInfo } from "../webgl/gl-info";
 import { GLProgram } from "../webgl/program";
 import { Matrix4 } from "../math";
+import { GLProgramManager } from "../webgl/program-manager";
 
 export class GLRenderer {
   constructor(el: HTMLCanvasElement, options?: any) {
@@ -27,9 +28,9 @@ export class GLRenderer {
   }
 
   private activeProgram: GLProgram;
-  private programs: GLProgram[] = [];
+  private programManager: GLProgramManager;
   addProgram(program: GLProgram) {
-    this.programs.push(program);
+    this.programManager.addNewProgram(program);
   }
 
   useProgram(program: GLProgram) {

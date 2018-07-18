@@ -25,17 +25,11 @@ export class GLProgram {
   constructor(renderer: GLRenderer, config: GLProgramConfig) {
     this.renderer = renderer;
     this.id = generateUUID();
-    console.log(this);
-    if (config.autoInjectHeader) {
-      config.vertexShaderString = injectVertexShaderHeaders(config, config.vertexShaderString);
-      config.fragmentShaderString = injectFragmentShaderHeaders(config, config.fragmentShaderString);
-    }
-    console.log(config.vertexShaderString);
-    console.log(config.fragmentShaderString);
 
     this.createShaders(config);
     this.createProgram(this.vertexShader, this.fragmentShader);
     this.createGLResource(config);
+    
     this.config = config;
     renderer.addProgram(this);
 
@@ -59,10 +53,16 @@ export class GLProgram {
   drawCount: number;
 
   private createShaders(conf: GLProgramConfig) {
+    if (conf.autoInjectHeader) {
+      conf.vertexShaderString = injectVertexShaderHeaders(conf, conf.vertexShaderString);
+      conf.fragmentShaderString = injectFragmentShaderHeaders(conf, conf.fragmentShaderString);
+      console.log(conf.vertexShaderString);
+      console.log(conf.fragmentShaderString);
+    }
     this.vertexShader = new GLShader(this.renderer);
-    this.vertexShader.compileRawShader(conf.vertexShaderString, ShaderType.vertex);
+    this.vertexShader.compileShader(conf.vertexShaderString, ShaderType.vertex);
     this.fragmentShader = new GLShader(this.renderer);
-    this.fragmentShader.compileRawShader(conf.fragmentShaderString, ShaderType.fragment);
+    this.fragmentShader.compileShader(conf.fragmentShaderString, ShaderType.fragment);
   }
 
   private createProgram(vertexShader: GLShader, fragmentShader: GLShader) {

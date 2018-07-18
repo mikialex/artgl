@@ -10,9 +10,6 @@ import { PerspectiveCamera } from "./camera/perspective-camera";
 
 window.onload = function () {
 
-
-
-  // var worker = new Worker()
   let canv = document.querySelector('canvas');
   let renderer = new GLRenderer(canv);
   const engine = new ARTEngine(renderer);
@@ -24,10 +21,8 @@ window.onload = function () {
   let testMat = new TestMaterial();
 
   let testMesh = new Mesh(testGeo, testMat);
-  
-  engine.renderList.addRenderItem(testMesh, new Matrix4());
 
-  engine.render();
+  engine.renderObject(testMesh, new Matrix4());
 
 
   // const testProgramConf = generateStandradProgramConfig();

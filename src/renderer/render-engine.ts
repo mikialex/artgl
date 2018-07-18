@@ -1,5 +1,5 @@
 import { GLRenderer } from "./webgl-renderer";
-import { RenderList } from "./render-list";
+import { RenderList, RenderCall } from "./render-list";
 import { LightList } from "./light-list";
 import { RenderObject } from "../core/render-object";
 import { Camera } from "../core/camera";
@@ -17,8 +17,6 @@ export class ARTEngineAdaptor {
     
   }
 }
-
-
 
 export class ARTEngine {
   constructor(renderer: GLRenderer) {
@@ -52,14 +50,18 @@ export class ARTEngine {
     const transparentList = this.renderList.transparentList;
     for (let i = 0; i < opaqueList.length; i++) {
       const renderCall = opaqueList[i];
-      this.renderObject(renderCall.object, renderCall.matrix);
+      this.renderObject(renderCall.object, renderCall.transform);
     }
 
     for (let i = 0; i < transparentList.length; i++) {
       const renderCall = transparentList[i];
-      this.renderObject(renderCall.object, renderCall.matrix);
+      this.renderObject(renderCall.object, renderCall.transform);
     }
 
+  }
+
+  renderObjects(renderCalls: RenderCall[]) {
+    
   }
 
   renderObject(object: RenderObject, matrix:Matrix4) {

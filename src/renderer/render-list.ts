@@ -3,9 +3,9 @@ import { Material } from "../core/material";
 import { RenderObject } from "../core/render-object";
 import { Matrix4 } from "../math";
 
-export interface RenderListItem{
-  // transform:
-  object: RenderObject,
+export interface RenderCall {
+  object: RenderObject;
+  transform: Matrix4;
 }
 
 export class RenderList{
@@ -13,24 +13,24 @@ export class RenderList{
     
   }
 
-  opaqueList = [];
-  transparentList = [];
+  opaqueList: RenderCall[] = [];
+  transparentList: RenderCall[] = [];
 
   opaqueCount = 0;
   transparentCount = 0;
 
-  addRenderItem(object: RenderObject, transformation: Matrix4) {
-    if (object.material.isTransparent) {
-      this.transparentList.push({ object, transformation});
-      this.transparentCount++;
-    } else {
-      if (this.opaqueCount < this.opaqueList.length) {
-        this.opaqueList[this.opaqueCount]({ object, transformation });
-      } else {
-        this.opaqueList.push({ object, transformation });
-      }
-      this.opaqueCount++;
-    }
+  addRenderItem(object: RenderObject, transform: Matrix4) {
+    // if (object.material.isTransparent) {
+    //   this.transparentList.push({ object, transform});
+    //   this.transparentCount++;
+    // } else {
+    //   if (this.opaqueCount < this.opaqueList.length) {
+    //     this.opaqueList[this.opaqueCount]({ object, transform });
+    //   } else {
+    //     this.opaqueList.push({ object, transformation });
+    //   }
+    //   this.opaqueCount++;
+    // }
   }
 
   clear() {

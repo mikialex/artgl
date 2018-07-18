@@ -1,4 +1,5 @@
 import { GLRenderer } from "../renderer/webgl-renderer";
+import { GLProgramConfig } from "./program";
 
 export enum ShaderType {
   vertex,
@@ -12,7 +13,7 @@ export class GLShader {
   renderer: GLRenderer;
   shader: WebGLShader;
 
-  compileRawShader = (source: string, type: ShaderType): WebGLShader => {
+  compileShader = (source: string, type: ShaderType): WebGLShader => {
     const gl = this.renderer.gl;
     var shader = gl.createShader(type === ShaderType.vertex ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER);
     gl.shaderSource(shader, source);
