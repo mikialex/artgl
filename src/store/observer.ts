@@ -1,25 +1,16 @@
 import { ReactiveStore } from "./reactive-store";
 import { Watcher } from "./watcher";
 
-interface ObserverConfig {
-  name: string;
-}
-
 let gId = 0;
 export class DataObserver {
-  constructor(store: ReactiveStore, conf: ObserverConfig) {
+  constructor(store: ReactiveStore) {
     this.store = store;
     this.id = gId++;
-    this.name = conf.name;
   }
   id;
-  name;
   realValue;
   store: ReactiveStore;
   
-  // other data dependencies this data rely
-  dependency: DataObserver[] = [];
-
   // watchers that watch this data
   watchers: Watcher[] = [];
   userWatchers = [];
@@ -39,7 +30,7 @@ export class DataObserver {
   }
 
   get isGetter() {
-    return this.dependency.length > 0;
+    return this.updateWatcher !== undefined;
   }
 
   setValue(value) {
@@ -50,21 +41,21 @@ export class DataObserver {
       const oldValue = this.realValue;
       this.realValue = value;
       this.watchers.forEach(watcher => {
-        watcher.run(value, oldValue);
+        watcher.update(value, oldValue);
       });
     }
   }
-  updateValue() {
-    if (this.isGetter) {
-      console.log('eval getter ' + this.name);
-      this.realValue = this.updateWatcher.run();
-      this.isDirty = false;
-    }
-    return this.realValue;
-  }
+  // updateValue() {
+  //   if (this.isGetter) {
+  //     console.log('eval getter ' + this.name);
+  //     this.realValue = this.updateWatcher.run();
+  //     this.isDirty = false;
+  //   }
+  //   return this.realValue;
+  // }
   getValue() {
     if (this.isDirty) {
-      this.updateValue();
+      // this.updateValue();
     }
     return this.realValue;
   }

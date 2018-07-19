@@ -13,6 +13,8 @@ export class ReactiveStore {
     const self = this;
     const getterObserverMap = {};
 
+    this.observe(storeConfig.states);
+
     Object.keys(storeConfig.states).forEach(stateKey => {
       this.defineReactive(this.states, stateKey);
     });
@@ -22,91 +24,59 @@ export class ReactiveStore {
     });
 
 
-
-    // // merge env
-    // this.env = {};
-    // Object.keys(this.states).forEach(key => {
-    //   Object.defineProperty(this.env, key, {
-    //     get: function () {
-    //       return self.states[key];
-    //     },
-    //     set: function (value) {
-    //       self.states[key] = value;
-    //     }
-    //   });
-    // });
-    // Object.keys(this.getters).forEach(key => {
-    //   Object.defineProperty(this.env, key, {
-    //     get: function () {
-    //       return self.getters[key];
-    //     },
-    //   });
-    // });
-
-    // // rebind
-    // Object.keys(this.observers).forEach(key => {
-    //   const obs = this.observers[key];
-    //   if (obs.isGetter) {
-    //     obs.getterFunc = obs.getterFunc.bind(this.env);
-    //   }
-    // });
-
     Object.keys(storeConfig.getters).forEach(getterKey => {
       const getter = storeConfig.getters[getterKey];
       this.createGetterWatcher(getterObserverMap[getterKey], getter);
     });
 
-    // Object.keys(storeConfig.watchers).forEach(watcherKey => {
-    //   const watcher = storeConfig.watchers[watcherKey];
-    //   Object.keys(this.observers).forEach(key => {
-    //     const obs = this.observers[key];
-    //     if (obs.name === watcherKey) {
-    //       obs.watch(watcher.bind(this.env));
-    //     }
-    //   });
-    // });
+  }
 
+  observe(data) {
+    if (Array.isArray(data)) {
+      // TODO
+    }
+    if (!data || typeof data !== 'object') {
+      return
+    }
+    Object.keys(data).forEach(key => {
+      this.defineReactive(data, key)
+      this.observe(data[key])
+    })
   }
 
   defineReactive(obj: any, key: string) {
     const self = this;
     const value = obj[key];
-    const observer = new DataObserver(this, {
-      name: key,
-    });
+    const observer = new DataObserver(this);
     observer.setValue((typeof value === 'function')? undefined : value)
     this.observers[observer.id] = observer;
     Object.defineProperty(obj, key, {
       get: function () {
-        this.notifyGet(observer);
+        self.notifyGet(observer);
         return self.observers[key].getValue();
       },
       set: function (value) {
+        self.observe(value);
         self.observers[key].setValue(value);
       }
     });
-    if (typeof value === 'object') {
-      if (Array.isArray(value)) {
-        // TODO
-      } else {
-        Object.keys(value).forEach(subKey => {
-          this.defineReactive(value, subKey);
-        });
-      }
-    }
     return observer;
   }
 
   createGetterWatcher(func, observer: DataObserver) {
-    const watcher = new Watcher(this, func);
-    watcher.findSubscription();
-    watcher.applyToGetterObserver(observer);
+    const dependencyList = this.collectDependency(func);
+    const getter = new Watcher(this, () => {
+      observer.setValue(func());
+    });
+    dependencyList.forEach((dep: DataObserver) => {
+      dep.addWatcher(getter);
+    });
   }
 
-  collectDependency(watcher: Watcher) {
+  collectDependency(func) {
     this.isCollectDenpendency = true;
     this.dependencyList = [];
-    watcher.run();
+    func();
     this.isCollectDenpendency = false;
     return this.dependencyList;
   }
@@ -126,6 +96,13 @@ export class ReactiveStore {
   env: any = { a: 1 };
 
 }
+
+
+
+
+
+
+
 
 (window as any).store = new ReactiveStore({
   states: {
