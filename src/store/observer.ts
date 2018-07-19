@@ -3,8 +3,6 @@ import { Watcher } from "./watcher";
 
 interface ObserverConfig {
   name: string;
-  isGetter: boolean;
-  getterFunc?: Function;
 }
 
 let gId = 0;
@@ -13,10 +11,6 @@ export class DataObserver {
     this.store = store;
     this.id = gId++;
     this.name = conf.name;
-    this.isGetter = conf.isGetter;
-    if (this.isGetter) {
-      this.getterFunc = conf.getterFunc;
-    }
   }
   id;
   name;
@@ -29,21 +23,23 @@ export class DataObserver {
   // watchers that watch this data
   watchers: Watcher[] = [];
   userWatchers = [];
+  
+  // value update watcher
+  updateWatcher: Watcher;
 
-  isGetter = false;
-  getterFunc;
   isDirty = false;
 
-  watch(callBack) {
-    if (this.watchers.indexOf(callBack) === -1) {
-      this.watchers.push(callBack);
+  addWatcher(watcher: Watcher) {
+    if (this.watchers.indexOf(watcher) === -1) {
+      this.watchers.push(watcher);
     }
   }
-  unwatch(callBack) {
-    const index = this.watchers.indexOf(callBack);
-    if (index === -1) {
-      this.watchers.splice(index, 1);
-    }
+  removeWatcher(watcher: Watcher) {
+    this.watchers = this.watchers.filter(wa => wa.id === watcher.id);
+  }
+
+  get isGetter() {
+    return this.dependency.length > 0;
   }
 
   setValue(value) {
@@ -53,15 +49,15 @@ export class DataObserver {
     if (value !== this.realValue) {
       const oldValue = this.realValue;
       this.realValue = value;
-      this.watchers.forEach(watchCallback => {
-        watchCallback(value, oldValue);
+      this.watchers.forEach(watcher => {
+        watcher.run(value, oldValue);
       });
     }
   }
   updateValue() {
     if (this.isGetter) {
       console.log('eval getter ' + this.name);
-      this.realValue = this.getterFunc();
+      this.realValue = this.updateWatcher.run();
       this.isDirty = false;
     }
     return this.realValue;
