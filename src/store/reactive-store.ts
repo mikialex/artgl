@@ -8,16 +8,16 @@ interface ReactiveStoreConfig {
   watchers?: { [index: string]: Function };
 }
 
+// store makes a data obserable by convert its property to getter setter,
+// to send update info to their corespondent dataobserver;
 export class ReactiveStore {
   constructor(storeConfig: ReactiveStoreConfig) {
     const self = this;
+    this.states = storeConfig.states;
 
-    this.observe(storeConfig.states);
+    this.observe(this.states);
 
-    Object.keys(storeConfig.getters).forEach(getterKey => {
-      const getterFunc = storeConfig.getters[getterKey];
-      this.createWatcher(getterFunc, () => {});
-    });
+    this.createGetterObservers(storeConfig.getters);
 
   }
 
@@ -29,14 +29,13 @@ export class ReactiveStore {
       return
     }
     Object.keys(data).forEach(key => {
-      this.defineReactive(data, key)
+      this.defineReactive(data, key, data[key])
       this.observe(data[key])
     })
   }
 
-  defineReactive(obj: any, key: string) {
+  defineReactive(obj: any, key: string, value:any) {
     const self = this;
-    const value = obj[key];
     const observer = new DataObserver(this);
     observer.setValue((typeof value === 'function')? undefined : value)
     this.observers[observer.id] = observer;
@@ -57,6 +56,24 @@ export class ReactiveStore {
   createWatcher(func, callback) {
     return new Watcher(this, func, callback);
   }
+
+  createGetterObservers(getters) {
+    // first, create getters self obs by getterName
+    Object.keys(getters).forEach(getterKey => {
+      this.getterKeyObsererMap[getterKey] = { obs: this.defineReactive(this.states, getterKey, undefined) };
+    });
+    // then, make watchers from getter getterFunction
+    Object.keys(getters).forEach(getterKey => {
+      const observer = this.getterKeyObsererMap[getterKey].obs;
+      const getterFunc = getters[getterKey];
+      const watcher = this.createWatcher(getterFunc, (newVal) => {
+        observer.setValue(newVal);
+      });
+      this.getterKeyObsererMap[getterKey].watcher = watcher;
+    });
+    // TODO getter inital value, fix getter dengpendency eval sequence
+  }
+  getterKeyObsererMap = {};
 
   observers: { [index: string]: DataObserver } = {};
   states = {};

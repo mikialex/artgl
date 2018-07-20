@@ -2,6 +2,7 @@ import { ReactiveStore } from "./reactive-store";
 import { Watcher } from "./watcher";
 
 let gId = 0;
+// data observer watch a data, handle data's watcher
 export class DataObserver {
   constructor(store: ReactiveStore) {
     this.store = store;
@@ -26,10 +27,8 @@ export class DataObserver {
 
   setValue(value) {
     if (value !== this.realValue) {
-      const oldValue = this.realValue;
-      this.realValue = value;
       this.watchers.forEach(watcher => {
-        watcher.update(value, oldValue);
+        watcher.update();
       });
     }
   }

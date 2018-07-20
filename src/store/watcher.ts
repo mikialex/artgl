@@ -23,8 +23,13 @@ export class Watcher{
     DataObserver.target = null;
   }
 
-  update(newVal, oldVal) {
-    this.callback(newVal, oldVal);
+  update() {
+    const oldVal = this.value;
+    this.execute();
+    const newVal = this.value;
+    if (newVal !== oldVal) {
+      this.callback(newVal, oldVal);
+    }
   }
 
 }
