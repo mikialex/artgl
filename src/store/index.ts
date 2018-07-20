@@ -1,7 +1,15 @@
 import { Component } from "./component";
 import { ReactiveScene } from "./reactive-scene";
 
-export class MyComponent extends Component {
+// demo usage 
+// first, define several components that extends basecomponent
+// these components defined how your construct you scene tree from data
+// then, create  a root component, this component is mounted on the root of scene tree
+// and regist all your component to ReactiveScene
+// finally, create an ReactiveScene instance with a reative store as a reactive data provider
+// get your autoUpdate autoMaintan reactive scenetree by renderRoot(yourRootComponent)
+
+class MyComponent extends Component {
   constructor() {
     super();
   }
@@ -9,7 +17,7 @@ export class MyComponent extends Component {
 
   render(props) {
     if (this.store.a === true) {
-      return ReactiveScene.h('object3D', null);
+      return ReactiveScene.h('object3D', { a: props.a});
     } else {
       return null;
     }

@@ -5,17 +5,24 @@ let gId = 0;
 // watch a func exper, when its dependency change , eval func and exe updatecallback  
 // dependency collect is via DataObserver.target
 export class Watcher{
-  constructor(store: ReactiveStore, func, callback) {
-    this.store = store;
+  constructor(func, callback) {
     this.func = func;
     this.callback = callback;
     this.id = gId++;
+    this.execute(); // collect dependency
   }
   id;
-  store;
   value;
   func;
   callback;
+
+  observers = [];
+  // we may exam whether a func is rely reactive data
+  // we can create a watcher , check it isARealWatcher.
+  // if false, we may not need this watcher, because this func is not reactive
+  get isARealWatcher() {
+    return this.observers.length > 0;
+  }
 
   execute() {
     DataObserver.target = this;
@@ -32,4 +39,12 @@ export class Watcher{
     }
   }
 
+}
+
+export function createWatcherIfNeed(func) {
+  if (typeof func !== 'function') {
+    return null;
+  }
+  const watcher = new Watcher(func, null);
+  return watcher.isARealWatcher ? watcher : null;
 }

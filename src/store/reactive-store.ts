@@ -52,28 +52,24 @@ export class ReactiveStore {
     return observer;
   }
 
-  // create watcher from a func
-  createWatcher(func, callback) {
-    return new Watcher(this, func, callback);
-  }
-
+  getterKeyObserverMap = {};
   createGetterObservers(getters) {
     // first, create getters self obs by getterName
     Object.keys(getters).forEach(getterKey => {
-      this.getterKeyObsererMap[getterKey] = { obs: this.defineReactive(this.states, getterKey, undefined) };
+      this.getterKeyObserverMap[getterKey] = { obs: this.defineReactive(this.states, getterKey, undefined) };
     });
     // then, make watchers from getter getterFunction
     Object.keys(getters).forEach(getterKey => {
-      const observer = this.getterKeyObsererMap[getterKey].obs;
+      const observer = this.getterKeyObserverMap[getterKey].obs;
       const getterFunc = getters[getterKey];
-      const watcher = this.createWatcher(getterFunc, (newVal) => {
+      const watcher = new Watcher(getterFunc, (newVal) => {
         observer.setValue(newVal);
       });
-      this.getterKeyObsererMap[getterKey].watcher = watcher;
+      this.getterKeyObserverMap[getterKey].watcher = watcher;
     });
     // TODO getter inital value, fix getter dengpendency eval sequence
+    // this can be done by denpendency aly between data obs
   }
-  getterKeyObsererMap = {};
 
   observers: { [index: string]: DataObserver } = {};
   states = {};

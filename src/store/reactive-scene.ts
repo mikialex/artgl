@@ -22,10 +22,16 @@ export class ReactiveScene{
 
   scene
 
-  static isCollectrRenderDenpendency
+  static isCollectingRenderDenpendency
   static h(tag, data, ...rest) { // render ReactiveSceneFragment Recursively
-    if (ReactiveScene.isCollectrRenderDenpendency) {
-      return null
+    if (ReactiveScene.isCollectingRenderDenpendency) {
+      Object.keys(data).forEach(key => { // touch props
+        return data[key];// touch all possible values, emit getters
+      })
+      rest.forEach(child => {
+        child();
+      })
+      return;
     }
     ReactiveScene.SceneCreator.createScene(tag, data, parent);
     rest.forEach(child => {
