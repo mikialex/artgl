@@ -4,29 +4,19 @@ import { Watcher } from "./watcher";
 
 interface ReactiveStoreConfig {
   states: { [index: string]: any };
-  getters: { [index: string]: any };
-  watchers: { [index: string]: Function };
+  getters?: { [index: string]: any };
+  watchers?: { [index: string]: Function };
 }
 
 export class ReactiveStore {
   constructor(storeConfig: ReactiveStoreConfig) {
     const self = this;
-    const getterObserverMap = {};
 
     this.observe(storeConfig.states);
 
-    Object.keys(storeConfig.states).forEach(stateKey => {
-      this.defineReactive(this.states, stateKey);
-    });
     Object.keys(storeConfig.getters).forEach(getterKey => {
-      const obs = this.defineReactive(this.getters, getterKey);
-      getterObserverMap[getterKey] = obs;
-    });
-
-
-    Object.keys(storeConfig.getters).forEach(getterKey => {
-      const getter = storeConfig.getters[getterKey];
-      this.createGetterWatcher(getterObserverMap[getterKey], getter);
+      const getterFunc = storeConfig.getters[getterKey];
+      this.createWatcher(getterFunc, () => {});
     });
 
   }
@@ -52,7 +42,7 @@ export class ReactiveStore {
     this.observers[observer.id] = observer;
     Object.defineProperty(obj, key, {
       get: function () {
-        self.notifyGet(observer);
+        DataObserver.target && observer.addWatcher(DataObserver.target);
         return self.observers[key].getValue();
       },
       set: function (value) {
@@ -63,37 +53,14 @@ export class ReactiveStore {
     return observer;
   }
 
-  createGetterWatcher(func, observer: DataObserver) {
-    const dependencyList = this.collectDependency(func);
-    const getter = new Watcher(this, () => {
-      observer.setValue(func());
-    });
-    dependencyList.forEach((dep: DataObserver) => {
-      dep.addWatcher(getter);
-    });
+  // create watcher from a func
+  createWatcher(func, callback) {
+    return new Watcher(this, func, callback);
   }
 
-  collectDependency(func) {
-    this.isCollectDenpendency = true;
-    this.dependencyList = [];
-    func();
-    this.isCollectDenpendency = false;
-    return this.dependencyList;
-  }
-
-  notifyGet(observer) {
-    if (this.isCollectDenpendency && this.dependencyList.indexOf(observer.name) === -1) {
-      this.dependencyList.push(observer);
-    }
-  }
-
-
-  isCollectDenpendency = false;
-  dependencyList = [];
   observers: { [index: string]: DataObserver } = {};
   states = {};
   getters = {};
-  env: any = { a: 1 };
 
 }
 

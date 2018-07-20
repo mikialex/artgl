@@ -24,7 +24,7 @@ window.onload = function () {
 
   engine.renderObject(testMesh, new Matrix4());
 
-
+  const test = new ReactiveStore({ states: {}})
   // const testProgramConf = generateStandradProgramConfig();
   // let program = new GLProgram(renderer, testProgramConf);
 
