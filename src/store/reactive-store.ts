@@ -2,7 +2,7 @@ import { DataObserver } from "./observer";
 import { Watcher } from "./watcher";
 
 
-interface ReactiveStoreConfig {
+export interface ReactiveStoreConfig {
   states: { [index: string]: any };
   getters?: { [index: string]: any };
   watchers?: { [index: string]: Function };

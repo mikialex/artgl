@@ -1,7 +1,9 @@
 import { Watcher } from "./watcher";
 import { ReactiveStore } from "./reactive-store";
+import { Component } from "./component";
+import { ReactiveScene } from "./reactive-scene";
 
-export class ElementCreator {
+export class SceneCreator {
   constructor() {
     
   }
@@ -10,8 +12,8 @@ export class ElementCreator {
     this.elementMetaInfos[elementConf.name] = elementConf;
   }
 
-  registComponent(componentsConfig) {
-    this.componentMetaInfos[componentsConfig.name] = componentsConfig;
+  registComponent(component: Component) {
+    this.componentMetaInfos[component.name] = component;
   }
 
   elementMetaInfos = {};
@@ -21,7 +23,7 @@ export class ElementCreator {
     
   }
 
-  createElement(conf, datas, parent) {
+  createElement(conf, datas) {
     const obj = conf.render();
     Object.keys(datas).forEach(key => {
       const data = datas[key];
@@ -34,18 +36,18 @@ export class ElementCreator {
         });
       }
     })
-    parent.add(obj);
     return obj;
   }
 
-  createComponent(conf, datas, parent) {
-    isCollectrRenderDenpendency = true;
-    const creator = new Watcher({} as ReactiveStore, conf.render(datas), (newVal) => {
-      conf.render(datas)
+  createComponent(comName: string, datas) {
+    const com = new this.componentMetaInfos[comName]();
+    ReactiveScene.isCollectrRenderDenpendency = true;
+    const creator = new Watcher({} as ReactiveStore, com.render(datas), (newVal) => {
+      com.render(datas)
     });
-    isCollectrRenderDenpendency = false;
+    ReactiveScene.isCollectrRenderDenpendency = false;
 
-    const obj = conf.render();
+    const obj = com.render();
     Object.keys(datas).forEach(key => {
       const data = datas[key];
       if (typeof data !== 'string') { // plain data
@@ -53,69 +55,31 @@ export class ElementCreator {
       } else {
         // create att watcher, when function relys denpendency change, auto update new att to scene obj
         const updator = new Watcher({} as ReactiveStore, data, (newVal) => {
-          conf.render(datas)
+          com.render(datas)
         });
       }
     })
+    obj.componentInstance = com;
+    return obj;
   }
   
+  // create a ReactiveScene Fragment from a Component Or Primitive, called by h
   createScene(tag, datas, parent) {
     let obj;
     if (this.elementMetaInfos[tag] !== undefined) { // render primitive element
-      obj = this.createElement(this.elementMetaInfos[tag], datas, parent);
+      obj = this.createElement(this.elementMetaInfos[tag], datas);
     } else {
-      obj = this.createComponent(this.componentMetaInfos[tag], datas, parent);
+      obj = this.createComponent(tag, datas);
     }
     return obj;
   }
 }
 
 declare var THREE: any;
-const creator = new ElementCreator();
+const creator = new SceneCreator();
 creator.registElement({
   name: 'object3D',
   render: () => {
     return new THREE.Object3D;
   }
 })
-creator.registComponent({
-  name: 'MyComponent',
-  render: () => {
-    if (store.a === true) {
-      return h('object3D', null);
-    } else {
-      return null;
-    }
-  }
-})
-
-
-let root = new THREE.Scene();
-let parent = root;
-let isCollectrRenderDenpendency = false;
-export function h(tag, data, ...rest) {
-  if (isCollectrRenderDenpendency) {
-    return null
-  }
-  creator.createScene(tag, data, parent);
-  rest.forEach(child => {
-    // if (child === h) { // WTF
-    //   child();
-    // } else {
-      
-    // }
-  })
-}
-
-const template =
-  h(
-    "scene",
-    null,
-    h(
-      "obj",
-      { a: "sdf", b: cal() },
-      h("obj", null)
-    ),
-    h("obj", null),
-    h("obj", null)
-  );
