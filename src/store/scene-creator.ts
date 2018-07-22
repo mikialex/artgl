@@ -42,7 +42,7 @@ export class SceneCreator {
   
   //
   createComponent(comName: string, datas, parent) {
-    const com = new this.componentMetaInfos[comName]();
+    const com = new this.componentMetaInfos[comName](); // FIX
 
     // collect render function it selfs denpendency
     ReactiveScene.isCollectingRenderDenpendency = true;

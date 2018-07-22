@@ -22,8 +22,17 @@ export class ReactiveScene{
 
   scene
 
+  static useFakeElement;
   static isCollectingRenderDenpendency
+  static componentTarget
   static h(tag, data, ...rest) { // render ReactiveSceneFragment Recursively
+    if (this.useFakeElement) {
+      ReactiveScene.SceneCreator.createScene('fake', data, parent);
+      rest.forEach(child => {
+        child();
+      })
+    }
+    
     if (ReactiveScene.isCollectingRenderDenpendency) {
       Object.keys(data).forEach(key => { // touch props
         return data[key];// touch all possible values, emit getters

@@ -36,7 +36,11 @@ class My3D extends Component {
       { test: this.cal() },
       ReactiveScene.h(
         "obj",
-        { a: "sdf", b: this.store.a },
+        {
+          a: "sdf",
+          b: this.store.a,
+          rx_if: this.store.b
+        },
         ReactiveScene.h("obj", null)
       ),
       ReactiveScene.h(MyComponent, { name: "Sara" }),
