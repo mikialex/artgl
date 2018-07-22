@@ -15,12 +15,8 @@ class MyComponent extends Component {
   }
   name: 'MyComponent'
 
-  render(props) {
-    if (this.store.a === true) {
-      return ReactiveScene.h('object3D', { a: props.a});
-    } else {
-      return null;
-    }
+  render(props) { // props is not implemented
+      return ReactiveScene.h('object3D', { a: props.a, rs_if:this.store.a});
   }
 }
 
@@ -52,6 +48,18 @@ class My3D extends Component {
 
 ReactiveScene.registComponent(MyComponent)
 ReactiveScene.registComponent(My3D)
+
+// reqiste THREE primitives
+// this code can provide inner
+declare var THREE: any;
+const compiler = ReactiveScene.compiler;
+compiler.registPrimitive({
+  name: 'object3D',
+  render: () => {
+    return new THREE.Object3D;
+  }
+})
+
 
 const RS = new ReactiveScene({
   store: {}
