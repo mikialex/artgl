@@ -9,7 +9,8 @@ export class Watcher{
     this.func = func;
     this.callback = callback;
     this.id = gId++;
-    this.execute(); // collect dependency
+    this.execute(); // get inital value, 
+    //you cant determine a func's depencency by execute once, maybe use decorator to specify
   }
   id;
   value;
@@ -41,10 +42,3 @@ export class Watcher{
 
 }
 
-export function createWatcherIfNeed(func) {
-  if (typeof func !== 'function') {
-    return null;
-  }
-  const watcher = new Watcher(func, null);
-  return watcher.isARealWatcher ? watcher : null;
-}

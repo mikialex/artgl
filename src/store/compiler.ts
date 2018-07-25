@@ -1,6 +1,6 @@
 import { ComponentTemplate, ComponentTemplateNode, ComponentInstance, Component } from "./component";
 import { ReactiveScene } from "./reactive-scene";
-import { createWatcherIfNeed } from "./watcher";
+import { Watcher } from "./watcher";
 
 export class Compiler {
   constructor() {
@@ -44,24 +44,22 @@ export class Compiler {
     const template = this.getComponentTemplate(tn).template;
     let com;
     if (tn.ifExp !== undefined) {
-      const watcher = createWatcherIfNeed(tn.ifExp);
-      if (watcher !== undefined) {
-        watcher.callback = (newVal) => {
-          if (newVal) {
-            com = new ComponentInstance(tn);
-            // this.bindReactiveDataToPrimitive(tn, obj);
-            if (comParent !== undefined) {
-              comParent.add(com);
-            }
-          } else {
-            // obj.unbindReactiveDataToPrimitive();
-            if (comParent !== undefined) {
-              com.dispose();
-              comParent.remove(com);
-            }
+      const watcher = new Watcher(tn.ifExp, (newVal) => {
+        if (newVal) {
+          com = new ComponentInstance(tn);
+          // this.bindReactiveDataToPrimitive(tn, obj);
+          if (comParent !== undefined) {
+            comParent.add(com);
+          }
+        } else {
+          // obj.unbindReactiveDataToPrimitive();
+          if (comParent !== undefined) {
+            com.dispose();
+            comParent.remove(com);
           }
         }
-      }
+      })
+
     }
     const shouldCreate = tn.ifExp();
     if (!shouldCreate) {
@@ -112,19 +110,16 @@ export class Compiler {
   createPrimitive(tn: ComponentTemplateNode, parent) {
     let obj;
     if (tn.ifExp !== undefined) {
-      const watcher = createWatcherIfNeed(tn.ifExp);
-      if (watcher !== undefined) {
-        watcher.callback = (newVal) => {
-          if (newVal) {
-            obj = tn.create();
-            this.bindReactiveDataToPrimitive(tn, obj);
-            parent.add(obj);
-          } else {
-            obj.unbindReactiveDataToPrimitive();
-            parent.remove(obj);
-          }
+      const watcher = new Watcher(tn.ifExp, (newVal) => {
+        if (newVal) {
+          obj = tn.create();
+          this.bindReactiveDataToPrimitive(tn, obj);
+          parent.add(obj);
+        } else {
+          obj.unbindReactiveDataToPrimitive();
+          parent.remove(obj);
         }
-      }
+      });
     }
     const shouldCreate = tn.ifExp();
     if (!shouldCreate) {
@@ -139,15 +134,9 @@ export class Compiler {
   bindReactiveDataToPrimitive(tn, obj) {
     Object.keys(tn.datas).forEach(dataKey => {
       const dataExp = tn.datas[dataKey];
-      const watcher = createWatcherIfNeed(dataExp);
-      if (watcher !== undefined) {
-        watcher.callback = (newVal) => {
-          obj[dataKey] = newVal;
-        }
-        obj.updateWatchers.push(watcher);
-      } else { // static
-        obj[dataKey] = dataExp();
-      }
+      const watcher = new Watcher(dataExp, (newVal) => {
+        obj[dataKey] = newVal;
+      });
     })
   }
   unbindReactiveDataToPrimitive(obj) {

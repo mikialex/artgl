@@ -35,10 +35,14 @@ Artix 是下一代先进的webGL的渲染框架。为下一代webGL创意工具�
 
 [renderGraph](./src/render-graph/dev-design.md)
 
+[Reactive Scene](./src/store/dev-design.md)
+
 [uniform静态检查](./src/webgl/uniform/uniform-dev-design.md)
 
-## 编码风格
+## style guides
 
 * 文件夹 文件使用 小写字母和 - ，主要避免不同系统大小写行为，不同的git大小写配置导致的问题，同时具有更好的可读性。
+
 * 尽量不使用index.ts做为文件名，文件名和文件夹名字冗余并不是什么问题，这只会造成不知道一堆index是什么东西的情况。
+
 * code编写尽量匹配tslint的官方最佳实践，项目早期不会引入lint工具进行强制检查。
