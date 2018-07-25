@@ -1,4 +1,4 @@
-import { Watcher, createWatcherIfNeed } from "./watcher";
+import { Watcher } from "./watcher";
 import { ReactiveScene } from "./reactive-scene";
 
 // component is a composeabel fragment of scene descripition
