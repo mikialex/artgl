@@ -1,7 +1,22 @@
-interface Pipeable{
+import { RenderGraphNode } from "./render-node";
+
+export interface Pipeable{
 
 }
 
-class RenderGraph{
-  pipelines = [];
+export class RenderGraph{
+  private pipelines = [];
+  private inputNode: RenderGraphNode;
+
+  updateRenderNodeDenpendency() {
+    
+  }
+
+  setInputNode(node: RenderGraphNode) {
+    this.inputNode = node;
+  }
+
+  snapShot() {
+    
+  }
 }

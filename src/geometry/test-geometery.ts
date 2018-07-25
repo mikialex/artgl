@@ -10,7 +10,8 @@ export class TestGeometry extends Geometry {
         position: {
           usage: AttributeUsage.position,
           stride: 3
-      } },
+        }
+      },
       drawFrom: 0,
       drawCount: 5,
     }
