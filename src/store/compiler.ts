@@ -41,7 +41,7 @@ export class Compiler {
       // objParent = new THREE.Object3d(); // TODO
     }
 
-    const template = this.getComponentTemplate(tn).template;
+    const template = this.getComponentTemplate(tn);
     let com;
     if (tn.ifExp !== undefined) {
       const watcher = new Watcher(tn.ifExp, (newVal) => {

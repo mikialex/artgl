@@ -43,6 +43,7 @@ export class GLProgram {
   private renderer: GLRenderer;
   getRenderer() { return this.renderer };
   private program: WebGLProgram;
+  getProgram() { return this.program };
   private config: GLProgramConfig;
   private attributes: { [index: string]: GLAttribute } = {};
   private attributeUsageMap: { [index: number]: GLAttribute } = {};

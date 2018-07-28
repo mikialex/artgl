@@ -66,8 +66,7 @@ export class ARTEngine {
 
   renderObject(object: RenderObject, matrix:Matrix4) {
     const material = object.material;
-    material.createProgram(this.renderer);
-    const program = material.program;
+    const program = material.getProgram(this.renderer);
     program.setUniform('worldMatrix', matrix);
     program.setUniform('MVPMatrix', this.MVPMatrix);
     this.connectGeometryData(object.geometry, program);
@@ -77,8 +76,10 @@ export class ARTEngine {
 
   connectGeometryData(geometry: Geometry, program: GLProgram) {
     for (const infoKey in geometry.layout.dataInfo) {
-      const info = geometry.layout.dataInfo[infoKey];
-      program.getAttributeByUsage(info.usage).updateData(geometry.bufferDatas[infoKey]);
+      const usage = geometry.layout.dataInfo[infoKey].usage;
+      if (usage !== undefined) {
+        program.getAttributeByUsage(usage).updateData(geometry.bufferDatas[infoKey]);
+      }
     }
 
   }

@@ -22,16 +22,25 @@ export class Material{
   name: string;
   uuid = generateUUID();
 
+  needUpdate = true;
   isTransparent = false;
+  program: GLProgram;
 
   createProgram(renderer: GLRenderer): GLProgram {
     throw 'material not implemented';
   }
 
-  program: GLProgram;
+  getProgram(renderer: GLRenderer) {
+    if (this.needUpdate) {
+      this.createProgram(renderer);
+    }
+    return this.program;
+  }
 
   dispose() {
-
+    if (this.program !== undefined) {
+      this.program.dispose();
+    }
   }
 
   // fog = true;

@@ -28,7 +28,7 @@ export class GLRenderer {
   }
 
   private activeProgram: GLProgram;
-  private programManager: GLProgramManager;
+  private programManager = new GLProgramManager(this);
   addProgram(program: GLProgram) {
     this.programManager.addNewProgram(program);
   }

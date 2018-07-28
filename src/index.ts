@@ -2,7 +2,6 @@ import { GLRenderer } from "./renderer/webgl-renderer";
 import { GLProgram } from "./webgl/program";
 import { TestGeometry } from "./geometry/test-geometery";
 import { ARTEngine } from "./renderer/render-engine";
-import { ReactiveStore } from './store/reactive-store';
 import { Mesh } from "./object/mesh";
 import { TestMaterial } from "./material/test-material";
 import { Matrix4 } from "./math";
@@ -24,7 +23,7 @@ window.onload = function () {
 
   engine.renderObject(testMesh, new Matrix4());
 
-  const test = new ReactiveStore({ states: {}})
+  // const test = new ReactiveStore({ states: {}})
   // const testProgramConf = generateStandradProgramConfig();
   // let program = new GLProgram(renderer, testProgramConf);
 

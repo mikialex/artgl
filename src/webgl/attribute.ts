@@ -20,7 +20,7 @@ export class GLAttribute {
     this.descriptor = descriptor;
     this.program = program;
     this.gl = program.getRenderer().gl;
-    this.location = this.gl.getAttribLocation(this.program, descriptor.name);
+    this.location = this.gl.getAttribLocation(this.program.getProgram(), descriptor.name);
   }
   private gl: WebGLRenderingContext;
   program: GLProgram;
