@@ -1,7 +1,7 @@
 import { GLDataType } from "../shader-util";
 import { Matrix4 } from "../../math";
 
-export function findUnifromSetter(type:GLDataType) {
+export function findUniformSetter(type:GLDataType) {
   switch (type) {
     case GLDataType.float: return setValue1f; // FLOAT
     // case 0x8b50: return setValue2fv; // _VEC2
@@ -49,7 +49,7 @@ function setValue1i(gl, location, v) { gl.uniform1i(location, v) }
 
 function setValueM4a(gl, location, v) { gl.uniformMatrix4fv(location, false ,v) }
 
-export function findUnifromFlattener(type: GLDataType) {
+export function findUniformFlattener(type: GLDataType) {
   switch (type) {
     case GLDataType.float: return flattenFloat; // FLOAT
     case GLDataType.floatVec2: return flattenFloat; // _VEC2

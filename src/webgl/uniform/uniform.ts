@@ -1,5 +1,5 @@
 import { GLProgram } from "../program";
-import { findUnifromSetter, findUnifromFlattener } from "./uniform-util";
+import { findUniformSetter, findUniformFlattener } from "./uniform-util";
 import { GLDataType } from "../shader-util";
 
 export type uniformUploadType = number | Float32Array 
@@ -28,11 +28,11 @@ export class GLUniform<T>{
       // that will may cause null location
       throw 'create uniform fail';
     }
-    this.setter = findUnifromSetter(descriptor.type);
+    this.setter = findUniformSetter(descriptor.type);
     if (descriptor.flattener !== undefined) {
       this.flattener = descriptor.flattener;
     } else {
-      this.flattener = findUnifromFlattener(descriptor.type);
+      this.flattener = findUniformFlattener(descriptor.type);
     }
 
   }

@@ -5,11 +5,14 @@ export class BufferData{
   constructor() {
   }
   data: BufferDataType;
+  shouldUpdate = true;
 
   setIndex(index: number, value: number) {
+    this.shouldUpdate = true;
     this.data[index] = value;
   }
   setData(data: BufferDataType) {
+    this.shouldUpdate = true;
     this.data = data;
   }
 }
