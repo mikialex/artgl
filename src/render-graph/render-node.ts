@@ -1,10 +1,5 @@
-
-
-// export interface RenderGraphNodeConfig{
-//   outputs: {
-//     [index:string]: 
-//   }
-// }
+import { EntityList } from "./entity-list";
+import { RGNListOutPut, RGNDependency, entityListFilter } from "./interface";
 
 let gid = 0;
 // implement node connect logic
@@ -14,12 +9,22 @@ export class RenderGraphNode {
   }
   id: number;
 
+  dependency: RGNDependency[];
+
+  makeDependency(node: RenderGraphNode) {
+    
+  }
+
+  getResult(): RGNListOutPut {
+    return {} as any;
+  }
+
+  getNetResult(): EntityList {
+    return {} as any;
+  }
 
 }
 
-interface OperationDiscriptor{
-  oper
-}
 
 // transform a list
 export interface TransformNodeConfig {
@@ -32,17 +37,18 @@ export class TransformNode extends RenderGraphNode{
 }
 
 // filter a list
-export interface FilterNodeConfig{
-  filterFunc: (any) => boolean;
-}
 export class FilterNode extends RenderGraphNode {
-  constructor(config: FilterNodeConfig) {
+  constructor() {
     super();
   }
 
-  filteredResult
+  setFilter(filter: entityListFilter) {
+    
+  }
 
-  filteritemResult
+  getList() {
+    
+  }
 
 }
 

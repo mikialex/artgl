@@ -1,14 +1,28 @@
 import { RenderGraphNode } from "./render-node";
+import { RGNproperty } from "./interface";
 
 export interface Pipeable{
 
 }
 
+// export class PipeLine{
+//   constructor() {
+    
+//   }
+
+//   node: RenderGraphNode;
+// }
+
 export class RenderGraph{
   private pipelines = [];
-  private inputNode: RenderGraphNode;
+  private inputNodes: RenderGraphNode[];
+  private nodeEvalList: RenderGraphNode[] = [];
 
-  updateRenderNodeDenpendency() {
+  private updateRenderNodeDenpendency() {
+
+  }
+
+  getNodeProperty(propertyDescriptor: RGNproperty) {
     
   }
 

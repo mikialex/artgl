@@ -7,4 +7,13 @@ export { MathUtil } from './util';
 export interface DataObject<T>{
   copy(value: T);
   clone: (value: T) => T;
+  equals: (value: T) => boolean;
+}
+
+export interface VectorDataObject<T>{
+  normalize();
+  length: () => number;
+  lengthManhattan: () => number;
+  min: (value: T) => T;
+  max: (value: T) => T;
 }
