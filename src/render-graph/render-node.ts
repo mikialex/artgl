@@ -1,58 +1,43 @@
 import { EntityList } from "./entity-list";
-import { RGNListOutPut, RGNDependency, entityListFilter } from "./interface";
+
 
 let gid = 0;
 // implement node connect logic
 export class RenderGraphNode {
-  constructor() {
+  constructor(keyName: string) {
     this.id = gid++;
+    this.keyName = keyName;
   }
   id: number;
+  keyName: string;
+  isValid: boolean = false;
 
-  dependency: RGNDependency[];
+  // this node depends whats nodes
+  dependency: RenderGraphNode[];
+
+  checkValidation() {
+    this.isValid = true;
+    return this.isValid;
+  }
 
   makeDependency(node: RenderGraphNode) {
-    
+    this.dependency.push(node);
+  }
+  removeDependency(node: RenderGraphNode) {
+    const index = this.dependency.indexOf(node);
+    if (index !== -1) {
+      this.dependency.splice(index, 1);
+    }
   }
 
-  getResult(): RGNListOutPut {
-    return {} as any;
+  cachedEntityList: EntityList;
+  entityListNeedUpdate: boolean = true;
+  getEntityList(): EntityList {
+    if (this.entityListNeedUpdate) {
+      
+    } else {
+      return this.cachedEntityList
+    }
   }
-
-  getNetResult(): EntityList {
-    return {} as any;
-  }
-
-}
-
-
-// transform a list
-export interface TransformNodeConfig {
-  transformFunc: (any) => any;
-}
-export class TransformNode extends RenderGraphNode{
-  constructor(config: TransformNodeConfig) {
-    super();
-  }
-}
-
-// filter a list
-export class FilterNode extends RenderGraphNode {
-  constructor() {
-    super();
-  }
-
-  setFilter(filter: entityListFilter) {
-    
-  }
-
-  getList() {
-    
-  }
-
-}
-
-
-export class RenderNode extends RenderGraphNode {
 
 }

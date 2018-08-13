@@ -1,33 +1,22 @@
 import { RenderGraphNode } from "./render-node";
 import { RGNproperty } from "./interface";
+import { InputNode } from "./nodes/input-node";
+import { RenderNode } from "./nodes/render-node";
 
-export interface Pipeable{
-
-}
-
-// export class PipeLine{
-//   constructor() {
-    
-//   }
-
-//   node: RenderGraphNode;
-// }
 
 export class RenderGraph{
-  private pipelines = [];
-  private inputNodes: RenderGraphNode[];
+  private inputNodes: InputNode[];
+  private nodes: RenderGraphNode[];
+  private renderNodes: RenderNode[];
   private nodeEvalList: RenderGraphNode[] = [];
 
-  private updateRenderNodeDenpendency() {
-
-  }
 
   getNodeProperty(propertyDescriptor: RGNproperty) {
     
   }
 
-  setInputNode(node: RenderGraphNode) {
-    this.inputNode = node;
+  addNode(node: InputNode) {
+    this.inputNodes.push(node);
   }
 
   snapShot() {

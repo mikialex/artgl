@@ -17,20 +17,10 @@ export interface entityListFilter {
 }
 export type entityListOperationFunc = (item, params: any) => any;
 export interface entityListOperator {
-  func: entityListFilterFunc;
+  func: entityListOperationFunc;
   dependency: RGNproperty[];
 }
 
-// describe a rendernode output, which can be
-// get a real list by excute it, we not generate new list
-// because of memory over allocation
-export interface RGNListOutPut {
-  list: EntityList;
-  filters: entityListFilter[];
-}
+export type entityListTransfomer = entityListOperator | entityListFilter;
 
-export interface RGNDependency {
-  node: RenderGraphNode;
-  
-}
 
