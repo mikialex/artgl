@@ -1,9 +1,10 @@
 import { RenderGraphNode } from "../render-node";
 import { EntityList } from "../entity-list";
+import { RenderGraph } from "../render-graph";
 
 export class InputNode extends RenderGraphNode {
-  constructor(keyName: string) {
-    super(keyName);
+  constructor(keyName: string, graph: RenderGraph) {
+    super(keyName, graph);
   }
 
   private input: EntityList;

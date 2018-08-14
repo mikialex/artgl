@@ -3,20 +3,23 @@ import { RGNproperty } from "./interface";
 import { InputNode } from "./nodes/input-node";
 import { RenderNode } from "./nodes/render-node";
 
+type Collection<T> = { [index: string]: T };
 
 export class RenderGraph{
-  private inputNodes: InputNode[];
-  private nodes: RenderGraphNode[];
-  private renderNodes: RenderNode[];
-  private nodeEvalList: RenderGraphNode[] = [];
-
+  private inputNodes: Collection<InputNode> = {};
+  private nodes: Collection<RenderGraphNode> = {};
+  private renderNodes: Collection<RenderNode> = {};
 
   getNodeProperty(propertyDescriptor: RGNproperty) {
     
   }
 
-  addNode(node: InputNode) {
-    this.inputNodes.push(node);
+  addNode(node: RenderGraphNode) {
+    this.nodes[node.keyName] = node;
+  }
+
+  addInputNode(node: InputNode) {
+    this.inputNodes[node.keyName] = node;
   }
 
   snapShot() {
