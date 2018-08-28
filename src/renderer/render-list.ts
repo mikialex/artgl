@@ -1,5 +1,3 @@
-import { Geometry } from "../core/geometry";
-import { Material } from "../core/material";
 import { RenderObject } from "../core/render-object";
 import { Matrix4 } from "../math";
 

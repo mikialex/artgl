@@ -139,6 +139,18 @@ export class Vector2 implements DataObject<Vector2>, VectorDataObject<Vector2>{
     return this.divideScalar(length || 1).multiplyScalar(Math.max(min, Math.min(max, length)));
   }
 
+  public rotate(radians: number, anchor?: Vector2): Vector2 {
+    anchor = anchor || new Vector2();
+    const v = anchor.sub(this).multiplyScalar(-1);
+    const x = v.x;
+    const y = v.y;
+    const c = Math.cos(radians);
+    const s = Math.sin(radians);
+    this.x = x * c - y * s;
+    this.y = x * s + y * c;
+    return this;
+  }
+
 }
 const tempMin = new Vector2();
 const tempMax = new Vector2();
@@ -267,6 +279,7 @@ Object.assign(Vector2.prototype, {
     return this;
 
   },
+  
 
   rotateAround: function (center, angle) {
 

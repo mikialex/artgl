@@ -1,9 +1,10 @@
-import { Camera } from "../core/camera";
+
+import { Interactor } from "./interactor";
 
 // controler is about how to minupulate camera easliy
 export class Controler{
-  constructor(camera: Camera) {
-    this.camera = camera;
+  constructor(interactor: Interactor) {
+    this.interactor = interactor;
   }
-  camera: Camera;
+  interactor: Interactor;
 }

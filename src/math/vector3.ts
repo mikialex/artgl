@@ -1,9 +1,15 @@
+import {Quaternion} from './quaternion';
+import {Matrix4} from './Matrix4';
+import {Spherical} from './Spherical';
+
 export class Vector3 {
 
+  private buffer: Float32Array;
+
   constructor(public x?: number, public y?: number, public z?: number) {
-    this.x = x === undefined ? 0 : x;
-    this.y = x === undefined ? 0 : y;
-    this.z = z === undefined ? 0 : z;
+    this.x = x || 0;
+    this.y = y || 0;
+    this.z = z || 0;
   }
 
   public set(x: number, y: number, z: number): Vector3 {
@@ -22,6 +28,20 @@ export class Vector3 {
 
   public clone(): Vector3 {
     return new Vector3(this.x, this.y, this.z);
+  }
+
+  public add(v: Vector3): Vector3 {
+    this.x += v.x;
+    this.y += v.y;
+    this.z += v.z;
+    return this;
+  }
+
+  public sub(v: Vector3): Vector3 {
+    this.x -= v.x;
+    this.y -= v.y;
+    this.z -= v.z;
+    return this;
   }
 
   public mag(): number {
@@ -81,5 +101,56 @@ export class Vector3 {
 
   public cross(v: Vector3): Vector3 {
     return this.crossVectors(this, v);
+  }
+
+  public setFromQuaternion(q: Quaternion): Vector3 {
+    const x = this.x, y = this.y, z = this.z;
+    const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
+
+    // calculate quat * vector
+    const ix = qw * x + qy * z - qz * y;
+    const iy = qw * y + qz * x - qx * z;
+    const iz = qw * z + qx * y - qy * x;
+    const iw = - qx * x - qy * y - qz * z;
+
+    // calculate result * inverse quat
+    this.x = ix * qw + iw * - qx + iy * - qz - iz * - qy;
+    this.y = iy * qw + iw * - qy + iz * - qx - ix * - qz;
+    this.z = iz * qw + iw * - qz + ix * - qy - iy * - qx;
+
+    return this;
+  }
+
+  public setFromSpherical(s: Spherical): Vector3 {
+    const sinRadius = Math.sin(s.polar) * s.radius;
+    this.x = sinRadius * Math.sin(s.azim);
+    this.y = Math.cos(s.polar) * s.radius;
+    this.z = sinRadius * Math.cos(s.azim);
+    return this;
+  }
+
+  public applyMatrix4(m: Matrix4): Vector3 {
+    const x = this.x;
+    const y = this.y;
+    const z = this.z;
+    const e = m.elements;
+
+    const w = 1 / (e[3] * x + e[7] * y + e[11] * z + e[15]);
+    this.x = (e[0] * x + e[4] * y + e[8] * z + e[12]) * w;
+    this.y = (e[1] * x + e[5] * y + e[9] * z + e[13]) * w;
+    this.z = (e[2] * x + e[6] * y + e[10] * z + e[14]) * w;
+
+    return this;
+  }
+
+  public getBuffer() {
+    if (this.buffer === undefined) {
+      this.buffer = new Float32Array([this.x, this.y, this.z]);
+    } else {
+      this.buffer[0] = this.x;
+      this.buffer[1] = this.y;
+      this.buffer[2] = this.z;
+    }
+    return this.buffer;
   }
 }

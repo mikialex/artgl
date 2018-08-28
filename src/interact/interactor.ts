@@ -70,11 +70,11 @@ export class Interactor{
     this.mouseWheel(delta);
   }
 
-  protected leftMouseMove(offset: Vector2): void { }
-  protected RightMouseMove(offset: Vector2): void { }
-  protected mouseWheel(delta: number): void { }
-  protected mouseDown(): void { }
-  protected mouseUp(): void { }
+  public leftMouseMove(offset: Vector2): void { }
+  public rightMouseMove(offset: Vector2): void { }
+  public mouseWheel(delta: number): void { }
+  public mouseDown(): void { }
+  public mouseUp(): void { }
 
 
   dispose() {
