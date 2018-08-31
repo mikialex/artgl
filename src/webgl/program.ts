@@ -39,7 +39,7 @@ export class GLProgram {
       }
     });
   }
-  id: number;
+  id: string;
   private renderer: GLRenderer;
   getRenderer() { return this.renderer };
   private program: WebGLProgram;
@@ -95,7 +95,7 @@ export class GLProgram {
 
   updateAttribute(name: string, data: any) {
     const attribute = this.attributes[name];
-    if (!attribute) {
+    if (attribute === undefined) {
       throw 'try to set a none exist attribute';
     }
     attribute.updateData(data);

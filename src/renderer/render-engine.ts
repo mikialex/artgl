@@ -27,6 +27,7 @@ export class ARTEngine {
 
   renderList: RenderList = new RenderList();
   lightList: LightList = new LightList();
+  
   activeCamera: Camera;
   activeCameraMatrixRerverse = new Matrix4();
   MVPMatrix = new Matrix4();
