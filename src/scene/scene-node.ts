@@ -1,5 +1,4 @@
 import { Vector3, Matrix4 } from "../math";
-import { RenderObject } from "../core/render-object";
 import { Scene } from "./scene";
 
 export class SceneNode {
@@ -39,7 +38,7 @@ export class SceneNode {
     }
   }
 
-  traverse(fn: (scenNode) => any) {
+  traverse(fn: (sceneNode: SceneNode) => any) {
     fn(this);
     for (let i = 0; i < this.children.length; i++) {
       fn(this.children[i]);

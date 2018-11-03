@@ -2,6 +2,9 @@ import { GLInfo } from "../webgl/gl-info";
 import { GLProgram, GLProgramConfig } from "../webgl/program";
 import { Matrix4 } from "../math";
 import { GLProgramManager } from "../webgl/program-manager";
+import { GLAttributeBufferDataManager } from "../webgl/attribute-buffer-manager";
+import { BufferData, BufferDataType } from "../core/buffer-data";
+import { Material } from "../core/material";
 
 export class GLRenderer {
   constructor(el: HTMLCanvasElement, options?: any) {
@@ -29,12 +32,14 @@ export class GLRenderer {
 
   private activeProgram: GLProgram;
   private programManager = new GLProgramManager(this);
-  createProgram(conf: GLProgramConfig) {
+  private attributeBufferManager = new GLAttributeBufferDataManager(this);
+  createProgram(conf: GLProgramConfig): GLProgram {
     const program = new GLProgram(this, conf);
     this.programManager.addNewProgram(program);
+    return program;
   }
 
-  getProgram() {
+  getProgram(storeId: string): GLProgram {
     
   }
 
@@ -46,6 +51,20 @@ export class GLRenderer {
     this.activeProgram = program;
   }
 
+  
+  createBuffer(data: ArrayBuffer): WebGLBuffer {
+    const id = this.attributeBufferManager.createBuffer(data);
+    return this.attributeBufferManager.getGLBuffer(id);
+  }
+
+  getBuffer(bufferData: BufferData) {
+    return this.attributeBufferManager.getGLBuffer(bufferData.storeId);
+  }
+
+  deleteBuffer() {
+
+  }
+
   render() {
     this.gl.drawArrays(this.gl.TRIANGLES, this.activeProgram.drawFrom, this.activeProgram.drawCount);
     console.log('render')
@@ -53,6 +72,11 @@ export class GLRenderer {
 
   clear() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+  }
+
+  dispose() {
+    this.attributeBufferManager.dispose();
+    this.programManager.dispose();
   }
   
 }

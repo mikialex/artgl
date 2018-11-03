@@ -49,9 +49,11 @@ let program = new GLProgram(renderer,
   }
 );
 
+const buffer1 = renderer.createBuffer(new Float32Array([1,1,1,2,3,4].buffer));
+const buffer2 = renderer.createBuffer(new Float32Array([1,1,1,2,3,4].buffer));
 
-program.setAttribute('position', new Float32Array([1,1,1,2,3,4]));
-program.setAttribute('vertexColor', new Float32Array([1, 1, 1, 2, 3, 4]));
+program.updateAttribute('position', buffer1);
+program.updateAttribute('vertexColor', buffer2);
 
 program.setUniform('lineColor', 0.8);
 

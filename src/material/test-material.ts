@@ -1,6 +1,5 @@
 import { Material, standradMeshAttributeLayout } from "../core/material";
 import { GLDataType } from "../webgl/shader-util";
-import { GLProgram } from "../webgl/program";
 import { GLRenderer } from "../renderer/webgl-renderer";
 import { Matrix4 } from "../math";
 import { AttributeUsage } from "../webgl/attribute";

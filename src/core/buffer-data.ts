@@ -1,5 +1,6 @@
+import { GLRenderer } from "../renderer/webgl-renderer";
 
-type BufferDataType = Float32Array | Int32Array ;
+export type BufferDataType = Float32Array | Int32Array ;
 
 export class BufferData{
   constructor() {
@@ -14,6 +15,10 @@ export class BufferData{
   setData(data: BufferDataType) {
     this.shouldUpdate = true;
     this.data = data;
+  }
+
+  getGLAttribute(renderer: GLRenderer): WebGLBuffer {
+    return renderer.getGLAttributeBuffer(this);
   }
 }
 

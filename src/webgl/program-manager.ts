@@ -2,17 +2,17 @@ import { GLRenderer } from "../renderer/webgl-renderer";
 import { GLProgram } from "./program";
 
 export class GLProgramManager{
-  constructor(renderer:GLRenderer) {
+  constructor(renderer: GLRenderer) {
     
   }
-  private programs = {};
+  private programs: { [index: string]: GLProgram } = {};
 
   addNewProgram(program: GLProgram) {
     this.programs[program.id] = program;
   }
 
-  getProgramByMaterial() {
-    
+  getProgram(storeId: string) {
+    return this.programs[storeId];
   }
 
   dispose() {

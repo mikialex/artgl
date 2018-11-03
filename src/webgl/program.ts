@@ -4,6 +4,7 @@ import { generateUUID } from "../math";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
 import { GLUniform, UniformDescriptor } from "./uniform/uniform";
 import { AttributeDescriptor, GLAttribute, AttributeUsage } from "./attribute";
+import { BufferDataType } from "../core/buffer-data";
 ;
 
 export interface VaryingDescriptor {
@@ -93,12 +94,12 @@ export class GLProgram {
     }
   }
 
-  updateAttribute(name: string, data: any) {
+  updateAttribute(name: string, data: WebGLBuffer) {
     const attribute = this.attributes[name];
     if (attribute === undefined) {
       throw 'try to set a none exist attribute';
     }
-    attribute.updateData(data);
+    attribute.useBuffer(data);
   }
 
   getAttributeByUsage(usage:AttributeUsage) {
