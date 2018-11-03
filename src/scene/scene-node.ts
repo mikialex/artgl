@@ -5,8 +5,7 @@ import { Camera } from "../core/camera";
 import { Light } from "../core/light";
 
 export class SceneNode {
-  constructor(scene) {
-    this.scene = scene;
+  constructor() {
   }
   scene: Scene;
   // position = new Vector3(0, 0, 0);

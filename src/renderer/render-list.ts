@@ -1,18 +1,13 @@
 import { RenderObject } from "../core/render-object";
 import { Matrix4 } from "../math";
 
-export interface RenderCall {
-  object: RenderObject;
-  transform: Matrix4;
-}
-
 export class RenderList{
   constructor() {
     
   }
 
-  opaqueList: RenderCall[] = [];
-  transparentList: RenderCall[] = [];
+  opaqueList: RenderObject[] = [];
+  transparentList: RenderObject[] = [];
 
   opaqueCount = 0;
   transparentCount = 0;
