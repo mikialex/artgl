@@ -24,7 +24,6 @@ export class Material{
 
   needUpdate = true;
   isTransparent = false;
-  program: GLProgram;
 
   createProgram(renderer: GLRenderer): GLProgram {
     throw 'material not implemented';
@@ -34,12 +33,13 @@ export class Material{
     if (this.needUpdate) {
       this.createProgram(renderer);
     }
-    return this.program;
+    return renderer.getProgram(this);
   }
 
-  dispose() {
-    if (this.program !== undefined) {
-      this.program.dispose();
+  dispose(renderer: GLRenderer) {
+    const program = this.getProgram(renderer);
+    if (program) {
+      program.dispose();
     }
   }
 

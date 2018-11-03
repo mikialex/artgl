@@ -15,11 +15,33 @@ export class Scene {
     
   }
 
-  addEntity(node: SceneNode) {
-
+  setRootNode(node: SceneNode) {
+    if (!node.scene) {
+      throw 'node has set to scene, abort';
+    }
+    this.root = node;
+    this.root.traverse((node) => {
+      node.scene = this;
+    });
   }
 
-  removeEntity(node: SceneNode) {
+  disposeRootNode() {
+    if (!this.root) {
+      throw 'scene hasnt root';
+    }
+    this.root.traverse((node) => {
+      node.scene = undefined;
+    });
+    this.objectList = [];
+    this.lightList = [];
+    this.root = undefined;
+  }
+
+  private addObject(object: RenderObject) {
+    this.objectList.push(object);
+  }
+
+  private removeObject(node: SceneNode) {
 
   }
 }

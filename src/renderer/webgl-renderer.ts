@@ -1,5 +1,5 @@
 import { GLInfo } from "../webgl/gl-info";
-import { GLProgram } from "../webgl/program";
+import { GLProgram, GLProgramConfig } from "../webgl/program";
 import { Matrix4 } from "../math";
 import { GLProgramManager } from "../webgl/program-manager";
 
@@ -29,6 +29,15 @@ export class GLRenderer {
 
   private activeProgram: GLProgram;
   private programManager = new GLProgramManager(this);
+  createProgram(conf: GLProgramConfig) {
+    const program = new GLProgram(this, conf);
+    this.programManager.addNewProgram(program);
+  }
+
+  getProgram() {
+    
+  }
+
   addProgram(program: GLProgram) {
     this.programManager.addNewProgram(program);
   }

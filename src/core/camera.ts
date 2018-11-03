@@ -1,9 +1,9 @@
 import { SceneNode } from "../scene/scene-node";
 import { Matrix4 } from "../math";
 
-export class Camera{
+export class Camera extends SceneNode{
   constructor() {
-    
+    super();
   }
 
   projectionMatrix = new Matrix4();
@@ -11,5 +11,4 @@ export class Camera{
     
   }
 
-  nodeRef: SceneNode;
 }

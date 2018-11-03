@@ -1,47 +1,48 @@
 import { Vector3, Matrix4 } from "../math";
 import { RenderObject } from "../core/render-object";
 import { Scene } from "./scene";
-import { Camera } from "../core/camera";
-import { Light } from "../core/light";
 
 export class SceneNode {
   constructor() {
   }
   scene: Scene;
-  // position = new Vector3(0, 0, 0);
-  // rotation = new Quaternion();
-  // scale = new Vector3(1, 1, 1);
 
   parent: SceneNode = null;
   children: SceneNode[] = [];
 
-  object: RenderObject;
-  light: Light;
-  camera: Camera;
   property: {};
 
-  isMatrixNeedUpdate = false;
+  // position = new Vector3(0, 0, 0);
+  // rotation = new Quaternion();
+  // scale = new Vector3(1, 1, 1);
   matrix = new Matrix4();
-
-  // objToWorldMatrix: Matrix
+  worldMatrix = new Matrix4();
+  isTransfromDirty = true;
 
   // updateObjToWorldMatrix() {
   //   this.objToWorldMatrix = Matrix.Compose(this.scale, this.rotation, this.position);
   // }
 
   addChild(node: SceneNode) {
-    // if()
-    // this.scene.addEntity(obj);
+    if (node === this) {
+      throw 'cant add self to self';
+    }
     node.parent = this;
     this.children.push(node);
   }
 
   removeChild(node: SceneNode) {
-    // this.scene.removeEntity(obj);
     let index = this.children.indexOf(node);
     if (index !== - 1) {
       node.parent = null;
       this.children.splice(index, 1);
+    }
+  }
+
+  traverse(fn: (scenNode) => any) {
+    fn(this);
+    for (let i = 0; i < this.children.length; i++) {
+      fn(this.children[i]);
     }
   }
 }

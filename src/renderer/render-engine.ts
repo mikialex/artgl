@@ -1,6 +1,5 @@
 import { GLRenderer } from "./webgl-renderer";
 import { RenderList } from "./render-list";
-import { LightList } from "./light-list";
 import { RenderObject } from "../core/render-object";
 import { Camera } from "../core/camera";
 import { Matrix4 } from "../math";
@@ -26,7 +25,6 @@ export class ARTEngine {
   renderer: GLRenderer;
 
   renderList: RenderList = new RenderList();
-  lightList: LightList = new LightList();
   
   activeCamera: Camera;
   activeCameraMatrixRerverse = new Matrix4();

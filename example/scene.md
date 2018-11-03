@@ -18,7 +18,7 @@ artix提供一套场景图和相应的适配器实现。
   scene.setCamera(camera);
 
   const root = new SceneNode();
-  scene.setRoot(root);
+  scene.setRootNode(root);
 
   let testGeo = new TestGeometry();
   let testMat = new TestMaterial();

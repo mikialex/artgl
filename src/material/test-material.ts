@@ -26,7 +26,7 @@ export class TestMaterial extends Material{
   }
 
   createProgram(renderer: GLRenderer) {
-    this.program = new GLProgram(renderer, {
+    return renderer.createProgram({
       attributes: [
         { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
         // { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal, stride: 3 },
@@ -40,6 +40,5 @@ export class TestMaterial extends Material{
       fragmentShaderString: fragmentShaderSource,
       autoInjectHeader: true,
     });
-    return this.program;
   }
 }
