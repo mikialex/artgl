@@ -1,4 +1,4 @@
-import { GLRenderer } from "../renderer/webgl-renderer";
+import { ARTEngine } from "../renderer/render-engine";
 
 export type BufferDataType = Float32Array | Int32Array ;
 
@@ -7,6 +7,7 @@ export class BufferData{
   }
   data: BufferDataType;
   shouldUpdate = true;
+  storeId: string;
 
   setIndex(index: number, value: number) {
     this.shouldUpdate = true;
@@ -17,8 +18,8 @@ export class BufferData{
     this.data = data;
   }
 
-  getGLAttribute(renderer: GLRenderer): WebGLBuffer {
-    return renderer.getGLAttributeBuffer(this);
+  getGLAttribute(engine: ARTEngine): WebGLBuffer {
+    return engine.getGLAttributeBuffer(this);
   }
 }
 

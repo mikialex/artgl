@@ -3,8 +3,7 @@ import { GLProgram, GLProgramConfig } from "../webgl/program";
 import { Matrix4 } from "../math";
 import { GLProgramManager } from "../webgl/program-manager";
 import { GLAttributeBufferDataManager } from "../webgl/attribute-buffer-manager";
-import { BufferData, BufferDataType } from "../core/buffer-data";
-import { Material } from "../core/material";
+import { GLState } from "../webgl/gl-state";
 
 export class GLRenderer {
   constructor(el: HTMLCanvasElement, options?: any) {
@@ -19,17 +18,21 @@ export class GLRenderer {
   gl: WebGLRenderingContext;
   el: HTMLCanvasElement;
 
-  devicePixelRatio = 1;
   projectionMatrix = new Matrix4();
   glInfo: GLInfo;
 
-  private width = 100;
-  private height = 100;
-  resize(width: number, height: number) {
+  width = 100;
+  height = 100;
+  devicePixelRatio = 1;
+  setSize(width: number, height: number) {
     this.width = width;
     this.height = height;
+    this.el.width = this.width * this.devicePixelRatio;
+    this.el.height = this.height * this.devicePixelRatio;
+		this.state.viewport( 0, 0, width, height );
   }
 
+  state: GLState = new GLState(this);
   private activeProgram: GLProgram;
   private programManager = new GLProgramManager(this);
   private attributeBufferManager = new GLAttributeBufferDataManager(this);
@@ -40,7 +43,7 @@ export class GLRenderer {
   }
 
   getProgram(storeId: string): GLProgram {
-    
+    return this.programManager.getProgram(storeId);
   }
 
   addProgram(program: GLProgram) {
@@ -57,12 +60,12 @@ export class GLRenderer {
     return this.attributeBufferManager.getGLBuffer(id);
   }
 
-  getBuffer(bufferData: BufferData) {
-    return this.attributeBufferManager.getGLBuffer(bufferData.storeId);
+  getBuffer(storeId: string) {
+    return this.attributeBufferManager.getGLBuffer(storeId);
   }
 
-  deleteBuffer() {
-
+  deleteBuffer(storeId: string) {
+    this.attributeBufferManager.disposeBuffer(storeId);
   }
 
   render() {

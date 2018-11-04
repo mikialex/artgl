@@ -1,5 +1,6 @@
+import { DataObject } from ".";
 
-export class Vector4 {
+export class Vector4 implements DataObject<Vector4> {
   constructor(x?: number, y?: number, z?: number, w?: number) {
     this.x = x || 0;
     this.y = y || 0;
@@ -13,6 +14,22 @@ export class Vector4 {
   w: number;
   isVector4:true = true;
 
+  clone(){
+    return new Vector4(this.x, this.y, this.z, this.w);
+  }
+
+  copy(v: Vector4) {
+    this.x = v.x;
+    this.y = v.y;
+    this.z = v.z;
+    this.w = (v.w !== undefined) ? v.w : 1;
+    return this;
+  }
+
+  equals(v: Vector4) {
+    return ((v.x === this.x) && (v.y === this.y) && (v.z === this.z) && (v.w === this.w));
+  }
+  
 }
 
 
@@ -104,22 +121,6 @@ Object.assign(Vector4.prototype, {
 
   },
 
-  clone: function () {
-
-    return new this.constructor(this.x, this.y, this.z, this.w);
-
-  },
-
-  copy: function (v) {
-
-    this.x = v.x;
-    this.y = v.y;
-    this.z = v.z;
-    this.w = (v.w !== undefined) ? v.w : 1;
-
-    return this;
-
-  },
 
   add: function (v, w) {
 
@@ -574,11 +575,6 @@ Object.assign(Vector4.prototype, {
 
   },
 
-  equals: function (v) {
-
-    return ((v.x === this.x) && (v.y === this.y) && (v.z === this.z) && (v.w === this.w));
-
-  },
 
   fromArray: function (array, offset) {
 

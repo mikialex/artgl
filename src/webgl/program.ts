@@ -4,8 +4,6 @@ import { generateUUID } from "../math";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
 import { GLUniform, UniformDescriptor } from "./uniform/uniform";
 import { AttributeDescriptor, GLAttribute, AttributeUsage } from "./attribute";
-import { BufferDataType } from "../core/buffer-data";
-;
 
 export interface VaryingDescriptor {
   name: string,

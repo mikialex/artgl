@@ -3,6 +3,7 @@ import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { GLDataType } from "../webgl/shader-util";
 import { GLRenderer } from "../renderer/webgl-renderer";
 import { AttributeUsage } from "../webgl/attribute";
+import { ARTEngine } from "../renderer/render-engine";
 
 export const standradMeshAttributeLayout = [
   { name:'position',type:GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
@@ -18,26 +19,24 @@ export class Material{
   constructor() {
   }
 
-  config;
+  config: MaterialConfig;
   name: string;
   uuid = generateUUID();
+  programId: string;
 
   needUpdate = true;
   isTransparent = false;
 
-  createProgram(renderer: GLRenderer): GLProgram {
-    throw 'material not implemented';
-  }
 
-  getProgram(renderer: GLRenderer) {
+  getProgram(engine: ARTEngine): GLProgram {
     if (this.needUpdate) {
-      this.createProgram(renderer);
+      engine.createProgram(this);
     }
-    return renderer.getProgram(this);
+    return engine.getProgram(this);
   }
 
-  dispose(renderer: GLRenderer) {
-    const program = this.getProgram(renderer);
+  dispose(engine: ARTEngine): void {
+    const program = this.getProgram(engine);
     if (program) {
       program.dispose();
     }

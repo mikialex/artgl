@@ -5,6 +5,8 @@ import { Camera } from "../core/camera";
 import { Matrix4 } from "../math";
 import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
+import { BufferData } from "../core/buffer-data";
+import { Material } from "../core/material";
 
 export class ARTEngineAdaptor {
   constructor(engine: ARTEngine) {
@@ -60,16 +62,24 @@ export class ARTEngine {
   }
 
   renderObjects(objects: RenderObject[]) {
-    
+    for (let i = 0; i < objects.length; i++) {
+      this.renderObject(objects[i]);
+    }
   }
 
   renderObject(object: RenderObject) {
+
+    // prepare material
     const material = object.material;
-    const program = material.getProgram(this.renderer);
+    const program = material.getProgram(this);
+    this.renderer.useProgram(program);
     program.setUniform('worldMatrix', object.matrix);
     program.setUniform('MVPMatrix', this.MVPMatrix);
+
+    // prepare geometry
     this.connectGeometryData(object.geometry, program);
-    this.renderer.useProgram(program);
+
+    // render
     this.renderer.render();
   }
 
@@ -77,10 +87,28 @@ export class ARTEngine {
     for (const infoKey in geometry.layout.dataInfo) {
       const usage = geometry.layout.dataInfo[infoKey].usage;
       if (usage !== undefined) {
-        program.getAttributeByUsage(usage).updateData(geometry.bufferDatas[infoKey]);
+        const bufferData = geometry.bufferDatas[infoKey];
+        const glBuffer = this.getGLAttributeBuffer(bufferData);
+        program.getAttributeByUsage(usage).useBuffer(glBuffer);
       }
     }
 
+  }
+
+  getProgram(material: Material): GLProgram  {
+    const id = material.programId;
+    const program = this.renderer.getProgram(id);
+    return program;
+  }
+
+  createProgram(material: Material): GLProgram  {
+    const program = this.renderer.createProgram(material.config.programConfig);
+    material.programId = program.id;
+    return program;
+  }
+
+  getGLAttributeBuffer(bufferData: BufferData): WebGLBuffer {
+    return this.renderer.getBuffer(bufferData.storeId);
   }
 
 }
