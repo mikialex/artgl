@@ -1,6 +1,6 @@
 import { Geometry } from "../core/geometry";
 import { AttributeUsage } from "../webgl/attribute";
-import { BufferData, Float32BufferData } from "../core/buffer-data";
+import { Float32BufferData } from "../core/buffer-data";
 
 export class TestGeometry extends Geometry {
   constructor() {
@@ -13,7 +13,7 @@ export class TestGeometry extends Geometry {
         }
       },
       drawFrom: 0,
-      drawCount: 5,
+      drawCount: 36,
     }
     this.populate();
   }

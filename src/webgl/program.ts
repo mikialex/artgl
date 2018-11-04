@@ -30,7 +30,7 @@ export class GLProgram {
     this.createGLResource(config);
     
     this.config = config;
-    renderer.addProgram(this);
+    renderer.programManager.addNewProgram(this);
 
     config.attributes.forEach(att => {
       if (att.usage !== undefined) {
@@ -74,8 +74,6 @@ export class GLProgram {
     if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
       let info = gl.getProgramInfoLog(this.program);
       throw 'Could not compile WebGL program. \n\n' + info;
-    } else {
-      gl.useProgram(this.program);
     }
   }
 

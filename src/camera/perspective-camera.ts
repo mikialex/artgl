@@ -5,6 +5,15 @@ export class PerspectiveCamera extends Camera{
   constructor(near?: number, far?: number,
     fov?: number, aspect?: number, zoom?:number) {
     super();
+    this.fov = fov !== undefined ? fov : 50;
+    this.zoom = 1;
+  
+    this.near = near !== undefined ? near : 0.1;
+    this.far = far !== undefined ? far : 2000;
+  
+    this.aspect = aspect !== undefined ? aspect : 1;
+  
+    this.updateProjectionMatrix();
   }
 
   near: number;

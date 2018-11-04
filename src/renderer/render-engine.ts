@@ -30,7 +30,7 @@ export class ARTEngine {
   
   activeCamera: Camera;
   activeCameraMatrixRerverse = new Matrix4();
-  MVPMatrix = new Matrix4();
+  VPMatrix = new Matrix4();
 
   adaptor: ARTEngineAdaptor;
 
@@ -38,10 +38,10 @@ export class ARTEngine {
     this.adaptor = adaptor;
   }
 
-  setCamera(camera: Camera, matrix: Matrix4) {
-    this.activeCameraMatrixRerverse.getInverse(matrix, true);
+  updateViewProjection(camera: Camera) {
+    this.activeCameraMatrixRerverse.getInverse(camera.worldMatrix, true);
     camera.updateProjectionMatrix();
-    this.MVPMatrix.multiplyMatrices(camera.projectionMatrix, this.activeCameraMatrixRerverse);
+    this.VPMatrix.multiplyMatrices(camera.projectionMatrix, this.activeCameraMatrixRerverse);
     this.activeCamera = camera;
   }
 
@@ -74,7 +74,7 @@ export class ARTEngine {
     const program = material.getProgram(this);
     this.renderer.useProgram(program);
     program.setUniform('worldMatrix', object.matrix);
-    program.setUniform('MVPMatrix', this.MVPMatrix);
+    program.setUniform('VPMatrix', this.VPMatrix);
 
     // prepare geometry
     this.connectGeometryData(object.geometry, program);
@@ -88,10 +88,16 @@ export class ARTEngine {
       const usage = geometry.layout.dataInfo[infoKey].usage;
       if (usage !== undefined) {
         const bufferData = geometry.bufferDatas[infoKey];
-        const glBuffer = this.getGLAttributeBuffer(bufferData);
+        let glBuffer = this.getGLAttributeBuffer(bufferData);
+        if (glBuffer === undefined) {
+          glBuffer = this.createAttibuteBuffer(bufferData);
+        }
         program.getAttributeByUsage(usage).useBuffer(glBuffer);
       }
     }
+
+    program.drawFrom = geometry.layout.drawFrom;
+    program.drawCount = geometry.layout.drawCount;
 
   }
 
@@ -109,6 +115,12 @@ export class ARTEngine {
 
   getGLAttributeBuffer(bufferData: BufferData): WebGLBuffer {
     return this.renderer.getBuffer(bufferData.storeId);
+  }
+
+  createAttibuteBuffer(bufferData: BufferData): WebGLBuffer {
+    const id = this.renderer.createBuffer(bufferData.data.buffer);
+    bufferData.storeId = id;
+    return this.renderer.getBuffer(id);
   }
 
 }

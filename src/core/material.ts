@@ -1,7 +1,6 @@
 import { generateUUID } from "../math";
 import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { GLDataType } from "../webgl/shader-util";
-import { GLRenderer } from "../renderer/webgl-renderer";
 import { AttributeUsage } from "../webgl/attribute";
 import { ARTEngine } from "../renderer/render-engine";
 
@@ -21,7 +20,7 @@ export class Material{
 
   config: MaterialConfig;
   name: string;
-  uuid = generateUUID();
+  uuid: string = generateUUID();
   programId: string;
 
   needUpdate = true;

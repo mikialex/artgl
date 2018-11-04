@@ -43,7 +43,7 @@ export class Interactor{
     mousePosition.set(event.clientX, event.clientY);
     v1.copy(mousePosition).sub(prev);
     if (this.mouseButton === 0) { this.leftMouseMove(v1); }
-    if (this.mouseButton === 2) { this.RightMouseMove(v1); }
+    if (this.mouseButton === 2) { this.rightMouseMove(v1); }
     prev.copy(mousePosition);
   }
 

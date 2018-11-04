@@ -13,7 +13,7 @@ window.onload = function () {
   let renderer = new GLRenderer(canv);
   const engine = new ARTEngine(renderer);
   const camera = new PerspectiveCamera();
-  engine.setCamera(camera, new Matrix4());
+  engine.updateViewProjection(camera);
 
 
   let testGeo = new TestGeometry();
@@ -21,7 +21,7 @@ window.onload = function () {
 
   let testMesh = new Mesh(testGeo, testMat);
 
-  engine.renderObject(testMesh, new Matrix4());
+  engine.renderObject(testMesh);
 
   // const test = new ReactiveStore({ states: {}})
   // const testProgramConf = generateStandradProgramConfig();

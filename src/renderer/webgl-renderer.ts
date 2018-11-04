@@ -33,9 +33,9 @@ export class GLRenderer {
   }
 
   state: GLState = new GLState(this);
-  private activeProgram: GLProgram;
-  private programManager = new GLProgramManager(this);
-  private attributeBufferManager = new GLAttributeBufferDataManager(this);
+  activeProgram: GLProgram;
+  programManager = new GLProgramManager(this);
+  attributeBufferManager = new GLAttributeBufferDataManager(this);
   createProgram(conf: GLProgramConfig): GLProgram {
     const program = new GLProgram(this, conf);
     this.programManager.addNewProgram(program);
@@ -46,18 +46,14 @@ export class GLRenderer {
     return this.programManager.getProgram(storeId);
   }
 
-  addProgram(program: GLProgram) {
-    this.programManager.addNewProgram(program);
-  }
-
   useProgram(program: GLProgram) {
     this.activeProgram = program;
+    this.gl.useProgram(program.getProgram());
   }
 
   
-  createBuffer(data: ArrayBuffer): WebGLBuffer {
-    const id = this.attributeBufferManager.createBuffer(data);
-    return this.attributeBufferManager.getGLBuffer(id);
+  createBuffer(data: ArrayBuffer): string {
+    return this.attributeBufferManager.createBuffer(data);
   }
 
   getBuffer(storeId: string) {
