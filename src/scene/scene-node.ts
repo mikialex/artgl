@@ -1,9 +1,7 @@
-import { Vector3, Matrix4 } from "../math";
+import { Vector3, Matrix4, Quaternion} from "../math";
 import { Scene } from "./scene";
 
 export class SceneNode {
-  constructor() {
-  }
   scene: Scene;
 
   parent: SceneNode = null;
@@ -11,16 +9,16 @@ export class SceneNode {
 
   property: {};
 
-  // position = new Vector3(0, 0, 0);
-  // rotation = new Quaternion();
-  // scale = new Vector3(1, 1, 1);
+  position = new Vector3(0, 0, 0);
+  rotation = new Quaternion();
+  scale = new Vector3(1, 1, 1);
   matrix = new Matrix4();
   worldMatrix = new Matrix4();
   isTransfromDirty = true;
 
-  // updateObjToWorldMatrix() {
-  //   this.objToWorldMatrix = Matrix.Compose(this.scale, this.rotation, this.position);
-  // }
+  updateLocalMatrix() {
+      this.matrix.compose(this.scale, this.rotation, this.position);
+  }
 
   addChild(node: SceneNode) {
     if (node === this) {

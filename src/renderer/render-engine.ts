@@ -73,7 +73,7 @@ export class ARTEngine {
     const material = object.material;
     const program = material.getProgram(this);
     this.renderer.useProgram(program);
-    program.setUniform('worldMatrix', object.matrix);
+    program.setUniform('MMatrix', object.worldMatrix);
     program.setUniform('VPMatrix', this.VPMatrix);
 
     // prepare geometry

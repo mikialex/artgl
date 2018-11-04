@@ -1,5 +1,5 @@
-import {Vector3} from './Vector3';
-import {Matrix4} from './Matrix4';
+import {Vector3} from './vector3';
+import {Matrix4} from './matrix4';
 
 export class Quaternion {
 
@@ -58,6 +58,7 @@ export class Quaternion {
     return this;
   }
 
+		// assumes axis is normalized
   public setFromAxisAngle(axis: Vector3, angle: number): Quaternion {
     const halfAngle = angle / 2;
     const s = Math.sin(halfAngle);

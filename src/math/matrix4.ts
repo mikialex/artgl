@@ -1,3 +1,6 @@
+import { Vector3 } from "./vector3";
+import { Quaternion } from "./quaternion";
+
 export class Matrix4 {
   constructor() {
 
@@ -23,6 +26,13 @@ export class Matrix4 {
     return this;
   }
 
+  compose (position: Vector3, quaternion: Quaternion, scale: Vector3) {
+    this.makeRotationFromQuaternion(quaternion);
+    this.scale(scale.x, scale.y, scale.z);
+    this.setPostion(position.x, position.y, position.z);
+		return this;
+  }
+  
   identity() {
     this.set(
       1, 0, 0, 0,
@@ -151,6 +161,48 @@ export class Matrix4 {
     te[3] *= x; te[7] *= y; te[11] *= z;
     return this;
   }
+
+  setPostion(x,y,z) {
+    var te = this.elements;
+		te[ 12 ] = x;
+		te[ 13 ] = y;
+		te[ 14 ] = z;
+		return this;
+  }
+
+  makeRotationFromQuaternion(q: Quaternion) {
+    var te = this.elements;
+
+		var x = q.x, y = q.y, z = q.z, w = q.w;
+		var x2 = x + x, y2 = y + y, z2 = z + z;
+		var xx = x * x2, xy = x * y2, xz = x * z2;
+		var yy = y * y2, yz = y * z2, zz = z * z2;
+		var wx = w * x2, wy = w * y2, wz = w * z2;
+
+		te[ 0 ] = 1 - ( yy + zz );
+		te[ 4 ] = xy - wz;
+		te[ 8 ] = xz + wy;
+
+		te[ 1 ] = xy + wz;
+		te[ 5 ] = 1 - ( xx + zz );
+		te[ 9 ] = yz - wx;
+
+		te[ 2 ] = xz - wy;
+		te[ 6 ] = yz + wx;
+		te[ 10 ] = 1 - ( xx + yy );
+
+		// last column
+		te[ 3 ] = 0;
+		te[ 7 ] = 0;
+		te[ 11 ] = 0;
+
+		// bottom row
+		te[ 12 ] = 0;
+		te[ 13 ] = 0;
+		te[ 14 ] = 0;
+		te[ 15 ] = 1;
+		return this;
+	}
 
   makeTranslation(x, y, z) {
     this.set(
