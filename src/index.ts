@@ -21,9 +21,9 @@ window.onload = function () {
   let testMat = new TestMaterial();
 
   let testMesh = new Mesh(testGeo, testMat);
-  const rotation = (new Quaternion()).setFromAxisAngle(new Vector3(1,1,1).normalize(), 3);
-  testMesh.worldMatrix.makeRotationFromQuaternion(rotation);
-  // testMesh.worldMatrix.makeRotationY(10);
+  const rotation = (new Quaternion()).setFromAxisAngle(new Vector3(1,1,1).normalize(), 1.4);
+  testMesh.matrix.makeRotationFromQuaternion(rotation);
+  testMesh.updateMatrixWorld();
 
   engine.renderObject(testMesh);
 

@@ -14,7 +14,7 @@ export class SceneNode {
   scale = new Vector3(1, 1, 1);
   matrix = new Matrix4();
   worldMatrix = new Matrix4();
-  isTransfromDirty = true;
+  isTransformDirty = true;
 
   updateLocalMatrix() {
       this.matrix.compose(this.scale, this.rotation, this.position);
@@ -42,4 +42,23 @@ export class SceneNode {
       fn(this.children[i]);
     }
   }
+
+  updateMatrixWorld(force?){
+		if (this.isTransformDirty || force) {
+
+			if (this.parent === null) {
+	      this.worldMatrix.copy(this.matrix);
+			} else {
+	      this.worldMatrix.multiplyMatrices(this.parent.worldMatrix, this.matrix);
+			}
+			this.isTransformDirty = false;
+			force = true;
+		}
+		var children = this.children;
+		for (var i = 0, l = children.length; i < l; i++) {
+			children[i].updateMatrixWorld(force);
+		}
+  }
+
+  
 }

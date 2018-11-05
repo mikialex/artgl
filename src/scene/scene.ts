@@ -15,6 +15,10 @@ export class Scene {
     
   }
 
+  updateWorldMatrix() {
+    this.root.updateMatrixWorld(true);
+  }
+
   setRootNode(node: SceneNode) {
     if (!node.scene) {
       throw 'node has set to scene, abort';
