@@ -27,26 +27,15 @@ window.onload = function () {
 
   engine.renderObject(testMesh);
 
-  // const test = new ReactiveStore({ states: {}})
-  // const testProgramConf = generateStandradProgramConfig();
-  // let program = new GLProgram(renderer, testProgramConf);
-
-  // program.setGeometryData(testGeo);
-  // // program.setUniform('lineColor', 0.1);
-
-  // renderer.useProgram(program);
-  // renderer.render();
-  // // renderer.clear();
-
-
-  // window.requestAnimationFrame(tick);
-  // let frame = 0;
-  // function tick() {
-  //   frame++;
-  //   // program.setUniform('lineColor', Math.sin(frame/10));
-  //   renderer.render();
-  //   window.requestAnimationFrame(tick);
-  // }
+  window.requestAnimationFrame(tick);
+  let frame = 0;
+  function tick() {
+    frame++;
+    engine.renderObject(testMesh);
+    if (frame < 100) {
+      window.requestAnimationFrame(tick);
+    }
+  }
 
 }
 

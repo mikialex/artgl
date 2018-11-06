@@ -110,6 +110,7 @@ export class ARTEngine {
   createProgram(material: Material): GLProgram  {
     const program = this.renderer.createProgram(material.config.programConfig);
     material.programId = program.id;
+    material.needUpdate = false;
     return program;
   }
 

@@ -7,8 +7,6 @@ export class SceneNode {
   parent: SceneNode = null;
   children: SceneNode[] = [];
 
-  property: {};
-
   position = new Vector3(0, 0, 0);
   rotation = new Quaternion();
   scale = new Vector3(1, 1, 1);
