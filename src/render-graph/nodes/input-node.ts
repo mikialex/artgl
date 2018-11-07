@@ -1,4 +1,4 @@
-import { RenderGraphNode } from "../render-node";
+import { RenderGraphNode } from "../render-graph-node";
 import { EntityList } from "../entity-list";
 import { RenderGraph } from "../render-graph";
 

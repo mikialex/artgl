@@ -1,6 +1,7 @@
-import { RenderGraphNode } from "../render-node";
+import { RenderGraphNode } from "../render-graph-node";
 import { entityListFilter } from "../interface";
 import { RenderGraph } from "../render-graph";
+import { RenderList } from "../../renderer/render-list";
 
 // filter a list
 export class FilterNode extends RenderGraphNode {
@@ -10,6 +11,10 @@ export class FilterNode extends RenderGraphNode {
 
   setFilter(filter: entityListFilter) {
 
+  }
+
+  pipe(render: RenderList) {
+    
   }
 
 }

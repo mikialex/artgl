@@ -1,5 +1,5 @@
 import { EntityList } from "./entity-list";
-import { RenderGraphNode } from "./render-node";
+import { RenderGraphNode } from "./render-graph-node";
 
 
 // get a property on rgn
