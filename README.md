@@ -1,3 +1,7 @@
+
+<img src="./logo.svg" 
+style="margin:30px; width: 500px"></img>
+
 ## About Project
 
 ArtGL is underdeveloping next generation advance webGL framework .
