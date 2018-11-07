@@ -2,7 +2,6 @@ import { Controler } from "./controler";
 import { Spherical } from "../math/spherical";
 import { Interactor } from "./interactor";
 import { Vector2 } from "../math/vector2";
-import { clamp } from "../math/uuid";
 import { Vector3 } from "../math";
 import { Camera } from "../core/camera";
 
@@ -15,14 +14,14 @@ export default class OrbitController extends Controler {
   constructor(public camera: Camera, interactor: Interactor) {
     super(interactor);
 
-    // this.interactor.leftMouseMove = this.rotate;
-    // this.interactor.rightMouseMove = this.move;
-    // this.interactor.mouseWheel = this.zoom;
+    this.interactor.leftMouseMove = this.rotate;
+    this.interactor.rightMouseMove = this.move;
+    this.interactor.mouseWheel = this.zoom;
 
-    // this.spherical = new Spherical();
-    // const v = new Vector3();
-    // v.copy(camera.position).sub(this.spherical.center);
-    // this.spherical.setFromVector(v);
+    this.spherical = new Spherical();
+    const v = new Vector3();
+    v.copy(camera.position).sub(this.spherical.center);
+    this.spherical.setFromVector(v);
   }
 
   private rotate = (offset: Vector2) => {

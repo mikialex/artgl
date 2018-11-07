@@ -3,6 +3,7 @@ import { RenderGraphNode } from "./render-node";
 
 
 // get a property on rgn
+// specify the node and node's property
 export interface RGNproperty{
   node: RenderGraphNode,
   key: string

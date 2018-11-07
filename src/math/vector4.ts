@@ -126,7 +126,7 @@ Object.assign(Vector4.prototype, {
 
     if (w !== undefined) {
 
-      console.warn('THREE.Vector4: .add() now only accepts one argument. Use .addVectors( a, b ) instead.');
+      console.warn('Vector4: .add() now only accepts one argument. Use .addVectors( a, b ) instead.');
       return this.addVectors(v, w);
 
     }
@@ -177,7 +177,7 @@ Object.assign(Vector4.prototype, {
 
     if (w !== undefined) {
 
-      console.warn('THREE.Vector4: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.');
+      console.warn('Vector4: .sub() now only accepts one argument. Use .subVectors( a, b ) instead.');
       return this.subVectors(v, w);
 
     }
@@ -607,7 +607,7 @@ Object.assign(Vector4.prototype, {
 
     if (offset !== undefined) {
 
-      console.warn('THREE.Vector4: offset has been removed from .fromBufferAttribute().');
+      console.warn('Vector4: offset has been removed from .fromBufferAttribute().');
 
     }
 

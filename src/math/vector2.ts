@@ -269,7 +269,7 @@ Object.assign(Vector2.prototype, {
 
     if (offset !== undefined) {
 
-      console.warn('THREE.Vector2: offset has been removed from .fromBufferAttribute().');
+      console.warn('Vector2: offset has been removed from .fromBufferAttribute().');
 
     }
 

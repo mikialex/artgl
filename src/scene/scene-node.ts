@@ -1,4 +1,4 @@
-import { Vector3, Matrix4, Quaternion} from "../math";
+import { Vector3, Matrix4, Quaternion } from "../math";
 import { Scene } from "./scene";
 
 export class SceneNode {
@@ -15,7 +15,7 @@ export class SceneNode {
   isTransformDirty = true;
 
   updateLocalMatrix() {
-      this.matrix.compose(this.scale, this.rotation, this.position);
+    this.matrix.compose(this.scale, this.rotation, this.position);
   }
 
   addChild(node: SceneNode) {
@@ -41,22 +41,22 @@ export class SceneNode {
     }
   }
 
-  updateMatrixWorld(force?){
-		if (this.isTransformDirty || force) {
+  updateMatrixWorld(force?: boolean): void {
+    if (this.isTransformDirty || force) {
 
-			if (this.parent === null) {
-	      this.worldMatrix.copy(this.matrix);
-			} else {
-	      this.worldMatrix.multiplyMatrices(this.parent.worldMatrix, this.matrix);
-			}
-			this.isTransformDirty = false;
-			force = true;
-		}
-		var children = this.children;
-		for (var i = 0, l = children.length; i < l; i++) {
-			children[i].updateMatrixWorld(force);
-		}
+      if (this.parent === null) {
+        this.worldMatrix.copy(this.matrix);
+      } else {
+        this.worldMatrix.multiplyMatrices(this.parent.worldMatrix, this.matrix);
+      }
+      this.isTransformDirty = false;
+      force = true;
+    }
+    var children = this.children;
+    for (var i = 0, l = children.length; i < l; i++) {
+      children[i].updateMatrixWorld(force);
+    }
   }
 
-  
+
 }

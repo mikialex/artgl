@@ -151,7 +151,7 @@ export class Matrix4 implements DataObject<Matrix4>{
     var det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
 
     if (det === 0) {
-      var msg = "THREE.Matrix4.getInverse(): can't invert matrix, determinant is 0";
+      var msg = "Matrix4.getInverse(): can't invert matrix, determinant is 0";
       if (throwOnDegenerate === true) {
         throw new Error(msg);
       } else {
