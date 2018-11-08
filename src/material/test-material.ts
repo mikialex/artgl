@@ -9,6 +9,7 @@ const vertexShaderSource =
       vec4 worldPosition = VPMatrix * MMatrix * vec4(position, 1.0);
       color = vec3(normal.xyz);
       gl_Position = worldPosition;
+      gl_PointSize = 10.0;
     }
     ` 
 const fragmentShaderSource =

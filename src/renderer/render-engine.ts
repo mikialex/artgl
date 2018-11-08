@@ -1,4 +1,4 @@
-import { GLRenderer } from "./webgl-renderer";
+import { GLRenderer, DrawMode } from "./webgl-renderer";
 import { RenderList } from "./render-list";
 import { RenderObject } from "../core/render-object";
 import { Camera } from "../core/camera";
@@ -80,7 +80,7 @@ export class ARTEngine {
     this.connectGeometryData(object.geometry, program);
 
     // render
-    this.renderer.render();
+    this.renderer.render(DrawMode.POINTS);
   }
 
   connectGeometryData(geometry: Geometry, program: GLProgram) {

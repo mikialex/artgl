@@ -5,6 +5,12 @@ import { GLProgramManager } from "../webgl/program-manager";
 import { GLAttributeBufferDataManager } from "../webgl/attribute-buffer-manager";
 import { GLState } from "../webgl/gl-state";
 
+export enum DrawMode{
+  TRIANGLES,
+  LINES,
+  POINTS
+}
+
 export class GLRenderer {
   constructor(el: HTMLCanvasElement, options?: any) {
     this.gl = el.getContext('webgl', options);
@@ -65,8 +71,21 @@ export class GLRenderer {
     this.attributeBufferManager.disposeBuffer(storeId);
   }
 
-  render() {
-    this.gl.drawArrays(this.gl.TRIANGLES, this.activeProgram.drawFrom, this.activeProgram.drawCount);
+  render(mode: DrawMode) {
+    switch (mode) {
+      case DrawMode.TRIANGLES:
+      this.gl.drawArrays(this.gl.TRIANGLES, this.activeProgram.drawFrom, this.activeProgram.drawCount);
+        break;
+      case DrawMode.LINES:
+      this.gl.drawArrays(this.gl.LINES, this.activeProgram.drawFrom, this.activeProgram.drawCount);
+        break;
+      case DrawMode.POINTS:
+      this.gl.drawArrays(this.gl.POINTS, this.activeProgram.drawFrom, this.activeProgram.drawCount);
+        break;
+    
+      default:
+        throw 'un support draw mode'
+    }
   }
 
   clear() {
