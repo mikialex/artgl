@@ -6,14 +6,23 @@ import { Mesh } from "./object/mesh";
 import { TestMaterial } from "./material/test-material";
 import { Matrix4, Quaternion, Vector3 } from "./math";
 import { PerspectiveCamera } from "./camera/perspective-camera";
+import { Interactor } from "./interact/interactor";
+import { OrbitController } from "./interact/orbit-controler";
 
 window.onload = function () {
 
   let canv = document.querySelector('canvas');
+  const width = canv.clientWidth;
+  const height = canv.clientHeight;
   let renderer = new GLRenderer(canv);
   const engine = new ARTEngine(renderer);
   const camera = new PerspectiveCamera();
-  camera.worldMatrix.setPostion(0, 0, 10);
+
+  camera.aspect = width / height;
+  // camera.worldMatrix.setPostion(0, 0, 10);
+  camera.position.set(0, 0, 10);
+  camera.updateLocalMatrix();
+  camera.updateWorldMatrix();
   engine.updateViewProjection(camera);
 
 
@@ -21,22 +30,24 @@ window.onload = function () {
   let testMat = new TestMaterial();
 
   let testMesh = new Mesh(testGeo, testMat);
-  const rotation = (new Quaternion()).setFromAxisAngle(new Vector3(1,1,1).normalize(), 1.4);
-  testMesh.matrix.makeRotationFromQuaternion(rotation);
-  testMesh.updateMatrixWorld();
 
-  engine.renderObject(testMesh);
+
+  const myInteractor = new Interactor(canv);
+  const myOrbitControler = new OrbitController(camera, myInteractor);
 
   window.requestAnimationFrame(tick);
-  let frame = 0;
+  let time = 0;
   function tick() {
-    frame++;
+    time++;
+    const rotation = (new Quaternion()).setFromAxisAngle(new Vector3(1,1,1).normalize(), time/30);
+    testMesh.matrix.makeRotationFromQuaternion(rotation);
+    testMesh.updateWorldMatrix(true);
+
+    myOrbitControler.update();
+    camera.updateWorldMatrix(true);
+    engine.updateViewProjection(camera);
     engine.renderObject(testMesh);
-    if (frame < 100) {
-      window.requestAnimationFrame(tick);
-    }
+    window.requestAnimationFrame(tick);
   }
 
 }
-
-  

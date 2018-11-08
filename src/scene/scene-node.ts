@@ -1,5 +1,6 @@
 import { Vector3, Matrix4, Quaternion } from "../math";
 import { Scene } from "./scene";
+import { Euler } from "../math/euler";
 
 export class SceneNode {
   scene: Scene;
@@ -8,14 +9,15 @@ export class SceneNode {
   children: SceneNode[] = [];
 
   position = new Vector3(0, 0, 0);
-  rotation = new Quaternion();
+  rotation = new Euler();
+  quaternion = new Quaternion();
   scale = new Vector3(1, 1, 1);
   matrix = new Matrix4();
   worldMatrix = new Matrix4();
   isTransformDirty = true;
 
   updateLocalMatrix() {
-    this.matrix.compose(this.scale, this.rotation, this.position);
+    this.matrix.compose(this.position, this.quaternion, this.scale);
   }
 
   addChild(node: SceneNode) {
@@ -41,7 +43,7 @@ export class SceneNode {
     }
   }
 
-  updateMatrixWorld(force?: boolean): void {
+  updateWorldMatrix(force?: boolean): void {
     if (this.isTransformDirty || force) {
 
       if (this.parent === null) {
@@ -54,7 +56,7 @@ export class SceneNode {
     }
     var children = this.children;
     for (var i = 0, l = children.length; i < l; i++) {
-      children[i].updateMatrixWorld(force);
+      children[i].updateWorldMatrix(force);
     }
   }
 

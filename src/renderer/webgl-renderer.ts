@@ -66,8 +66,8 @@ export class GLRenderer {
   }
 
   render() {
+    this.clear();
     this.gl.drawArrays(this.gl.TRIANGLES, this.activeProgram.drawFrom, this.activeProgram.drawCount);
-    console.log('render')
   }
 
   clear() {

@@ -185,6 +185,46 @@ export class Matrix4 implements DataObject<Matrix4>{
     return this;
   }
 
+  public lookAt = function () {
+    let x: Vector3;
+    let y: Vector3;
+    let z: Vector3;
+
+    return function lookAt(origin: Vector3, target: Vector3, up: Vector3): Matrix4 {
+      if (x === undefined) x = new Vector3();
+      if (y === undefined) y = new Vector3();
+      if (z === undefined) z = new Vector3();
+
+      const te = this.elements;
+
+      z.copy(origin).sub(target);
+      if (z.mag() === 0) {
+        z.z = 1;
+      }
+
+      z.normalize();
+      x.crossVectors(up, z);
+      if (x.mag() === 0) {
+        if (Math.abs(up.z) === 1) {
+          z.x += 0.0001;
+        } else {
+          z.z += 0.0001;
+        }
+        z.normalize();
+        x.crossVectors(up, z);
+      }
+
+      x.normalize();
+      y.crossVectors(z, x);
+
+      te[0] = x.x; te[4] = y.x; te[8] = z.x;
+      te[1] = x.y; te[5] = y.y; te[9] = z.y;
+      te[2] = x.z; te[6] = y.z; te[10] = z.z;
+
+      return this;
+    };
+  }();
+
   scale(x, y, z) {
     const te = this.elements;
     te[0] *= x; te[4] *= y; te[8] *= z;

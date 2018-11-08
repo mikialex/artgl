@@ -9,11 +9,14 @@ const MaxPolarAngle = 179 / 180 * Math.PI;
 const MinPolarAngle = 0.1;
 const RotateAngleFactor = 2.5;
 
-export default class OrbitController extends Controler {
+const tempVec = new Vector3();
+
+export class OrbitController extends Controler {
 
   constructor(public camera: PerspectiveCamera, interactor: Interactor) {
     super(interactor);
 
+    this.camera = camera;
     this.interactor.leftMouseMove = this.rotate;
     this.interactor.rightMouseMove = this.move;
     this.interactor.mouseWheel = this.zoom;
@@ -38,6 +41,12 @@ export default class OrbitController extends Controler {
     this.spherical.center.x += offset.x;
     this.spherical.center.z -= offset.y;
   }
+
+  public update() {
+    tempVec.setFromSpherical(this.spherical).add(this.spherical.center);
+    this.camera.position.copy(tempVec);
+    this.camera.lookAt(this.spherical.center);
+}
 
 
   public interactor: Interactor;

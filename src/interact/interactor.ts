@@ -11,6 +11,7 @@ const v1 = new Vector2();
 export class Interactor{
   constructor(inputElement:HTMLElement) {
     this.inputElement = inputElement;
+    this.bind();
   }
 
   mouseButton: number;

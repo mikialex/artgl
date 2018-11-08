@@ -16,7 +16,7 @@ export class Scene {
   }
 
   updateWorldMatrix() {
-    this.root.updateMatrixWorld(true);
+    this.root.updateWorldMatrix(true);
   }
 
   setRootNode(node: SceneNode) {
