@@ -28,8 +28,10 @@ export class OrbitController extends Controler {
   }
 
   private rotate = (offset: Vector2) => {
-    this.spherical.azim += offset.x / this.camera.width * Math.PI * RotateAngleFactor;
-    this.spherical.polar = MathUtil.clamp(this.spherical.polar - offset.y / this.camera.height * Math.PI * RotateAngleFactor, MinPolarAngle, MaxPolarAngle);
+    const viewWidth = this.camera.width * 5000;
+    const viewHeight = this.camera.height * 5000;
+    this.spherical.azim += offset.x / viewWidth * Math.PI * RotateAngleFactor;
+    this.spherical.polar = MathUtil.clamp(this.spherical.polar + offset.y / viewHeight * Math.PI * RotateAngleFactor, MinPolarAngle, MaxPolarAngle);
   }
 
   private zoom = (factor: number) => {
@@ -37,9 +39,10 @@ export class OrbitController extends Controler {
   }
 
   private move = (offset: Vector2) => {
-    offset.rotate(this.spherical.azim).multiplyScalar(this.spherical.radius * 0.002);
+    console.log(this.spherical.azim);
+    offset.rotate(-this.spherical.azim).multiplyScalar(this.spherical.radius * 0.002);
     this.spherical.center.x += offset.x;
-    this.spherical.center.z -= offset.y;
+    this.spherical.center.z += offset.y;
   }
 
   public update() {

@@ -39,9 +39,9 @@ window.onload = function () {
   let time = 0;
   function tick() {
     time++;
-    const rotation = (new Quaternion()).setFromAxisAngle(new Vector3(1,1,1).normalize(), time/30);
-    testMesh.matrix.makeRotationFromQuaternion(rotation);
-    testMesh.updateWorldMatrix(true);
+    // const rotation = (new Quaternion()).setFromAxisAngle(new Vector3(1,1,1).normalize(), time/30);
+    // testMesh.matrix.makeRotationFromQuaternion(rotation);
+    // testMesh.updateWorldMatrix(true);
 
     myOrbitControler.update();
     camera.updateWorldMatrix(true);
