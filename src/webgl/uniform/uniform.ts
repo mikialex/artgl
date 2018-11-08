@@ -46,7 +46,7 @@ export class GLUniform<T>{
   private flattener: flattenerType
   set(value:T){
     this.setter(this.gl, this.location, this.flattener(value, this.receiveData));
-  }
+  } // TODO optimize flatten uniform gc issue
 
 }
 

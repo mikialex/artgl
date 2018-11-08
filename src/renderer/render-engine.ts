@@ -40,7 +40,7 @@ export class ARTEngine {
 
   updateViewProjection(camera: Camera) {
     this.activeCameraMatrixRerverse.getInverse(camera.worldMatrix, true);
-    camera.updateProjectionMatrix();
+    camera.updateProjectionMatrix(); // TODO projectmatrix may not need update
     this.VPMatrix.multiplyMatrices(camera.projectionMatrix, this.activeCameraMatrixRerverse);
     this.activeCamera = camera;
   }

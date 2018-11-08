@@ -15,7 +15,13 @@ export interface MaterialConfig{
 }
 
 export class Material{
-  constructor() {
+  constructor(config: MaterialConfig) {
+    // setup default uniform value
+    this.config = config;
+    this.config.programConfig.uniforms.forEach(uniform => {
+      // TODO distinguish matrix unifrom ...
+      this.uniformValues[uniform.name] = uniform.default;
+    })
   }
 
   config: MaterialConfig;
@@ -25,6 +31,8 @@ export class Material{
 
   needUpdate = true;
   isTransparent = false;
+
+  uniformValues: { [index: string]: any } = {};
 
 
   getProgram(engine: ARTEngine): GLProgram {

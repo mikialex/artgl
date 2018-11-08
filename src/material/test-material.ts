@@ -21,8 +21,7 @@ const fragmentShaderSource =
 
 export class TestMaterial extends Material{
   constructor() {
-    super();
-    this.config = {
+    const config = {
       programConfig:{
         attributes: [
           { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
@@ -41,6 +40,7 @@ export class TestMaterial extends Material{
         autoInjectHeader: true,
       }
     }
+    super(config);
   }
 
 }

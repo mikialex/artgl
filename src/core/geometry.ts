@@ -6,6 +6,7 @@ interface LayoutInfo{
   stride: number,
 }
 
+// layout is specify this geomeotry's data usage info
 export interface GeometryDataLayout {
   dataInfo: { [index: string]: LayoutInfo };
   drawFrom: number;
