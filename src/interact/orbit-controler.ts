@@ -2,8 +2,8 @@ import { Controler } from "./controler";
 import { Spherical } from "../math/spherical";
 import { Interactor } from "./interactor";
 import { Vector2 } from "../math/vector2";
-import { Vector3 } from "../math";
-import { Camera } from "../core/camera";
+import { Vector3, MathUtil } from "../math";
+import { PerspectiveCamera } from "../camera/perspective-camera";
 
 const MaxPolarAngle = 179 / 180 * Math.PI;
 const MinPolarAngle = 0.1;
@@ -11,7 +11,7 @@ const RotateAngleFactor = 2.5;
 
 export default class OrbitController extends Controler {
 
-  constructor(public camera: Camera, interactor: Interactor) {
+  constructor(public camera: PerspectiveCamera, interactor: Interactor) {
     super(interactor);
 
     this.interactor.leftMouseMove = this.rotate;
@@ -25,8 +25,8 @@ export default class OrbitController extends Controler {
   }
 
   private rotate = (offset: Vector2) => {
-    // this.spherical.azim += offset.x / this.camera.size.width * Math.PI * RotateAngleFactor;
-    // this.spherical.polar = clamp(this.spherical.polar - offset.y / this.camera.size.height * Math.PI * RotateAngleFactor, MinPolarAngle, MaxPolarAngle);
+    this.spherical.azim += offset.x / this.camera.width * Math.PI * RotateAngleFactor;
+    this.spherical.polar = MathUtil.clamp(this.spherical.polar - offset.y / this.camera.height * Math.PI * RotateAngleFactor, MinPolarAngle, MaxPolarAngle);
   }
 
   private zoom = (factor: number) => {

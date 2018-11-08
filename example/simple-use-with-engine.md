@@ -1,8 +1,7 @@
 # Simple Engine Usage
 
-Use ARTEngine to experience middle level of usage of Artix
+Use ARTEngine to experience middle level of usage of Artix. Using inner render abstraction such as geometry and material.
 
-下面这个例子是Engine最简单的使用
 ``` ts
   let canv = document.querySelector('canvas');
   let renderer = new GLRenderer(canv);

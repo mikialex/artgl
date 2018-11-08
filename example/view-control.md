@@ -1,7 +1,7 @@
-# 相机交互
+# Camera interaction
 
 ```ts
-  // 选择一个元素作为交互事件的触发器，一般是画布
+  // choose a html elment as input source
   let canv = document.querySelector('canvas');
   const myInteractor = new Interactor(canv);
   const camera = new PerspectiveCamera();

@@ -26,7 +26,7 @@ export class GLUniform<T>{
     if (this.location === null) {
       // if you declare a uniform , but not realy used in shader
       // that will may cause null location
-      throw 'create uniform fail';
+      console.warn('create uniform fail: ', descriptor.name);
     }
     this.setter = findUniformSetter(descriptor.type);
     if (descriptor.flattener !== undefined) {

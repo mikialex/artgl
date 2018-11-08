@@ -23,6 +23,13 @@ export class PerspectiveCamera extends Camera{
   aspect: number;
   zoom: number;
 
+  get width() {
+    return this.aspect * this.height;
+  }
+  get height() {
+    return 2 * this.near * Math.tan(MathUtil.DEG2RAD * 0.5 * this.fov) / this.zoom;
+  }
+
   updateProjectionMatrix () {
     const top = this.near * Math.tan(MathUtil.DEG2RAD * 0.5 * this.fov) / this.zoom;
     const height = 2 * top;

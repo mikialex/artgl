@@ -2,9 +2,9 @@
 
 create a renderer and a program, set attributes, uniforms, draw it.
 
-最低层次的用法，仅仅是对webgl底层的简单封装。
+Create a program by simple config object, which contains two shaders and several attribute and uniform discriptor. Then, bind some data and parameter to it. Finally, create a renderer to render it.
 
-通过简单的config，创建一个program，包含两个shader，若干attribute和unifrom等资源，创建一个渲染器，指定一个目标，指定一堆数据，一些参数，然后渲染，得到结果。
+lowest level of artgl useage, just simple encapsule of webglctx.
 
 ```ts
 

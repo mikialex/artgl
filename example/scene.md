@@ -1,7 +1,6 @@
-# 使用场景树
+# Scene Description
 
-ARTEngine被设计支持多种上层结构的场景描述，上层结构通过适配器对接Engine。
-artix提供一套场景图和相应的适配器实现。
+ARTEngine is designed to suppport different scene decription system. The upper structure use an adpator to supply renderdata to engine; We provide a standard scene tree implementation for you.
 
 ```ts
   let canv = document.querySelector('canvas');
