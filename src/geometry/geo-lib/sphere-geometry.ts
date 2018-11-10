@@ -1,21 +1,44 @@
 
 import { Geometry } from '../../core/geometry';
 import { Vector3 } from '../../math';
+import { AttributeUsage } from '../../webgl/attribute';
+import { Float32BufferData, BufferData, Uint16BufferData } from '../../core/buffer-data';
 
 
 export class SphereGeometry extends Geometry {
-  // constructor(radius?: number, widthSegments?: number, heightSegments?: number,
-  //   phiStart?: number, phiLength?: number, thetaStart?: number, thetaLength?: number) {
-  //   super();
-  //   this.radius = radius !== undefined ? radius : 1;
-  //   this.widthSegments = Math.max(3, Math.floor(widthSegments) || 8);
-  //   this.heightSegments = Math.max(2, Math.floor(heightSegments) || 6);
-  //   this.phiStart = phiStart !== undefined ? phiStart : 0;
-  //   this.phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
-  //   this.thetaStart = thetaStart !== undefined ? thetaStart : 0;
-  //   this.thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
-  //   this.thetaEnd = this.thetaStart + this.thetaLength;
-  // }
+  constructor(radius?: number, widthSegments?: number, heightSegments?: number,
+    phiStart?: number, phiLength?: number, thetaStart?: number, thetaLength?: number) {
+    super();
+    this.radius = radius !== undefined ? radius : 1;
+    this.widthSegments = Math.max(3, Math.floor(widthSegments) || 8);
+    this.heightSegments = Math.max(2, Math.floor(heightSegments) || 6);
+    this.phiStart = phiStart !== undefined ? phiStart : 0;
+    this.phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
+    this.thetaStart = thetaStart !== undefined ? thetaStart : 0;
+    this.thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
+    this.thetaEnd = this.thetaStart + this.thetaLength;
+
+    this.layout = {
+      dataInfo: {
+        index: {
+          usage: AttributeUsage.index,
+          stride: 1
+        },
+        position: {
+          usage: AttributeUsage.position,
+          stride: 3
+        },
+        normal: {
+          usage: AttributeUsage.normal,
+          stride: 3
+        }
+      },
+      drawFrom: 0,
+      drawCount: 36,
+      indexDraw: true
+    }
+    this.populate();
+  }
   radius = 1;
   widthSegments = 10;
   heightSegments = 10;
@@ -26,7 +49,7 @@ export class SphereGeometry extends Geometry {
   thetaEnd: number;
 
   populate() {
-    console.log(this);
+
     let ix, iy;
     let index = 0;
     let grid = [];
@@ -49,8 +72,6 @@ export class SphereGeometry extends Geometry {
         vertex.x = - this.radius * Math.cos(this.phiStart + u * this.phiLength) * Math.sin(this.thetaStart + v * this.thetaLength);
         vertex.y = this.radius * Math.cos(this.thetaStart + v * this.thetaLength);
         vertex.z = this.radius * Math.sin(this.phiStart + u * this.phiLength) * Math.sin(this.thetaStart + v * this.thetaLength);
-
-
         vertices.push(vertex.x, vertex.y, vertex.z);
         // normal
         normal.set(vertex.x, vertex.y, vertex.z).normalize();
@@ -73,8 +94,19 @@ export class SphereGeometry extends Geometry {
         if (iy !== this.heightSegments - 1 || this.thetaEnd < Math.PI) indices.push(b, c, d);
       }
     }
-    console.log(vertices);
-    return new Float32Array(vertices);
+
+    const positionBuffer = new Float32BufferData(this.layout.dataInfo.position.stride * this.layout.drawCount);
+    this.bufferDatas.position = positionBuffer;
+    positionBuffer.setData(new Float32Array(vertices))
+
+    const normalBuffer = new Float32BufferData(this.layout.dataInfo.normal.stride * this.layout.drawCount);
+    this.bufferDatas.normal = normalBuffer;
+    normalBuffer.setData(new Float32Array(normals))
+
+    const indexBuffer = new Uint16BufferData(1);
+    this.bufferDatas.index = indexBuffer;
+    indexBuffer.setData(new Uint16Array(indices));
+    this.layout.drawCount = indices.length;
 
   }
 

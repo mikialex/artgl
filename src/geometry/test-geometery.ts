@@ -77,7 +77,7 @@ export class TestGeometry extends Geometry {
     ])
     )
 
-    const normal = new Float32BufferData(this.layout.dataInfo.position.stride * this.layout.drawCount);
+    const normal = new Float32BufferData(this.layout.dataInfo.normal.stride * this.layout.drawCount);
     this.bufferDatas.normal = normal;
     normal.setData(generateNormalFromPostion(position.data as Float32Array));
   }

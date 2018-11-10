@@ -2,6 +2,7 @@ import { GLDataType } from "./shader-util";
 import { GLProgram } from "./program";
 
 export const enum AttributeUsage {
+  index,
   position,
   normal,
   color,

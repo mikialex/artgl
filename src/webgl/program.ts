@@ -49,8 +49,9 @@ export class GLProgram {
   private uniforms: { [index: string]: GLUniform<any> } = {};
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
-  drawFrom: number;
-  drawCount: number;
+  drawFrom: number = 0;
+  drawCount: number = 0;
+  useIndexDraw: boolean = false;
 
   private createShaders(conf: GLProgramConfig) {
     if (conf.autoInjectHeader) {
@@ -109,6 +110,11 @@ export class GLProgram {
 
   setUniform(name: string, data: GLData) {
     this.uniforms[name].set(data);
+  }
+
+  useIndexBuffer(buffer: WebGLBuffer) {
+    const gl = this.renderer.gl;
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
   }
 
   dispose() {

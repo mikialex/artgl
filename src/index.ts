@@ -8,6 +8,7 @@ import { Matrix4, Quaternion, Vector3 } from "./math";
 import { PerspectiveCamera } from "./camera/perspective-camera";
 import { Interactor } from "./interact/interactor";
 import { OrbitController } from "./interact/orbit-controler";
+import { SphereGeometry } from "./geometry/geo-lib/sphere-geometry";
 
 window.onload = function () {
 
@@ -26,10 +27,12 @@ window.onload = function () {
   engine.updateViewProjection(camera);
 
 
-  let testGeo = new TestGeometry();
+  // let testGeo = new TestGeometry();
+  let testGeo = new SphereGeometry(1,20,20);
   let testMat = new TestMaterial();
 
   let testMesh = new Mesh(testGeo, testMat);
+
 
 
   const myInteractor = new Interactor(canv);

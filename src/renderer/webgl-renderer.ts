@@ -6,9 +6,9 @@ import { GLAttributeBufferDataManager } from "../webgl/attribute-buffer-manager"
 import { GLState } from "../webgl/gl-state";
 
 export enum DrawMode{
-  TRIANGLES,
-  LINES,
-  POINTS
+  TRIANGLES = 4,
+  LINES = 1,
+  POINTS = 0
 }
 
 export class GLRenderer {
@@ -59,8 +59,8 @@ export class GLRenderer {
   }
 
   
-  createBuffer(data: ArrayBuffer): string {
-    return this.attributeBufferManager.createBuffer(data);
+  createBuffer(data: ArrayBuffer, useforIndex: boolean): string {
+    return this.attributeBufferManager.createBuffer(data, useforIndex);
   }
 
   getBuffer(storeId: string) {
@@ -71,20 +71,16 @@ export class GLRenderer {
     this.attributeBufferManager.disposeBuffer(storeId);
   }
 
-  render(mode: DrawMode) {
-    switch (mode) {
-      case DrawMode.TRIANGLES:
-      this.gl.drawArrays(this.gl.TRIANGLES, this.activeProgram.drawFrom, this.activeProgram.drawCount);
-        break;
-      case DrawMode.LINES:
-      this.gl.drawArrays(this.gl.LINES, this.activeProgram.drawFrom, this.activeProgram.drawCount);
-        break;
-      case DrawMode.POINTS:
-      this.gl.drawArrays(this.gl.POINTS, this.activeProgram.drawFrom, this.activeProgram.drawCount);
-        break;
-    
-      default:
-        throw 'un support draw mode'
+  render(mode: DrawMode, useIndex: boolean) {
+    if (useIndex) {
+      this.gl.drawElements(
+        mode,
+        this.activeProgram.drawCount,
+        this.gl.UNSIGNED_SHORT,
+        0
+      );
+    } else {
+      this.gl.drawArrays(mode, this.activeProgram.drawFrom, this.activeProgram.drawCount);
     }
   }
 

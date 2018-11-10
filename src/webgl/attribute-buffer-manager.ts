@@ -12,11 +12,16 @@ export class GLAttributeBufferDataManager {
     return this, this.buffers[storeId];
   }
 
-  createBuffer(data: ArrayBuffer): string {
+  createBuffer(data: ArrayBuffer, useForIndex: boolean): string {
     const gl = this.renderer.gl;
     const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    if (useForIndex) {
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    } else {
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    }
     const id = generateUUID();
     this.buffers[id] = buffer;
     return id;

@@ -7,6 +7,7 @@ import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
 import { Material } from "../core/material";
+import { AttributeUsage } from "../webgl/attribute";
 
 export class ARTEngineAdaptor {
   constructor(engine: ARTEngine) {
@@ -80,20 +81,39 @@ export class ARTEngine {
     this.connectGeometryData(object.geometry, program);
 
     // render
-    this.renderer.render(DrawMode.POINTS);
+    this.renderer.render(DrawMode.TRIANGLES, program.useIndexDraw);
   }
 
   connectGeometryData(geometry: Geometry, program: GLProgram) {
+    let indexBuffer;
     for (const infoKey in geometry.layout.dataInfo) {
       const usage = geometry.layout.dataInfo[infoKey].usage;
-      if (usage !== undefined) {
+      if (usage !== undefined && usage !== AttributeUsage.index) {
         const bufferData = geometry.bufferDatas[infoKey];
         let glBuffer = this.getGLAttributeBuffer(bufferData);
         if (glBuffer === undefined) {
-          glBuffer = this.createAttibuteBuffer(bufferData);
+          glBuffer = this.createAttributeBuffer(bufferData, false);
         }
         program.getAttributeByUsage(usage).useBuffer(glBuffer);
       }
+
+      if (usage === AttributeUsage.index) {
+        if (indexBuffer !== undefined) {
+          throw 'only can set one index buffer';
+        }
+        indexBuffer = geometry.bufferDatas[infoKey];
+      }
+    }
+
+    if (geometry.layout.indexDraw) {
+      program.useIndexDraw = true;
+      let glIndexBuffer = this.getGLAttributeBuffer(indexBuffer);
+      if (glIndexBuffer === undefined) {
+        glIndexBuffer = this.createAttributeBuffer(indexBuffer, true);
+      }
+      program.useIndexBuffer(glIndexBuffer);
+    } else {
+      program.useIndexDraw = false;
     }
 
     program.drawFrom = geometry.layout.drawFrom;
@@ -118,8 +138,8 @@ export class ARTEngine {
     return this.renderer.getBuffer(bufferData.storeId);
   }
 
-  createAttibuteBuffer(bufferData: BufferData): WebGLBuffer {
-    const id = this.renderer.createBuffer(bufferData.data.buffer);
+  createAttributeBuffer(bufferData: BufferData, useforIndex: boolean): WebGLBuffer {
+    const id = this.renderer.createBuffer(bufferData.data.buffer, useforIndex);
     bufferData.storeId = id;
     return this.renderer.getBuffer(id);
   }

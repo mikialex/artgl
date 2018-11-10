@@ -9,6 +9,7 @@ interface LayoutInfo{
 // layout is specify this geomeotry's data usage info
 export interface GeometryDataLayout {
   dataInfo: { [index: string]: LayoutInfo };
+  indexDraw?: boolean;
   drawFrom: number;
   drawCount: number;
 }

@@ -1,6 +1,6 @@
 import { ARTEngine } from "../renderer/render-engine";
 
-export type BufferDataType = Float32Array | Int32Array ;
+export type BufferDataType = Float32Array | Uint16Array ;
 
 export class BufferData{
   constructor() {
@@ -31,9 +31,9 @@ export class Float32BufferData extends BufferData{
 
 }
 
-export class Int32BufferData extends BufferData {
+export class Uint16BufferData extends BufferData {
   constructor(size: number) {
     super();
-    this.data = new Int32Array(size);
+    this.data = new Uint16Array(size);
   }
 }
