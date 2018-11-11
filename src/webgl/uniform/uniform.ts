@@ -1,5 +1,5 @@
 import { GLProgram } from "../program";
-import { findUniformSetter, findUniformFlattener } from "./uniform-util";
+import { findUniformSetter, findUniformFlattener, findUniformDiffer, findUniformCopyer } from "./uniform-util";
 import { GLDataType } from "../shader-util";
 
 export type uniformUploadType = number | Float32Array 
@@ -29,6 +29,8 @@ export class GLUniform<T>{
       console.warn('create uniform fail: ', descriptor.name);
     }
     this.setter = findUniformSetter(descriptor.type);
+    this.differ = findUniformDiffer(descriptor.type);
+    this.copyer = findUniformCopyer(descriptor.type);
     if (descriptor.flattener !== undefined) {
       this.flattener = descriptor.flattener;
     } else {
@@ -40,13 +42,25 @@ export class GLUniform<T>{
   program: GLProgram;
   location: WebGLUniformLocation;
   value: T;
+  lastReceiveData: uniformUploadType;
   receiveData: uniformUploadType;
   descriptor: UniformDescriptor<T>;
   private setter: (gl: WebGLRenderingContext, localtion: WebGLUniformLocation, data: uniformUploadType) => void;
   private flattener: flattenerType
-  set(value:T){
-    this.setter(this.gl, this.location, this.flattener(value, this.receiveData));
-  } // TODO optimize flatten uniform gc issue
+  private differ;
+  private copyer;
+  set(value: T) {
+    this.receiveData = this.flattener(value, this.receiveData);
+    const diffResult = true;
+    if (diffResult) {
+      if (this.lastReceiveData === undefined || this.differ(this.receiveData, this.lastReceiveData)) {
+        this.setter(this.gl, this.location, this.receiveData);
+        this.lastReceiveData = this.copyer(this.receiveData, this.lastReceiveData);
+      }
+    } else {
+      this.setter(this.gl, this.location, this.receiveData);
+    }
+  }
 
 }
 

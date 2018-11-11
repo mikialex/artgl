@@ -49,6 +49,50 @@ function setValue1i(gl, location, v) { gl.uniform1i(location, v) }
 
 function setValueM4a(gl, location, v) { gl.uniformMatrix4fv(location, false ,v) }
 
+function differFloat(newVal, oldVal) {
+  return newVal === oldVal;
+}
+function differArray(newVal, oldVal) {
+  if (newVal.length !== oldVal.length) {
+    return true;
+  }
+  for (let i = 0; i < newVal.length; i++) {
+    if (newVal[i] !== oldVal[i]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function copyFloat(newVal, target) {
+  return newVal;
+}
+function copyArray(newVal, target) {
+  let targetReal = target;
+  if (target=== undefined || newVal.length !== target.length) {
+    targetReal = [];
+  }
+  for (let i = 0; i < newVal.length; i++) {
+    targetReal[i] = newVal[i]
+  }
+  return targetReal;
+}
+
+
+export function findUniformDiffer(type: GLDataType) {
+  switch (type) {
+    case GLDataType.float: return differFloat; // FLOAT
+    case GLDataType.Mat4: return differArray // _MAT4
+  }
+}
+
+export function findUniformCopyer(type: GLDataType) {
+  switch (type) {
+    case GLDataType.float: return copyFloat; // FLOAT
+    case GLDataType.Mat4: return copyArray // _MAT4
+  }
+}
+
 export function findUniformFlattener(type: GLDataType) {
   switch (type) {
     case GLDataType.float: return flattenFloat; // FLOAT

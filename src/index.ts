@@ -80,9 +80,6 @@ window.onload = function () {
   render();
   function tick() {
     time++;
-    // const rotation = (new Quaternion()).setFromAxisAngle(new Vector3(1,1,1).normalize(), time/30);
-    // testMesh.matrix.makeRotationFromQuaternion(rotation);
-    // testMesh.updateWorldMatrix(true);
     if (active) {
       render();
     }
