@@ -19,7 +19,7 @@ export class Interactor{
 
   controlers: Controler[] = [];
 
-  public bind(): void {
+  private bind(): void {
     const el = this.inputElement;
     this.mouseButton = -1;
     el.addEventListener('mousemove', this.onMouseMove, false);
@@ -30,7 +30,7 @@ export class Interactor{
     // el.addEventListener('keyup', this.cancelLoop, false);
     el.addEventListener('contextmenu', this.preventContentMenu, false);
   }
-  public unbind(): void {
+  private unbind(): void {
     const el = this.inputElement;
     this.mouseButton = -1;
     el.removeEventListener('mousemove', this.onMouseMove);
@@ -51,10 +51,10 @@ export class Interactor{
     mousePosition.set(event.clientX, event.clientY);
     v1.copy(prev).sub(mousePosition);
     if (this.mouseButton === 0) {
-      this.leftMouseMove(v1);
+      this.groupEmit(this.leftMouseMoveCallBacks, v1);
     }
     if (this.mouseButton === 2) {
-      this.rightMouseMove(v1);
+      this.groupEmit(this.rightMouseMoveCallBacks, v1);
     }
     prev.copy(mousePosition);
   }
@@ -66,7 +66,7 @@ export class Interactor{
   }
 
   private onMouseUp = (event: MouseEvent) => {
-    this.mouseUp();
+    this.groupEmit(this.mouseUpCallBacks);
     this.mouseButton = -1;
   }
 
@@ -80,17 +80,58 @@ export class Interactor{
       delta = -event.deltaY;
     }
     delta = delta > 0 ? 1.1 : 0.9;
-    this.mouseWheel(delta);
+    this.groupEmit(this.mouseWheelCallBacks, delta);
   }
 
-  public leftMouseMove(offset: Vector2): void { }
-  public rightMouseMove(offset: Vector2): void { }
-  public mouseWheel(delta: number): void { }
-  public mouseDown(): void { }
-  public mouseUp(): void { }
+  private leftMouseMoveCallBacks = [];
+  private rightMouseMoveCallBacks = [];
+  private mouseWheelCallBacks = [];
+  private mouseDownCallBacks = [];
+  private mouseUpCallBacks = [];
 
+  private groupEmit(callBackList, ...param) {
+    callBackList.forEach(callback => {
+      callback.callback(...param);
+    });
+  }
+  private removeControler(controler, callBackList) {
+    callBackList = callBackList.filter(callback => { return callback.controler === controler });
+  }
+
+  public bindLeftMouseMove(controler: Controler, callback: (offset: Vector2) => any) {
+    this.leftMouseMoveCallBacks.push({controler, callback});
+  }
+
+  public bindRightMouseMove(controler: Controler, callback: (offset: Vector2) => any) {
+    this.rightMouseMoveCallBacks.push({controler, callback});
+  }
+
+  public bindMouseWheel(controler: Controler, callback: (delta: number) => any) {
+    this.mouseWheelCallBacks.push({controler, callback});
+  }
+
+  public bindMouseDown(controler: Controler, callback: () => any) {
+    this.mouseDownCallBacks.push({controler, callback});
+  }
+
+  public bindMouseUp(controler: Controler, callback: () => any) {
+    this.mouseUpCallBacks.push({controler, callback});
+  }
+
+  public unbindControlerAllListener(controler: Controler) {
+    this.removeControler(this.mouseUpCallBacks, controler);
+    this.removeControler(this.rightMouseMoveCallBacks, controler);
+    this.removeControler(this.mouseWheelCallBacks, controler);
+    this.removeControler(this.mouseDownCallBacks, controler);
+    this.removeControler(this.mouseUpCallBacks, controler);
+  }
 
   dispose() {
-    
+    this.unbind();
+    this.leftMouseMoveCallBacks = [];
+    this.rightMouseMoveCallBacks = [];
+    this.mouseWheelCallBacks = [];
+    this.mouseDownCallBacks = [];
+    this.mouseUpCallBacks = [];
   }
 }

@@ -41,7 +41,8 @@ window.onload = function () {
 
 
   const myInteractor = new Interactor(canv);
-  const myOrbitControler = new OrbitController(camera, myInteractor);
+  const myOrbitControler = new OrbitController(camera);
+  myOrbitControler.registerInteractor(myInteractor);
 
   window.requestAnimationFrame(tick);
   let time = 0;

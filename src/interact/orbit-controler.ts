@@ -13,18 +13,26 @@ const tempVec = new Vector3();
 
 export class OrbitController extends Controler {
 
-  constructor(public camera: PerspectiveCamera, interactor: Interactor) {
-    super(interactor);
-
+  constructor(public camera: PerspectiveCamera) {
+    super();
     this.camera = camera;
-    this.interactor.leftMouseMove = this.rotate;
-    this.interactor.rightMouseMove = this.move;
-    this.interactor.mouseWheel = this.zoom;
-
     this.spherical = new Spherical();
+
     const v = new Vector3();
     v.copy(camera.position).sub(this.spherical.center);
     this.spherical.setFromVector(v);
+  }
+
+  public spherical: Spherical;
+
+  public registerInteractor(interactor: Interactor) {
+    if (this.interactor !== undefined) {
+      this.interactor.unbindControlerAllListener(this);
+    }
+    this.interactor = interactor;
+    this.interactor.bindLeftMouseMove(this, this.rotate);
+    this.interactor.bindRightMouseMove(this, this.move);
+    this.interactor.bindMouseWheel(this, this.zoom);
   }
 
   private rotate = (offset: Vector2) => {
@@ -49,9 +57,5 @@ export class OrbitController extends Controler {
     this.camera.position.copy(tempVec);
     this.camera.lookAt(this.spherical.center);
   }
-
-
-  public interactor: Interactor;
-  public spherical: Spherical;
 
 }
