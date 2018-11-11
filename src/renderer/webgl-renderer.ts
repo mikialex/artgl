@@ -15,6 +15,7 @@ export class GLRenderer {
     this.glInfo = new GLInfo(this);
     this.glInfo.createAllExtension();
     this.devicePixelRatio = window.devicePixelRatio;
+    this.state = new GLState(this);
     this.gl.enable(this.gl.DEPTH_TEST);
   }
   gl: WebGLRenderingContext;
@@ -31,7 +32,9 @@ export class GLRenderer {
     this.height = height;
     this.el.width = this.width * this.devicePixelRatio;
     this.el.height = this.height * this.devicePixelRatio;
-		this.state.viewport( 0, 0, width, height );
+    this.el.style.width = width + 'px';
+    this.el.style.height = height + 'px';
+		this.state.viewport( 0, 0, width * this.devicePixelRatio, height * this.devicePixelRatio );
   }
 
   state: GLState = new GLState(this);
