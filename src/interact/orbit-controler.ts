@@ -39,7 +39,6 @@ export class OrbitController extends Controler {
   }
 
   private move = (offset: Vector2) => {
-    console.log(this.spherical.azim);
     offset.rotate(-this.spherical.azim).multiplyScalar(this.spherical.radius * 0.002);
     this.spherical.center.x += offset.x;
     this.spherical.center.z += offset.y;
@@ -49,7 +48,7 @@ export class OrbitController extends Controler {
     tempVec.setFromSpherical(this.spherical).add(this.spherical.center);
     this.camera.position.copy(tempVec);
     this.camera.lookAt(this.spherical.center);
-}
+  }
 
 
   public interactor: Interactor;

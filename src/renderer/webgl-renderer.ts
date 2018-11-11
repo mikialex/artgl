@@ -4,12 +4,7 @@ import { Matrix4 } from "../math";
 import { GLProgramManager } from "../webgl/program-manager";
 import { GLAttributeBufferDataManager } from "../webgl/attribute-buffer-manager";
 import { GLState } from "../webgl/gl-state";
-
-export enum DrawMode{
-  TRIANGLES = 4,
-  LINES = 1,
-  POINTS = 0
-}
+import { DrawMode } from "../webgl/const";
 
 export class GLRenderer {
   constructor(el: HTMLCanvasElement, options?: any) {

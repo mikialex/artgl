@@ -1,4 +1,4 @@
-import { GLRenderer, DrawMode } from "./webgl-renderer";
+import { GLRenderer } from "./webgl-renderer";
 import { RenderList } from "./render-list";
 import { RenderObject } from "../core/render-object";
 import { Camera } from "../core/camera";
@@ -8,6 +8,7 @@ import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
 import { Material } from "../core/material";
 import { AttributeUsage } from "../webgl/attribute";
+import { DrawMode } from "../webgl/const";
 
 export class ARTEngineAdaptor {
   constructor(engine: ARTEngine) {

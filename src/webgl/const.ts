@@ -1,11 +1,17 @@
-export enum CullSide {
+export const enum DrawMode{
+  TRIANGLES = 4,
+  LINES = 1,
+  POINTS = 0
+}
+
+export const enum CullSide {
   CullFaceNone = 0,
   CullFaceBack = 1,
   CullFaceFront = 2,
   CullFaceFrontBack = 3
 }
 
-export enum DepthFunction {
+export const enum DepthFunction {
   NeverDepth = 0,
   AlwaysDepth = 1,
   LessDepth = 2,
@@ -16,7 +22,7 @@ export enum DepthFunction {
   NotEqualDepth = 7,
 }
 
-export enum BlendingMode {
+export const enum BlendingMode {
   NoBlending = 0,
   NormalBlending = 1,
   AdditiveBlending = 2,

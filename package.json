@@ -1,14 +1,14 @@
 {
   "name": "artgl",
-  "version": "1.0.0",
+  "version": "0.0.1-alpha",
   "description": "",
-  "main": "index.js",
+  "main": "artigl.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node_modules/.bin/webpack-dev-server --port 8000 --config webpack.config.js"
+    "dev": "npx webpack-dev-server --port 8000 --config webpack.config.dev.js",
+    "package": "npx webpack --config webpack.config.prod.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "mikialex",
+  "license": "MIT",
   "devDependencies": {
     "html-webpack-plugin": "^2.29.0",
     "mocha": "^4.1.0",

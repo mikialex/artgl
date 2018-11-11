@@ -27,11 +27,16 @@ window.onload = function () {
   engine.updateViewProjection(camera);
 
 
-  // let testGeo = new TestGeometry();
-  let testGeo = new SphereGeometry(1,20,20);
+  let testGeo = new TestGeometry();
+  let testGeoSphere = new SphereGeometry(1,20,20);
   let testMat = new TestMaterial();
 
   let testMesh = new Mesh(testGeo, testMat);
+  testMesh.position.set(-0.5, -0.5, 0.5);
+  testMesh.scale.set(0.6, 0.6, 0.6);
+  testMesh.updateLocalMatrix();
+  testMesh.updateWorldMatrix(true);
+  let testSpere = new Mesh(testGeoSphere, testMat);
 
 
 
@@ -50,6 +55,7 @@ window.onload = function () {
     camera.updateWorldMatrix(true);
     engine.updateViewProjection(camera);
     engine.renderObject(testMesh);
+    engine.renderObject(testSpere);
     window.requestAnimationFrame(tick);
   }
 

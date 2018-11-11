@@ -6,8 +6,6 @@ style="margin:30px; width: 500px"></img>
 
 ArtGL is underdeveloping next generation advance webGL framework .
 
-> this project is under developing
-
 ## Design Aim
 
 ### Simple
