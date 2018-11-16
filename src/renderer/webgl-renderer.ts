@@ -52,8 +52,10 @@ export class GLRenderer {
   }
 
   useProgram(program: GLProgram) {
-    this.activeProgram = program;
-    this.gl.useProgram(program.getProgram());
+    if (this.activeProgram !== program) {
+      this.activeProgram = program;
+      this.gl.useProgram(program.getProgram());
+    }
   }
 
   
