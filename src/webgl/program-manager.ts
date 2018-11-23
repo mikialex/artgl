@@ -5,7 +5,7 @@ export class GLProgramManager{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
   }
-  private renderer;
+  private renderer: GLRenderer;
   private programs: { [index: string]: GLProgram } = {};
 
   addNewProgram(program: GLProgram) {

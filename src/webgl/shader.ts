@@ -7,28 +7,34 @@ export enum ShaderType {
 }
 
 export class GLShader {
-  constructor(renderer: GLRenderer) {
+  constructor(renderer: GLRenderer, type: ShaderType) {
     this.renderer = renderer;
+    const gl = this.renderer.gl;
+    this.type = type;
+    var shader = gl.createShader(type === ShaderType.vertex ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER);
+    if (shader === null) {
+      throw 'webgl shader create failed';
+    }
+    this.shader = shader;
   }
   renderer: GLRenderer;
   shader: WebGLShader;
+  type: ShaderType;
 
-  compileShader = (source: string, type: ShaderType): WebGLShader => {
+  compileShader(source: string, type: ShaderType): WebGLShader {
     const gl = this.renderer.gl;
-    var shader = gl.createShader(type === ShaderType.vertex ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER);
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      let log = gl.getShaderInfoLog(shader);
+    gl.shaderSource(this.shader, source);
+    gl.compileShader(this.shader);
+    if (!gl.getShaderParameter(this.shader, gl.COMPILE_STATUS)) {
+      let log = gl.getShaderInfoLog(this.shader);
       if (log) {
         throw new Error(log);
       }
     }
-    if (!shader) {
-      throw new Error("Something went wrong while compile the shader.");
+    if (!this.shader) {
+      throw "Something went wrong while compile the shader.";
     }
-    this.shader = shader;
-    return shader;
+    return this.shader;
   };
 
 }

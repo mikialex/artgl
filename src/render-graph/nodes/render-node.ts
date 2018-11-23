@@ -1,7 +1,7 @@
 import { RenderGraphNode } from "../render-graph-node";
 import { RenderGraph } from "../render-graph";
 import { ARTEngine } from "../../engine/render-engine";
-import { RenderList } from "../../renderer/render-list";
+import { RenderList } from "../../engine/render-list";
 
 export class RenderNode extends RenderGraphNode {
   constructor(keyName: string, graph: RenderGraph) {

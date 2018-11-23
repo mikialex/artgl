@@ -4,6 +4,7 @@ import { generateUUID } from "../math/uuid";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
 import { GLUniform, UniformDescriptor } from "./uniform/uniform";
 import { AttributeDescriptor, GLAttribute, AttributeUsage } from "./attribute";
+import { Nullable } from "../type";
 
 export interface VaryingDescriptor {
   name: string,
@@ -25,7 +26,10 @@ export class GLProgram {
     this.renderer = renderer;
     this.id = generateUUID();
 
-    this.createShaders(config);
+    this.vertexShader = new GLShader(this.renderer, ShaderType.vertex);
+    this.fragmentShader = new GLShader(this.renderer, ShaderType.fragment);
+    this.compileShaders(config);
+
     this.createProgram(this.vertexShader, this.fragmentShader);
     this.createGLResource(config);
     
@@ -39,10 +43,15 @@ export class GLProgram {
     });
   }
   id: string;
-  private renderer: GLRenderer;
+  readonly renderer: GLRenderer;
   getRenderer() { return this.renderer };
-  private program: WebGLProgram;
-  getProgram() { return this.program };
+  private program: Nullable<WebGLProgram> = null;
+  getProgram(): WebGLProgram {
+    if (this.program === null) {
+      throw 'program is broken'
+    }
+    return this.program
+  };
   private config: GLProgramConfig;
   private attributes: { [index: string]: GLAttribute } = {};
   private attributeUsageMap: { [index: number]: GLAttribute } = {};
@@ -53,22 +62,24 @@ export class GLProgram {
   drawCount: number = 0;
   useIndexDraw: boolean = false;
 
-  private createShaders(conf: GLProgramConfig) {
+  private compileShaders(conf: GLProgramConfig) {
     if (conf.autoInjectHeader) {
       conf.vertexShaderString = injectVertexShaderHeaders(conf, conf.vertexShaderString);
       conf.fragmentShaderString = injectFragmentShaderHeaders(conf, conf.fragmentShaderString);
       console.log(conf.vertexShaderString);
       console.log(conf.fragmentShaderString);
     }
-    this.vertexShader = new GLShader(this.renderer);
     this.vertexShader.compileShader(conf.vertexShaderString, ShaderType.vertex);
-    this.fragmentShader = new GLShader(this.renderer);
     this.fragmentShader.compileShader(conf.fragmentShaderString, ShaderType.fragment);
   }
 
   private createProgram(vertexShader: GLShader, fragmentShader: GLShader) {
     const gl = this.renderer.gl;
-    this.program = gl.createProgram();
+    const program = gl.createProgram();
+    if (program === null) {
+      throw 'webgl program create failed';
+    }
+    this.program = program;
     gl.attachShader(this.program, vertexShader.shader);
     gl.attachShader(this.program, fragmentShader.shader);
     gl.linkProgram(this.program);

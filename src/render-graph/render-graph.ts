@@ -3,7 +3,7 @@ import { RGNproperty } from "./interface";
 import { InputNode } from "./nodes/input-node";
 import { RenderNode } from "./nodes/render-node";
 import { FilterNode } from "./nodes/filter-node";
-import { RenderList } from "../renderer/render-list";
+import { RenderList } from "../engine/render-list";
 
 type Collection<T> = { [index: string]: T };
 

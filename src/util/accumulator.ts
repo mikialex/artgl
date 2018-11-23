@@ -1,11 +1,11 @@
 export class Acumulator {
   constructor(size?: number) {
-    this.size = size;
+    this.size = size || 10;
     this.reset();
   }
   private size = 10;
   private count = 0;
-  private records = [];
+  private records: number[] = [];
 
   private all = 0;
   private average = 0;

@@ -21,15 +21,17 @@ export class GLAttribute {
     this.descriptor = descriptor;
     this.program = program;
     this.gl = program.getRenderer().gl;
-    this.location = this.gl.getAttribLocation(this.program.getProgram(), descriptor.name);
+    const prog = this.program.getProgram();
+    this.location = this.gl.getAttribLocation(prog, descriptor.name);
+    this.type = descriptor.type;
   }
-  private gl: WebGLRenderingContext;
-  program: GLProgram;
-  location: number; // need location type ?
-  descriptor: AttributeDescriptor;
-  type: GLDataType;
-  count: number = 0;
-  stride: number = 1;
+  readonly gl: WebGLRenderingContext;
+  readonly program: GLProgram;
+  readonly location: number; // need location type ?
+  readonly descriptor: AttributeDescriptor;
+  readonly type: GLDataType;
+  readonly count: number = 0;
+  readonly stride: number = 1;
 
   useBuffer(buffer: WebGLBuffer) {
     const gl = this.gl;

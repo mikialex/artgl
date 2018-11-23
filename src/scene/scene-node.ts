@@ -1,11 +1,12 @@
-import { Vector3, Matrix4, Quaternion } from "../math";
+import { Vector3, Matrix4, Quaternion } from "../math/index";
 import { Scene } from "./scene";
 import { Euler } from "../math/euler";
+import { Nullable } from "../type";
 
 export class SceneNode {
-  scene: Scene;
+  scene: Nullable<Scene> = null;
 
-  parent: SceneNode = null;
+  parent: Nullable<SceneNode> = null;
   children: SceneNode[] = [];
 
   position = new Vector3(0, 0, 0);

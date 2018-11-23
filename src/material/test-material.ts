@@ -1,6 +1,6 @@
 import { Material, standradMeshAttributeLayout } from "../core/material";
 import { GLDataType } from "../webgl/shader-util";
-import { Matrix4 } from "../math";
+import { Matrix4 } from "../math/index";
 import { AttributeUsage } from "../webgl/attribute";
 
 const vertexShaderSource =

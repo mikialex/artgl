@@ -1,7 +1,9 @@
 import { GLDataType } from "../shader-util";
-import { Matrix4 } from "../../math/index";
+import { Matrix4, Vector3 } from "../../math/index";
+import { Vector2 } from "../../math/vector2";
+import { Vector4 } from "../../math/vector4";
 
-export function findUniformSetter(type:GLDataType) {
+export function findUniformSetter(type: GLDataType) {
   switch (type) {
     case GLDataType.float: return setValue1f; // FLOAT
     // case 0x8b50: return setValue2fv; // _VEC2
@@ -22,8 +24,8 @@ export function findUniformSetter(type:GLDataType) {
   }
 }
 
-function setValue1f(gl, location, v) { gl.uniform1f(location, v) }
-function setValue1i(gl, location, v) { gl.uniform1i(location, v) }
+function setValue1f(gl: WebGLRenderingContext, location: any, v: number) { gl.uniform1f(location, v) }
+function setValue1i(gl: WebGLRenderingContext, location: any, v: number) { gl.uniform1i(location, v) }
 // // Array of vectors 
 // function setValueV2a(gl, v) {
 //   gl.uniform2fv(this.addr, flatten(v, this.size, 2));
@@ -47,12 +49,12 @@ function setValue1i(gl, location, v) { gl.uniform1i(location, v) }
 //   gl.uniformMatrix3fv(this.addr, false, flatten(v, this.size, 9));
 // }
 
-function setValueM4a(gl, location, v) { gl.uniformMatrix4fv(location, false ,v) }
+function setValueM4a(gl: WebGLRenderingContext, location: any, v: any) { gl.uniformMatrix4fv(location, false, v) }
 
-function differFloat(newVal, oldVal) {
+function differFloat(newVal: number, oldVal: number) {
   return newVal === oldVal;
 }
-function differArray(newVal, oldVal) {
+function differArray(newVal: number[], oldVal: number[]) {
   if (newVal.length !== oldVal.length) {
     return true;
   }
@@ -64,12 +66,12 @@ function differArray(newVal, oldVal) {
   return false;
 }
 
-function copyFloat(newVal, target) {
+function copyFloat(newVal: number, target: number) {
   return newVal;
 }
-function copyArray(newVal, target) {
+function copyArray(newVal: number[], target: number[]) {
   let targetReal = target;
-  if (target=== undefined || newVal.length !== target.length) {
+  if (target === undefined || newVal.length !== target.length) {
     targetReal = [];
   }
   for (let i = 0; i < newVal.length; i++) {
@@ -115,19 +117,19 @@ export function findUniformFlattener(type: GLDataType) {
   throw 'uniform falttener not found'
 }
 
-function flattenFloat(v) {
+function flattenFloat(v: number) {
   return v;
 }
 
-function flattenVector2(v) {
+function flattenVector2(v: Vector2) {
 
 }
 
-function flattenVector3(v) {
-  
+function flattenVector3(v: Vector3) {
+
 }
 
-function flattenVector4(v) {
+function flattenVector4(v: Vector4) {
 
 }
 

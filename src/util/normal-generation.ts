@@ -1,4 +1,4 @@
-import { Vector3 } from "../math";
+import { Vector3 } from "../math/index";
 
 const v1 = new Vector3();
 const v2 = new Vector3();

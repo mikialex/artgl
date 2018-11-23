@@ -29,10 +29,10 @@ export class GLInfo{
     this.renderer = renderer;
   }
   renderer: GLRenderer;
-  private extensions = {}
-  private parameters = {}
+  private extensions: {[index: string]: any} = {}
+  private parameters: {[index: string]: any} = {}
 
-  createExtension(name) {
+  createExtension(name: string) {
     const gl = this.renderer.gl;
     var ext = gl.getExtension(name);
     if (!ext) {
@@ -44,14 +44,14 @@ export class GLInfo{
     this.extensions[name] = ext;
   }
 
-  getExtension (name) {
+  getExtension (name: string) {
     if (!(name in this.extensions)) {
       this.createExtension(name);
     }
     return this.extensions[name];
   };
 
-  getParameter (name) {
+  getParameter (name: string) {
     return this.parameters[name];
   };
 
@@ -62,7 +62,7 @@ export class GLInfo{
     }
     for (var i = 0; i < PARAMETER_NAMES.length; i++) {
       var name = PARAMETER_NAMES[i];
-      this.parameters[name] = this.renderer.gl.getParameter(this.renderer.gl[name]);
+      this.parameters[name] = this.renderer.gl.getParameter((this.renderer.gl as any)[name]);
     }
   }
 }

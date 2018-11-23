@@ -3,12 +3,17 @@ import { GLProgram, GLProgramConfig } from "./program";
 import { Matrix4 } from "../math/index";
 import { GLProgramManager } from "./program-manager";
 import { GLAttributeBufferDataManager } from "./attribute-buffer-manager";
-import { GLState } from "./gl-state";
+import { GLState } from "./states/gl-state";
 import { DrawMode } from "./const";
+import { Nullable } from "../type";
 
 export class GLRenderer {
   constructor(el: HTMLCanvasElement, options?: any) {
-    this.gl = el.getContext('webgl', options);
+    const ctx = el.getContext('webgl', options);
+    if (ctx === null) {
+      throw 'webgl context create failed';
+    }
+    this.gl = ctx;
     this.el = el;
     this.width = this.el.width;
     this.height = this.el.height;
@@ -34,11 +39,11 @@ export class GLRenderer {
     this.el.height = this.height * this.devicePixelRatio;
     this.el.style.width = width + 'px';
     this.el.style.height = height + 'px';
-		this.state.viewport( 0, 0, width * this.devicePixelRatio, height * this.devicePixelRatio );
+		this.state.setViewport( 0, 0, width * this.devicePixelRatio, height * this.devicePixelRatio );
   }
 
   state: GLState = new GLState(this);
-  activeProgram: GLProgram;
+  activeProgram: Nullable<GLProgram> = null;
   programManager = new GLProgramManager(this);
   attributeBufferManager = new GLAttributeBufferDataManager(this);
   createProgram(conf: GLProgramConfig): GLProgram {
@@ -72,6 +77,9 @@ export class GLRenderer {
   }
 
   render(mode: DrawMode, useIndex: boolean) {
+    if (this.activeProgram === null) {
+      throw 'renderer hasnt active program'
+    }
     if (useIndex) {
       this.gl.drawElements(
         mode,

@@ -2,7 +2,7 @@ import { GLProgram } from "../program";
 import { findUniformSetter, findUniformFlattener, findUniformDiffer, findUniformCopyer } from "./uniform-util";
 import { GLDataType } from "../shader-util";
 
-export type uniformUploadType = number | Float32Array 
+export type uniformUploadType = number | Float32Array | number[]
 export type flattenerType= (value: any, receiveData: uniformUploadType) => uniformUploadType;
 
 
@@ -22,12 +22,13 @@ export class GLUniform<T>{
     this.program = program;
     this.gl = program.getRenderer().gl;
     const glProgram = program.getProgram();
-    this.location = this.gl.getUniformLocation(glProgram, descriptor.name);
-    if (this.location === null) {
+    const location = this.gl.getUniformLocation(glProgram, descriptor.name);
+    if (location === null) {
       // if you declare a uniform , but not realy used in shader
       // that will may cause null location
       console.warn('create uniform fail: ', descriptor.name);
     }
+    this.location = location;
     this.setter = findUniformSetter(descriptor.type);
     this.differ = findUniformDiffer(descriptor.type);
     this.copyer = findUniformCopyer(descriptor.type);
@@ -63,34 +64,3 @@ export class GLUniform<T>{
   }
 
 }
-
-//// type checking
-// const uni = new GLUniform(undefined, {
-//   name: 'ddd',
-//   type: GLDataType.float,
-//   default: 1
-// })
-// uni.set(1);
-
-// class test<T, K extends keyof T>{
-//   constructor(conf: T, names:K[]) {
-    
-//   }
-//   conf: T
-  
-//   set(key:K, value: T[K]) {
-//     this.conf[key] = value;
-//   }
-
-// }
-
-// interface inter{
-//   a: string;
-//   b: number
-// }
-
-// const a = new test({a:'', b:123}, ['a', 'b'])
-
-// a.set('a', 23)
-
-// a.set('b', 2)

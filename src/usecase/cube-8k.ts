@@ -3,7 +3,7 @@ import { GLRenderer, ARTEngine, PerspectiveCamera, SphereGeometry, TestMaterial,
 import { TestGeometry } from "../geometry/test-geometery";
 
 export default function() {
-  let canv = document.querySelector('canvas');
+  let canv = document.querySelector('canvas') as HTMLCanvasElement; 
   const width = canv.clientWidth;
   const height = canv.clientHeight;
   let renderer = new GLRenderer(canv);
@@ -22,7 +22,7 @@ export default function() {
   let testGeoSphere = new SphereGeometry(1,20,20);
   let testMat = new TestMaterial();
 
-  let meshes = [];
+  const meshes: Mesh[] = [];
   for (let i = 0; i < 20; i++) {
     for (let j = 0; j < 20; j++) {
       for (let k = 0; k < 20; k++) {

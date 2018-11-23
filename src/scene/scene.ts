@@ -2,20 +2,19 @@ import { SceneNode } from "./scene-node";
 import { RenderObject } from "../core/render-object";
 import { Light } from "../core/light";
 import { Camera } from "../core/camera";
+import { Nullable } from "../type";
 
 export class Scene {
-  root: SceneNode
+  root: Nullable<SceneNode> = null;
   
-  objectList: RenderObject[];
-  lightList: Light[];
-  cameras: Camera[];
-
-  flattenList: number[];
-  flattenTreeToList() {
-    
-  }
+  objectList: RenderObject[] = [];
+  lightList: Light[] = [];
+  cameras: Camera[] = [];
 
   updateWorldMatrix() {
+    if(this.root === null){
+      return;
+    }
     this.root.updateWorldMatrix(true);
   }
 
@@ -34,11 +33,11 @@ export class Scene {
       throw 'scene hasnt root';
     }
     this.root.traverse((node) => {
-      node.scene = undefined;
+      node.scene = null;
     });
     this.objectList = [];
     this.lightList = [];
-    this.root = undefined;
+    this.root = null;
   }
 
   private addObject(object: RenderObject) {
