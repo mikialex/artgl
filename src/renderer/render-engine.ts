@@ -2,7 +2,7 @@ import { GLRenderer } from "./webgl-renderer";
 import { RenderList } from "./render-list";
 import { RenderObject } from "../core/render-object";
 import { Camera } from "../core/camera";
-import { Matrix4 } from "../math";
+import { Matrix4 } from "../math/matrix4";
 import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";

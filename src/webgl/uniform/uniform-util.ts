@@ -1,5 +1,5 @@
 import { GLDataType } from "../shader-util";
-import { Matrix4 } from "../../math";
+import { Matrix4 } from "../../math/index";
 
 export function findUniformSetter(type:GLDataType) {
   switch (type) {

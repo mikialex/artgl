@@ -1,6 +1,6 @@
 import { GLInfo } from "../webgl/gl-info";
 import { GLProgram, GLProgramConfig } from "../webgl/program";
-import { Matrix4 } from "../math";
+import { Matrix4 } from "../math/index";
 import { GLProgramManager } from "../webgl/program-manager";
 import { GLAttributeBufferDataManager } from "../webgl/attribute-buffer-manager";
 import { GLState } from "../webgl/gl-state";

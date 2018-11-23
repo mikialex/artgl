@@ -1,4 +1,4 @@
-import { DataObject } from ".";
+import { DataObject } from "./index";
 
 export class Vector4 implements DataObject<Vector4> {
   constructor(x?: number, y?: number, z?: number, w?: number) {

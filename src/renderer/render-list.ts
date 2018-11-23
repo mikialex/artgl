@@ -1,5 +1,5 @@
 import { RenderObject } from "../core/render-object";
-import { Matrix4 } from "../math";
+import { Matrix4 } from "../math/index";
 
 export class RenderList{
   constructor() {
