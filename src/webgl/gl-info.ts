@@ -1,6 +1,6 @@
 // https://github.com/pissang/claygl/blob/master/src/core/GLInfo.js
 
-import { GLRenderer } from "../renderer/webgl-renderer";
+import { GLRenderer } from "./webgl-renderer";
 
 const EXTENSION_LIST = [
   'OES_texture_float',

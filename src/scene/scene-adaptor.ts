@@ -1,4 +1,4 @@
-import { ARTEngineAdaptor, ARTEngine } from "../renderer/render-engine";
+import { ARTEngineAdaptor, ARTEngine } from "../engine/render-engine";
 
 export class SceneAdaptor extends ARTEngineAdaptor {
   constructor(engine: ARTEngine) {

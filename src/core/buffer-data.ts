@@ -1,4 +1,4 @@
-import { ARTEngine } from "../renderer/render-engine";
+import { ARTEngine } from "../engine/render-engine";
 
 export type BufferDataType = Float32Array | Uint16Array ;
 

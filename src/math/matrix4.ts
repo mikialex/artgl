@@ -1,6 +1,6 @@
 import { Vector3 } from "./vector3";
 import { Quaternion } from "./quaternion";
-import { DataObject } from ".";
+import { DataObject } from "./index";
 
 export class Matrix4 implements DataObject<Matrix4>{
   constructor() {
@@ -30,7 +30,7 @@ export class Matrix4 implements DataObject<Matrix4>{
     return true;
   }
 
-  fromArray(array, offset?) {
+  fromArray(array: number[], offset?) {
     if (offset === undefined) offset = 0;
     for (var i = 0; i < 16; i++) {
       this.elements[i] = array[i + offset];
@@ -49,7 +49,10 @@ export class Matrix4 implements DataObject<Matrix4>{
     0, 0, 0, 1
   ]
 
-  set(n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44) {
+  set(n11: number, n12: number, n13: number, n14: number,
+    n21: number, n22: number, n23: number, n24: number,
+    n31: number, n32: number, n33: number, n34: number,
+    n41: number, n42: number, n43: number, n44: number) {
     const te = this.elements;
     te[0] = n11; te[4] = n12; te[8] = n13; te[12] = n14;
     te[1] = n21; te[5] = n22; te[9] = n23; te[13] = n24;
@@ -75,7 +78,8 @@ export class Matrix4 implements DataObject<Matrix4>{
     return this;
   }
 
-  makePerspective(left, right, top, bottom, near, far) {
+  makePerspective(left: number, right: number, top: number,
+    bottom: number, near: number, far: number) {
     const te = this.elements;
     const x = 2 * near / (right - left);
     const y = 2 * near / (top - bottom);
@@ -93,7 +97,7 @@ export class Matrix4 implements DataObject<Matrix4>{
     return this;
   }
 
-  multiplyMatrices(a, b) {
+  multiplyMatrices(a: Matrix4, b: Matrix4) {
 
     var ae = a.elements;
     var be = b.elements;
@@ -133,7 +137,7 @@ export class Matrix4 implements DataObject<Matrix4>{
 
   }
 
-  getInverse(m, throwOnDegenerate) {
+  getInverse(m: Matrix4, throwOnDegenerate: boolean) {
     // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
     var te = this.elements,
       me = m.elements,
@@ -276,7 +280,7 @@ export class Matrix4 implements DataObject<Matrix4>{
     return this;
   }
 
-  makeTranslation(x, y, z) {
+  makeTranslation(x: number, y: number, z: number) {
     this.set(
       1, 0, 0, x,
       0, 1, 0, y,
@@ -286,7 +290,7 @@ export class Matrix4 implements DataObject<Matrix4>{
     return this;
   }
 
-  makeRotationX(theta) {
+  makeRotationX(theta: number) {
     var c = Math.cos(theta), s = Math.sin(theta);
     this.set(
       1, 0, 0, 0,
@@ -297,7 +301,7 @@ export class Matrix4 implements DataObject<Matrix4>{
     return this;
   }
 
-  makeRotationY(theta) {
+  makeRotationY(theta: number) {
     var c = Math.cos(theta), s = Math.sin(theta);
     this.set(
       c, 0, s, 0,
@@ -308,7 +312,7 @@ export class Matrix4 implements DataObject<Matrix4>{
     return this;
   }
 
-  makeRotationZ(theta) {
+  makeRotationZ(theta: number) {
     var c = Math.cos(theta), s = Math.sin(theta);
     this.set(
       c, - s, 0, 0,
@@ -319,7 +323,7 @@ export class Matrix4 implements DataObject<Matrix4>{
     return this;
   }
 
-  toArray(array, offset) {
+  toArray(array: number[], offset: number) {
 
     if (array === undefined) array = [];
     if (offset === undefined) offset = 0;

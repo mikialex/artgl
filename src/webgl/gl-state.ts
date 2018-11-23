@@ -1,4 +1,4 @@
-import { GLRenderer } from "../renderer/webgl-renderer";
+import { GLRenderer } from "./webgl-renderer";
 
 export class GLState{
   constructor(renderer: GLRenderer) {

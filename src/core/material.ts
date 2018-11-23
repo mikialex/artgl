@@ -2,7 +2,7 @@ import { generateUUID } from "../math";
 import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { GLDataType } from "../webgl/shader-util";
 import { AttributeUsage } from "../webgl/attribute";
-import { ARTEngine } from "../renderer/render-engine";
+import { ARTEngine } from "../engine/render-engine";
 
 export const standradMeshAttributeLayout = [
   { name:'position',type:GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },

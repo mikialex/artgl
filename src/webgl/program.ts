@@ -1,6 +1,6 @@
-import { GLRenderer } from "../renderer/webgl-renderer";
+import { GLRenderer } from "./webgl-renderer";
 import { GLShader, ShaderType } from "./shader";
-import { generateUUID } from "../math";
+import { generateUUID } from "../math/uuid";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
 import { GLUniform, UniformDescriptor } from "./uniform/uniform";
 import { AttributeDescriptor, GLAttribute, AttributeUsage } from "./attribute";

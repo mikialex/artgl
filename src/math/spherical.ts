@@ -4,8 +4,11 @@ import { MathUtil } from './util';
 export class Spherical {
 
   public center = new Vector3();
+  public radius: number;
+  public polar: number;
+  public azim: number;
 
-  constructor(public radius?: number, public polar?: number, public azim?: number) {
+  constructor(radius?: number, polar?: number, azim?: number) {
     this.radius = radius || 1;
     this.polar = polar || 0;
     this.azim = azim || 0;

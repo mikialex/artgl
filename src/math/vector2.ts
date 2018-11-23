@@ -1,12 +1,13 @@
-import { DataObject, VectorDataObject } from ".";
+import { DataObject, VectorDataObject } from "./index";
+import { Vector3 } from "./vector3";
 
 export class Vector2 implements DataObject<Vector2>, VectorDataObject<Vector2>{
   constructor(x?: number, y?: number) {
     this.x = x || 0;
     this.y = y || 0;
   }
-  x;
-  y;
+  x: number;
+  y: number;
 
   get width() { return this.x; }
   set width(value: number) { this.x = value }
@@ -112,18 +113,18 @@ export class Vector2 implements DataObject<Vector2>, VectorDataObject<Vector2>{
     return this;
   }
 
-  length () {
+  length() {
     return Math.sqrt(this.x * this.x + this.y * this.y);
   }
-  lengthManhattan () {
+  lengthManhattan() {
     return Math.abs(this.x) + Math.abs(this.y);
   }
 
-  normalize () {
+  normalize() {
     return this.divideScalar(this.length() || 1);
   }
 
-  clamp (min: Vector2, max: Vector2) {
+  clamp(min: Vector2, max: Vector2) {
     // assumes min < max, componentwise
     this.x = Math.max(min.x, Math.min(max.x, this.x));
     this.y = Math.max(min.y, Math.min(max.y, this.y));
@@ -133,8 +134,8 @@ export class Vector2 implements DataObject<Vector2>, VectorDataObject<Vector2>{
     tempMin.set(minVal, minVal);
     tempMax.set(maxVal, maxVal);
     return this.clamp(tempMin, tempMax);
-  } 
-  clampLength (min: number, max: number) {
+  }
+  clampLength(min: number, max: number) {
     var length = this.length();
     return this.divideScalar(length || 1).multiplyScalar(Math.max(min, Math.min(max, length)));
   }
@@ -151,148 +152,102 @@ export class Vector2 implements DataObject<Vector2>, VectorDataObject<Vector2>{
     return this;
   }
 
-}
-const tempMin = new Vector2();
-const tempMax = new Vector2();
-
-
-Object.assign(Vector2.prototype, {
-
-  floor: function () {
+  floor() {
     this.x = Math.floor(this.x);
     this.y = Math.floor(this.y);
     return this;
-  },
-  ceil: function () {
+  }
+  ceil() {
     this.x = Math.ceil(this.x);
     this.y = Math.ceil(this.y);
     return this;
-  },
-  round: function () {
+  }
+  round() {
     this.x = Math.round(this.x);
     this.y = Math.round(this.y);
     return this;
-  },
-  roundToZero: function () {
+  }
+  roundToZero() {
     this.x = (this.x < 0) ? Math.ceil(this.x) : Math.floor(this.x);
     this.y = (this.y < 0) ? Math.ceil(this.y) : Math.floor(this.y);
     return this;
-  },
+  }
 
-  negate: function () {
+  negate() {
     this.x = - this.x;
     this.y = - this.y;
     return this;
-  },
-
-  dot: function (v) {
-
-    return this.x * v.x + this.y * v.y;
-
-  },
-
-  lengthSq: function () {
-
-    return this.x * this.x + this.y * this.y;
-
-  },
-
-
-  angle: function () {
-
-    // computes the angle in radians with respect to the positive x-axis
-
-    var angle = Math.atan2(this.y, this.x);
-
-    if (angle < 0) angle += 2 * Math.PI;
-
-    return angle;
-
-  },
-
-  distanceTo: function (v) {
-    return Math.sqrt(this.distanceToSquared(v));
-  },
-  distanceToSquared: function (v) {
-    var dx = this.x - v.x, dy = this.y - v.y;
-    return dx * dx + dy * dy;
-  },
-  distanceToManhattan: function (v) {
-    return Math.abs(this.x - v.x) + Math.abs(this.y - v.y);
-  },
-
-  setLength: function (length) {
-
-    return this.normalize().multiplyScalar(length);
-
-  },
-
-  lerp: function (v, alpha) {
-
-    this.x += (v.x - this.x) * alpha;
-    this.y += (v.y - this.y) * alpha;
-
-    return this;
-
-  },
-
-  lerpVectors: function (v1, v2, alpha) {
-
-    return this.subVectors(v2, v1).multiplyScalar(alpha).add(v1);
-
-  },
-
-  fromArray: function (array, offset) {
-
-    if (offset === undefined) offset = 0;
-
-    this.x = array[offset];
-    this.y = array[offset + 1];
-
-    return this;
-
-  },
-
-  toArray: function (array, offset) {
-
-    if (array === undefined) array = [];
-    if (offset === undefined) offset = 0;
-
-    array[offset] = this.x;
-    array[offset + 1] = this.y;
-
-    return array;
-
-  },
-
-  fromBufferAttribute: function (attribute, index, offset) {
-
-    if (offset !== undefined) {
-
-      console.warn('Vector2: offset has been removed from .fromBufferAttribute().');
-
-    }
-
-    this.x = attribute.getX(index);
-    this.y = attribute.getY(index);
-
-    return this;
-
-  },
-  
-
-  rotateAround: function (center, angle) {
-
-    var c = Math.cos(angle), s = Math.sin(angle);
-
-    var x = this.x - center.x;
-    var y = this.y - center.y;
-
-    this.x = x * c - y * s + center.x;
-    this.y = x * s + y * c + center.y;
-
-    return this;
-
   }
 
-});
+  dot(v: Vector2) {
+    return this.x * v.x + this.y * v.y;
+  }
+
+  lengthSq() {
+    return this.x * this.x + this.y * this.y;
+  }
+
+
+  angle() {
+    // computes the angle in radians with respect to the positive x-axis
+    var angle = Math.atan2(this.y, this.x);
+    if (angle < 0) angle += 2 * Math.PI;
+    return angle;
+  }
+
+  distanceTo(v: Vector2) {
+    return Math.sqrt(this.distanceToSquared(v));
+  }
+
+  distanceToSquared(v: Vector2) {
+    var dx = this.x - v.x, dy = this.y - v.y;
+    return dx * dx + dy * dy;
+  }
+
+  distanceToManhattan(v: Vector2) {
+    return Math.abs(this.x - v.x) + Math.abs(this.y - v.y);
+  }
+
+  setLength(length: number) {
+    return this.normalize().multiplyScalar(length);
+  }
+
+  lerp(v: Vector2, alpha: number) {
+    this.x += (v.x - this.x) * alpha;
+    this.y += (v.y - this.y) * alpha;
+    return this;
+  }
+
+  lerpVectors(v1: Vector2, v2: Vector2, alpha: number) {
+    return this.subVectors(v2, v1).multiplyScalar(alpha).add(v1);
+  }
+
+  fromArray(array: number[], offset: number) {
+    if (offset === undefined) offset = 0;
+    this.x = array[offset];
+    this.y = array[offset + 1];
+    return this;
+  }
+
+  toArray(array: number[], offset: number) {
+    if (array === undefined) array = [];
+    if (offset === undefined) offset = 0;
+    array[offset] = this.x;
+    array[offset + 1] = this.y;
+    return array;
+  }
+
+  rotateAround(center: Vector3, angle: number) {
+    var c = Math.cos(angle), s = Math.sin(angle);
+    var x = this.x - center.x;
+    var y = this.y - center.y;
+    this.x = x * c - y * s + center.x;
+    this.y = x * s + y * c + center.y;
+    return this;
+  }
+
+}
+
+const tempMin = new Vector2();
+const tempMax = new Vector2();
+

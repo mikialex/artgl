@@ -1,4 +1,4 @@
-import { GLRenderer } from "../renderer/webgl-renderer";
+import { GLRenderer } from "./webgl-renderer";
 import { GLProgramConfig } from "./program";
 
 export enum ShaderType {

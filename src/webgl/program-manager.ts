@@ -1,10 +1,11 @@
-import { GLRenderer } from "../renderer/webgl-renderer";
+import { GLRenderer } from "./webgl-renderer";
 import { GLProgram } from "./program";
 
 export class GLProgramManager{
   constructor(renderer: GLRenderer) {
-    
+    this.renderer = renderer;
   }
+  private renderer;
   private programs: { [index: string]: GLProgram } = {};
 
   addNewProgram(program: GLProgram) {

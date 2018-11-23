@@ -10,9 +10,9 @@ export class Vector3Observable extends Vector3{
 
   onChange = () => { };
 
-  _x;
-  _y;
-  _z;
+  _x: number;
+  _y: number;
+  _z: number;
 
   get x() {
     return this._x;

@@ -1,5 +1,5 @@
 import { GLProgramConfig } from "./program";
-import { Matrix4, Vector3 } from "../math";
+import { Matrix4, Vector3 } from "../math/index";
 
 export type GLData = number | Matrix4;
 

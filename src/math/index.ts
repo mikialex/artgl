@@ -5,13 +5,13 @@ export { generateUUID } from './uuid';
 export { MathUtil } from './util';
 
 export interface DataObject<T>{
-  copy(value: T);
+  copy: (value: T) => void;
   clone: (value: T) => T;
   equals: (value: T) => boolean;
 }
 
 export interface VectorDataObject<T>{
-  normalize();
+  normalize: () => T;
   length: () => number;
   lengthManhattan: () => number;
   min: (value: T) => T;

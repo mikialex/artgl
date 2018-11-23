@@ -2,7 +2,7 @@ import { Quaternion } from './quaternion';
 import { Vector3 } from './vector3';
 import { Matrix4 } from './matrix4';
 import { MathUtil } from './util';
-import { DataObject } from '.';
+import { DataObject } from './index';
 
 enum EulerOrder {
   'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX'
@@ -11,7 +11,7 @@ enum EulerOrder {
 const tempMatirx = new Matrix4();
 
 export class Euler implements DataObject<Euler>{
-  constructor(x?, y?, z?, order?) {
+  constructor(x?: number, y?: number, z?: number, order?: EulerOrder) {
     this._x = x || 0;
     this._y = y || 0;
     this._z = z || 0;
@@ -25,7 +25,7 @@ export class Euler implements DataObject<Euler>{
   _z: number;
   _order: EulerOrder = Euler.defaultOrder;
 
-  onChangeCallback;
+  onChangeCallback: Function;
 
   get x() { return this._x };
   get y() { return this._y };
@@ -51,7 +51,7 @@ export class Euler implements DataObject<Euler>{
     return this;
   }
 
-  equals(euler) {
+  equals(euler: Euler) {
     return (euler._x === this._x) &&
       (euler._y === this._y) &&
       (euler._z === this._z) &&

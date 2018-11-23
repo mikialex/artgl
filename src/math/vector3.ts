@@ -4,7 +4,7 @@ import {Spherical} from './Spherical';
 
 export class Vector3 {
 
-  private buffer: Float32Array;
+  private buffer: Float32Array = new Float32Array(3);
   public x: number;
   public y: number;
   public z: number;

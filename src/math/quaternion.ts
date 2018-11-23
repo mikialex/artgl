@@ -3,12 +3,18 @@ import {Matrix4} from './matrix4';
 
 export class Quaternion {
 
-  constructor(public x?: number, public y?: number, public z?: number, public w?: number) {
+  constructor(x?: number, y?: number, z?: number,w?: number) {
     this.x = x || 0;
     this.y = x || 0;
     this.z = z || 0;
     this.w = w || 1;
   }
+
+  public x: number;
+  public y: number;
+  public z: number;
+  public w: number;
+
 
   public set(x: number, y: number, z: number, w: number): Quaternion {
     this.x = x;

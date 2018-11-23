@@ -1,4 +1,4 @@
-import { GLRenderer } from "./webgl-renderer";
+import { GLRenderer } from "../webgl/webgl-renderer";
 import { RenderList } from "./render-list";
 import { RenderObject } from "../core/render-object";
 import { Camera } from "../core/camera";
@@ -106,7 +106,7 @@ export class ARTEngine {
       }
     }
 
-    if (geometry.layout.indexDraw) {
+    if (indexBuffer !== undefined && geometry.layout.indexDraw) {
       program.useIndexDraw = true;
       let glIndexBuffer = this.getGLAttributeBuffer(indexBuffer);
       if (glIndexBuffer === undefined) {

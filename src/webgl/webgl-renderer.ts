@@ -1,10 +1,10 @@
-import { GLInfo } from "../webgl/gl-info";
-import { GLProgram, GLProgramConfig } from "../webgl/program";
+import { GLInfo } from "./gl-info";
+import { GLProgram, GLProgramConfig } from "./program";
 import { Matrix4 } from "../math/index";
-import { GLProgramManager } from "../webgl/program-manager";
-import { GLAttributeBufferDataManager } from "../webgl/attribute-buffer-manager";
-import { GLState } from "../webgl/gl-state";
-import { DrawMode } from "../webgl/const";
+import { GLProgramManager } from "./program-manager";
+import { GLAttributeBufferDataManager } from "./attribute-buffer-manager";
+import { GLState } from "./gl-state";
+import { DrawMode } from "./const";
 
 export class GLRenderer {
   constructor(el: HTMLCanvasElement, options?: any) {

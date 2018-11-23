@@ -1,6 +1,6 @@
 import { RenderGraphNode } from "../render-graph-node";
 import { RenderGraph } from "../render-graph";
-import { ARTEngine } from "../../renderer/render-engine";
+import { ARTEngine } from "../../engine/render-engine";
 import { RenderList } from "../../renderer/render-list";
 
 export class RenderNode extends RenderGraphNode {

@@ -1,5 +1,5 @@
-import { GLRenderer } from "../renderer/webgl-renderer";
-import { generateUUID } from "../math";
+import { GLRenderer } from "./webgl-renderer";
+import { generateUUID } from "../math/uuid";
 
 export class GLAttributeBufferDataManager {
   constructor(renderer: GLRenderer) {
