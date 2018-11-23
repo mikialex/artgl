@@ -1,9 +1,13 @@
-import {Vector3} from './vector3';
-import {Matrix4} from './matrix4';
+import { Vector3 } from './vector3';
+import { Matrix4 } from './matrix4';
+
+const v1: Vector3 = new Vector3
+let r: number = 0;
+const EPS: number = 0.000001;
 
 export class Quaternion {
 
-  constructor(x?: number, y?: number, z?: number,w?: number) {
+  constructor(x?: number, y?: number, z?: number, w?: number) {
     this.x = x || 0;
     this.y = x || 0;
     this.z = z || 0;
@@ -64,7 +68,7 @@ export class Quaternion {
     return this;
   }
 
-		// assumes axis is normalized
+  // assumes axis is normalized
   public setFromAxisAngle(axis: Vector3, angle: number): Quaternion {
     const halfAngle = angle / 2;
     const s = Math.sin(halfAngle);
@@ -77,71 +81,61 @@ export class Quaternion {
     return this;
   }
 
-  public setFromUnitVectors = function () {
-
-    let v1: Vector3;
-    let r;
-    const EPS = 0.000001;
-
-    return function (vFrom: Vector3, vTo: Vector3) {
-      if (v1 === undefined) v1 = new Vector3();
-      r = vFrom.dot(vTo) + 1;
-      if (r < EPS) {
-        r = 0;
-        if (Math.abs(vFrom.x) > Math.abs(vFrom.z)) {
-          v1.set(- vFrom.y, vFrom.x, 0);
-        } else {
-          v1.set(0, - vFrom.z, vFrom.y);
-        }
+  public setFromUnitVectors(vFrom: Vector3, vTo: Vector3) {
+    r = vFrom.dot(vTo) + 1;
+    if (r < EPS) {
+      r = 0;
+      if (Math.abs(vFrom.x) > Math.abs(vFrom.z)) {
+        v1.set(- vFrom.y, vFrom.x, 0);
       } else {
-        v1.crossVectors(vFrom, vTo);
+        v1.set(0, - vFrom.z, vFrom.y);
       }
-      this.x = v1.x;
-      this.y = v1.y;
-      this.z = v1.z;
-      this.w = r;
-      return this.normalize();
+    } else {
+      v1.crossVectors(vFrom, vTo);
     }
-  }();
+    this.x = v1.x;
+    this.y = v1.y;
+    this.z = v1.z;
+    this.w = r;
+    return this.normalize();
+  }
 
-  public setFromRotationMatrix = function () {
-    return function (m: Matrix4) {
-      // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
-      // assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
-      const te = m.elements;
-      const m11 = te[0], m12 = te[4], m13 = te[8];
-      const m21 = te[1], m22 = te[5], m23 = te[9];
-      const m31 = te[2], m32 = te[6], m33 = te[10];
-      const trace = m11 + m22 + m33;
-      let s;
+  public setFromRotationMatrix(m: Matrix4) {
+    // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+    // assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+    const te = m.elements;
+    const m11 = te[0], m12 = te[4], m13 = te[8];
+    const m21 = te[1], m22 = te[5], m23 = te[9];
+    const m31 = te[2], m32 = te[6], m33 = te[10];
+    const trace = m11 + m22 + m33;
+    let s;
 
-      if (trace > 0) {
-        s = 0.5 / Math.sqrt(trace + 1.0);
-        this.w = 0.25 / s;
-        this.x = (m32 - m23) * s;
-        this.y = (m13 - m31) * s;
-        this.z = (m21 - m12) * s;
-      } else if (m11 > m22 && m11 > m33) {
-        s = 2.0 * Math.sqrt(1.0 + m11 - m22 - m33);
-        this.w = (m32 - m23) / s;
-        this.x = 0.25 * s;
-        this.y = (m12 + m21) / s;
-        this.z = (m13 + m31) / s;
-      } else if (m22 > m33) {
-        s = 2.0 * Math.sqrt(1.0 + m22 - m11 - m33);
-        this.w = (m13 - m31) / s;
-        this.x = (m12 + m21) / s;
-        this.y = 0.25 * s;
-        this.z = (m23 + m32) / s;
-      } else {
-        s = 2.0 * Math.sqrt(1.0 + m33 - m11 - m22);
-        this.w = (m21 - m12) / s;
-        this.x = (m13 + m31) / s;
-        this.y = (m23 + m32) / s;
-        this.z = 0.25 * s;
-      }
-      return this;
+    if (trace > 0) {
+      s = 0.5 / Math.sqrt(trace + 1.0);
+      this.w = 0.25 / s;
+      this.x = (m32 - m23) * s;
+      this.y = (m13 - m31) * s;
+      this.z = (m21 - m12) * s;
+    } else if (m11 > m22 && m11 > m33) {
+      s = 2.0 * Math.sqrt(1.0 + m11 - m22 - m33);
+      this.w = (m32 - m23) / s;
+      this.x = 0.25 * s;
+      this.y = (m12 + m21) / s;
+      this.z = (m13 + m31) / s;
+    } else if (m22 > m33) {
+      s = 2.0 * Math.sqrt(1.0 + m22 - m11 - m33);
+      this.w = (m13 - m31) / s;
+      this.x = (m12 + m21) / s;
+      this.y = 0.25 * s;
+      this.z = (m23 + m32) / s;
+    } else {
+      s = 2.0 * Math.sqrt(1.0 + m33 - m11 - m22);
+      this.w = (m21 - m12) / s;
+      this.x = (m13 + m31) / s;
+      this.y = (m23 + m32) / s;
+      this.z = 0.25 * s;
     }
-  }();
+    return this;
+  }
 
 }

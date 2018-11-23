@@ -25,7 +25,7 @@ export class Euler implements DataObject<Euler>{
   _z: number;
   _order: EulerOrder = Euler.defaultOrder;
 
-  onChangeCallback: Function;
+  onChangeCallback: Function = () => { };
 
   get x() { return this._x };
   get y() { return this._y };
@@ -39,10 +39,9 @@ export class Euler implements DataObject<Euler>{
 
   clone() {
     return new Euler(this._x, this._y, this._z, this._order);
-
   }
 
-  copy(euler) {
+  copy(euler: Euler) {
     this._x = euler._x;
     this._y = euler._y;
     this._z = euler._z;
@@ -58,7 +57,7 @@ export class Euler implements DataObject<Euler>{
       (euler._order === this._order);
   }
 
-  setFromRotationMatrix(m, order, update) {
+  setFromRotationMatrix(m: Matrix4, order: EulerOrder, update: boolean) {
     var clamp = MathUtil.clamp;
 
     // assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
@@ -70,7 +69,7 @@ export class Euler implements DataObject<Euler>{
 
     order = order || this._order;
 
-    if (order === 'XYZ') {
+    if (order === EulerOrder.XYZ) {
 
       this._y = Math.asin(clamp(m13, - 1, 1));
       if (Math.abs(m13) < 0.99999) {
@@ -81,7 +80,7 @@ export class Euler implements DataObject<Euler>{
         this._z = 0;
       }
 
-    } else if (order === 'YXZ') {
+    } else if (order === EulerOrder.YXZ) {
 
       this._x = Math.asin(- clamp(m23, - 1, 1));
       if (Math.abs(m23) < 0.99999) {
@@ -92,7 +91,7 @@ export class Euler implements DataObject<Euler>{
         this._z = 0;
       }
 
-    } else if (order === 'ZXY') {
+    } else if (order === EulerOrder.ZXY) {
 
       this._x = Math.asin(clamp(m32, - 1, 1));
       if (Math.abs(m32) < 0.99999) {
@@ -103,7 +102,7 @@ export class Euler implements DataObject<Euler>{
         this._z = Math.atan2(m21, m11);
       }
 
-    } else if (order === 'ZYX') {
+    } else if (order === EulerOrder.ZYX) {
 
       this._y = Math.asin(- clamp(m31, - 1, 1));
       if (Math.abs(m31) < 0.99999) {
@@ -114,7 +113,7 @@ export class Euler implements DataObject<Euler>{
         this._z = Math.atan2(- m12, m22);
       }
 
-    } else if (order === 'YZX') {
+    } else if (order === EulerOrder.YZX) {
 
       this._z = Math.asin(clamp(m21, - 1, 1));
 
@@ -126,7 +125,7 @@ export class Euler implements DataObject<Euler>{
         this._y = Math.atan2(m13, m33);
       }
 
-    } else if (order === 'XZY') {
+    } else if (order === EulerOrder.XZY) {
 
       this._z = Math.asin(- clamp(m12, - 1, 1));
 
@@ -138,8 +137,6 @@ export class Euler implements DataObject<Euler>{
         this._y = 0;
       }
 
-    } else {
-      console.warn('Euler: .setFromRotationMatrix() given unsupported order: ' + order);
     }
 
     this._order = order;
@@ -147,91 +144,50 @@ export class Euler implements DataObject<Euler>{
     return this;
   }
 
-  setFromQuaternion(q, order, update) {
+  setFromQuaternion(q: Quaternion, order: EulerOrder, update: boolean) {
     tempMatirx.makeRotationFromQuaternion(q);
     return this.setFromRotationMatrix(tempMatirx, order, update);
   };
 
-}
-
-
-Object.assign(Euler.prototype, {
-
-  isEuler: true,
-
-  set: function (x, y, z, order) {
-
+  set(x: number, y: number, z: number, order: EulerOrder) {
     this._x = x;
     this._y = y;
     this._z = z;
     this._order = order || this._order;
-
     this.onChangeCallback();
-
     return this;
+  }
 
-  },
-
-
-
-  setFromVector3: function (v, order) {
-
+  setFromVector3(v: Vector3, order: EulerOrder) {
     return this.set(v.x, v.y, v.z, order || this._order);
+  }
 
-  },
-
-  // reorder: function () {
-
-  // 	// WARNING: this discards revolution information -bhouston
-
-  // 	var q = new Quaternion();
-
-  // 	return function reorder( newOrder ) {
-
-  // 		q.setFromEuler( this );
-
-  // 		return this.setFromQuaternion( q, newOrder );
-
-  // 	};
-
-  // }(),
-
-
-  fromArray: function (array) {
-
+  fromArray(array: number[]) {
     this._x = array[0];
     this._y = array[1];
     this._z = array[2];
     if (array[3] !== undefined) this._order = array[3];
-
     this.onChangeCallback();
-
     return this;
+  }
 
-  },
-
-  toArray: function (array, offset) {
-
+  toArray(array: number[], offset: number) {
     if (array === undefined) array = [];
     if (offset === undefined) offset = 0;
-
     array[offset] = this._x;
     array[offset + 1] = this._y;
     array[offset + 2] = this._z;
     array[offset + 3] = this._order;
-
     return array;
+  }
 
-  },
-
-  toVector3: function (optionalResult) {
-    
-    if (optionalResult) {
-      return optionalResult.set(this._x, this._y, this._z);
+  toVector3(optionalTarget: Vector3) {
+    if (optionalTarget) {
+      return optionalTarget.set(this._x, this._y, this._z);
     } else {
       return new Vector3(this._x, this._y, this._z);
     }
-  },
+  }
 
-});
+}
 

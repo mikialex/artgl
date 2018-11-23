@@ -3,9 +3,9 @@ import { Vector3 } from "./vector3";
 export class Vector3Observable extends Vector3{
   constructor(x?: number, y?: number, z?: number) {
     super();
-    this._x = x;
-    this._y = y;
-    this._z = z;
+    this._x = x || 0;
+    this._y = y || 0;
+    this._z = z || 0;
   }
 
   onChange = () => { };

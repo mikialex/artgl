@@ -1,5 +1,6 @@
 import { DataObject } from "./index";
 import { Matrix4 } from "./matrix4";
+import { Quaternion } from "./quaternion";
 
 export class Vector4 implements DataObject<Vector4> {
   constructor(x?: number, y?: number, z?: number, w?: number) {
@@ -30,6 +31,81 @@ export class Vector4 implements DataObject<Vector4> {
   equals(v: Vector4) {
     return ((v.x === this.x) && (v.y === this.y) && (v.z === this.z) && (v.w === this.w));
   }
+
+  set (x: number, y: number, z: number, w: number) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.w = w;
+    return this;
+  }
+
+  setScalar (scalar: number) {
+    this.x = scalar;
+    this.y = scalar;
+    this.z = scalar;
+    this.w = scalar;
+    return this;
+  }
+
+  setX (x: number) {
+    this.x = x;
+    return this;
+  }
+
+  setY (y: number) {
+    this.y = y;
+    return this;
+  }
+
+  setZ (z: number) {
+    this.z = z;
+    return this;
+  }
+
+  setW (w: number) {
+    this.w = w;
+    return this;
+  }
+
+  setComponent (index: number, value: number) {
+    switch (index) {
+      case 0: this.x = value; break;
+      case 1: this.y = value; break;
+      case 2: this.z = value; break;
+      case 3: this.w = value; break;
+      default: throw new Error('index is out of range: ' + index);
+    }
+    return this;
+  }
+
+  getComponent (index: number) {
+    switch (index) {
+      case 0: return this.x;
+      case 1: return this.y;
+      case 2: return this.z;
+      case 3: return this.w;
+      default: throw new Error('index is out of range: ' + index);
+    }
+  }
+
+  setAxisAngleFromQuaternion (q: Quaternion) {
+    // http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
+    // q is assumed to be normalized
+    this.w = 2 * Math.acos(q.w);
+    var s = Math.sqrt(1 - q.w * q.w);
+    if (s < 0.0001) {
+      this.x = 1;
+      this.y = 0;
+      this.z = 0;
+    } else {
+      this.x = q.x / s;
+      this.y = q.y / s;
+      this.z = q.z / s;
+    }
+    return this;
+  }
+
 
   add (v: Vector4) {
     this.x += v.x;
@@ -105,126 +181,145 @@ export class Vector4 implements DataObject<Vector4> {
     this.z = e[2] * x + e[6] * y + e[10] * z + e[14] * w;
     this.w = e[3] * x + e[7] * y + e[11] * z + e[15] * w;
     return this;
-
   }
 
   divideScalar (scalar: number) {
-
     return this.multiplyScalar(1 / scalar);
-
   }
 
-  
-}
-
-
-Object.assign(Vector4.prototype, {
-
-  isVector4: true,
-
-  set: function (x, y, z, w) {
-
-    this.x = x;
-    this.y = y;
-    this.z = z;
-    this.w = w;
-
+  min (v: Vector4) {
+    this.x = Math.min(this.x, v.x);
+    this.y = Math.min(this.y, v.y);
+    this.z = Math.min(this.z, v.z);
+    this.w = Math.min(this.w, v.w);
     return this;
+  }
 
-  },
-
-  setScalar: function (scalar) {
-    this.x = scalar;
-    this.y = scalar;
-    this.z = scalar;
-    this.w = scalar;
+  max (v: Vector4) {
+    this.x = Math.max(this.x, v.x);
+    this.y = Math.max(this.y, v.y);
+    this.z = Math.max(this.z, v.z);
+    this.w = Math.max(this.w, v.w);
     return this;
-  },
+  }
 
-  setX: function (x) {
-    this.x = x;
+  clamp (min: Vector4, max: Vector4) {
+    // assumes min < max, componentwise
+    this.x = Math.max(min.x, Math.min(max.x, this.x));
+    this.y = Math.max(min.y, Math.min(max.y, this.y));
+    this.z = Math.max(min.z, Math.min(max.z, this.z));
+    this.w = Math.max(min.w, Math.min(max.w, this.w));
     return this;
-  },
+  }
 
-  setY: function (y) {
+  clampScalar (minVal: number, maxVal: number) {
+      tempMin.set(minVal, minVal, minVal, minVal);
+      tempMax.set(maxVal, maxVal, maxVal, maxVal);
+      return this.clamp(tempMin, tempMax);
+    };
 
-    this.y = y;
+  clampLength (min:  number, max:  number) {
+    var length = this.length();
+    return this.divideScalar(length || 1).multiplyScalar(Math.max(min, Math.min(max, length)));
+  }
 
+  floor () {
+    this.x = Math.floor(this.x);
+    this.y = Math.floor(this.y);
+    this.z = Math.floor(this.z);
+    this.w = Math.floor(this.w);
     return this;
+  }
 
-  },
-
-  setZ: function (z) {
-
-    this.z = z;
-
+  ceil () {
+    this.x = Math.ceil(this.x);
+    this.y = Math.ceil(this.y);
+    this.z = Math.ceil(this.z);
+    this.w = Math.ceil(this.w);
     return this;
+  }
 
-  },
-
-  setW: function (w) {
-
-    this.w = w;
-
+  round () {
+    this.x = Math.round(this.x);
+    this.y = Math.round(this.y);
+    this.z = Math.round(this.z);
+    this.w = Math.round(this.w);
     return this;
+  }
 
-  },
-
-  setComponent: function (index, value) {
-
-    switch (index) {
-
-      case 0: this.x = value; break;
-      case 1: this.y = value; break;
-      case 2: this.z = value; break;
-      case 3: this.w = value; break;
-      default: throw new Error('index is out of range: ' + index);
-
-    }
-
+  roundToZero () {
+    this.x = (this.x < 0) ? Math.ceil(this.x) : Math.floor(this.x);
+    this.y = (this.y < 0) ? Math.ceil(this.y) : Math.floor(this.y);
+    this.z = (this.z < 0) ? Math.ceil(this.z) : Math.floor(this.z);
+    this.w = (this.w < 0) ? Math.ceil(this.w) : Math.floor(this.w);
     return this;
+  }
 
-  },
-
-  getComponent: function (index) {
-    switch (index) {
-      case 0: return this.x;
-      case 1: return this.y;
-      case 2: return this.z;
-      case 3: return this.w;
-      default: throw new Error('index is out of range: ' + index);
-    }
-  },
-
-  setAxisAngleFromQuaternion: function (q) {
-
-    // http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
-
-    // q is assumed to be normalized
-
-    this.w = 2 * Math.acos(q.w);
-
-    var s = Math.sqrt(1 - q.w * q.w);
-
-    if (s < 0.0001) {
-
-      this.x = 1;
-      this.y = 0;
-      this.z = 0;
-
-    } else {
-
-      this.x = q.x / s;
-      this.y = q.y / s;
-      this.z = q.z / s;
-
-    }
-
+  negate () {
+    this.x = - this.x;
+    this.y = - this.y;
+    this.z = - this.z;
+    this.w = - this.w;
     return this;
+  }
 
-  },
+  dot (v: Vector4) {
+    return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
+  }
 
-  setAxisAngleFromRotationMatrix: function (m) {
+  lengthSq () {
+    return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
+  }
+
+  length () {
+    return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+  }
+
+  lengthManhattan () {
+    return Math.abs(this.x) + Math.abs(this.y) + Math.abs(this.z) + Math.abs(this.w);
+  }
+
+  normalize () {
+    return this.divideScalar(this.length() || 1);
+  }
+
+  setLength (length: number) {
+    return this.normalize().multiplyScalar(length);
+  }
+
+  lerp (v: Vector4, alpha: number) {
+    this.x += (v.x - this.x) * alpha;
+    this.y += (v.y - this.y) * alpha;
+    this.z += (v.z - this.z) * alpha;
+    this.w += (v.w - this.w) * alpha;
+    return this;
+  }
+
+  lerpVectors (v1: Vector4, v2: Vector4, alpha: number) {
+    return this.subVectors(v2, v1).multiplyScalar(alpha).add(v1);
+  }
+
+
+  fromArray (array: number[], offset: number) {
+    if (offset === undefined) offset = 0;
+    this.x = array[offset];
+    this.y = array[offset + 1];
+    this.z = array[offset + 2];
+    this.w = array[offset + 3];
+    return this;
+  }
+
+  toArray (array: number[], offset: number) {
+    if (array === undefined) array = [];
+    if (offset === undefined) offset = 0;
+    array[offset] = this.x;
+    array[offset + 1] = this.y;
+    array[offset + 2] = this.z;
+    array[offset + 3] = this.w;
+    return array;
+  }
+
+  setAxisAngleFromRotationMatrix(m: Matrix4) {
 
     // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/index.htm
 
@@ -338,145 +433,13 @@ Object.assign(Vector4.prototype, {
     this.z = (m21 - m12) / s;
     this.w = Math.acos((m11 + m22 + m33 - 1) / 2);
     return this;
-  },
-
-  min: function (v) {
-    this.x = Math.min(this.x, v.x);
-    this.y = Math.min(this.y, v.y);
-    this.z = Math.min(this.z, v.z);
-    this.w = Math.min(this.w, v.w);
-    return this;
-  },
-
-  max: function (v) {
-    this.x = Math.max(this.x, v.x);
-    this.y = Math.max(this.y, v.y);
-    this.z = Math.max(this.z, v.z);
-    this.w = Math.max(this.w, v.w);
-    return this;
-  },
-
-  clamp: function (min, max) {
-    // assumes min < max, componentwise
-    this.x = Math.max(min.x, Math.min(max.x, this.x));
-    this.y = Math.max(min.y, Math.min(max.y, this.y));
-    this.z = Math.max(min.z, Math.min(max.z, this.z));
-    this.w = Math.max(min.w, Math.min(max.w, this.w));
-    return this;
-  },
-
-  clampScalar: function () {
-    var min, max;
-    return function clampScalar(minVal, maxVal) {
-      if (min === undefined) {
-        min = new Vector4();
-        max = new Vector4();
-      }
-      min.set(minVal, minVal, minVal, minVal);
-      max.set(maxVal, maxVal, maxVal, maxVal);
-      return this.clamp(min, max);
-    };
-  }(),
-
-  clampLength: function (min, max) {
-    var length = this.length();
-    return this.divideScalar(length || 1).multiplyScalar(Math.max(min, Math.min(max, length)));
-  },
-
-  floor: function () {
-    this.x = Math.floor(this.x);
-    this.y = Math.floor(this.y);
-    this.z = Math.floor(this.z);
-    this.w = Math.floor(this.w);
-    return this;
-  },
-
-  ceil: function () {
-    this.x = Math.ceil(this.x);
-    this.y = Math.ceil(this.y);
-    this.z = Math.ceil(this.z);
-    this.w = Math.ceil(this.w);
-    return this;
-  },
-
-  round: function () {
-    this.x = Math.round(this.x);
-    this.y = Math.round(this.y);
-    this.z = Math.round(this.z);
-    this.w = Math.round(this.w);
-    return this;
-  },
-
-  roundToZero: function () {
-    this.x = (this.x < 0) ? Math.ceil(this.x) : Math.floor(this.x);
-    this.y = (this.y < 0) ? Math.ceil(this.y) : Math.floor(this.y);
-    this.z = (this.z < 0) ? Math.ceil(this.z) : Math.floor(this.z);
-    this.w = (this.w < 0) ? Math.ceil(this.w) : Math.floor(this.w);
-    return this;
-  },
-
-  negate: function () {
-    this.x = - this.x;
-    this.y = - this.y;
-    this.z = - this.z;
-    this.w = - this.w;
-    return this;
-  },
-
-  dot: function (v) {
-    return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
-  },
-
-  lengthSq: function () {
-    return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
-  },
-
-  length: function () {
-    return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
-  },
-
-  lengthManhattan: function () {
-    return Math.abs(this.x) + Math.abs(this.y) + Math.abs(this.z) + Math.abs(this.w);
-  },
-
-  normalize: function () {
-    return this.divideScalar(this.length() || 1);
-  },
-
-  setLength: function (length) {
-    return this.normalize().multiplyScalar(length);
-  },
-
-  lerp: function (v, alpha) {
-    this.x += (v.x - this.x) * alpha;
-    this.y += (v.y - this.y) * alpha;
-    this.z += (v.z - this.z) * alpha;
-    this.w += (v.w - this.w) * alpha;
-    return this;
-  },
-
-  lerpVectors: function (v1, v2, alpha) {
-    return this.subVectors(v2, v1).multiplyScalar(alpha).add(v1);
-  },
+  }
+  
+}
 
 
-  fromArray: function (array, offset) {
-    if (offset === undefined) offset = 0;
-    this.x = array[offset];
-    this.y = array[offset + 1];
-    this.z = array[offset + 2];
-    this.w = array[offset + 3];
-    return this;
-  },
 
-  toArray: function (array, offset) {
-    if (array === undefined) array = [];
-    if (offset === undefined) offset = 0;
-    array[offset] = this.x;
-    array[offset + 1] = this.y;
-    array[offset + 2] = this.z;
-    array[offset + 3] = this.w;
-    return array;
-  },
 
-});
+
+const tempMin = new Vector4();
+const tempMax = new Vector4();

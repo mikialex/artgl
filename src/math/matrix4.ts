@@ -2,6 +2,10 @@ import { Vector3 } from "./vector3";
 import { Quaternion } from "./quaternion";
 import { DataObject } from "./index";
 
+const tempx: Vector3 = new Vector3;
+const tempy: Vector3 = new Vector3;
+const tempz: Vector3 = new Vector3;
+
 export class Matrix4 implements DataObject<Matrix4>{
   constructor() {
 
@@ -30,7 +34,7 @@ export class Matrix4 implements DataObject<Matrix4>{
     return true;
   }
 
-  fromArray(array: number[], offset?) {
+  fromArray(array: number[], offset?: number) {
     if (offset === undefined) offset = 0;
     for (var i = 0; i < 16; i++) {
       this.elements[i] = array[i + offset];
@@ -38,7 +42,7 @@ export class Matrix4 implements DataObject<Matrix4>{
     return this;
   }
 
-  static flatten(v: Matrix4, array) {
+  static flatten(v: Matrix4, array: number[]) {
     return v.toArray(array, 0);
   }
 
@@ -189,47 +193,38 @@ export class Matrix4 implements DataObject<Matrix4>{
     return this;
   }
 
-  public lookAt = function () {
-    let x: Vector3;
-    let y: Vector3;
-    let z: Vector3;
+  public lookAt(origin: Vector3, target: Vector3, up: Vector3): Matrix4 {
 
-    return function lookAt(origin: Vector3, target: Vector3, up: Vector3): Matrix4 {
-      if (x === undefined) x = new Vector3();
-      if (y === undefined) y = new Vector3();
-      if (z === undefined) z = new Vector3();
+    const te = this.elements;
 
-      const te = this.elements;
+    tempz.copy(origin).sub(target);
+    if (tempz.mag() === 0) {
+      tempz.z = 1;
+    }
 
-      z.copy(origin).sub(target);
-      if (z.mag() === 0) {
-        z.z = 1;
+    tempz.normalize();
+    tempx.crossVectors(up, tempz);
+    if (tempx.mag() === 0) {
+      if (Math.abs(up.z) === 1) {
+        tempz.x += 0.0001;
+      } else {
+        tempz.z += 0.0001;
       }
+      tempz.normalize();
+      tempx.crossVectors(up, tempz);
+    }
 
-      z.normalize();
-      x.crossVectors(up, z);
-      if (x.mag() === 0) {
-        if (Math.abs(up.z) === 1) {
-          z.x += 0.0001;
-        } else {
-          z.z += 0.0001;
-        }
-        z.normalize();
-        x.crossVectors(up, z);
-      }
+    tempx.normalize();
+    tempy.crossVectors(tempz, tempx);
 
-      x.normalize();
-      y.crossVectors(z, x);
+    te[0] = tempx.x; te[4] = tempy.x; te[8] = tempz.x;
+    te[1] = tempx.y; te[5] = tempy.y; te[9] = tempz.y;
+    te[2] = tempx.z; te[6] = tempy.z; te[10] = tempz.z;
 
-      te[0] = x.x; te[4] = y.x; te[8] = z.x;
-      te[1] = x.y; te[5] = y.y; te[9] = z.y;
-      te[2] = x.z; te[6] = y.z; te[10] = z.z;
+    return this;
+  };
 
-      return this;
-    };
-  }();
-
-  scale(x, y, z) {
+  scale(x: number, y: number, z: number) {
     const te = this.elements;
     te[0] *= x; te[4] *= y; te[8] *= z;
     te[1] *= x; te[5] *= y; te[9] *= z;
@@ -238,7 +233,7 @@ export class Matrix4 implements DataObject<Matrix4>{
     return this;
   }
 
-  setPostion(x, y, z) {
+  setPostion(x: number, y: number, z: number) {
     var te = this.elements;
     te[12] = x;
     te[13] = y;
@@ -353,6 +348,5 @@ export class Matrix4 implements DataObject<Matrix4>{
     return array;
 
   }
-
 
 }
