@@ -14,6 +14,13 @@ export interface GeometryDataLayout {
   drawCount: number;
 }
 
+/**
+ * geometry define what to draw
+ * by defined data layout and data content
+ * also handle gl buffer updatation
+ * @export
+ * @class Geometry
+ */
 export class Geometry {
   constructor() {
   }

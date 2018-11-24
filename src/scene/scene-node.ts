@@ -3,6 +3,13 @@ import { Scene } from "./scene";
 import { Euler } from "../math/euler";
 import { Nullable } from "../type";
 
+/**
+ * a scene node in a scene tree
+ * organize the scene hierachy
+ *
+ * @export
+ * @class SceneNode
+ */
 export class SceneNode {
   scene: Nullable<Scene> = null;
 

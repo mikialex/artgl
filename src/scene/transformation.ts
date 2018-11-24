@@ -1,6 +1,13 @@
 import { Matrix4, Euler, Quaternion, Vector3 } from "../math/index";
 import { Vector3Observable } from "../math/observable/vector3-observable";
 
+/**
+ * Decribe a node's local transformation info.
+ * Users can set values and, from getter to get cleaned value
+ * not need to update manully. ALl calculation is lazy.
+ * @export
+ * @class Transformation
+ */
 export class Transformation{
   constructor() {
     this._position.onChange = () => {

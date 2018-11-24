@@ -1,5 +1,11 @@
 import { ARTEngine } from "../engine/render-engine";
 
+/**
+ * texture container for bitmap render data
+ * 
+ * @export
+ * @class Texture
+ */
 export class Texture {
   constructor() {
     

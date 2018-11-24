@@ -4,6 +4,13 @@ import { Light } from "../core/light";
 import { Camera } from "../core/camera";
 import { Nullable } from "../type";
 
+/**
+ * scene data management
+ * contains full scene tree, and other scene data
+ * also responsible for list structure cache for performance
+ * @export
+ * @class Scene
+ */
 export class Scene {
   root: Nullable<SceneNode> = null;
   

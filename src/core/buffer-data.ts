@@ -2,6 +2,12 @@ import { ARTEngine } from "../engine/render-engine";
 
 export type BufferDataType = Float32Array | Uint16Array ;
 
+/**
+ * bufferdata is webglbuffer container
+ * 
+ * @export
+ * @class BufferData
+ */
 export class BufferData{
   constructor() {
   }
