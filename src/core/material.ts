@@ -1,4 +1,4 @@
-import { generateUUID } from "../math";
+import { generateUUID } from "../math/index";
 import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { GLDataType } from "../webgl/shader-util";
 import { AttributeUsage } from "../webgl/attribute";

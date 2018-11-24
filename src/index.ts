@@ -1,5 +1,5 @@
 import cube8k from './usecase/cube-8k';
-import { Vector3Observable } from './math/vector3-observable';
+import { Vector3Observable } from './math/observable/vector3-observable';
 
 window.onload = function () {
 

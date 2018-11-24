@@ -1,12 +1,16 @@
 import { GLRenderer } from "./webgl-renderer";
 import { generateUUID } from "../math/uuid";
 
-export class TexureManager{
+export class GLTextureManager{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
   }
   renderer: GLRenderer;
   private textures: { [index: string]: WebGLTexture } = {};
+
+  getGLTexture(storeId: string) {
+    return this.textures[storeId];
+  }
 
   createTextureFromImageElement(image: HTMLImageElement) {
     const gl = this.renderer.gl;

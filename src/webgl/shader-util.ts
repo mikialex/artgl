@@ -20,7 +20,8 @@ export const enum GLDataType{
   intVec4,
   Mat2,
   Mat3,
-  Mat4
+  Mat4,
+  boolean
 }
 
 const shaderStringMap: { [index: string]: GLDataType } = {

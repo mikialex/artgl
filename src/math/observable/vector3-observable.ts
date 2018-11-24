@@ -1,4 +1,4 @@
-import { Vector3 } from "./vector3";
+import { Vector3 } from "../vector3";
 
 export class Vector3Observable extends Vector3{
   constructor(x?: number, y?: number, z?: number) {

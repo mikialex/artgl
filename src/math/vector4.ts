@@ -1,8 +1,13 @@
-import { DataObject } from "./index";
+import { DataObject, ArrayFlattenable, VectorDataObject } from "./index";
 import { Matrix4 } from "./matrix4";
 import { Quaternion } from "./quaternion";
 
-export class Vector4 implements DataObject<Vector4> {
+export class Vector4
+  implements
+  DataObject<Vector4>,
+  VectorDataObject<Vector4>,
+  ArrayFlattenable<Vector4>
+{
   constructor(x?: number, y?: number, z?: number, w?: number) {
     this.x = x || 0;
     this.y = y || 0;
@@ -299,26 +304,6 @@ export class Vector4 implements DataObject<Vector4> {
     return this.subVectors(v2, v1).multiplyScalar(alpha).add(v1);
   }
 
-
-  fromArray (array: number[], offset: number) {
-    if (offset === undefined) offset = 0;
-    this.x = array[offset];
-    this.y = array[offset + 1];
-    this.z = array[offset + 2];
-    this.w = array[offset + 3];
-    return this;
-  }
-
-  toArray (array: number[], offset: number) {
-    if (array === undefined) array = [];
-    if (offset === undefined) offset = 0;
-    array[offset] = this.x;
-    array[offset + 1] = this.y;
-    array[offset + 2] = this.z;
-    array[offset + 3] = this.w;
-    return array;
-  }
-
   setAxisAngleFromRotationMatrix(m: Matrix4) {
 
     // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/index.htm
@@ -433,6 +418,29 @@ export class Vector4 implements DataObject<Vector4> {
     this.z = (m21 - m12) / s;
     this.w = Math.acos((m11 + m22 + m33 - 1) / 2);
     return this;
+  }
+
+  fromArray (array: number[], offset?: number) {
+    if (offset === undefined) offset = 0;
+    this.x = array[offset];
+    this.y = array[offset + 1];
+    this.z = array[offset + 2];
+    this.w = array[offset + 3];
+    return this;
+  }
+
+  toArray (array?: number[], offset?: number) {
+    if (array === undefined) array = [];
+    if (offset === undefined) offset = 0;
+    array[offset] = this.x;
+    array[offset + 1] = this.y;
+    array[offset + 2] = this.z;
+    array[offset + 3] = this.w;
+    return array;
+  }
+
+  static flatten(v: Vector4, array: number[]) {
+    return v.toArray(array, 0);
   }
   
 }

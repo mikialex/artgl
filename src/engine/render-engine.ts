@@ -9,6 +9,7 @@ import { BufferData } from "../core/buffer-data";
 import { Material } from "../core/material";
 import { AttributeUsage } from "../webgl/attribute";
 import { DrawMode } from "../webgl/const";
+import { Texture } from "../core/texture";
 
 export class ARTEngineAdaptor {
   constructor(engine: ARTEngine) {
@@ -122,7 +123,12 @@ export class ARTEngine {
 
   }
 
-  getProgram(material: Material): GLProgram  {
+  getGLTexture(texture: Texture): WebGLTexture {
+    const id = texture.gltextureId;
+    return this.renderer.getGLTexture(id);
+  }
+
+  getProgram(material: Material): GLProgram {
     const id = material.programId;
     const program = this.renderer.getProgram(id);
     return program;

@@ -1,7 +1,12 @@
-import { DataObject, VectorDataObject } from "./index";
+import { DataObject, VectorDataObject, ArrayFlattenable } from "./index";
 import { Vector3 } from "./vector3";
 
-export class Vector2 implements DataObject<Vector2>, VectorDataObject<Vector2>{
+export class Vector2
+  implements
+  DataObject<Vector2>,
+  VectorDataObject<Vector2>,
+  ArrayFlattenable<Vector2>
+{
   constructor(x?: number, y?: number) {
     this.x = x || 0;
     this.y = y || 0;
@@ -222,21 +227,6 @@ export class Vector2 implements DataObject<Vector2>, VectorDataObject<Vector2>{
     return this.subVectors(v2, v1).multiplyScalar(alpha).add(v1);
   }
 
-  fromArray(array: number[], offset: number) {
-    if (offset === undefined) offset = 0;
-    this.x = array[offset];
-    this.y = array[offset + 1];
-    return this;
-  }
-
-  toArray(array: number[], offset: number) {
-    if (array === undefined) array = [];
-    if (offset === undefined) offset = 0;
-    array[offset] = this.x;
-    array[offset + 1] = this.y;
-    return array;
-  }
-
   rotateAround(center: Vector3, angle: number) {
     var c = Math.cos(angle), s = Math.sin(angle);
     var x = this.x - center.x;
@@ -244,6 +234,25 @@ export class Vector2 implements DataObject<Vector2>, VectorDataObject<Vector2>{
     this.x = x * c - y * s + center.x;
     this.y = x * s + y * c + center.y;
     return this;
+  }
+
+  fromArray(array: number[], offset?: number) {
+    if (offset === undefined) offset = 0;
+    this.x = array[offset];
+    this.y = array[offset + 1];
+    return this;
+  }
+
+  toArray(array?: number[], offset?: number) {
+    if (array === undefined) array = [];
+    if (offset === undefined) offset = 0;
+    array[offset] = this.x;
+    array[offset + 1] = this.y;
+    return array;
+  }
+
+  static flatten(v: Vector2, array: number[]) {
+    return v.toArray(array, 0);
   }
 
 }

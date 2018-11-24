@@ -1,12 +1,16 @@
 import { Vector3 } from "./vector3";
 import { Quaternion } from "./quaternion";
-import { DataObject } from "./index";
+import { DataObject, ArrayFlattenable } from "./index";
 
 const tempx: Vector3 = new Vector3;
 const tempy: Vector3 = new Vector3;
 const tempz: Vector3 = new Vector3;
 
-export class Matrix4 implements DataObject<Matrix4>{
+export class Matrix4
+  implements
+  DataObject<Matrix4>,
+  ArrayFlattenable<Matrix4>
+{
   constructor() {
 
   }
@@ -32,18 +36,6 @@ export class Matrix4 implements DataObject<Matrix4>{
       if (te[i] !== me[i]) return false;
     }
     return true;
-  }
-
-  fromArray(array: number[], offset?: number) {
-    if (offset === undefined) offset = 0;
-    for (var i = 0; i < 16; i++) {
-      this.elements[i] = array[i + offset];
-    }
-    return this;
-  }
-
-  static flatten(v: Matrix4, array: number[]) {
-    return v.toArray(array, 0);
   }
 
   elements: number[] = [
@@ -348,5 +340,18 @@ export class Matrix4 implements DataObject<Matrix4>{
     return array;
 
   }
+
+  fromArray(array: number[], offset?: number) {
+    if (offset === undefined) offset = 0;
+    for (var i = 0; i < 16; i++) {
+      this.elements[i] = array[i + offset];
+    }
+    return this;
+  }
+
+  static flatten(v: Matrix4, array: number[]) {
+    return v.toArray(array, 0);
+  }
+
 
 }

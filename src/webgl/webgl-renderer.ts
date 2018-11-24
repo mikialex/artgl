@@ -6,6 +6,7 @@ import { GLAttributeBufferDataManager } from "./attribute-buffer-manager";
 import { GLState } from "./states/gl-state";
 import { DrawMode } from "./const";
 import { Nullable } from "../type";
+import { GLTextureManager } from "./texture-manager";
 
 export class GLRenderer {
   constructor(el: HTMLCanvasElement, options?: any) {
@@ -44,8 +45,9 @@ export class GLRenderer {
 
   state: GLState = new GLState(this);
   activeProgram: Nullable<GLProgram> = null;
-  programManager = new GLProgramManager(this);
-  attributeBufferManager = new GLAttributeBufferDataManager(this);
+  readonly programManager = new GLProgramManager(this);
+  readonly textureManger = new GLTextureManager(this);
+  readonly attributeBufferManager = new GLAttributeBufferDataManager(this);
   createProgram(conf: GLProgramConfig): GLProgram {
     const program = new GLProgram(this, conf);
     this.programManager.addNewProgram(program);
@@ -61,6 +63,10 @@ export class GLRenderer {
       this.activeProgram = program;
       this.gl.useProgram(program.getProgram());
     }
+  }
+
+  getGLTexture(storeId: string) {
+    return this.textureManger.getGLTexture(storeId);
   }
 
   

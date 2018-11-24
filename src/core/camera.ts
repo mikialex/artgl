@@ -1,5 +1,5 @@
 import { SceneNode } from "../scene/scene-node";
-import { Matrix4 } from "../math";
+import { Matrix4 } from "../math/index";
 
 export class Camera extends SceneNode{
   constructor() {

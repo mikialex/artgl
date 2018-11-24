@@ -1,9 +1,14 @@
-import {Quaternion} from './quaternion';
-import {Matrix4} from './Matrix4';
-import {Spherical} from './Spherical';
+import { Quaternion } from './quaternion';
+import { Matrix4 } from './Matrix4';
+import { Spherical } from './Spherical';
+import { DataObject, VectorDataObject, ArrayFlattenable } from './index';
 
-export class Vector3 {
-
+export class Vector3
+  implements
+  DataObject<Vector3>,
+  VectorDataObject<Vector3>,
+  ArrayFlattenable<Vector3>
+{
   private buffer: Float32Array = new Float32Array(3);
   public x: number;
   public y: number;
@@ -27,6 +32,10 @@ export class Vector3 {
     this.y = v.y;
     this.z = v.z;
     return this;
+  }
+
+  public equals(v: Vector3) {
+    return ((v.x === this.x) && (v.y === this.y)) && (v.z === this.z);
   }
 
   public clone(): Vector3 {
@@ -74,12 +83,22 @@ export class Vector3 {
     return this.multiplyScalar(inv_length);
   }
 
-  public min(): number {
-    return Math.min(Math.min(this.x, this.y), this.z);
+  public lengthManhattan() {
+    return Math.abs(this.x) + Math.abs(this.y) + Math.abs(this.z);
   }
 
-  public max(): number {
-    return Math.max(Math.max(this.x, this.y), this.z);
+  public min(v: Vector3) {
+    this.x = Math.min(this.x, v.x);
+    this.y = Math.min(this.y, v.y);
+    this.z = Math.min(this.z, v.z);
+    return this;
+  }
+
+  public max(v: Vector3) {
+    this.x = Math.max(this.x, v.x);
+    this.y = Math.max(this.y, v.y);
+    this.z = Math.max(this.z, v.z);
+    return this;
   }
 
   public clamp(min: Vector3, max: Vector3): Vector3 {
@@ -155,5 +174,26 @@ export class Vector3 {
       this.buffer[2] = this.z;
     }
     return this.buffer;
+  }
+
+  fromArray(array: number[], offset?: number) {
+    if (offset === undefined) offset = 0;
+    this.x = array[offset];
+    this.y = array[offset + 1];
+    this.z = array[offset + 2];
+    return this;
+  }
+
+  toArray(array?: number[], offset?: number) {
+    if (array === undefined) array = [];
+    if (offset === undefined) offset = 0;
+    array[offset] = this.x;
+    array[offset + 1] = this.y;
+    array[offset + 2] = this.z;
+    return array;
+  }
+
+  static flatten(v: Vector3, array: number[]) {
+    return v.toArray(array, 0);
   }
 }

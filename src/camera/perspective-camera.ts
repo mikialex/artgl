@@ -1,4 +1,4 @@
-import { Vector3, Matrix4, MathUtil} from "../math";
+import { Vector3, Matrix4, MathUtil} from "../math/index";
 import { Camera } from "../core/camera";
 
 const tempMatrix = new Matrix4();

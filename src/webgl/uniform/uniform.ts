@@ -50,11 +50,19 @@ export class GLUniform<T>{
   private flattener: flattenerType
   private differ;
   private copyer;
+
   set(value: T) {
     this.receiveData = this.flattener(value, this.receiveData);
-    const diffResult = true;
-    if (diffResult) {
-      if (this.lastReceiveData === undefined || this.differ(this.receiveData, this.lastReceiveData)) {
+
+    if (this.lastReceiveData === undefined) { // this uniform never uploadever
+      this.lastReceiveData = this.flattener(value, this.lastReceiveData);
+      this.setter(this.gl, this.location, this.receiveData);
+      return;
+    }
+
+    const enableDiff = true;
+    if (enableDiff) {
+      if (this.differ(this.receiveData, this.lastReceiveData)) {
         this.setter(this.gl, this.location, this.receiveData);
         this.lastReceiveData = this.copyer(this.receiveData, this.lastReceiveData);
       }
