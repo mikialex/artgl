@@ -9,7 +9,8 @@ export type BufferDataType = Float32Array | Uint16Array ;
  * @class BufferData
  */
 export class BufferData{
-  constructor() {
+  constructor(data: BufferDataType) {
+    this.data = data;
   }
   data: BufferDataType;
   shouldUpdate = true;
@@ -30,16 +31,14 @@ export class BufferData{
 }
 
 export class Float32BufferData extends BufferData{
-  constructor(size: number) {
-    super();
-    this.data = new Float32Array(size); 
+  constructor(data: Float32Array) {
+    super(data);
   }
 
 }
 
 export class Uint16BufferData extends BufferData {
-  constructor(size: number) {
-    super();
-    this.data = new Uint16Array(size);
+  constructor(data: Uint16Array) {
+    super(data);
   }
 }

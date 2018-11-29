@@ -93,6 +93,9 @@ export class GLRenderer {
         this.gl.UNSIGNED_SHORT,
         0
       );
+      if (this.gl.getError() !== this.gl.NO_ERROR) {
+        throw 'err';
+      }
     } else {
       this.gl.drawArrays(mode, this.activeProgram.drawFrom, this.activeProgram.drawCount);
     }

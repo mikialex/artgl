@@ -1,10 +1,8 @@
 import cube8k from './usecase/cube-8k';
-import { Vector3Observable } from './math/observable/vector3-observable';
-import { loadObjFile } from './loader/obj-loader';
-import { openFile } from './util/file-io';
+import objload from './usecase/load-obj';
 
 window.onload = async function () {
-  (window as any).load = loadObjFile;
+  objload();
   // setTimeout(() => {
   //   openFile()
   // }, 1000);

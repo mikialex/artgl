@@ -24,9 +24,7 @@ export class TestGeometry extends Geometry {
   }
 
   populate() {
-    const position = new Float32BufferData(this.layout.dataInfo.position.stride * this.layout.drawCount);
-    this.bufferDatas.position = position;
-    position.setData(new Float32Array([
+    const positionBuffer = new Float32Array([
       -1.0,-1.0,-1.0, // triangle 1 : begin
       -1.0, 1.0, 1.0, // triangle 1 : end
       -1.0,-1.0, 1.0,
@@ -75,11 +73,12 @@ export class TestGeometry extends Geometry {
       -1.0, 1.0, 1.0,
       1.0, 1.0, 1.0,
     ])
-    )
+    
+    const position = new Float32BufferData(positionBuffer);
+    this.bufferDatas.position = position;
 
-    const normal = new Float32BufferData(this.layout.dataInfo.normal.stride * this.layout.drawCount);
+    const normal = new Float32BufferData(generateNormalFromPostion(position.data as Float32Array));
     this.bufferDatas.normal = normal;
-    normal.setData(generateNormalFromPostion(position.data as Float32Array));
   }
 
 }

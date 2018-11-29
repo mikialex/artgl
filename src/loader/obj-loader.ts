@@ -1,12 +1,14 @@
-import { Geometry } from "../core/geometry";
+import { Geometry, defaultGeometryLayoutDataInfo } from "../core/geometry";
 import { Vector3 } from "../math/vector3";
 import { Vector2 } from "../math/vector2";
 import { loadStringFromFile } from "../util/file-io";
+import { Float32BufferData, Uint16BufferData } from "../core/buffer-data";
+import { generateNormalFromPostion } from "../util/normal-generation";
 
-export async function loadObjFile() {
+export async function loadObjFile(): Promise<Geometry> {
   const loader = new OBJLoader();
   const str = await loadStringFromFile();
-  loader.parse(str);
+  return loader.parse(str);
 }
 
 export class OBJLoader {
@@ -267,6 +269,34 @@ export class OBJLoader {
       }
 
     }
-    return new Geometry();
+    const geometry = new Geometry();
+    const position = [];
+    this.wrappedPositionForBabylon.forEach(po => {
+      position.push(po.x);
+      position.push(po.y);
+      position.push(po.z);
+    })
+
+    const normal = [];
+    this.wrappedNormalsForBabylon.forEach(po => {
+      normal.push(po.x);
+      normal.push(po.y);
+      normal.push(po.z);
+    })
+    const positionBuffer = new Float32Array(position);
+    const normalBuffer = new Float32Array(normal);
+    const indexBuffer = new Uint16Array(this.indicesForBabylon);
+    geometry.bufferDatas.position = new Float32BufferData(positionBuffer);
+    geometry.bufferDatas.normal = new Float32BufferData(normalBuffer);
+    // geometry.bufferDatas.normal = new Float32BufferData(generateNormalFromPostion(positionBuffer));
+    geometry.bufferDatas.index = new Uint16BufferData(indexBuffer);
+    geometry.layout = {
+      dataInfo: defaultGeometryLayoutDataInfo,
+      drawCount: indexBuffer.length,
+      drawFrom: 0,
+      indexDraw: true,
+    }
+
+    return geometry;
   }
 }

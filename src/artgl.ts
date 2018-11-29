@@ -25,3 +25,6 @@ export { PerspectiveCamera } from "./camera/perspective-camera";
 //interaction
 export { Interactor } from "./interact/interactor";
 export { OrbitController } from "./interact/orbit-controler";
+
+//loader
+export { OBJLoader } from './loader/obj-loader';

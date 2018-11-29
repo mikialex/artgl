@@ -1,8 +1,8 @@
 
 import { Geometry } from '../../core/geometry';
-import { Vector3 } from '../../math';
+import { Vector3 } from '../../math/index';
 import { AttributeUsage } from '../../webgl/attribute';
-import { Float32BufferData, BufferData, Uint16BufferData } from '../../core/buffer-data';
+import { Float32BufferData, Uint16BufferData } from '../../core/buffer-data';
 
 
 export class SphereGeometry extends Geometry {
@@ -95,17 +95,14 @@ export class SphereGeometry extends Geometry {
       }
     }
 
-    const positionBuffer = new Float32BufferData(this.layout.dataInfo.position.stride * this.layout.drawCount);
+    const positionBuffer = new Float32BufferData(new Float32Array(vertices));
     this.bufferDatas.position = positionBuffer;
-    positionBuffer.setData(new Float32Array(vertices))
 
-    const normalBuffer = new Float32BufferData(this.layout.dataInfo.normal.stride * this.layout.drawCount);
+    const normalBuffer = new Float32BufferData(new Float32Array(normals));
     this.bufferDatas.normal = normalBuffer;
-    normalBuffer.setData(new Float32Array(normals))
 
-    const indexBuffer = new Uint16BufferData(1);
+    const indexBuffer = new Uint16BufferData(new Uint16Array(indices));
     this.bufferDatas.index = indexBuffer;
-    indexBuffer.setData(new Uint16Array(indices));
     this.layout.drawCount = indices.length;
 
   }

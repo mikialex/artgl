@@ -38,14 +38,24 @@ export class Geometry {
     throw 'geometry not implemented'
   }
 
-
-
   dispose() {
 
   }
 
-
 }
 
-
+export const defaultGeometryLayoutDataInfo = {
+  position: {
+    usage: AttributeUsage.position,
+    stride: 3
+  },
+  normal: {
+    usage: AttributeUsage.normal,
+    stride: 3
+  },
+  index: {
+    usage: AttributeUsage.index,
+    stride: 1
+  },
+}
 
