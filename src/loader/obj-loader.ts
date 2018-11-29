@@ -1,27 +1,34 @@
 import { Geometry } from "../core/geometry";
 import { Vector3 } from "../math/vector3";
 import { Vector2 } from "../math/vector2";
+import { loadStringFromFile } from "../util/file-io";
+
+export async function loadObjFile() {
+  const loader = new OBJLoader();
+  const str = await loadStringFromFile();
+  loader.parse(str);
+}
 
 export class OBJLoader {
-  public vertexPattern = /v( +[\d|\.|\+|\-|e|E]+)( +[\d|\.|\+|\-|e|E]+)( +[\d|\.|\+|\-|e|E]+)/;
+  private vertexPattern = /v( +[\d|\.|\+|\-|e|E]+)( +[\d|\.|\+|\-|e|E]+)( +[\d|\.|\+|\-|e|E]+)/;
   // vn float float float
 
-  public normalPattern = /vn( +[\d|\.|\+|\-|e|E]+)( +[\d|\.|\+|\-|e|E]+)( +[\d|\.|\+|\-|e|E]+)/;
+  private normalPattern = /vn( +[\d|\.|\+|\-|e|E]+)( +[\d|\.|\+|\-|e|E]+)( +[\d|\.|\+|\-|e|E]+)/;
   // vt float float
 
-  public uvPattern = /vt( +[\d|\.|\+|\-|e|E]+)( +[\d|\.|\+|\-|e|E]+)/;
+  private uvPattern = /vt( +[\d|\.|\+|\-|e|E]+)( +[\d|\.|\+|\-|e|E]+)/;
   // f vertex vertex vertex ...
 
-  public facePattern1 = /f\s+(([\d]{1,}[\s]?){3,})+/;
+  private facePattern1 = /f\s+(([\d]{1,}[\s]?){3,})+/;
   // f vertex/uvs vertex/uvs vertex/uvs ...
 
-  public facePattern2 = /f\s+((([\d]{1,}\/[\d]{1,}[\s]?){3,})+)/;
+  private facePattern2 = /f\s+((([\d]{1,}\/[\d]{1,}[\s]?){3,})+)/;
   // f vertex/uvs/normal vertex/uvs/normal vertex/uvs/normal ...
 
-  public facePattern3 = /f\s+((([\d]{1,}\/[\d]{1,}\/[\d]{1,}[\s]?){3,})+)/;
+  private facePattern3 = /f\s+((([\d]{1,}\/[\d]{1,}\/[\d]{1,}[\s]?){3,})+)/;
   // f vertex//normal vertex//normal vertex//normal ...
 
-  public facePattern4 = /f\s+((([\d]{1,}\/\/[\d]{1,}[\s]?){3,})+)/;
+  private facePattern4 = /f\s+((([\d]{1,}\/\/[\d]{1,}[\s]?){3,})+)/;
 
   private collectTriangle(faces: string[]): string[] {
     const triangles = [];
@@ -254,6 +261,9 @@ export class OBJLoader {
 
         //Define a mesh or an object
         //Each time this keyword is analysed, create a new Object with all data for creating a babylonMesh
+      } else {
+        //If there is another possibility
+        console.log("Unhandled expression at line : " + line);
       }
 
     }
