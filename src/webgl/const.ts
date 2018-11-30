@@ -12,7 +12,7 @@ export const enum CullSide {
 }
 
 export const enum DepthFunction {
-  NeverDepth = 0,
+  NeverDepth = 99,
   AlwaysDepth = 1,
   LessDepth = 2,
   LessEqualDepth = 3,
@@ -29,6 +29,11 @@ export const enum BlendingMode {
   SubtractiveBlending = 3,
   MultiplyBlending = 4,
   CustomBlending = 5,
+}
+
+export const enum GLTextureType {
+  texture2D = 0x0DE1,
+  textureCubeMap = 0x8513,
 }
   
 export var FrontFaceDirectionCW = 0;

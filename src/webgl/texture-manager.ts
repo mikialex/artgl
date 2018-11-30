@@ -1,18 +1,55 @@
 import { GLRenderer } from "./webgl-renderer";
 import { generateUUID } from "../math/uuid";
+import { GLTextureType } from "./const";
+
+interface textureBindInfo {
+  type: GLTextureType,
+  texture: WebGLTexture
+}
 
 export class GLTextureManager{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
   }
-  renderer: GLRenderer;
+  readonly renderer: GLRenderer;
+  readonly gl: WebGLRenderingContext;
   private textures: { [index: string]: WebGLTexture } = {};
+
+  activeTexture(slot: number) {
+    if ( this.currentTextureSlot !== slot ) {
+      this.gl.activeTexture(slot);
+			this.currentTextureSlot = slot;
+		}
+  }
+
+  private currentTextureSlot = null;
+  private currentBindTextures: textureBindInfo[];
+  bindTexture(webglType: GLTextureType, webglTexture: WebGLTexture ) {
+		if ( this.currentTextureSlot === null ) {
+			this.activeTexture(0);
+		}
+		let boundTexture = this.currentBindTextures[ this.currentTextureSlot ];
+		if ( boundTexture === undefined ) {
+			boundTexture = { type: undefined, texture: undefined };
+      this.currentBindTextures[this.currentTextureSlot] = boundTexture;
+		}
+		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
+			this.gl.bindTexture( webglType, webglTexture);
+			boundTexture.type = webglType;
+			boundTexture.texture = webglTexture;
+		}
+	}
 
   getGLTexture(storeId: string) {
     return this.textures[storeId];
   }
 
-  createTextureFromImageElement(image: HTMLImageElement) {
+  deleteGLTexture(storeId: string) {
+    const texture = this.getGLTexture(storeId);
+    this.gl.deleteTexture(texture);
+  }
+
+  createTextureFromImageElement(image: HTMLImageElement): string {
     const gl = this.renderer.gl;
     var texture = gl.createTexture();
     if (texture === null) {
@@ -28,5 +65,6 @@ export class GLTextureManager{
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     const id = generateUUID();
     this.textures[id] = texture;
+    return id;
   }
 }

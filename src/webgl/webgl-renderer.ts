@@ -22,13 +22,16 @@ export class GLRenderer {
     this.glInfo.createAllExtension();
     this.devicePixelRatio = window.devicePixelRatio;
     this.state = new GLState(this);
-    this.gl.enable(this.gl.DEPTH_TEST);
   }
   gl: WebGLRenderingContext;
   el: HTMLCanvasElement;
 
   projectionMatrix = new Matrix4();
   glInfo: GLInfo;
+
+  // enable this will cause great performance issue
+  // only enable this when debug draw range issue
+  enableRenderErrorCatch: boolean = false;
 
   width = 100;
   height = 100;
@@ -43,7 +46,7 @@ export class GLRenderer {
 		this.state.setViewport( 0, 0, width * this.devicePixelRatio, height * this.devicePixelRatio );
   }
 
-  state: GLState = new GLState(this);
+  state: GLState;
   activeProgram: Nullable<GLProgram> = null;
   readonly programManager = new GLProgramManager(this);
   readonly textureManger = new GLTextureManager(this);
@@ -93,11 +96,15 @@ export class GLRenderer {
         this.gl.UNSIGNED_SHORT,
         0
       );
-      if (this.gl.getError() !== this.gl.NO_ERROR) {
-        throw 'err';
-      }
     } else {
       this.gl.drawArrays(mode, this.activeProgram.drawFrom, this.activeProgram.drawCount);
+    }
+
+    if (this.enableRenderErrorCatch) {
+      const errorCode = this.gl.getError();
+      if ( errorCode !== this.gl.NO_ERROR) {
+        throw `gl draw error: ${ errorCode }`;
+      }
     }
   }
 
