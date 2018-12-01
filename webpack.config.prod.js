@@ -4,7 +4,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 var ROOT_PATH = path.resolve(__dirname);
 var APP_PATH = path.resolve(ROOT_PATH, 'src');
-var BUILD_PATH = path.resolve(ROOT_PATH, 'dist');
+var BUILD_PATH = path.resolve(ROOT_PATH, 'package');
 
 module.exports = {
   entry: {

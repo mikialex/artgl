@@ -35,6 +35,23 @@ export const enum GLTextureType {
   texture2D = 0x0DE1,
   textureCubeMap = 0x8513,
 }
+
+
+export enum TextureFilter {
+  linear,
+  nearest,
+  NEAREST_MIPMAP_NEAREST,
+  LINEAR_MIPMAP_NEAREST,
+  NEAREST_MIPMAP_LINEAR,
+  LINEAR_MIPMAP_LINEAR
+}
+
+export enum TextureWrap {
+  repeat,
+  clampToEdge,
+  mirroredRepeat
+}
+
   
 export var FrontFaceDirectionCW = 0;
 export var FrontFaceDirectionCCW = 1;

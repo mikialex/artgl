@@ -1,20 +1,21 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
+    "outDir": "./dist/src",
     "sourceMap": true,
     "module": "es6",
     "target": "es6",
     "jsx": "react",
-    "allowJs": true,
+    "declaration": true,
     // "strict": true,
     "lib": [
-      "webworker",
-      "scripthost",
       "es6",
       "dom"
-    ]
-    // "baseUrl": "./src"
+    ],
+    "baseUrl": "./src"
   },
+  "include": [
+    "src"
+  ],
   "exclude": [
     "node_modules"
   ],

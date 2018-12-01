@@ -1,27 +1,28 @@
 {
   "name": "artgl",
   "version": "0.0.1-alpha",
-  "description": "",
-  "main": "artigl.js",
+  "description": "webgl renderer",
+  "main": "src/artigl.js",
+	"types": "src/artgl.d.ts",
   "scripts": {
     "dev": "npx webpack-dev-server --port 8000 --config webpack.config.dev.js",
-    "package": "npx webpack --config webpack.config.prod.js"
+    "package": "npx webpack --config webpack.config.prod.js",
+    "buildsrc": "npx tsc --build",
+    "build": "node ./script/build.js"
   },
   "author": "mikialex",
   "license": "MIT",
   "devDependencies": {
     "html-webpack-plugin": "^2.29.0",
-    "mocha": "^4.1.0",
     "ts-loader": "^2.2.2",
     "tslint": "^5.8.0",
-    "typescript": "^2.9",
+    "typescript": "^3.1",
     "webpack": "^3.1.0",
     "webpack-dev-server": "^2.5.1",
-    "webpack-glsl-loader": "^1.0.1"
-  },
-  "dependencies": {
     "clean-webpack-plugin": "^0.1.18",
     "friendly-errors-webpack-plugin": "^1.7.0",
     "webpack-bundle-analyzer": "^2.13.1"
+  },
+  "dependencies": {
   }
 }

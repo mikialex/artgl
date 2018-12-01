@@ -72,9 +72,9 @@ export class Interactor{
 
   private onMouseWheel = (event: MouseWheelEvent) => {
     let delta = 0;
-    if (event.wheelDelta !== void 0) {
+    if ((event as any).wheelDelta !== void 0) {
       // WebKit / Opera / Explorer 9
-      delta = event.wheelDelta;
+      delta = (event as any).wheelDelta;
     } else if (event.deltaY !== void 0) {
       // Firefox
       delta = -event.deltaY;

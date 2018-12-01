@@ -2,7 +2,7 @@ import { Controler } from "./controler";
 import { Spherical } from "../math/spherical";
 import { Interactor } from "./interactor";
 import { Vector2 } from "../math/vector2";
-import { Vector3, MathUtil } from "../math";
+import { Vector3, MathUtil } from "../math/index";
 import { PerspectiveCamera } from "../camera/perspective-camera";
 
 const MaxPolarAngle = 179 / 180 * Math.PI;

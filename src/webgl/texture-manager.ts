@@ -1,6 +1,6 @@
 import { GLRenderer } from "./webgl-renderer";
 import { generateUUID } from "../math/uuid";
-import { GLTextureType } from "./const";
+import { GLTextureType, TextureFilter, TextureWrap } from "./const";
 
 interface textureBindInfo {
   type: GLTextureType,
@@ -51,7 +51,7 @@ export class GLTextureManager{
 
   createTextureFromImageElement(image: HTMLImageElement): string {
     const gl = this.renderer.gl;
-    var texture = gl.createTexture();
+    const texture = gl.createTexture();
     if (texture === null) {
       throw 'webgl texture create fail';
     }
@@ -67,4 +67,26 @@ export class GLTextureManager{
     this.textures[id] = texture;
     return id;
   }
+
+  private createTexture(config: TextureDescriptor) {
+    const gl = this.renderer.gl;
+    const texture = gl.createTexture();
+    switch (config.minFilter) {
+      case TextureFilter.linear:
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        break;
+      case TextureFilter.nearest:
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+interface TextureDescriptor {
+  minFilter: TextureFilter;
+  maxFilter: TextureFilter;
+  sWrap: TextureWrap;
+  tWrap: TextureWrap;
 }
