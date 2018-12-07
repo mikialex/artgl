@@ -12,6 +12,7 @@ export { BufferData } from "./core/buffer-data";
 
 // geometry lib
 export { SphereGeometry } from "./geometry/geo-lib/sphere-geometry";
+export { TestGeometry } from "./geometry/test-geometery";
 
 // material lib
 export { TestMaterial } from "./material/test-material";

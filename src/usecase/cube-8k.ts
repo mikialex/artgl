@@ -1,15 +1,13 @@
-import { GLRenderer, ARTEngine, PerspectiveCamera, SphereGeometry, TestMaterial, Mesh, Interactor, OrbitController } from "../artgl";
-
-import { TestGeometry } from "../geometry/test-geometery";
+import ARTGL from '../export';
 
 export default function() {
   let canv = document.querySelector('canvas') as HTMLCanvasElement; 
   const width = canv.clientWidth;
   const height = canv.clientHeight;
-  let renderer = new GLRenderer(canv);
+  let renderer = new ARTGL.GLRenderer(canv);
   renderer.setSize(width, height);
-  const engine = new ARTEngine(renderer);
-  const camera = new PerspectiveCamera();
+  const engine = new ARTGL.ARTEngine(renderer);
+  const camera = new ARTGL.PerspectiveCamera();
 
   camera.aspect = width / height;
   camera.position.set(0, 0, 10);
@@ -18,18 +16,18 @@ export default function() {
   engine.updateViewProjection(camera);
 
 
-  let testGeo = new TestGeometry();
-  let testGeoSphere = new SphereGeometry(1,20,20);
-  let testMat = new TestMaterial();
+  let testGeo = new ARTGL.TestGeometry();
+  let testGeoSphere = new ARTGL.SphereGeometry(1,20,20);
+  let testMat = new ARTGL.TestMaterial();
 
-  const meshes: Mesh[] = [];
+  const meshes: ARTGL.Mesh[] = [];
   for (let i = 0; i < 20; i++) {
     for (let j = 0; j < 20; j++) {
       for (let k = 0; k < 20; k++) {
       // let testGeo2 = new TestGeometry();
       // const testMesh = new Mesh(testGeo2, testMat);
 
-      const testMesh = new Mesh(testGeo, testMat);
+      const testMesh = new ARTGL.Mesh(testGeo, testMat);
       testMesh.position.set(i, j, k);
       testMesh.scale.set(0.1, 0.1, 0.1);
       testMesh.updateLocalMatrix();
@@ -40,12 +38,8 @@ export default function() {
   }
 
 
-  let testSpere = new Mesh(testGeoSphere, testMat);
-
-
-
-  const myInteractor = new Interactor(canv);
-  const myOrbitControler = new OrbitController(camera);
+  const myInteractor = new ARTGL.Interactor(canv);
+  const myOrbitControler = new ARTGL.OrbitController(camera);
   myOrbitControler.registerInteractor(myInteractor);
 
   let active = false;

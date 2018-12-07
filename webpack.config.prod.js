@@ -8,9 +8,9 @@ var BUILD_PATH = path.resolve(ROOT_PATH, 'package');
 
 module.exports = {
   entry: {
-    app: path.resolve(APP_PATH, 'artgl.ts'),
+    app: path.resolve(APP_PATH, 'export.ts'),
   },
-  // devtool: 'eval-source-map',
+  devtool: 'source-map',
   output: {
     filename: 'artgl.js',
     path: BUILD_PATH
