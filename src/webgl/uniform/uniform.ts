@@ -41,11 +41,11 @@ export class GLUniform<T>{
   }
   private gl: WebGLRenderingContext;
   program: GLProgram;
+  descriptor: UniformDescriptor<T>;
   location: WebGLUniformLocation;
   value: T;
   lastReceiveData: uniformUploadType;
   receiveData: uniformUploadType;
-  descriptor: UniformDescriptor<T>;
   private setter: (gl: WebGLRenderingContext, localtion: WebGLUniformLocation, data: uniformUploadType) => void;
   private flattener: flattenerType
   private differ;

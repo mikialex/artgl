@@ -24,8 +24,3 @@ ArtGL is underdeveloping next generation advance webGL framework .
 
 ## DevDesigns
 
-[material sys](./src/material/dev-design.md)
-
-[renderGraph](./src/render-graph/dev-design.md)
-
-[Reactive Scene](./src/store/dev-design.md)

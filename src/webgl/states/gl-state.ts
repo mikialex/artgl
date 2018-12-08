@@ -3,6 +3,7 @@ import { Vector4 } from "../../math/vector4";
 import { CullSide } from "../const";
 import { GLColorBuffer } from "./gl-color-buffer";
 import { GLDepthBuffer } from "./gl-depth-buffer";
+import { GLTextureSlot } from "./gl-texture-slot";
 
 export class GLState{
   constructor(renderer: GLRenderer) {
@@ -10,11 +11,13 @@ export class GLState{
     this.gl = renderer.gl;
     this.colorbuffer = new GLColorBuffer(renderer);
     this.depthbuffer = new GLDepthBuffer(renderer);
+    this.textureSlot = new GLTextureSlot(renderer);
   }
   readonly renderer: GLRenderer;
   readonly gl: WebGLRenderingContext;
   readonly colorbuffer: GLColorBuffer;
   readonly depthbuffer: GLDepthBuffer;
+  readonly textureSlot: GLTextureSlot;
 
   currentViewport: Vector4 = new Vector4();
   newViewport: Vector4 = new Vector4();

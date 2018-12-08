@@ -27,10 +27,14 @@ var PARAMETER_NAMES = [
 export class GLInfo{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
+    const gl = renderer.gl;
+	  this. maxTextures = gl.getParameter( gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS );
   }
   renderer: GLRenderer;
-  private extensions: {[index: string]: any} = {}
-  private parameters: {[index: string]: any} = {}
+  private extensions: { [index: string]: any } = {}
+  private parameters: { [index: string]: any } = {}
+  
+  maxTextures: number;
 
   createExtension(name: string) {
     const gl = this.renderer.gl;

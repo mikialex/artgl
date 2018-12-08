@@ -5,6 +5,7 @@ import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLD
 import { GLUniform, UniformDescriptor } from "./uniform/uniform";
 import { AttributeDescriptor, GLAttribute, AttributeUsage } from "./attribute";
 import { Nullable } from "../type";
+import { GLTexture, TextureDescriptor } from "./gl-texture";
 
 export interface VaryingDescriptor {
   name: string,
@@ -15,6 +16,7 @@ export interface GLProgramConfig {
   attributes: AttributeDescriptor[];
   uniforms?: UniformDescriptor<any>[];
   varyings?: VaryingDescriptor[];
+  textures?: TextureDescriptor[];
   vertexShaderString: string;
   fragmentShaderString: string;
   autoInjectHeader: boolean
@@ -56,6 +58,7 @@ export class GLProgram {
   private attributes: { [index: string]: GLAttribute } = {};
   private attributeUsageMap: { [index: number]: GLAttribute } = {};
   private uniforms: { [index: string]: GLUniform<any> } = {};
+  private textures: { [index: string]: GLTexture };
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
   drawFrom: number = 0;
@@ -98,6 +101,11 @@ export class GLProgram {
     if (config.uniforms !== undefined) {
       config.uniforms.forEach(uni => {
         this.uniforms[uni.name] = new GLUniform(this, uni)
+      })
+    }
+    if (config.textures !== undefined) {
+      config.textures.forEach(tex => {
+        this.textures[tex.name] = new GLTexture(this, tex);
       })
     }
   }

@@ -1,12 +1,14 @@
 import { GLRenderer } from "./webgl-renderer";
 import { generateUUID } from "../math/uuid";
-import { GLTextureType, TextureFilter, TextureWrap } from "./const";
+import { TextureFilter, TextureWrap } from "./const";
 
-interface textureBindInfo {
-  type: GLTextureType,
-  texture: WebGLTexture
-}
-
+/**
+ * responsible for webgltexture resource allocation and deallocation
+ * outside request create webgltexture from given source or description
+ * 
+ * @export
+ * @class GLTextureManager
+ */
 export class GLTextureManager{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
@@ -14,31 +16,6 @@ export class GLTextureManager{
   readonly renderer: GLRenderer;
   readonly gl: WebGLRenderingContext;
   private textures: { [index: string]: WebGLTexture } = {};
-
-  activeTexture(slot: number) {
-    if ( this.currentTextureSlot !== slot ) {
-      this.gl.activeTexture(slot);
-			this.currentTextureSlot = slot;
-		}
-  }
-
-  private currentTextureSlot = null;
-  private currentBindTextures: textureBindInfo[];
-  bindTexture(webglType: GLTextureType, webglTexture: WebGLTexture ) {
-		if ( this.currentTextureSlot === null ) {
-			this.activeTexture(0);
-		}
-		let boundTexture = this.currentBindTextures[ this.currentTextureSlot ];
-		if ( boundTexture === undefined ) {
-			boundTexture = { type: undefined, texture: undefined };
-      this.currentBindTextures[this.currentTextureSlot] = boundTexture;
-		}
-		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
-			this.gl.bindTexture( webglType, webglTexture);
-			boundTexture.type = webglType;
-			boundTexture.texture = webglTexture;
-		}
-	}
 
   getGLTexture(storeId: string) {
     return this.textures[storeId];
