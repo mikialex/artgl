@@ -1,5 +1,7 @@
 import { BufferData } from "./buffer-data";
 import { AttributeUsage } from "../webgl/attribute";
+import { Box3 } from "../math/entity/box3";
+import { Sphere } from "../math/entity/sphere";
 
 interface LayoutInfo{
   usage: AttributeUsage,
@@ -21,22 +23,34 @@ export interface GeometryDataLayout {
  * @export
  * @class Geometry
  */
-export class Geometry {
+export abstract class Geometry {
   constructor() {
   }
-  bufferDatas: { [index: string]: BufferData } = {};
+  readonly bufferDatas: { [index: string]: BufferData } = {};
   layout: GeometryDataLayout;
   needUpdate: boolean = true;
-  parameters: any;
+
+  _AABBBox: Box3 = new Box3();
+  abstract updateAABBBox(): void;
+  get AABBBox(): Box3 {
+    if (this.needUpdate) {
+      this.updateAABBBox();
+    }
+    return this._AABBBox;
+  }
+
+  _boundingShere: Sphere = new Sphere();
+  abstract updateBoundingShere(): void;
+  get boundingShere(): Sphere {
+    return this._boundingShere;
+  }
 
   /**
    * creat or update the geometry's data in bufferdatas
    * 
    * @memberof Geometry
    */
-  populate() {
-    throw 'geometry not implemented'
-  }
+  abstract populate(): void;
 
   dispose() {
 

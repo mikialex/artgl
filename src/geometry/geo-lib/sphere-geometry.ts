@@ -48,6 +48,9 @@ export class SphereGeometry extends Geometry {
   thetaLength = Math.PI * 2;
   thetaEnd: number;
 
+  updateBoundingShere() { }
+  updateAABBBox() { }
+
   populate() {
 
     let ix, iy;

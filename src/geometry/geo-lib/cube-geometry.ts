@@ -27,6 +27,9 @@ export class CubeGeometry extends Geometry {
     heightSegments: 1,
     depthSegments: 1,
   }
+  
+  updateBoundingShere() { }
+  updateAABBBox() { }
 
   populate() {
     const position = [];

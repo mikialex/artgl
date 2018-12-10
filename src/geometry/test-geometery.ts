@@ -23,6 +23,9 @@ export class TestGeometry extends Geometry {
     this.populate();
   }
 
+  updateBoundingShere() { }
+  updateAABBBox() { }
+
   populate() {
     const positionBuffer = new Float32Array([
       -1.0,-1.0,-1.0, // triangle 1 : begin

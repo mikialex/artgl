@@ -4,6 +4,7 @@ import { Vector2 } from "../math/vector2";
 import { loadStringFromFile } from "../util/file-io";
 import { Float32BufferData, Uint16BufferData } from "../core/buffer-data";
 import { generateNormalFromPostion } from "../util/normal-generation";
+import { StandradGeometry } from "../geometry/standrad-geometry";
 
 export async function loadObjFile(): Promise<Geometry> {
   const loader = new OBJLoader();
@@ -269,7 +270,7 @@ export class OBJLoader {
       }
 
     }
-    const geometry = new Geometry();
+    const geometry = new StandradGeometry();
     const position = [];
     this.wrappedPositionForBabylon.forEach(po => {
       position.push(po.x);

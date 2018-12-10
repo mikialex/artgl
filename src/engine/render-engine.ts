@@ -94,7 +94,7 @@ export class ARTEngine {
         const bufferData = geometry.bufferDatas[infoKey];
         let glBuffer = this.getGLAttributeBuffer(bufferData);
         if (glBuffer === undefined) {
-          glBuffer = this.createAttributeBuffer(bufferData, false);
+          glBuffer = this.createOrUpdateAttributeBuffer(bufferData, false);
         }
         program.getAttributeByUsage(usage).useBuffer(glBuffer);
       }
@@ -111,7 +111,7 @@ export class ARTEngine {
       program.useIndexDraw = true;
       let glIndexBuffer = this.getGLAttributeBuffer(indexBuffer);
       if (glIndexBuffer === undefined) {
-        glIndexBuffer = this.createAttributeBuffer(indexBuffer, true);
+        glIndexBuffer = this.createOrUpdateAttributeBuffer(indexBuffer, true);
       }
       program.useIndexBuffer(glIndexBuffer);
     } else {
@@ -142,13 +142,11 @@ export class ARTEngine {
   }
 
   getGLAttributeBuffer(bufferData: BufferData): WebGLBuffer {
-    return this.renderer.getBuffer(bufferData.storeId);
+    return this.renderer.attributeBufferManager.getGLBuffer(bufferData.data.buffer as ArrayBuffer);
   }
 
-  createAttributeBuffer(bufferData: BufferData, useforIndex: boolean): WebGLBuffer {
-    const id = this.renderer.createBuffer(bufferData.data.buffer, useforIndex);
-    bufferData.storeId = id;
-    return this.renderer.getBuffer(id);
+  createOrUpdateAttributeBuffer(bufferData: BufferData, useforIndex: boolean): WebGLBuffer {
+    return this.renderer.attributeBufferManager.updateOrCreateBuffer(bufferData.data.buffer as ArrayBuffer, useforIndex);
   }
 
 }

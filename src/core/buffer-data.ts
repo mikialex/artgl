@@ -14,7 +14,6 @@ export class BufferData{
   }
   data: BufferDataType;
   shouldUpdate = true;
-  storeId: string;
 
   setIndex(index: number, value: number) {
     this.shouldUpdate = true;

@@ -72,19 +72,6 @@ export class GLRenderer {
     return this.textureManger.getGLTexture(storeId);
   }
 
-  
-  createBuffer(data: ArrayBuffer, useforIndex: boolean): string {
-    return this.attributeBufferManager.createBuffer(data, useforIndex);
-  }
-
-  getBuffer(storeId: string) {
-    return this.attributeBufferManager.getGLBuffer(storeId);
-  }
-
-  deleteBuffer(storeId: string) {
-    this.attributeBufferManager.disposeBuffer(storeId);
-  }
-
   render(mode: DrawMode, useIndex: boolean) {
     if (this.activeProgram === null) {
       throw 'renderer hasnt active program'

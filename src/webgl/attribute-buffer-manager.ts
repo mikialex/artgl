@@ -1,18 +1,17 @@
 import { GLRenderer } from "./webgl-renderer";
-import { generateUUID } from "../math/uuid";
 
 export class GLAttributeBufferDataManager {
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
   }
-  renderer: GLRenderer;
-  buffers: { [index: string]: WebGLBuffer } = {};
+  readonly renderer: GLRenderer;
+  private buffers: WeakMap<ArrayBuffer, WebGLBuffer> = new WeakMap();
 
-  getGLBuffer(storeId: string) {
-    return this, this.buffers[storeId];
+  getGLBuffer(arraybuffer: ArrayBuffer): WebGLBuffer {
+    return this.buffers.get(arraybuffer);
   }
 
-  createBuffer(data: ArrayBuffer, useForIndex: boolean): string {
+  createBuffer(data: ArrayBuffer, useForIndex: boolean): WebGLBuffer {
     const gl = this.renderer.gl;
     const buffer = gl.createBuffer();
     if (buffer === null) {
@@ -25,26 +24,30 @@ export class GLAttributeBufferDataManager {
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
       gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
     }
-    const id = generateUUID();
-    this.buffers[id] = buffer;
-    return id;
+    this.buffers.set(data, buffer);
+    return buffer;
   }
 
-  disposeBuffer(storeId: string) {
-    const bufferToDispose = this.buffers[storeId];
-    if (!bufferToDispose) {
+  disposeBuffer(data: ArrayBuffer) {
+    if (!this.buffers.has(data)) {
       throw 'cant find buffer to dispose';
     }
     const gl = this.renderer.gl;
-    gl.deleteBuffer(bufferToDispose);
+    const buffer = this.buffers.get(data);
+    gl.deleteBuffer(buffer);
+    this.buffers.delete(data);
+  }
+
+  updateOrCreateBuffer(data: ArrayBuffer, useForIndex: boolean): WebGLBuffer {
+    if (!this.buffers.has(data)) {
+      return this.createBuffer(data, useForIndex);
+    }
+    this.disposeBuffer(data);
+    this.createBuffer(data, useForIndex);
   }
 
   dispose() {
-    const gl = this.renderer.gl;
-    Object.keys(this.buffers).forEach(key => {
-      const buffer = this.buffers[key];
-      gl.deleteBuffer(buffer);
-    })
+    this.buffers = null;
   }
 
 }
