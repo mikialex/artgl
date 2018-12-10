@@ -30,3 +30,16 @@ export async function loadStringFromFile() {
   const str = await getStringContentFromFile(file);
   return str;
 }
+
+export async function loadImageFromURL(url: string) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.src = url;
+    image.onload = () => {
+      resolve(image);
+    };
+    image.onerror = (err) => {
+      reject(err);
+    }
+  })
+}

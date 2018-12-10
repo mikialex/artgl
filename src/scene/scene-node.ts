@@ -45,10 +45,13 @@ export class SceneNode {
   }
 
   traverse(fn: (sceneNode: SceneNode) => any) {
-    fn(this);
-    for (let i = 0; i < this.children.length; i++) {
-      fn(this.children[i]);
+    function visit(node: SceneNode) {
+      fn(node);
+      for (let i = 0; i < node.children.length; i++) {
+        visit(node.children[i]);
+      }
     }
+    visit(this);
   }
 
   updateWorldMatrix(force?: boolean): void {
