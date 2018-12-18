@@ -2,6 +2,11 @@ import { Geometry } from "./geometry";
 import { Material } from "./material";
 import { SceneNode } from "../scene/scene-node";
 
+export interface Range{
+
+}
+
+
 /**
  * render drawcall decription 
  * which is decribe all drawable things
@@ -22,6 +27,7 @@ export class RenderObject extends SceneNode{
 
   geometry: Geometry;
   material: Material;
+  ranger: Range
 
   renderOrder: number;
 }

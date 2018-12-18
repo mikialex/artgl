@@ -38,6 +38,7 @@ export class OBJLoader {
     this.getTriangles(faces, 1, triangles);
     return triangles;
   }
+
   private getTriangles(face: string[], v: number, triangleList: string[]) {
     //Work for each element of the array
     //Result obtained after 2 iterations:
@@ -67,13 +68,12 @@ export class OBJLoader {
   private tuplePosNorm: Array<{ normals: Array<number>; idx: Array<number> }> = [];
   private curPositionInIndices: number = 0;
 
-  private isInArray(obj: Array<number>) {
-    const arr = this.tuplePosNorm;
-    if (!arr[obj[0]]) {
-      arr[obj[0]] = { normals: [], idx: [] };
+  private isInArray(position: number, normal: number) {
+    if (!this.tuplePosNorm[position]) {
+      this.tuplePosNorm[position] = { normals: [], idx: [] };
     }
-    const idx = arr[obj[0]].normals.indexOf(obj[1]);
-    return idx === -1 ? -1 : arr[obj[0]].idx[idx];
+    const idx = this.tuplePosNorm[position].normals.indexOf(normal);
+    return idx === -1 ? -1 : this.tuplePosNorm[position].idx[idx];
     ``
   };
 
@@ -86,10 +86,10 @@ export class OBJLoader {
     normalsVectorFromOBJ: Vector3
   ) {
     //Check if this tuple already exists in the list of tuples
-    const index = this.isInArray([indicePositionFromObj, indiceNormalFromObj]);
-
+    const index = this.isInArray(indicePositionFromObj, indiceNormalFromObj);
+    
     //If it not exists
-    if (index == -1) {
+    if (index === -1) {
       //Add an new indice.
       //The array of indices is only an array with his length equal to the number of triangles - 1.
       //We add vertices data in this order
@@ -105,7 +105,8 @@ export class OBJLoader {
       this.wrappedNormalsForBabylon.push(normalsVectorFromOBJ);
       //Add the tuple in the comparison list
       this.tuplePosNorm[indicePositionFromObj].normals.push(indiceNormalFromObj);
-      this.tuplePosNorm[indicePositionFromObj].idx.push(this.curPositionInIndices++);
+      this.tuplePosNorm[indicePositionFromObj].idx.push(this.curPositionInIndices);
+      this.curPositionInIndices++
     } else {
       //The tuple already exists
       //Add the index of the already existing tuple
@@ -288,9 +289,15 @@ export class OBJLoader {
     const normalBuffer = new Float32Array(normal);
     const indexBuffer = new Uint16Array(this.indicesForBabylon);
     geometry.bufferDatas.position = new Float32BufferData(positionBuffer);
-    geometry.bufferDatas.normal = new Float32BufferData(normalBuffer);
-    // geometry.bufferDatas.normal = new Float32BufferData(generateNormalFromPostion(positionBuffer));
+    const useGeneraetNormal = true;
+    if (useGeneraetNormal) {
+      geometry.bufferDatas.normal = new Float32BufferData(generateNormalFromPostion(positionBuffer));
+    } else {
+      geometry.bufferDatas.normal = new Float32BufferData(normalBuffer);
+    }
     geometry.bufferDatas.index = new Uint16BufferData(indexBuffer);
+    console.log('indexlength:' + indexBuffer.length);
+    console.log('positionBuffer:' + positionBuffer.length);
     geometry.layout = {
       dataInfo: defaultGeometryLayoutDataInfo,
       drawCount: indexBuffer.length,
