@@ -1,5 +1,5 @@
 
-import { Geometry } from '../../core/geometry';
+import { Geometry, defaultGeometryLayoutDataInfo } from '../../core/geometry';
 import { Vector3 } from '../../math/index';
 import { AttributeUsage } from '../../webgl/attribute';
 import { Float32BufferData, Uint16BufferData } from '../../core/buffer-data';
@@ -19,20 +19,7 @@ export class SphereGeometry extends Geometry {
     this.thetaEnd = this.thetaStart + this.thetaLength;
 
     this.layout = {
-      dataInfo: {
-        index: {
-          usage: AttributeUsage.index,
-          stride: 1
-        },
-        position: {
-          usage: AttributeUsage.position,
-          stride: 3
-        },
-        normal: {
-          usage: AttributeUsage.normal,
-          stride: 3
-        }
-      },
+      dataInfo: defaultGeometryLayoutDataInfo,
       drawFrom: 0,
       drawCount: 36,
       indexDraw: true
@@ -104,8 +91,12 @@ export class SphereGeometry extends Geometry {
     const normalBuffer = new Float32BufferData(new Float32Array(normals));
     this.bufferDatas.normal = normalBuffer;
 
+    const uvBuffer = new Float32BufferData(new Float32Array(uvs));
+    this.bufferDatas.uv = uvBuffer;
+
     const indexBuffer = new Uint16BufferData(new Uint16Array(indices));
     this.bufferDatas.index = indexBuffer;
+
     this.layout.drawCount = indices.length;
 
   }

@@ -58,6 +58,21 @@ export abstract class Geometry {
 
 }
 
+export const defaultNoTexGeometryLayoutDataInfo = {
+  position: {
+    usage: AttributeUsage.position,
+    stride: 3
+  },
+  normal: {
+    usage: AttributeUsage.normal,
+    stride: 3
+  },
+  index: {
+    usage: AttributeUsage.index,
+    stride: 1
+  },
+}
+
 export const defaultGeometryLayoutDataInfo = {
   position: {
     usage: AttributeUsage.position,
@@ -66,6 +81,10 @@ export const defaultGeometryLayoutDataInfo = {
   normal: {
     usage: AttributeUsage.normal,
     stride: 3
+  },
+  uv: {
+    usage: AttributeUsage.uv,
+    stride: 2
   },
   index: {
     usage: AttributeUsage.index,

@@ -1,4 +1,4 @@
-import { Geometry, defaultGeometryLayoutDataInfo } from "../core/geometry";
+import { Geometry, defaultNoTexGeometryLayoutDataInfo } from "../core/geometry";
 import { Vector3 } from "../math/vector3";
 import { Vector2 } from "../math/vector2";
 import { loadStringFromFile } from "../util/file-io";
@@ -299,7 +299,7 @@ export class OBJLoader {
     console.log('indexlength:' + indexBuffer.length);
     console.log('positionBuffer:' + positionBuffer.length);
     geometry.layout = {
-      dataInfo: defaultGeometryLayoutDataInfo,
+      dataInfo: defaultNoTexGeometryLayoutDataInfo,
       drawCount: indexBuffer.length,
       drawFrom: 0,
       indexDraw: true,

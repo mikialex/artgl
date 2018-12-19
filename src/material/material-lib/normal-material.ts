@@ -1,7 +1,7 @@
-import { Material, standradMeshAttributeLayout } from "../core/material";
-import { GLDataType } from "../webgl/shader-util";
-import { Matrix4 } from "../math/index";
-import { AttributeUsage } from "../webgl/attribute";
+import { Material } from "../../core/material";
+import { GLDataType } from "../../webgl/shader-util";
+import { AttributeUsage } from "../../webgl/attribute";
+import { Matrix4 } from "../../math/matrix4";
 
 const vertexShaderSource =
   `
@@ -19,7 +19,6 @@ const fragmentShaderSource =
     }
     `
 
-
 export class TestMaterial extends Material{
   constructor() {
     const config = {
@@ -27,7 +26,7 @@ export class TestMaterial extends Material{
         attributes: [
           { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
           { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal, stride: 3 },
-          { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
+          // { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
         ],
         uniforms: [
           { name: 'MMatrix', type: GLDataType.Mat4 , default: new Matrix4()},

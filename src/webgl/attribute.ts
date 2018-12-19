@@ -24,6 +24,7 @@ export class GLAttribute {
     const prog = this.program.getProgram();
     this.location = this.gl.getAttribLocation(prog, descriptor.name);
     this.type = descriptor.type;
+    this.isActive = this.location !== -1;
   }
   readonly gl: WebGLRenderingContext;
   readonly program: GLProgram;
@@ -31,9 +32,12 @@ export class GLAttribute {
   readonly descriptor: AttributeDescriptor;
   readonly type: GLDataType;
   readonly count: number = 0;
-  readonly stride: number = 1;
+  readonly isActive: boolean;
 
   useBuffer(buffer: WebGLBuffer) {
+    if (!this.isActive) {
+      return;
+    }
     const gl = this.gl;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.vertexAttribPointer(this.location, this.descriptor.stride, gl.FLOAT, false, 0, 0);

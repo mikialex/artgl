@@ -96,12 +96,15 @@ export class ARTEngine {
         if (glBuffer === undefined) {
           glBuffer = this.createOrUpdateAttributeBuffer(bufferData, false);
         }
-        program.getAttributeByUsage(usage).useBuffer(glBuffer);
+        const attribute = program.getAttributeByUsage(usage);
+        if (attribute !== undefined) { // some buffer may not need to be used by shader
+          attribute.useBuffer(glBuffer);
+        }
       }
 
       if (usage === AttributeUsage.index) {
         if (indexBuffer !== undefined) {
-          throw 'only can set one index buffer';
+          throw 'geometry only can set one index buffer';
         }
         indexBuffer = geometry.bufferDatas[infoKey];
       }

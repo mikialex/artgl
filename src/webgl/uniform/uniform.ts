@@ -23,11 +23,7 @@ export class GLUniform<T>{
     this.gl = program.getRenderer().gl;
     const glProgram = program.getProgram();
     const location = this.gl.getUniformLocation(glProgram, descriptor.name);
-    if (location === null) {
-      // if you declare a uniform , but not realy used in shader
-      // that will may cause null location
-      console.warn('create uniform fail: ', descriptor.name);
-    }
+    this.isActive = location !== null;
     this.location = location;
     this.setter = findUniformSetter(descriptor.type);
     this.differ = findUniformDiffer(descriptor.type);
@@ -50,8 +46,12 @@ export class GLUniform<T>{
   private flattener: flattenerType
   private differ;
   private copyer;
+  isActive: boolean;
 
-  set(value: T) {
+  set(value: T): void {
+    if (!this.isActive) {
+      return;
+    }
     this.receiveData = this.flattener(value, this.receiveData);
 
     if (this.lastReceiveData === undefined) { // this uniform never uploadever
