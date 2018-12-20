@@ -23,28 +23,27 @@ export class GLTexture{
     this.gl = program.getRenderer().gl;
     const glProgram = program.getProgram();
     const location = this.gl.getUniformLocation(glProgram, descriptor.name);
-    if (location === null) {
-      // if you declare a uniform , but not realy used in shader
-      // that will may cause null location
-      console.warn('create texture uniform fail: ', descriptor.name);
-    }
+    this.isActive = location !== null;
     this.location = location;
     this.currentActiveSlot = -1;
   }
   private gl: WebGLRenderingContext;
-  program: GLProgram;
-  descriptor: TextureDescriptor;
-  location: WebGLUniformLocation;
+  private program: GLProgram;
+  readonly descriptor: TextureDescriptor;
+  private location: WebGLUniformLocation;
+  isActive: boolean;
+
 
   webgltexture: Nullable<WebGLTexture> = null;
   currentActiveSlot: number;
 
   useTexture(renderer: GLRenderer, textureDataStoreId: string): void {
-    const webgltexture = renderer.textureManger.getGLTexture(textureDataStoreId);
-    let textureSlot = renderer.state.textureSlot.findSlot(webgltexture);
-    if (textureSlot === -1) {
-      textureSlot = renderer.state.textureSlot.updateSlotTexture(webgltexture);
+    if (!this.isActive) {
+      return;
     }
+    const webgltexture = renderer.textureManger.getGLTexture(textureDataStoreId);
+    const textureSlot = renderer.state.textureSlot.updateSlotTexture(webgltexture);
+    this.currentActiveSlot = textureSlot;
     this.gl.uniform1i(this.location, textureSlot);
   }
 }

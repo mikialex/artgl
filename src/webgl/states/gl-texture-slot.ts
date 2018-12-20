@@ -48,11 +48,14 @@ export class GLTextureSlot{
 		}
 	}
 
-  findSlot(webgltexture: WebGLTexture): number {
+  findSlot(webglTexture: WebGLTexture): number {
     return 0;
   }  
 
-  updateSlotTexture(webgltexture: WebGLTexture): number {
-    return 0;
+  updateSlotTexture(webglTexture: WebGLTexture): number {
+    const textureSlotToUpdate = 0;
+    this.activeTexture(textureSlotToUpdate);
+    this.bindTexture(GLTextureType.texture2D, webglTexture);
+    return textureSlotToUpdate;
   }
 }
