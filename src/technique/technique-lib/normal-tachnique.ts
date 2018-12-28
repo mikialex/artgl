@@ -19,7 +19,7 @@ const fragmentShaderSource =
     }
     `
 
-export class TestMaterial extends Technique{
+export class NormalTechnique extends Technique{
   constructor() {
     const config = {
       programConfig:{

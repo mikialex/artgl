@@ -18,7 +18,7 @@ export default function() {
 
   // let testGeo = new ARTGL.TestGeometry();
   let testGeoSphere = new ARTGL.SphereGeometry(1,40,40);
-  let testMat = new ARTGL.TestMaterial();
+  let testMat = new ARTGL.TestTechnique();
   let testSpere = new ARTGL.Mesh(testGeoSphere, testMat)
 
   const myInteractor = new ARTGL.Interactor(canv);

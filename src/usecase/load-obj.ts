@@ -1,4 +1,4 @@
-import { GLRenderer, ARTEngine, PerspectiveCamera, TestMaterial, Mesh, Interactor, OrbitController, SphereGeometry } from "../artgl";
+import { GLRenderer, ARTEngine, PerspectiveCamera, TestTechnique, Mesh, Interactor, OrbitController, SphereGeometry, Material } from "../artgl";
 
 import { loadObjFile } from "../loader/obj-loader";
 
@@ -6,8 +6,9 @@ let mesh;
 
 async function loadObj() {
   const geometry = await loadObjFile();
-  const testMat = new TestMaterial();
-  mesh = new Mesh(geometry, testMat);
+  const testTech = new TestTechnique();
+  const material = new Material();
+  mesh = new Mesh(geometry, material, testTech);
 }
 
 export default function() {
@@ -40,8 +41,8 @@ export default function() {
 
 
   let testGeoSphere = new SphereGeometry(1,20,20);
-  let testMat = new TestMaterial();
-  let testSphere = new Mesh(testGeoSphere, testMat);
+  let testTech = new TestTechnique();
+  let testSphere = new Mesh(testGeoSphere, testTech);
 
   function render() {
     myOrbitControler.update();

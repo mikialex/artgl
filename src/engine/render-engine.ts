@@ -11,6 +11,7 @@ import { AttributeUsage } from "../webgl/attribute";
 import { DrawMode } from "../webgl/const";
 import { Texture } from "../core/texture";
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
+import { Material } from "../core/material";
 
 export class ARTEngineAdaptor {
   constructor(engine: ARTEngine) {
@@ -84,14 +85,21 @@ export class ARTEngine {
     program.setUniform('MMatrix', object.worldMatrix);
     program.setUniform('VPMatrix', this.VPMatrix);
 
+    // prepare material
+    this.connectMaterial(object.material, program);
+
     // prepare geometry
-    this.connectGeometryData(object.geometry, program);
+    this.connectGeometry(object.geometry, program);
 
     // render
     this.renderer.render(DrawMode.TRIANGLES, program.useIndexDraw);
   }
 
-  connectGeometryData(geometry: Geometry, program: GLProgram) {
+  connectMaterial(material: Material, program: GLProgram) {
+    
+  }
+
+  connectGeometry(geometry: Geometry, program: GLProgram) {
     let indexBuffer;
     for (const infoKey in geometry.layout.dataInfo) {
       const usage = geometry.layout.dataInfo[infoKey].usage;

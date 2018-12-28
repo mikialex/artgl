@@ -17,7 +17,7 @@ function mytest() {
   engine.updateViewProjection(camera);
 
   let testGeo = new ARTGL.TestGeometry();
-  let testMat = new ARTGL.TestMaterial();
+  let testTech = new ARTGL.TestTechnique();
 
   const meshes = [];
   for (let i = 0; i < 20; i++) {
@@ -26,7 +26,7 @@ function mytest() {
       // let testGeo2 = new TestGeometry();
       // const testMesh = new Mesh(testGeo2, testMat);
 
-      const testMesh = new ARTGL.Mesh(testGeo, testMat);
+      const testMesh = new ARTGL.Mesh(testGeo, testTech);
       testMesh.position.set(i, j, k);
       testMesh.scale.set(0.1, 0.1, 0.1);
       testMesh.updateLocalMatrix();

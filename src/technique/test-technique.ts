@@ -17,13 +17,14 @@ const vertexShaderSource =
 const fragmentShaderSource =
   `
     void main() {
-      gl_FragColor = vec4(v_uv, 1.0, 1.0);
+      gl_FragColor = texture2D(texture, v_uv);
+      // gl_FragColor = vec4(v_uv, 1.0, 1.0);
       // gl_FragColor = vec4(color * 0.5 + 0.5, 1.0);
     }
     `
 
 
-export class TestMaterial extends Technique{
+export class TestTechnique extends Technique{
   constructor() {
     const config = {
       programConfig:{

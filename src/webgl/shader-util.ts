@@ -77,11 +77,21 @@ export function injectFragmentShaderHeaders(config: GLProgramConfig, shaderText:
   injectText += 'precision highp float;\n';
   injectText = injectText + generateUniformString(config);
   injectText = injectText + generateVaryingString(config);
+  injectText = injectText + generateTextureString(config);
   return injectText + shaderText;
 }
 
+function generateTextureString(config: GLProgramConfig): string {
+  let text = '';
+  if (config.textures !== undefined) {
+    config.textures.forEach(texture => {
+      text = text + 'uniform sampler2D' + ' ' + texture.name + ';\n';
+    })
+  }
+  return text;
+}
 
-function generateAttributeString(config: GLProgramConfig) {
+function generateAttributeString(config: GLProgramConfig): string {
   let text = '';
   if (config.attributes !== undefined) {
     config.attributes.forEach(att => {
@@ -93,7 +103,7 @@ function generateAttributeString(config: GLProgramConfig) {
   return text;
 }
 
-function generateUniformString(config: GLProgramConfig) {
+function generateUniformString(config: GLProgramConfig): string {
   let text = '';
   if (config.uniforms !== undefined) {
 
@@ -106,7 +116,7 @@ function generateUniformString(config: GLProgramConfig) {
   return text;
 }
 
-function generateVaryingString(config: GLProgramConfig) {
+function generateVaryingString(config: GLProgramConfig): string {
   let text = '';
   if (config.varyings !== undefined) {
     config.varyings.forEach(vary => {

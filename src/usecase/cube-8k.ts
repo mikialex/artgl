@@ -17,8 +17,7 @@ export default function() {
 
 
   let testGeo = new ARTGL.TestGeometry();
-  let testGeoSphere = new ARTGL.SphereGeometry(1,20,20);
-  let testMat = new ARTGL.TestMaterial();
+  let testMat = new ARTGL.TestTechnique();
 
   const meshes: ARTGL.Mesh[] = [];
   for (let i = 0; i < 20; i++) {

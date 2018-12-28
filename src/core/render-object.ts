@@ -1,6 +1,7 @@
 import { Geometry } from "./geometry";
 import { Technique } from "./technique";
 import { SceneNode } from "../scene/scene-node";
+import { Material } from "./material";
 
 export interface Range{
 
@@ -19,12 +20,13 @@ export interface Range{
  * @extends {SceneNode}
  */
 export class RenderObject extends SceneNode{
-  constructor(geometry: Geometry, technique: Technique) {
+  constructor(geometry: Geometry, material: Material, technique: Technique) {
     super();
     this.geometry = geometry;
     this.technique = technique;
   }
 
+  material: Material;
   geometry: Geometry;
   technique: Technique;
   ranger: Range

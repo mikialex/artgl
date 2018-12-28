@@ -7,6 +7,7 @@ export { GLProgram } from "./webgl/program";
 export { ARTEngine } from "./engine/render-engine";
 export { Mesh } from "./object/mesh";
 export { Geometry } from "./core/geometry";
+export { Material } from './core/material';
 export { Technique } from "./core/technique";
 export { BufferData } from "./core/buffer-data";
 
@@ -15,7 +16,7 @@ export { SphereGeometry } from "./geometry/geo-lib/sphere-geometry";
 export { TestGeometry } from "./geometry/test-geometery";
 
 // technique lib
-export { TestMaterial } from "./technique/test-technique";
+export { TestTechnique } from "./technique/test-technique";
 
 // math
 export { Matrix4, Quaternion, Vector3 } from "./math/index";
