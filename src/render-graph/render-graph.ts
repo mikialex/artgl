@@ -5,4 +5,12 @@ export class RenderGraph{
 
   }
   composer: EffectComposer
+
+  render() {
+    this.composer.render();
+  }
+
+  setGraph() {
+    
+  }
 }

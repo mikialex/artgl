@@ -13,7 +13,7 @@ export class RenderList{
   transparentCount = 0;
 
   addRenderItem(object: RenderObject, transform: Matrix4) {
-    // if (object.material.isTransparent) {
+    // if (object.technique.isTransparent) {
     //   this.transparentList.push({ object, transform});
     //   this.transparentCount++;
     // } else {

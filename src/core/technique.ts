@@ -17,14 +17,14 @@ export interface MaterialConfig{
 /**
  * mateiral defined how to draw a things
  * typically, one mateiral is corespondent to a gl program
- *  program's shader and infos are defined in material config
- * material config is wrap a program condig
+ *  program's shader and infos are defined in technique config
+ * technique config is wrap a program condig
  * that the engine will use this to tell underlayer gl renderer
  * to create and compiled shader.
  * @export
- * @class Material
+ * @class Technique
  */
-export class Material{
+export class Technique{
   constructor(config: MaterialConfig) {
     // setup default uniform value
     this.config = config;

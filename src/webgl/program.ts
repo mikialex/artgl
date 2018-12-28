@@ -58,7 +58,7 @@ export class GLProgram {
   private attributes: { [index: string]: GLAttribute } = {};
   private attributeUsageMap: { [index: number]: GLAttribute } = {};
   private uniforms: { [index: string]: GLUniform<any> } = {};
-  private textures: { [index: string]: GLTexture };
+  private textures: { [index: string]: GLTexture } = {};
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
   drawFrom: number = 0;

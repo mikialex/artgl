@@ -16,9 +16,10 @@ export default function() {
   engine.updateViewProjection(camera);
 
 
-  let testGeo = new ARTGL.TestGeometry();
-  let testGeoSphere = new ARTGL.SphereGeometry(1,20,20);
+  // let testGeo = new ARTGL.TestGeometry();
+  let testGeoSphere = new ARTGL.SphereGeometry(1,40,40);
   let testMat = new ARTGL.TestMaterial();
+  let testSpere = new ARTGL.Mesh(testGeoSphere, testMat)
 
   const myInteractor = new ARTGL.Interactor(canv);
   const myOrbitControler = new ARTGL.OrbitController(camera);
@@ -36,7 +37,7 @@ export default function() {
     myOrbitControler.update();
     camera.updateWorldMatrix(true);
     engine.updateViewProjection(camera);
-    // engine.renderObject(testSpere);
+    engine.renderObject(testSpere);
   }
 
   window.requestAnimationFrame(tick);

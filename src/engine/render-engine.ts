@@ -6,10 +6,11 @@ import { Matrix4 } from "../math/matrix4";
 import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
-import { Material } from "../core/material";
+import { Technique } from "../core/technique";
 import { AttributeUsage } from "../webgl/attribute";
 import { DrawMode } from "../webgl/const";
 import { Texture } from "../core/texture";
+import { GLFramebuffer } from "../webgl/gl-framebuffer";
 
 export class ARTEngineAdaptor {
   constructor(engine: ARTEngine) {
@@ -48,6 +49,10 @@ export class ARTEngine {
     this.activeCamera = camera;
   }
 
+  setRenderTarget(target: GLFramebuffer) {
+    
+  }
+
   // render renderList
   render() {
     const opaqueList = this.renderList.opaqueList;
@@ -72,9 +77,9 @@ export class ARTEngine {
 
   renderObject(object: RenderObject) {
 
-    // prepare material
-    const material = object.material;
-    const program = material.getProgram(this);
+    // prepare technique
+    const technique = object.technique;
+    const program = technique.getProgram(this);
     this.renderer.useProgram(program);
     program.setUniform('MMatrix', object.worldMatrix);
     program.setUniform('VPMatrix', this.VPMatrix);
@@ -131,16 +136,16 @@ export class ARTEngine {
     return this.renderer.getGLTexture(id);
   }
 
-  getProgram(material: Material): GLProgram {
-    const id = material.programId;
+  getProgram(technique: Technique): GLProgram {
+    const id = technique.programId;
     const program = this.renderer.getProgram(id);
     return program;
   }
 
-  createProgram(material: Material): GLProgram  {
-    const program = this.renderer.createProgram(material.config.programConfig);
-    material.programId = program.id;
-    material.needUpdate = false;
+  createProgram(technique: Technique): GLProgram  {
+    const program = this.renderer.createProgram(technique.config.programConfig);
+    technique.programId = program.id;
+    technique.needUpdate = false;
     return program;
   }
 

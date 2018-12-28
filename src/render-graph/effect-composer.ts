@@ -1,9 +1,21 @@
 import { RenderPass } from "./pass";
+import { ARTEngine } from "../engine/render-engine";
 
 export class EffectComposer{
-  constructor() {
-    
+  constructor(engine: ARTEngine) {
+    this.engine = engine;
   }
 
-  passes: RenderPass;
+  private engine: ARTEngine;
+  private passes: RenderPass[];
+
+  clearPasses() {
+    this.passes = [];
+  }
+
+  render() {
+    this.passes.forEach(pass => {
+      pass.execute(this.engine);
+    });
+  }
 }
