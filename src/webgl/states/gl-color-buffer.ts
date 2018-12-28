@@ -13,6 +13,15 @@ export class GLColorBuffer{
   blueMaskEnabled: boolean = false;
   alphaMaskEnabled: boolean = false;
 
+  /**
+   * set color buffer mask, inner has diff check
+   *
+   * @param {boolean} redMask whether enable red channel color mask
+   * @param {boolean} greenMask whether enable green channel color mask
+   * @param {boolean} blueMask whether enable blue channel color mask
+   * @param {boolean} alphaMask whether enable alpha channel color mask
+   * @memberof GLColorBuffer
+   */
   setColorMask(redMask: boolean, greenMask: boolean, blueMask: boolean, alphaMask: boolean) {
     if (this.redMaskEnabled !== redMask ||
       this.greenMaskEnabled !== greenMask ||
