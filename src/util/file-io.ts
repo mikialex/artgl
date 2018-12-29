@@ -31,7 +31,7 @@ export async function loadStringFromFile() {
   return str;
 }
 
-export async function loadImageFromURL(url: string) {
+export async function loadImageFromURL(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.src = url;

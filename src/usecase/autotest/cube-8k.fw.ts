@@ -26,7 +26,9 @@ function mytest() {
       // let testGeo2 = new TestGeometry();
       // const testMesh = new Mesh(testGeo2, testMat);
 
-      const testMesh = new ARTGL.Mesh(testGeo, testTech);
+      const testMesh = new ARTGL.Mesh();
+      testMesh.geometry = testGeo;
+      testMesh.technique = testTech;
       testMesh.position.set(i, j, k);
       testMesh.scale.set(0.1, 0.1, 0.1);
       testMesh.updateLocalMatrix();

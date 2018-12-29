@@ -5,6 +5,6 @@ import { Material } from "../core/material";
 
 export class Points extends RenderObject{
   constructor(geometry: Geometry, material: Material, technique: Technique) {
-    super(geometry, material, technique);
+    super();
   }
 }

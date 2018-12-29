@@ -96,7 +96,23 @@ export class ARTEngine {
   }
 
   connectMaterial(material: Material, program: GLProgram) {
-    
+    if (material === undefined) {
+      if (program.needMaterial) {
+        throw 'texture is need but not have material'
+      }
+    }
+
+    for (const key in material.channel) {
+      const texture = material.channel[key];
+      // if (texture.needUpdate) {
+        
+      // }
+      if (texture.gltextureId === undefined) {
+        //upload here?
+        texture.gltextureId = this.renderer.textureManger.createTextureFromImageElement(texture.image);
+      }
+      program.setTexture(key, texture.gltextureId);
+    }
   }
 
   connectGeometry(geometry: Geometry, program: GLProgram) {

@@ -61,6 +61,7 @@ export class GLProgram {
   private textures: { [index: string]: GLTexture } = {};
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
+  needMaterial: boolean = false;
   drawFrom: number = 0;
   drawCount: number = 0;
   useIndexDraw: boolean = false;
@@ -106,6 +107,7 @@ export class GLProgram {
     if (config.textures !== undefined) {
       config.textures.forEach(tex => {
         this.textures[tex.name] = new GLTexture(this, tex);
+        this.needMaterial = true;
       })
     }
   }
@@ -120,6 +122,10 @@ export class GLProgram {
 
   getAttributeByUsage(usage:AttributeUsage) {
     return this.attributeUsageMap[usage];
+  }
+
+  setTexture(name: string, textureStoreId: string) {
+    this.textures[name].useTexture(this.renderer, textureStoreId);
   }
 
   setDrawRange(start:number, count:number) {

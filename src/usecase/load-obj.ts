@@ -2,13 +2,15 @@ import { GLRenderer, ARTEngine, PerspectiveCamera, TestTechnique, Mesh, Interact
 
 import { loadObjFile } from "../loader/obj-loader";
 
-let mesh;
+let mesh: Mesh;
 
 async function loadObj() {
   const geometry = await loadObjFile();
   const testTech = new TestTechnique();
   const material = new Material();
-  mesh = new Mesh(geometry, material, testTech);
+  mesh = new Mesh();
+  mesh.geometry = geometry;
+  mesh.technique = testTech;
 }
 
 export default function() {
@@ -39,11 +41,6 @@ export default function() {
     active = false;
   })
 
-
-  let testGeoSphere = new SphereGeometry(1,20,20);
-  let testTech = new TestTechnique();
-  let testSphere = new Mesh(testGeoSphere, testTech);
-
   function render() {
     myOrbitControler.update();
     camera.updateWorldMatrix(true);
@@ -51,7 +48,6 @@ export default function() {
     if (mesh !== undefined) {
       engine.renderObject(mesh);
     }
-    engine.renderObject(testSphere);
   }
 
   window.requestAnimationFrame(tick);

@@ -20,16 +20,14 @@ export interface Range{
  * @extends {SceneNode}
  */
 export class RenderObject extends SceneNode{
-  constructor(geometry: Geometry, material: Material, technique: Technique) {
+  constructor() {
     super();
-    this.geometry = geometry;
-    this.technique = technique;
   }
 
   material: Material;
   geometry: Geometry;
   technique: Technique;
-  ranger: Range
+  range: Range
 
   renderOrder: number;
 }

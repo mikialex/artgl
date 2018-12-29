@@ -11,6 +11,7 @@ export class Texture {
     
   }
 
+  image: HTMLImageElement;
   gltextureId: string;
 
   getGLTexture(engine: ARTEngine): WebGLTexture {

@@ -6,22 +6,9 @@ import { CubeGeometry } from "../geometry/geo-lib/cube-geometry";
 import { NormalTechnique } from "../technique/technique-lib/normal-tachnique";
 
 export class Mesh extends RenderObject{
-  constructor(geometry?: Geometry, material?: Material, technique?: Technique) {
-    if (geometry === undefined) {
-      geometry = new CubeGeometry();
-    }
-    if (material === undefined) {
-      material = new Material();
-    }
-    if (technique === undefined) {
-      technique = new NormalTechnique();
-    }
-    super(geometry, material, technique);
-    this.checkMaterialisValid(technique);
+  constructor() {
+    super();
   }
 
-  private checkMaterialisValid(technique) {
-    
-  }
 
 }

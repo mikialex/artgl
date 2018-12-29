@@ -23,7 +23,7 @@ export class GLTextureSlot{
   private slot: string[] = [];
 
   private currentTextureSlot = null;
-  private currentBindTextures: textureBindInfo[];
+  private currentBindTextures: textureBindInfo[] = [];
 
   activeTexture(slot: number) {
     if ( this.currentTextureSlot !== slot ) {
@@ -34,7 +34,7 @@ export class GLTextureSlot{
 
   bindTexture(webglType: GLTextureType, webglTexture: WebGLTexture ) {
 		if ( this.currentTextureSlot === null ) {
-			this.activeTexture(0);
+			this.activeTexture(this.gl.TEXTURE0);
 		}
 		let boundTexture = this.currentBindTextures[ this.currentTextureSlot ];
 		if ( boundTexture === undefined ) {
@@ -53,7 +53,7 @@ export class GLTextureSlot{
   }  
 
   updateSlotTexture(webglTexture: WebGLTexture): number {
-    const textureSlotToUpdate = 0;
+    const textureSlotToUpdate = this.gl.TEXTURE0;
     this.activeTexture(textureSlotToUpdate);
     this.bindTexture(GLTextureType.texture2D, webglTexture);
     return textureSlotToUpdate;
