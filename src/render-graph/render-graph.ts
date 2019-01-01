@@ -1,5 +1,6 @@
 import { EffectComposer } from "./effect-composer";
 import { PassDefine, GraphDefine, TextureDefine } from "./interface";
+import { GLFramebuffer } from "../webgl/gl-framebuffer";
 
 export class RenderGraph{
   constructor(){
@@ -7,7 +8,7 @@ export class RenderGraph{
   }
   composer: EffectComposer;
 
-  private renderTextures: Map<string, RenderTarget> = new Map();
+  private renderTextures: Map<string, GLFramebuffer> = new Map();
 
   render() {
     this.composer.render();
@@ -55,7 +56,7 @@ export class RenderGraph{
       if (this.renderTextures.has(define.name)) {
         throw 'render graph build error, dupilcate texture key namefound '
       }
-      this.renderTextures.set(new RenderTarget(define));
+      // this.renderTextures.set(new GLFramebuffer(define));
     })
   }
 }

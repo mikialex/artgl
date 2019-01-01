@@ -56,6 +56,6 @@ export class GLTextureSlot{
     const textureSlotToUpdate = this.gl.TEXTURE0;
     this.activeTexture(textureSlotToUpdate);
     this.bindTexture(GLTextureType.texture2D, webglTexture);
-    return textureSlotToUpdate;
+    return 0;
   }
 }

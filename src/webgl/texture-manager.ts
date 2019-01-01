@@ -12,12 +12,15 @@ import { TextureFilter, TextureWrap } from "./const";
 export class GLTextureManager{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
-    const gl = this.renderer.gl;
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true as any);
   }
   readonly renderer: GLRenderer;
   readonly gl: WebGLRenderingContext;
   private textures: { [index: string]: WebGLTexture } = {};
+
+  init() {
+    const gl = this.renderer.gl;
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true as any);
+  }
 
   getGLTexture(storeId: string) {
     return this.textures[storeId];

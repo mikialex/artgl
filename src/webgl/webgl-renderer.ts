@@ -25,6 +25,7 @@ export class GLRenderer {
     this.glInfo.createAllExtension();
     this.devicePixelRatio = window.devicePixelRatio;
     this.state = new GLState(this);
+    this.textureManger.init();
   }
   gl: WebGLRenderingContext;
   el: HTMLCanvasElement;
