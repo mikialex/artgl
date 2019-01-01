@@ -9,7 +9,10 @@ import { Nullable } from "../type";
 import { GLTextureManager } from "./texture-manager";
 
 export class GLRenderer {
-  constructor(el: HTMLCanvasElement, options?: any) {
+  constructor(el?: HTMLCanvasElement, options?: any) {
+    if (el === undefined) {
+      el = document.createElement('canvas');
+    }
     const ctx = el.getContext('webgl', options);
     if (ctx === null) {
       throw 'webgl context create failed';

@@ -59,9 +59,6 @@ export class Technique{
     }
   }
 
-  // fog = true;
-  // lights = true;
-
   // blending = NormalBlending;
   // side = FrontSide;
   // shading = SmoothShading; // THREE.FlatShading, THREE.SmoothShading

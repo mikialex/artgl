@@ -12,14 +12,20 @@ import { DrawMode } from "../webgl/const";
 import { Texture } from "../core/texture";
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { Material } from "../core/material";
+import { Scene } from "../scene/scene";
 
 export class ARTEngineAdaptor {
   constructor(engine: ARTEngine) {
     this.engine = engine;
   }
-  engine: ARTEngine;
+  private engine: ARTEngine;
+  private scene: Scene;
 
-  update() {
+  setScene(scene: Scene) {
+    this.scene = scene;
+  }
+
+  getRenderList() {
     
   }
 }

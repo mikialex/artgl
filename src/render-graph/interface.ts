@@ -32,11 +32,16 @@ enum stateType {
 
 export interface PassDefine {
   name: string,
-  input?: string[],
+  inputs?: string[],
   output: string,
-  entity: string[],
+  source: string[],
   filter?: () => boolean,
   sorter?: () => number,
   states?: stateType[],
   overrideProgram?: 'myshaderA',
+}
+
+export interface GraphDefine {
+  passes: PassDefine[],
+  renderTextures?: TextureDefine[];
 }

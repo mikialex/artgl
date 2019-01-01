@@ -4,7 +4,7 @@ style="margin:30px; width: 500px"></img>
 
 ## About Project
 
-ArtGL is underdeveloping next generation advance webGL framework .
+ArtGL is an underdeveloping next generation advance webGL framework .
 
 ## Design Aim
 
@@ -21,6 +21,3 @@ ArtGL is underdeveloping next generation advance webGL framework .
 
 
 ....
-
-## DevDesigns
-

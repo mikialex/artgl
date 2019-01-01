@@ -4,6 +4,12 @@ interface materialConfig{
 
 }
 
+/**
+ * Material is collection of textures
+ * contains bitmap render data
+ * @export
+ * @class Material
+ */
 export class Material{
   // constructor(conf: materialConfig) {
     

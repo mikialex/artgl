@@ -12,6 +12,8 @@ import { TextureFilter, TextureWrap } from "./const";
 export class GLTextureManager{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
+    const gl = this.renderer.gl;
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true as any);
   }
   readonly renderer: GLRenderer;
   readonly gl: WebGLRenderingContext;
@@ -32,7 +34,6 @@ export class GLTextureManager{
     if (texture === null) {
       throw 'webgl texture create fail';
     }
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true as any)
     gl.bindTexture(gl.TEXTURE_2D, texture);
   
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
