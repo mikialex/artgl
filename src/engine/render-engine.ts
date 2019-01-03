@@ -31,8 +31,8 @@ export class ARTEngineAdaptor {
 }
 
 export class ARTEngine {
-  constructor(renderer: GLRenderer) {
-    this.renderer = renderer;
+  constructor(el?: HTMLCanvasElement, options?: any) {
+    this.renderer = new GLRenderer(el, options);
   }
 
   renderer: GLRenderer;

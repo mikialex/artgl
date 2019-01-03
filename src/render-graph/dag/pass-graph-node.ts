@@ -6,6 +6,7 @@ export class PassGraphNode extends DAGNode{
   constructor(graph: RenderGraph, define: PassDefine) {
     super();
     this.name = define.name;
+    this.define = define;
     if (define.inputs !== undefined) {
       define.inputs.forEach(textInput => {
         const texture = graph.getTextureDependence(textInput);
@@ -15,7 +16,8 @@ export class PassGraphNode extends DAGNode{
       })
     }
   }
-  name: string;
+  readonly name: string;
+  readonly define: PassDefine;
 
   textureDependency = [];
 }

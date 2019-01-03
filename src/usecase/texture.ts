@@ -6,9 +6,7 @@ export default async function() {
   let canv = document.querySelector('canvas') as HTMLCanvasElement; 
   const width = canv.clientWidth;
   const height = canv.clientHeight;
-  let renderer = new ARTGL.GLRenderer(canv);
-  renderer.setSize(width, height);
-  const engine = new ARTGL.ARTEngine(renderer);
+  const engine = new ARTGL.ARTEngine(canv);
   const camera = new ARTGL.PerspectiveCamera();
 
   camera.aspect = width / height;

@@ -18,9 +18,7 @@ export default function() {
   let canv = document.querySelector('canvas') as HTMLCanvasElement; 
   const width = canv.clientWidth;
   const height = canv.clientHeight;
-  let renderer = new GLRenderer(canv);
-  renderer.setSize(width, height);
-  const engine = new ARTEngine(renderer);
+  const engine = new ARTEngine(canv);
   const camera = new PerspectiveCamera();
 
   camera.aspect = width / height;

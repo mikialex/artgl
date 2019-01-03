@@ -5,9 +5,7 @@ function mytest() {
   document.body.appendChild(canv);
   const width = canv.clientWidth;
   const height = canv.clientHeight;
-  let renderer = new ARTGL.GLRenderer(canv);
-  renderer.setSize(width, height);
-  const engine = new ARTGL.ARTEngine(renderer);
+  const engine = new ARTGL.ARTEngine(canv);
   const camera = new ARTGL.PerspectiveCamera();
 
   camera.aspect = width / height;
