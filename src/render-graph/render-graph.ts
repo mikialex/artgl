@@ -1,8 +1,8 @@
 import { EffectComposer } from "./effect-composer";
 import { PassDefine, GraphDefine, TextureDefine } from "./interface";
-import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { PassGraphNode } from "./dag/pass-graph-node";
 import { TextureNode } from "./dag/texture-node";
+import { DAGNode } from "./dag/dag-node";
 
 export class RenderGraph{
   constructor(){
@@ -11,6 +11,7 @@ export class RenderGraph{
   composer: EffectComposer;
 
   private renderTextures: Map<string, TextureNode> = new Map();
+  private passNodes: Map<string, PassGraphNode> = new Map();
 
   render() {
     this.composer.render();
@@ -18,48 +19,44 @@ export class RenderGraph{
 
   reset() {
     this.renderTextures.clear();
+    this.passNodes.clear();
     this.composer.clearPasses();
   }
 
-  setGraph(graphDefine: GraphDefine) {
+  public setGraph(graphDefine: GraphDefine) {
     this.reset();
     this.allocateRenderTextures(graphDefine.renderTextures);
-    this.setPassse(graphDefine.passes);
+    this.constructPassGraph(graphDefine.passes);
+    this.updateComposer();
   }
 
-  private setPassse(passesDefine: PassDefine[]) {
-    const rootPass = this.findScreenRootPass(passesDefine);
-    const passMap: {[index: string]: PassGraphNode} = {};
-    passesDefine.forEach(pass => {
-      if (passMap[pass.name] === undefined) {
-        passMap[pass.name] = new PassGraphNode(this, pass);
+  private constructPassGraph(passesDefine: PassDefine[]) {
+    passesDefine.forEach(define => {
+      if (this.passNodes.has(define.name)) {
+        this.passNodes.set(define.name, new PassGraphNode(this, define));
       } else {
         throw 'duplicate pass define found'
       }
     })
-    for (const key in passMap) {
-      const passNode = passMap[key];
-      if (passNode.define.inputs !== undefined) {
-        // passNode.define.inputs.forEach()
-      }
-      
-      passNode.connectTo
-    }
-    
+  }
+
+  private updateComposer() {
+    const rootPassNode = this.findScreenRootPass();
+    const renderPassQueue = DAGNode.generateDependencyOrderList(rootPassNode);
   }
 
   getTextureDependence(name: string): TextureNode {
     return this.renderTextures.get(name);
   }
 
-  private findScreenRootPass(passesDefine: PassDefine[]): PassDefine{
+  private findScreenRootPass(): PassGraphNode{
     let rootPass;
-    passesDefine.forEach(define => {
-      if (define.output === 'screen') {
+    this.passNodes.forEach(node => {
+      if (node.define.output === 'screen') {
         if (rootPass !== undefined) {
           throw 'render graph build error, dupilcate root screen pass '
         }
-        rootPass = define;
+        rootPass = node;
       }
     });
     if (rootPass === undefined) {

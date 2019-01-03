@@ -9,15 +9,14 @@ export class PassGraphNode extends DAGNode{
     this.define = define;
     if (define.inputs !== undefined) {
       define.inputs.forEach(textInput => {
-        const texture = graph.getTextureDependence(textInput);
-        if (texture === undefined) {
+        const textureNode = graph.getTextureDependence(textInput);
+        if (textureNode === undefined) {
           throw 'render graph build error, texture depend cant found';
         }
+        textureNode.connectTo(this);
       })
     }
   }
   readonly name: string;
   readonly define: PassDefine;
-
-  textureDependency = [];
 }
