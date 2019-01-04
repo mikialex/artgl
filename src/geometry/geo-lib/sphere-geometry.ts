@@ -22,7 +22,6 @@ export class SphereGeometry extends Geometry {
       dataInfo: defaultGeometryLayoutDataInfo,
       drawFrom: 0,
       drawCount: 36,
-      indexDraw: true
     }
     this.populate();
   }
@@ -95,7 +94,7 @@ export class SphereGeometry extends Geometry {
     this.bufferDatas.uv = uvBuffer;
 
     const indexBuffer = new Uint16BufferData(new Uint16Array(indices));
-    this.bufferDatas.index = indexBuffer;
+    this.indexBuffer = indexBuffer;
 
     this.layout.drawCount = indices.length;
 

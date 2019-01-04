@@ -21,12 +21,14 @@ export class GLTexture{
   constructor(program: GLProgram, descriptor: TextureDescriptor) {
     this.program = program;
     this.gl = program.getRenderer().gl;
+    this.name = descriptor.name
     const glProgram = program.getProgram();
     const location = this.gl.getUniformLocation(glProgram, descriptor.name);
     this.isActive = location !== null;
     this.location = location;
     this.currentActiveSlot = -1;
   }
+  name: string;
   private gl: WebGLRenderingContext;
   private program: GLProgram;
   readonly descriptor: TextureDescriptor;

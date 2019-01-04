@@ -4,6 +4,7 @@ interface materialConfig{
 
 }
 
+
 /**
  * Material is collection of textures
  * contains bitmap render data

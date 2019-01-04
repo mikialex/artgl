@@ -2,6 +2,7 @@ import { Geometry } from "./geometry";
 import { Technique } from "./technique";
 import { SceneNode } from "../scene/scene-node";
 import { Material } from "./material";
+import { Nullable } from "../type";
 
 export interface Range{
 
@@ -24,7 +25,7 @@ export class RenderObject extends SceneNode{
     super();
   }
 
-  material: Material;
+  material: Nullable<Material> = null;
   geometry: Geometry;
   technique: Technique;
   range: Range

@@ -11,7 +11,6 @@ interface LayoutInfo{
 // layout is specify this geomeotry's data usage info
 export interface GeometryDataLayout {
   dataInfo: { [index: string]: LayoutInfo };
-  indexDraw?: boolean;
   drawFrom: number;
   drawCount: number;
 }
@@ -27,6 +26,7 @@ export abstract class Geometry {
   constructor() {
   }
   readonly bufferDatas: { [index: string]: BufferData } = {};
+  indexBuffer: BufferData;
   layout: GeometryDataLayout;
   needUpdate: boolean = true;
 
@@ -67,10 +67,6 @@ export const defaultNoTexGeometryLayoutDataInfo = {
     usage: AttributeUsage.normal,
     stride: 3
   },
-  index: {
-    usage: AttributeUsage.index,
-    stride: 1
-  },
 }
 
 export const defaultGeometryLayoutDataInfo = {
@@ -85,10 +81,6 @@ export const defaultGeometryLayoutDataInfo = {
   uv: {
     usage: AttributeUsage.uv,
     stride: 2
-  },
-  index: {
-    usage: AttributeUsage.index,
-    stride: 1
   },
 }
 

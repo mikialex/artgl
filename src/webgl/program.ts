@@ -19,12 +19,21 @@ export interface GLProgramConfig {
   textures?: TextureDescriptor[];
   vertexShaderString: string;
   fragmentShaderString: string;
-  autoInjectHeader: boolean
+  autoInjectHeader: boolean;
+  useIndex?: boolean;
+}
+
+function fullfillProgramConfig(config: GLProgramConfig){
+  if (config.useIndex === undefined) {
+    config.useIndex = true;
+  }
+  return config;
 }
 
 
 export class GLProgram {
   constructor(renderer: GLRenderer, config: GLProgramConfig) {
+    fullfillProgramConfig(config);
     this.renderer = renderer;
     this.id = generateUUID();
 
@@ -36,6 +45,7 @@ export class GLProgram {
     this.createGLResource(config);
     
     this.config = config;
+    this.useIndexDraw = config.useIndex;
     renderer.programManager.addNewProgram(this);
 
     config.attributes.forEach(att => {
@@ -65,6 +75,18 @@ export class GLProgram {
   drawFrom: number = 0;
   drawCount: number = 0;
   useIndexDraw: boolean = false;
+
+  public forTextures(cb: (texture: GLTexture) => any): void {
+    for (const key in this.textures) {
+      cb(this.textures[key]);
+    }
+  }
+
+  public forAttributes(cb: (texture: GLAttribute) => any): void {
+    for (const key in this.attributes) {
+      cb(this.attributes[key]);
+    }
+  }
 
   private compileShaders(conf: GLProgramConfig) {
     if (conf.autoInjectHeader) {

@@ -47,6 +47,7 @@ export class TestTechnique extends Technique{
         vertexShaderString: vertexShaderSource,
         fragmentShaderString: fragmentShaderSource,
         autoInjectHeader: true,
+        useIndex: true
       }
     }
     super(config);

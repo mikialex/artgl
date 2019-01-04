@@ -2,7 +2,6 @@ import { GLDataType } from "./shader-util";
 import { GLProgram } from "./program";
 
 export const enum AttributeUsage {
-  index,
   position,
   normal,
   color,
@@ -19,6 +18,7 @@ export interface AttributeDescriptor {
 export class GLAttribute {
   constructor(program: GLProgram, descriptor: AttributeDescriptor) {
     this.descriptor = descriptor;
+    this.name = descriptor.name;
     this.program = program;
     this.gl = program.getRenderer().gl;
     const prog = this.program.getProgram();
@@ -26,6 +26,7 @@ export class GLAttribute {
     this.type = descriptor.type;
     this.isActive = this.location !== -1;
   }
+  readonly name: string;
   readonly gl: WebGLRenderingContext;
   readonly program: GLProgram;
   readonly location: number; // need location type ?

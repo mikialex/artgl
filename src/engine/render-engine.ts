@@ -13,6 +13,7 @@ import { Texture } from "../core/texture";
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { Material } from "../core/material";
 import { Scene } from "../scene/scene";
+import { GLTexture } from "../webgl/gl-texture";
 
 export class ARTEngineAdaptor {
   constructor(engine: ARTEngine) {
@@ -102,58 +103,44 @@ export class ARTEngine {
   }
 
   connectMaterial(material: Material, program: GLProgram) {
-    if (material === undefined) {
+    if (material === null) {
       if (program.needMaterial) {
         throw 'texture is need but not have material'
       }
     }
 
-    for (const key in material.channel) {
-      const texture = material.channel[key];
-      // if (texture.needUpdate) {
-        
-      // }
+    program.forTextures((tex: GLTexture) => {
+      const texture = material.channel[tex.name];
+      if (texture === undefined) {
+        throw 'cant fond texture';
+      }
       if (texture.gltextureId === undefined) {
-        //upload here?
         texture.gltextureId = this.renderer.textureManger.createTextureFromImageElement(texture.image);
       }
-      program.setTexture(key, texture.gltextureId);
-    }
+      tex.useTexture(this.renderer, texture.gltextureId);
+    })
   }
 
   connectGeometry(geometry: Geometry, program: GLProgram) {
-    let indexBuffer;
-    for (const infoKey in geometry.layout.dataInfo) {
-      const usage = geometry.layout.dataInfo[infoKey].usage;
-      if (usage !== undefined && usage !== AttributeUsage.index) {
-        const bufferData = geometry.bufferDatas[infoKey];
-        let glBuffer = this.getGLAttributeBuffer(bufferData);
-        if (glBuffer === undefined) {
-          glBuffer = this.createOrUpdateAttributeBuffer(bufferData, false);
-        }
-        const attribute = program.getAttributeByUsage(usage);
-        if (attribute !== undefined) { // some buffer may not need to be used by shader
-          attribute.useBuffer(glBuffer);
-        }
-      }
 
-      if (usage === AttributeUsage.index) {
-        if (indexBuffer !== undefined) {
-          throw 'geometry only can set one index buffer';
-        }
-        indexBuffer = geometry.bufferDatas[infoKey];
+    program.forAttributes(att => {
+      const bufferData = geometry.bufferDatas[att.name];
+      let glBuffer = this.getGLAttributeBuffer(bufferData);
+      if (glBuffer === undefined) {
+        glBuffer = this.createOrUpdateAttributeBuffer(bufferData, false);
       }
-    }
+      att.useBuffer(glBuffer);
+    })
 
-    if (indexBuffer !== undefined && geometry.layout.indexDraw) {
-      program.useIndexDraw = true;
-      let glIndexBuffer = this.getGLAttributeBuffer(indexBuffer);
-      if (glIndexBuffer === undefined) {
-        glIndexBuffer = this.createOrUpdateAttributeBuffer(indexBuffer, true);
+    if (program.useIndexDraw) {
+      if (geometry.indexBuffer === null) {
+        throw 'indexBuffer not found for index draw'
       }
-      program.useIndexBuffer(glIndexBuffer);
-    } else {
-      program.useIndexDraw = false;
+      let glBuffer = this.getGLAttributeBuffer(geometry.indexBuffer);
+      if (glBuffer === undefined) {
+        glBuffer = this.createOrUpdateAttributeBuffer(geometry.indexBuffer, true);
+      }
+      program.useIndexBuffer(glBuffer);
     }
 
     program.drawFrom = geometry.layout.drawFrom;

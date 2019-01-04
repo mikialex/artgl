@@ -295,14 +295,13 @@ export class OBJLoader {
     } else {
       geometry.bufferDatas.normal = new Float32BufferData(normalBuffer);
     }
-    geometry.bufferDatas.index = new Uint16BufferData(indexBuffer);
+    geometry.indexBuffer = new Uint16BufferData(indexBuffer);
     console.log('indexlength:' + indexBuffer.length);
     console.log('positionBuffer:' + positionBuffer.length);
     geometry.layout = {
       dataInfo: defaultNoTexGeometryLayoutDataInfo,
       drawCount: indexBuffer.length,
       drawFrom: 0,
-      indexDraw: true,
     }
 
     return geometry;
