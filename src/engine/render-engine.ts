@@ -1,13 +1,12 @@
 import { GLRenderer } from "../webgl/webgl-renderer";
 import { RenderList } from "./render-list";
-import { RenderObject } from "../core/render-object";
+import { RenderObject, RenderRange } from "../core/render-object";
 import { Camera } from "../core/camera";
 import { Matrix4 } from "../math/matrix4";
 import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
 import { Technique } from "../core/technique";
-import { AttributeUsage } from "../webgl/attribute";
 import { DrawMode } from "../webgl/const";
 import { Texture } from "../core/texture";
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
@@ -98,12 +97,14 @@ export class ARTEngine {
     // prepare geometry
     this.connectGeometry(object.geometry, program);
 
+    this.connectRange(object.range, program, object.geometry)
+
     // render
     this.renderer.render(DrawMode.TRIANGLES, program.useIndexDraw);
   }
 
   connectMaterial(material: Material, program: GLProgram) {
-    if (material === null) {
+    if (material === undefined) {
       if (program.needMaterial) {
         throw 'texture is need but not have material'
       }
@@ -142,10 +143,20 @@ export class ARTEngine {
       }
       program.useIndexBuffer(glBuffer);
     }
+  }
 
-    program.drawFrom = geometry.layout.drawFrom;
-    program.drawCount = geometry.layout.drawCount;
-
+  connectRange(range: RenderRange, program: GLProgram, geometry: Geometry) {
+    let start = 0;
+    let count = 0;
+    if (range === undefined) {
+      if (geometry.indexBuffer !== null) {
+        count = geometry.indexBuffer.data.length;
+      } else {
+        throw 'range should be set if use none index geometry'
+      }
+    }
+    program.drawFrom = start;
+    program.drawCount = count;
   }
 
   getGLTexture(texture: Texture): WebGLTexture {

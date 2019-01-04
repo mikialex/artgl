@@ -1,10 +1,32 @@
 import { Geometry } from "./geometry";
-import { Technique } from "./technique";
+import { Technique, MaterialConfig } from "./technique";
 import { SceneNode } from "../scene/scene-node";
 import { Material } from "./material";
 import { Nullable } from "../type";
 
-export interface Range{
+export class RenderRange{
+  constructor(start?:number, count?:number) {
+    if (start !== undefined) {
+      this.start = start;
+    }
+    if (count !== undefined) {
+      this.count = count;
+    }
+  }
+
+  setRange(start:number, count:number): void {
+    this.start = start;
+    this.count = count;
+  }
+
+  // static getFullRangeFromGeometry(geomemtry: Geometry): RenderRange {
+  //   if (geomemtry.indexBuffer !== undefined) {
+  //     return geomemtry.indexBuffer.data.length;
+  //   }
+  // }
+
+  start: number = 0;
+  count: number = 0;
 
 }
 
@@ -25,10 +47,10 @@ export class RenderObject extends SceneNode{
     super();
   }
 
-  material: Nullable<Material> = null;
+  material: Material;
   geometry: Geometry;
   technique: Technique;
-  range: Range
+  range: RenderRange
 
   renderOrder: number;
 }
