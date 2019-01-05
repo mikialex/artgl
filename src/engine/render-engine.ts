@@ -118,7 +118,9 @@ export class ARTEngine {
       if (texture.gltextureId === undefined) {
         texture.gltextureId = this.renderer.textureManger.createTextureFromImageElement(texture.image);
       }
-      tex.useTexture(this.renderer, texture.gltextureId);
+
+      const webgltexture = this.renderer.textureManger.getGLTexture(texture.gltextureId);
+      tex.useTexture(webgltexture);
     })
   }
 

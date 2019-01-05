@@ -21,7 +21,7 @@ export class GLShader {
   shader: WebGLShader;
   type: ShaderType;
 
-  compileShader(source: string, type: ShaderType): WebGLShader {
+  compileShader(source: string): WebGLShader {
     const gl = this.renderer.gl;
     gl.shaderSource(this.shader, source);
     gl.compileShader(this.shader);
@@ -36,5 +36,9 @@ export class GLShader {
     }
     return this.shader;
   };
+
+  dispose() {
+    this.renderer.gl.deleteShader(this.shader);
+  }
 
 }

@@ -1,6 +1,8 @@
 import { GLProgram } from "artgl";
 import { GLRenderer } from "./webgl-renderer";
 import { Nullable } from "type";
+import { GLTextureManager } from "./texture-manager";
+import { GLTextureSlot } from "./states/gl-texture-slot";
 
 export enum GLTextureType{
   texture2D,
@@ -20,6 +22,8 @@ export interface TextureDescriptor {
 export class GLTexture{
   constructor(program: GLProgram, descriptor: TextureDescriptor) {
     this.program = program;
+    this.textureManger = program.renderer.textureManger;
+    this.slotManager = program.renderer.state.textureSlot;
     this.gl = program.getRenderer().gl;
     this.name = descriptor.name
     const glProgram = program.getProgram();
@@ -30,6 +34,8 @@ export class GLTexture{
   }
   name: string;
   private gl: WebGLRenderingContext;
+  private textureManger: GLTextureManager;
+  private slotManager: GLTextureSlot;
   private program: GLProgram;
   readonly descriptor: TextureDescriptor;
   private location: WebGLUniformLocation;
@@ -39,13 +45,15 @@ export class GLTexture{
   webgltexture: Nullable<WebGLTexture> = null;
   currentActiveSlot: number;
 
-  useTexture(renderer: GLRenderer, textureDataStoreId: string): void {
+  useTexture(webgltexture: WebGLTexture): void {
     if (!this.isActive) {
       return;
     }
-    const webgltexture = renderer.textureManger.getGLTexture(textureDataStoreId);
-    const textureSlot = renderer.state.textureSlot.updateSlotTexture(webgltexture);
-    this.currentActiveSlot = textureSlot;
-    this.gl.uniform1i(this.location, textureSlot);
+    const textureSlot = this.slotManager.updateSlotTexture(webgltexture);
+    if (this.currentActiveSlot !== textureSlot) {
+      this.currentActiveSlot = textureSlot;
+      this.gl.uniform1i(this.location, textureSlot);
+    }
   }
+
 }

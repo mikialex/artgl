@@ -95,8 +95,8 @@ export class GLProgram {
       console.log(conf.vertexShaderString);
       console.log(conf.fragmentShaderString);
     }
-    this.vertexShader.compileShader(conf.vertexShaderString, ShaderType.vertex);
-    this.fragmentShader.compileShader(conf.fragmentShaderString, ShaderType.fragment);
+    this.vertexShader.compileShader(conf.vertexShaderString);
+    this.fragmentShader.compileShader(conf.fragmentShaderString);
   }
 
   private createProgram(vertexShader: GLShader, fragmentShader: GLShader) {
@@ -146,8 +146,8 @@ export class GLProgram {
     return this.attributeUsageMap[usage];
   }
 
-  setTexture(name: string, textureStoreId: string) {
-    this.textures[name].useTexture(this.renderer, textureStoreId);
+  setTexture(name: string, webglTexture: WebGLTexture) {
+    this.textures[name].useTexture(webglTexture);
   }
 
   setDrawRange(start:number, count:number) {
@@ -165,6 +165,8 @@ export class GLProgram {
   }
 
   dispose() {
-    
+    this.vertexShader.dispose();
+    this.fragmentShader.dispose();
+    this.renderer.gl.deleteProgram(this.program);
   }
 }
