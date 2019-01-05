@@ -16,11 +16,12 @@ export class GLTextureSlot{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
     this.gl = renderer.gl;
-    this.slot = new Array(renderer.glInfo.maxTextures).fill('');
+    this.maxSupport = renderer.glInfo.maxTextures;
+    generateTextureSlotMap(this.maxSupport, this.gl);
   }
   readonly renderer;
   readonly gl;
-  private slot: string[] = [];
+  readonly maxSupport;
 
   private currentTextureSlot = null;
   private currentBindTextures: textureBindInfo[] = [];
@@ -48,14 +49,34 @@ export class GLTextureSlot{
 		}
 	}
 
+  private slotIndex = 0;
+
+  resetSlotIndex() {
+    this.slotIndex = 0;
+  }
+
   findSlot(webglTexture: WebGLTexture): number {
-    return 0;
+    let slot = this.slotIndex;
+    if (this.slotIndex > this.maxSupport) {
+      throw 'texture use exceed max texture support'
+    }
+    this.slotIndex++;
+    return slot;
   }  
 
   updateSlotTexture(webglTexture: WebGLTexture): number {
-    const textureSlotToUpdate = this.gl.TEXTURE0;
-    this.activeTexture(textureSlotToUpdate);
+    const textureSlotToUpdate = this.findSlot(webglTexture);
+    const textureSlotGLToUpdate = textureSlotMap[textureSlotToUpdate];
+    this.activeTexture(textureSlotGLToUpdate);
     this.bindTexture(GLTextureType.texture2D, webglTexture);
-    return 0;
+    return textureSlotToUpdate;
+  }
+}
+
+const textureSlotMap:number[] = [];
+function generateTextureSlotMap(maxTexureSlotSupport:number, gl: WebGLRenderingContext) {
+  for (let i = 0; i < maxTexureSlotSupport; i++) {
+    const name = `TEXTURE${i}`;
+    textureSlotMap[i] = gl[name];
   }
 }

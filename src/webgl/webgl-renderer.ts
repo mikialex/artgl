@@ -97,6 +97,8 @@ export class GLRenderer {
         throw `gl draw error: ${ errorCode }`;
       }
     }
+
+    this.state.textureSlot.resetSlotIndex();
   }
 
   clear() {
