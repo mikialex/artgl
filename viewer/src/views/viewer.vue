@@ -1,25 +1,24 @@
 <template>
   <div class="viewer">
+    <ScenePanel />
     <div class="canvas-wrap">
       Canvas area
     </div>
-    <div class="config-panel">
-     <Config :config="demoConfig"/>
-    </div>
+    <ConfigPanel />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import Config from '../components/conf/config.vue';
-import demoConfig from '../conf';
+import ConfigPanel from './config-panel.vue'
+import ScenePanel from './scene-panel.vue'
 @Component({
   components:{
-    Config
+    ConfigPanel, ScenePanel
   }
 })
 export default class Viewer extends Vue {
-  demoConfig = demoConfig
+  
 }
 </script>
 
@@ -32,9 +31,9 @@ export default class Viewer extends Vue {
   border: 1px solid #ddd;
 }
 
-.config-panel{
-  display: flex;
-  justify-content: center;
+.scene-panel{
+  width: 300px;
+  min-width: 300px;
   border: 1px solid #ddd;
 }
 

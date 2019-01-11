@@ -17,7 +17,7 @@ export default class BooleanEditor extends Vue {
   }
 
   set _value(value){
-    this.$emit('input', value - 0);
+    this.$emit('input', value);
   }
 
 }

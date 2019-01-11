@@ -12,6 +12,11 @@ export default new Router({
       component: Viewer
     },
     {
+      path: '/graph',
+      name: 'graph',
+      component: Viewer
+    },
+    {
       path: '/about',
       name: 'about',
       // route level code-splitting

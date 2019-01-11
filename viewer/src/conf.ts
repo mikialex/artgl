@@ -14,11 +14,6 @@ export default {
         {
           name: 'useThree',
           value: false,
-          editors: [
-            {
-              type: 'boolean',
-            }
-          ],
           description: 'this is a demo description'
         },
         {
@@ -34,19 +29,11 @@ export default {
                   max: 50,
                   step: 1
                 },
-                {
-                  type: 'number',
-                }
               ]
             },
             {
               name: 'enable',
               value: true,
-              editors: [
-                {
-                  type: 'boolean',
-                }
-              ]
             }
           ]
         }

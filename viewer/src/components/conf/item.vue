@@ -1,24 +1,47 @@
 <template>
   <div class="item">
-    <div class="item-name">
-    {{config.name}} 
+    <div class="item-head">
+      <div class="item-name">
+      {{config.name}} 
+      </div>
+      <div class="inline-editor">
+        <NumberEditor
+          v-if="typeof config.value === 'number'"
+          v-model="config.value"/>
+        <BooleanEditor
+          v-if="typeof config.value === 'boolean'"
+          v-model="config.value"/>
+          <button  
+          @click="expandEditor = !expandEditor"
+          v-if="shouldHaveCustomEditor">&</button>
+      </div>
     </div>
-    <Editors :editorConfig="config.editors" v-model="config.value"/>
+
+    <Editors v-if="shouldHaveCustomEditor && expandEditor"
+    :editorConfig="config.editors" 
+    v-model="config.value"/>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import Editors from './editors.vue';
+import NumberEditor from './number.vue';
+import BooleanEditor from './boolean.vue';
 @Component({
   components:{
-    Editors
+    Editors, NumberEditor, BooleanEditor
   }
 })
 export default class ConfigItem extends Vue {
   name = 'config-item'
+  expandEditor:boolean = false;
 
   @Prop() config: any;
+
+  get shouldHaveCustomEditor(){
+    return this.config.editors !== undefined
+  }
 }
 
 </script>
@@ -27,8 +50,20 @@ export default class ConfigItem extends Vue {
 .item{
   border-top: 1px solid #ddd;
 }
-.item-name{
+
+.item-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 5px;
+}
+
+.inline-editor{
+  display: flex;
+  align-items: center;
+}
+
+.item-name{
   color:#444;
 }
 </style>

@@ -10,17 +10,6 @@
       </div>
     </div>
 
-    
-    <NumberEditor
-    v-if="editor.type === 'number'"
-    v-model="_value" 
-    :config="editor"/>
-
-    <BooleanEditor
-    v-else-if="editor.type === 'boolean'" 
-    v-model="_value" 
-    :config="editor"/>
-          
     <NumberSliderEditor
     v-else-if="editor.type === 'slider'" 
     v-model="_value" 
@@ -30,12 +19,10 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import NumberEditor from './number.vue';
-import BooleanEditor from './boolean.vue';
 import NumberSliderEditor from './number-slider.vue';
 @Component({
   components:{
-    NumberEditor, BooleanEditor, NumberSliderEditor
+    NumberSliderEditor
   }
 })
 export default class Editors extends Vue {
@@ -89,6 +76,7 @@ export default class Editors extends Vue {
   display: inline-block;
   padding: 3px;
   margin:2px;
+  border-radius: 3px;
   cursor: pointer;
   &:hover{
     background: #eee;
@@ -97,7 +85,6 @@ export default class Editors extends Vue {
 
 .active-editor-nav{
   background: #eee;
-  border-radius: 3px;
   
 }
 </style>
