@@ -1,6 +1,6 @@
-import { GLProgram } from "artgl";
+import { GLProgram } from "./program";
 import { GLRenderer } from "./webgl-renderer";
-import { Nullable } from "type";
+import { Nullable } from "../type";
 import { GLTextureManager } from "./texture-manager";
 import { GLTextureSlot } from "./states/gl-texture-slot";
 

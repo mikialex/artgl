@@ -2,11 +2,11 @@
   <div class="top-nav">
     <h3>ART.GL</h3> 
     <div class="current-project">
-      <div>
+      <!-- <div>
         demoscene.gltf 
-      </div>
+      </div> -->
       <router-link active-class="current" to="/">Viewer</router-link>
-      <router-link to="/about">RenderGraph</router-link>
+      <!-- <router-link to="/about">RenderGraph</router-link> -->
     </div>
   </div>
 </template>

@@ -1,5 +1,5 @@
-import { GLRenderer } from "webgl/webgl-renderer";
-import { GLTextureType } from "webgl/const";
+import { GLRenderer } from "../webgl-renderer";
+import { GLTextureType } from "../const";
 
 interface textureBindInfo {
   type: GLTextureType,

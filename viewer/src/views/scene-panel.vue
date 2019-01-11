@@ -26,6 +26,7 @@ export default class ScenePanel extends Vue {
 
 .scene-panel{
   border: 1px solid #ddd;
+  width: 300px;
 }
 
 </style>
