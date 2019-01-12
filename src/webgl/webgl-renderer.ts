@@ -19,8 +19,8 @@ export class GLRenderer {
     }
     this.gl = ctx;
     this.el = el;
-    this.width = this.el.width;
-    this.height = this.el.height;
+    this._width = this.el.width;
+    this._height = this.el.height;
     this.glInfo = new GLInfo(this);
     this.glInfo.createAllExtension();
     this.devicePixelRatio = window.devicePixelRatio;
@@ -37,16 +37,18 @@ export class GLRenderer {
   // only enable this when debug draw range issue
   enableRenderErrorCatch: boolean = false;
 
-  width = 100;
-  height = 100;
-  devicePixelRatio = 1;
+  private _width = 100;
+  get width() { return this._width };
+  private _height = 100;
+  get height() { return this._height };
+
+  devicePixelRatio = window.devicePixelRatio;
+
   setSize(width: number, height: number) {
-    this.width = width;
-    this.height = height;
-    this.el.width = this.width * this.devicePixelRatio;
-    this.el.height = this.height * this.devicePixelRatio;
-    this.el.style.width = width + 'px';
-    this.el.style.height = height + 'px';
+    this._width = width;
+    this._height = height;
+    this.el.width = this._width * this.devicePixelRatio;
+    this.el.height = this._height * this.devicePixelRatio;
 		this.state.setViewport( 0, 0, width * this.devicePixelRatio, height * this.devicePixelRatio );
   }
 

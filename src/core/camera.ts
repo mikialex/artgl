@@ -17,8 +17,7 @@ export class Camera extends SceneNode{
   }
 
   projectionMatrix = new Matrix4();
-  updateProjectionMatrix() {
-    
-  }
+  projectionMatrixNeedUpdate = false;
+  updateProjectionMatrix() {}
 
 }

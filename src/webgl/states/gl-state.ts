@@ -30,9 +30,7 @@ export class GLState{
     this.newViewport.set(x, y, width, height);
     if (!this.newViewport.equals(this.currentViewport)) {
       this.gl.viewport(x, y, width, height);
-      const temp = this.newViewport;
-      this.currentViewport = temp;
-      this.newViewport = this.currentViewport;
+      this.currentViewport.copy(this.newViewport);
     }
   }
 
@@ -40,9 +38,7 @@ export class GLState{
     this.newScissor.set(x, y, width, height);
     if (!this.newScissor.equals(this.currentScissor)) {
       this.gl.viewport(x, y, width, height);
-      const temp = this.newScissor;
-      this.currentScissor = temp;
-      this.newScissor = this.currentScissor;
+      this.currentScissor.copy(this.newScissor)
     }
   }
 

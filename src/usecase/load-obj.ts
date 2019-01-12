@@ -19,16 +19,9 @@ export default function() {
   const width = canv.clientWidth;
   const height = canv.clientHeight;
   const engine = new ARTEngine(canv);
-  const camera = new PerspectiveCamera();
-
-  camera.aspect = width / height;
-  camera.position.set(0, 0, 10);
-  camera.updateLocalMatrix();
-  camera.updateWorldMatrix(true);
-  engine.updateViewProjection(camera);
 
   const myInteractor = new Interactor(canv);
-  const myOrbitControler = new OrbitController(camera);
+  const myOrbitControler = new OrbitController(engine.camera as PerspectiveCamera);
   myOrbitControler.registerInteractor(myInteractor);
 
   let active = false;
@@ -41,8 +34,6 @@ export default function() {
 
   function render() {
     myOrbitControler.update();
-    camera.updateWorldMatrix(true);
-    engine.updateViewProjection(camera);
     if (mesh !== undefined) {
       engine.renderObject(mesh);
     }

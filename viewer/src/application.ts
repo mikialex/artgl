@@ -1,15 +1,33 @@
 import ARTGL from '../../src/export';
-import { ARTEngine, Mesh } from '../../src/artgl';
+import { ARTEngine, Mesh, PerspectiveCamera } from '../../src/artgl';
 
 export class Application{
   engine: ARTEngine;
+  el: HTMLCanvasElement;
   hasInitialized: boolean = false;
   active: boolean = true;
   initialize(canvas: HTMLCanvasElement) {
+    this.el = canvas;
     this.engine = new ARTEngine(canvas);
     this.hasInitialized = true;
     this.createDemoScene();
     window.requestAnimationFrame(this.render);
+    window.addEventListener('resize', this.onContainerResize);
+    this.onContainerResize();
+  }
+
+  unintialize() {
+    window.removeEventListener('resize', this.onContainerResize);
+  }
+
+  private onContainerResize = () => {
+    const width = this.el.offsetWidth;
+    const height = this.el.offsetHeight;
+    this.engine.renderer.setSize(width, height);
+    (this.engine.camera as PerspectiveCamera).aspect = width / height;
+  }
+  notifyResize() {
+    this.onContainerResize();
   }
 
   meshes: Mesh[] = [];
@@ -20,9 +38,6 @@ export class Application{
     for (let i = 0; i < 5; i++) {
       for (let j = 0; j < 5; j++) {
         for (let k = 0; k < 5; k++) {
-          // let testGeo2 = new TestGeometry();
-          // const testMesh = new Mesh(testGeo2, testMat);
-
           const testMesh = new ARTGL.Mesh();
           testMesh.geometry = testGeo;
           testMesh.technique = testMat;

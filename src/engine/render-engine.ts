@@ -13,6 +13,7 @@ import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { Material } from "../core/material";
 import { GLTexture } from "../webgl/gl-texture";
 import { PerspectiveCamera } from "../camera/perspective-camera";
+import { Nullable } from "../type";
 
 export interface RenderSource{
   getRenderList(): RenderList;
@@ -21,27 +22,96 @@ export interface RenderSource{
 export class ARTEngine {
   constructor(el?: HTMLCanvasElement, options?: any) {
     this.renderer = new GLRenderer(el, options);
+    // if we have a element param, use it as the default camera's param for convienience
+    if (el !== undefined) {
+      (this.camera as PerspectiveCamera).aspect = el.width / el.height;
+    }
   }
 
   renderer: GLRenderer;
 
-  // camera changes
-  activeCamera: Camera = new PerspectiveCamera();
-  activeCameraMatrixRerverse = new Matrix4();
-  VPMatrix = new Matrix4();
 
-  updateViewProjection(camera: Camera) {
-    this.activeCameraMatrixRerverse.getInverse(camera.worldMatrix, true);
-    camera.updateProjectionMatrix(); // TODO projectmatrix may not need update
-    this.VPMatrix.multiplyMatrices(camera.projectionMatrix, this.activeCameraMatrixRerverse);
-    this.activeCamera = camera;
+
+
+  //// frame contorls
+  private userRenderFrame: Nullable<FrameRequestCallback> = null;
+  private renderFrame: FrameRequestCallback = (time) => {
+    this.frameStart();
+    this.userRenderFrame(time);
+    this.frameEnd();
+    if (this.isAutoRenderActive) {
+      window.requestAnimationFrame(this.renderFrame);
+    }
+  }
+  isAutoRenderActive = false;
+  setFrame(frame: FrameRequestCallback) {
+    this.renderFrame = frame;
   }
 
-  setRenderTarget(target: GLFramebuffer) {
+  run() {
+    if (!this.userRenderFrame) {
+      throw 'frame function is not set';
+    }
+    this.isAutoRenderActive = true;
+    window.requestAnimationFrame(this.renderFrame);
+  }
+
+  stop() {
+    this.isAutoRenderActive = false;
+  }
+
+  private frameStart() {
+    this.updateViewProjection(this.camera);
+  }
+
+  private frameEnd() {
     
   }
 
-  // render renderList
+  notifyFrameStart() {
+    if (this.userRenderFrame) {
+      throw 'frame function is set';
+    }
+    this.frameStart();
+  }
+
+  notifyFrameEnd() {
+    if (this.userRenderFrame) {
+      throw 'frame function is set';
+    }
+    this.frameEnd();
+  }
+  ////
+
+
+
+
+  //// camera related
+  _camera: Camera = new PerspectiveCamera();
+  isCameraChanged = true;
+  get camera() { return this._camera };
+  set camera(camera) {
+    this._camera = camera;
+    this.isCameraChanged = true;
+  };
+  private cameraMatrixRerverse = new Matrix4();
+  private VPMatrix = new Matrix4();
+
+  private updateViewProjection(camera: Camera) {
+    if (camera.projectionMatrixNeedUpdate) {
+      camera.updateProjectionMatrix();
+    }
+    this.cameraMatrixRerverse.getInverse(camera.worldMatrix, true);
+    this.VPMatrix.multiplyMatrices(camera.projectionMatrix, this.cameraMatrixRerverse);
+    this.camera = camera;
+  }
+  ////
+
+
+
+
+  //// render APIs
+  // render renderList from given source
   renderSource(source: RenderSource) {
     const renderlist = source.getRenderList();
     for (let i = 0; i < renderlist.list.length; i++) {
@@ -76,7 +146,12 @@ export class ARTEngine {
     // render
     this.renderer.render(DrawMode.TRIANGLES, program.useIndexDraw);
   }
+  ////
 
+
+
+
+  //// low level resouce binding
   connectMaterial(material: Material, program: GLProgram) {
     if (material === undefined) {
       if (program.needMaterial) {
@@ -160,5 +235,12 @@ export class ARTEngine {
   createOrUpdateAttributeBuffer(bufferData: BufferData, useforIndex: boolean): WebGLBuffer {
     return this.renderer.attributeBufferManager.updateOrCreateBuffer(bufferData.data.buffer as ArrayBuffer, useforIndex);
   }
+
+
+  setRenderTarget(target: GLFramebuffer) {
+
+  }
+
+
 
 }
