@@ -11,23 +11,11 @@ import { DrawMode } from "../webgl/const";
 import { Texture } from "../core/texture";
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { Material } from "../core/material";
-import { Scene } from "../scene/scene";
 import { GLTexture } from "../webgl/gl-texture";
+import { PerspectiveCamera } from "../camera/perspective-camera";
 
-export class ARTEngineAdaptor {
-  constructor(engine: ARTEngine) {
-    this.engine = engine;
-  }
-  private engine: ARTEngine;
-  private scene: Scene;
-
-  setScene(scene: Scene) {
-    this.scene = scene;
-  }
-
-  getRenderList() {
-    
-  }
+export interface RenderSource{
+  getRenderList(): RenderList;
 }
 
 export class ARTEngine {
@@ -37,17 +25,10 @@ export class ARTEngine {
 
   renderer: GLRenderer;
 
-  renderList: RenderList = new RenderList();
-  
-  activeCamera: Camera;
+  // camera changes
+  activeCamera: Camera = new PerspectiveCamera();
   activeCameraMatrixRerverse = new Matrix4();
   VPMatrix = new Matrix4();
-
-  adaptor: ARTEngineAdaptor;
-
-  useAdaptor(adaptor: ARTEngineAdaptor) {
-    this.adaptor = adaptor;
-  }
 
   updateViewProjection(camera: Camera) {
     this.activeCameraMatrixRerverse.getInverse(camera.worldMatrix, true);
@@ -61,19 +42,12 @@ export class ARTEngine {
   }
 
   // render renderList
-  render() {
-    const opaqueList = this.renderList.opaqueList;
-    const transparentList = this.renderList.transparentList;
-    for (let i = 0; i < opaqueList.length; i++) {
-      const obj = opaqueList[i];
+  renderSource(source: RenderSource) {
+    const renderlist = source.getRenderList();
+    for (let i = 0; i < renderlist.list.length; i++) {
+      const obj = renderlist.list[i];
       this.renderObject(obj);
     }
-
-    for (let i = 0; i < transparentList.length; i++) {
-      const obj = transparentList[i];
-      this.renderObject(obj);
-    }
-
   }
 
   renderObjects(objects: RenderObject[]) {

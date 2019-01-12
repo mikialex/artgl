@@ -3,6 +3,8 @@ import { RenderObject } from "../core/render-object";
 import { Light } from "../core/light";
 import { Camera } from "../core/camera";
 import { Nullable } from "../type";
+import { RenderSource } from "../engine/render-engine";
+import { RenderList } from "../engine/render-list";
 
 /**
  * scene data management
@@ -11,12 +13,15 @@ import { Nullable } from "../type";
  * @export
  * @class Scene
  */
-export class Scene {
+export class Scene implements RenderSource {
   root: Nullable<SceneNode> = null;
   
-  objectList: RenderObject[] = [];
-  lightList: Light[] = [];
+  objectList: RenderList = new RenderList();
   cameras: Camera[] = [];
+
+  getRenderList() {
+    return this.objectList;
+  }
 
   updateWorldMatrix() {
     if(this.root === null){
@@ -42,13 +47,11 @@ export class Scene {
     this.root.traverse((node) => {
       node.scene = null;
     });
-    this.objectList = [];
-    this.lightList = [];
     this.root = null;
   }
 
   private addObject(object: RenderObject) {
-    this.objectList.push(object);
+    this.objectList.addRenderItem(object);
   }
 
   private removeObject(node: SceneNode) {

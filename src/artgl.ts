@@ -17,6 +17,7 @@ export { TestGeometry } from "./geometry/test-geometery";
 
 // technique lib
 export { TestTechnique } from "./technique/test-technique";
+export { NormalTechnique } from "./technique/technique-lib/normal-technique";
 
 // math
 export { Matrix4, Quaternion, Vector3 } from "./math/index";
