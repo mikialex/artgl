@@ -1,4 +1,4 @@
-import { Vector3, Matrix4, Quaternion } from "../math/index";
+import { Vector3, Matrix4, Quaternion, generateUUID } from "../math/index";
 import { Scene } from "./scene";
 import { Euler } from "../math/euler";
 import { Nullable } from "../type";
@@ -11,6 +11,7 @@ import { Nullable } from "../type";
  * @class SceneNode
  */
 export class SceneNode {
+  uuid = generateUUID();
   scene: Nullable<Scene> = null;
 
   parent: Nullable<SceneNode> = null;

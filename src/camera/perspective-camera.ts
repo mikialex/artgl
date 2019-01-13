@@ -50,6 +50,7 @@ export class PerspectiveCamera extends Camera{
     const width = this._aspect * height;
     const left = - 0.5 * width;
     this.projectionMatrix.makePerspective(left, left + width, top, top - height, this._near, this._far);
+    this.projectionMatrixNeedUpdate = false;
   }
 
   lookAt(targetPosition: Vector3) {

@@ -33,7 +33,7 @@ export class ARTEngine {
 
 
 
-  //// frame contorls
+  //// frame controls
   private userRenderFrame: Nullable<FrameRequestCallback> = null;
   private renderFrame: FrameRequestCallback = (time) => {
     this.frameStart();
@@ -61,26 +61,12 @@ export class ARTEngine {
   }
 
   private frameStart() {
-    this.updateViewProjection(this.camera);
   }
 
   private frameEnd() {
     
   }
 
-  notifyFrameStart() {
-    if (this.userRenderFrame) {
-      throw 'frame function is set';
-    }
-    this.frameStart();
-  }
-
-  notifyFrameEnd() {
-    if (this.userRenderFrame) {
-      throw 'frame function is set';
-    }
-    this.frameEnd();
-  }
   ////
 
 
@@ -88,7 +74,7 @@ export class ARTEngine {
 
   //// camera related
   _camera: Camera = new PerspectiveCamera();
-  isCameraChanged = true;
+  private isCameraChanged = true;
   get camera() { return this._camera };
   set camera(camera) {
     this._camera = camera;
@@ -96,14 +82,25 @@ export class ARTEngine {
   };
   private cameraMatrixRerverse = new Matrix4();
   private VPMatrix = new Matrix4();
+  private needUpdateVP = true;
 
-  private updateViewProjection(camera: Camera) {
-    if (camera.projectionMatrixNeedUpdate) {
-      camera.updateProjectionMatrix();
-    }
-    this.cameraMatrixRerverse.getInverse(camera.worldMatrix, true);
-    this.VPMatrix.multiplyMatrices(camera.projectionMatrix, this.cameraMatrixRerverse);
-    this.camera = camera;
+  connectCamera() {
+    // if (this.camera.projectionMatrixNeedUpdate) {
+      this.camera.updateProjectionMatrix();
+      this.needUpdateVP = true;
+    // }
+    // todo
+    this.camera.updateLocalMatrix();
+    this.camera.updateWorldMatrix(true);
+    // if (this.isCameraChanged) { // TODO camera matrix change
+      this.cameraMatrixRerverse.getInverse(this.camera.worldMatrix, true);
+      this.needUpdateVP = true;
+    // }
+    // if (this.needUpdateVP) {
+      this.VPMatrix.multiplyMatrices(this.camera.projectionMatrix, this.cameraMatrixRerverse);
+      this.needUpdateVP = false;
+    // }
+   
   }
   ////
 
@@ -127,6 +124,7 @@ export class ARTEngine {
   }
 
   renderObject(object: RenderObject) {
+    // this.connectCamera();
 
     // prepare technique
     const technique = object.technique;
