@@ -54,9 +54,8 @@ export class PerspectiveCamera extends Camera{
   }
 
   lookAt(targetPosition: Vector3) {
-    tempMatrix.lookAt(this.position, targetPosition, this.up);
-    this.quaternion.setFromRotationMatrix(tempMatrix);
-    this.updateLocalMatrix();
+    tempMatrix.lookAt(this.transform.position, targetPosition, this.up);
+    this.transform.quaternion.setFromRotationMatrix(tempMatrix);
   }
 
 

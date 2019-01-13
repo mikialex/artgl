@@ -90,7 +90,6 @@ export class ARTEngine {
       this.needUpdateVP = true;
     // }
     // todo
-    this.camera.updateLocalMatrix();
     this.camera.updateWorldMatrix(true);
     // if (this.isCameraChanged) { // TODO camera matrix change
       this.cameraMatrixRerverse.getInverse(this.camera.worldMatrix, true);

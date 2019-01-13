@@ -11,7 +11,7 @@ export class Application{
   initialize(canvas: HTMLCanvasElement) {
     this.el = canvas;
     this.engine = new ARTEngine(canvas);
-    this.engine.camera.position.set(20, 10, 10)
+    this.engine.camera.transform.position.set(20, 10, 10)
     this.interactor = new Interactor(canvas);
     this.orbitControler = new OrbitController(this.engine.camera as PerspectiveCamera);
     this.orbitControler.registerInteractor(this.interactor);
@@ -47,9 +47,8 @@ export class Application{
           const testMesh = new ARTGL.Mesh();
           testMesh.geometry = testGeo;
           testMesh.technique = testMat;
-          testMesh.position.set(i, j, k);
-          testMesh.scale.set(0.3, 0.3, 0.3);
-          testMesh.updateLocalMatrix();
+          testMesh.transform.position.set(i, j, k);
+          testMesh.transform.scale.set(0.3, 0.3, 0.3);
           testMesh.updateWorldMatrix(true);
           this.meshes.push(testMesh);
         }

@@ -1,6 +1,9 @@
 import { Matrix4, Euler, Quaternion, Vector3 } from "../math/index";
 import { Vector3Observable } from "../math/observable/vector3-observable";
 
+const tempVector3 = new Vector3();
+const tempMatrix = new Matrix4();
+
 /**
  * Decribe a node's local transformation info.
  * Users can set values and, from getter to get cleaned value
@@ -12,15 +15,30 @@ export class Transformation{
   constructor() {
     this._position.onChange = () => {
       this.matrixIsDirty = true;
+      this.transformFrameChanged = true;
     }
+
+    this._scale.onChange = () => {
+      this.matrixIsDirty = true;
+      this.transformFrameChanged = true;
+    }
+
+    // todo add rotation and qua change watcher
+    // this._quaternion.onChange = () => {
+    //   this.matrixIsDirty = true;
+    //   this.transformChanged = true;
+    // }
   }
+
+  transformFrameChanged = true;
+
   private _matrix: Matrix4 = new Matrix4();
   private matrixIsDirty = false;
 
   private _position: Vector3Observable = new Vector3Observable();
   private positionIsDirty = false;
 
-  private _scale: Vector3Observable = new Vector3Observable();
+  private _scale: Vector3Observable = new Vector3Observable(1, 1, 1);
   private scaleIsDirty = false;
 
   private _rotation: Euler = new Euler();
@@ -39,7 +57,7 @@ export class Transformation{
 
   get matrix(): Matrix4 {
     if (this.matrixIsDirty) {
-      
+      this._matrix.compose(this._position, this._quaternion, this._scale);
     }
     return this._matrix;
   }
@@ -51,12 +69,17 @@ export class Transformation{
       this._position._z = this._matrix.elements[14];
       this.positionIsDirty = false;
     }
-    return this.position;
+    return this._position;
   }
 
   get scale(): Vector3 {
     if (this.scaleIsDirty) {
-      
+      tempVector3.set(this._matrix.elements[0], this._matrix.elements[1], this._matrix.elements[2])
+      this._scale._x = tempVector3.length();
+      tempVector3.set(this._matrix.elements[4], this._matrix.elements[5], this._matrix.elements[6])
+      this._scale._x = tempVector3.length();
+      tempVector3.set(this._matrix.elements[8], this._matrix.elements[9], this._matrix.elements[10])
+      this._scale._x = tempVector3.length();
       this.scaleIsDirty = false;
     }
     return this._scale;
@@ -64,14 +87,18 @@ export class Transformation{
 
   get rotation(): Euler {
     if (this.eulerIsDirty) {
-      
+      this._rotation.setFromQuaternion(this.quaternion, Euler.defaultOrder, false);
+      this.eulerIsDirty = false;
     }
     return this._rotation;
   }
 
   get quaternion(): Quaternion {
     if (this.quaternionIsDirty) {
-      
+      tempMatrix.copy(this._matrix);
+      tempMatrix.scale(1 / this.scale.x, 1 / this.scale.y, 1 / this.scale.z);
+      this._quaternion.setFromRotationMatrix(tempMatrix);
+      this.quaternionIsDirty = false;
     }
     return this._quaternion;
   }

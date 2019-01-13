@@ -2,6 +2,7 @@ import { Vector3, Matrix4, Quaternion, generateUUID } from "../math/index";
 import { Scene } from "./scene";
 import { Euler } from "../math/euler";
 import { Nullable } from "../type";
+import { Transformation } from "./transformation";
 
 /**
  * a scene node in a scene tree
@@ -17,17 +18,19 @@ export class SceneNode {
   parent: Nullable<SceneNode> = null;
   children: SceneNode[] = [];
 
-  position = new Vector3(0, 0, 0);
-  rotation = new Euler();
-  quaternion = new Quaternion();
-  scale = new Vector3(1, 1, 1);
-  matrix = new Matrix4();
+  transform: Transformation = new Transformation();
   worldMatrix = new Matrix4();
-  isTransformDirty = true;
 
-  updateLocalMatrix() {
-    this.matrix.compose(this.position, this.quaternion, this.scale);
-  }
+  // position = new Vector3(0, 0, 0);
+  // rotation = new Euler();
+  // quaternion = new Quaternion();
+  // scale = new Vector3(1, 1, 1);
+  // matrix = new Matrix4();
+  // isTransformDirty = true;
+
+  // updateLocalMatrix() {
+  //   this.matrix.compose(this.position, this.quaternion, this.scale);
+  // }
 
   addChild(node: SceneNode) {
     if (node === this) {
@@ -56,14 +59,14 @@ export class SceneNode {
   }
 
   updateWorldMatrix(force?: boolean): void {
-    if (this.isTransformDirty || force) {
+    if (this.transform.transformFrameChanged || force) {
 
       if (this.parent === null) {
-        this.worldMatrix.copy(this.matrix);
+        this.worldMatrix.copy(this.transform.matrix);
       } else {
-        this.worldMatrix.multiplyMatrices(this.parent.worldMatrix, this.matrix);
+        this.worldMatrix.multiplyMatrices(this.parent.worldMatrix, this.transform.matrix);
       }
-      this.isTransformDirty = false;
+      this.transform.transformFrameChanged = false;
       force = true;
     }
     var children = this.children;

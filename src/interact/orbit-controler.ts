@@ -19,7 +19,7 @@ export class OrbitController extends Controler {
     this.spherical = new Spherical();
 
     const v = new Vector3();
-    v.copy(camera.position).sub(this.spherical.center);
+    v.copy(camera.transform.position).sub(this.spherical.center);
     this.spherical.setFromVector(v);
   }
 
@@ -54,7 +54,7 @@ export class OrbitController extends Controler {
 
   public update() {
     tempVec.setFromSpherical(this.spherical).add(this.spherical.center);
-    this.camera.position.copy(tempVec);
+    this.camera.transform.position.copy(tempVec);
     this.camera.lookAt(this.spherical.center);
   }
 
