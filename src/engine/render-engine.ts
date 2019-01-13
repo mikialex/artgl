@@ -61,6 +61,7 @@ export class ARTEngine {
   }
 
   private frameStart() {
+    this.connectCamera();
   }
 
   private frameEnd() {
@@ -123,7 +124,6 @@ export class ARTEngine {
   }
 
   renderObject(object: RenderObject) {
-    // this.connectCamera();
 
     // prepare technique
     const technique = object.technique;
