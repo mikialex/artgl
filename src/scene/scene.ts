@@ -5,6 +5,7 @@ import { Camera } from "../core/camera";
 import { Nullable } from "../type";
 import { RenderSource } from "../engine/render-engine";
 import { RenderList } from "../engine/render-list";
+import { Mesh } from "../object/mesh";
 
 /**
  * scene data management
@@ -14,21 +15,47 @@ import { RenderList } from "../engine/render-list";
  * @class Scene
  */
 export class Scene implements RenderSource {
-  root: Nullable<SceneNode> = null;
+  root: SceneNode = new SceneNode();
   
+
   objectList: RenderList = new RenderList();
-  cameras: Camera[] = [];
-
+  // mark scene structure changed between frame render
   isFrameStructureChange: boolean = true;
+  onRemoveList: Set<SceneNode> = new Set();
+  onAddList: Set<SceneNode> = new Set();
 
+  addNode(object: SceneNode) {
+    this.onRemoveList.delete(object);
+    this.onAddList.add(object);
+  }
+
+  removeNode(object: SceneNode) {
+    this.onAddList.delete(object);
+    this.onRemoveList.add(object);
+  }
+  
   getRenderList() {
+    if (this.isFrameStructureChange) {
+      this.updateObjectList();
+    }
     return this.objectList;
   }
 
+  updateObjectList() { 
+    // TODO optimize
+    this.objectList.reset();
+    this.onRemoveList.clear();
+    this.onAddList.clear();
+    this.root.traverse((node) => {
+      node.scene = this;
+      if (node instanceof Mesh) {
+        this.objectList.addRenderItem(node);
+      }
+    });
+
+  }
+
   updateWorldMatrix() {
-    if(this.root === null){
-      return;
-    }
     this.root.updateWorldMatrix(true);
   }
 
@@ -37,9 +64,7 @@ export class Scene implements RenderSource {
       throw 'node has set to scene, abort';
     }
     this.root = node;
-    this.root.traverse((node) => {
-      node.scene = this;
-    });
+    this.isFrameStructureChange = true;
   }
 
   disposeRootNode() {
@@ -52,11 +77,4 @@ export class Scene implements RenderSource {
     this.root = null;
   }
 
-  private addObject(object: RenderObject) {
-    this.objectList.addRenderItem(object);
-  }
-
-  private removeObject(node: SceneNode) {
-
-  }
 }

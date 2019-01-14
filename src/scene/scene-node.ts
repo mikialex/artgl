@@ -14,6 +14,7 @@ import { Transformation } from "./transformation";
 export class SceneNode {
   uuid = generateUUID();
   scene: Nullable<Scene> = null;
+  sceneNodeListIndex: number = -1;
 
   parent: Nullable<SceneNode> = null;
   children: SceneNode[] = [];
@@ -25,14 +26,25 @@ export class SceneNode {
     if (node === this) {
       throw 'cant add self to self';
     }
-    this.scene.isFrameStructureChange = true;
-    node.parent.removeChild(node);
+
+    if (this.scene !== null) {
+      this.scene.isFrameStructureChange = true;
+      this.scene.addNode(node);
+    }
+
+    if (node.parent !== null) {
+      node.parent.removeChild(node);
+    }
     node.parent = this;
     this.children.push(node);
   }
 
   removeChild(node: SceneNode) {
-    this.scene.isFrameStructureChange = true;
+    if (this.scene !== null) {
+      this.scene.isFrameStructureChange = true;
+      this.scene.removeNode(node);
+    }
+
     let index = this.children.indexOf(node);
     if (index !== - 1) {
       node.parent = null;

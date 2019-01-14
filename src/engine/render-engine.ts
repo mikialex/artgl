@@ -109,12 +109,11 @@ export class ARTEngine {
 
   //// render APIs
   // render renderList from given source
-  renderSource(source: RenderSource) {
+  render(source: RenderSource) {
     const renderlist = source.getRenderList();
-    for (let i = 0; i < renderlist.list.length; i++) {
-      const obj = renderlist.list[i];
+    renderlist.forEach((obj) => {
       this.renderObject(obj);
-    }
+    })
   }
 
   renderObjects(objects: RenderObject[]) {
