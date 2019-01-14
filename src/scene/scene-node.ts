@@ -20,7 +20,23 @@ export class SceneNode {
   children: SceneNode[] = [];
 
   transform: Transformation = new Transformation();
-  worldMatrix = new Matrix4();
+  _worldMatrix = new Matrix4();
+  _worldMatrixUpdateFrameId: number = 0;
+  get worldMatrix() {
+    return this._worldMatrix;
+  }
+
+  _visible: boolean = true;
+  _visibleNet: Boolean = true;
+  _visibleUpdateFrameId: number = 0;
+  set visible(value: boolean) {
+    if (this.scene !== null) {
+      this.scene.isFrameVisibleChange = true;
+    }
+  };
+  get visible() {
+    return this._visible;
+  }
 
   addChild(node: SceneNode) {
     if (node === this) {

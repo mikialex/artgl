@@ -8,7 +8,7 @@ export class Application{
   el: HTMLCanvasElement;
   hasInitialized: boolean = false;
   scene: Scene = new Scene();
-  active: boolean = true;
+  active: boolean = false;
   interactor: Interactor;
   orbitControler: OrbitController;
   initialize(canvas: HTMLCanvasElement) {
@@ -54,7 +54,7 @@ export class Application{
           const testMesh = new Mesh();
           testMesh.geometry = testGeo;
           testMesh.technique = testMat;
-          node2.transform.position.z = k;
+          testMesh.transform.position.z = k;
           testMesh.transform.scale.set(0.3, 0.3, 0.3);
           node2.addChild(testMesh);
         }
@@ -74,10 +74,12 @@ export class Application{
 
   run() {
     this.active = true;
+    this.interactor.enabled = true;
   }
 
   stop() {
     this.active = false;
+    this.interactor.enabled = false;
   }
 
 }

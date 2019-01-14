@@ -14,6 +14,7 @@ export class Interactor{
     this.bind();
   }
 
+  enabled: boolean = true;
   mouseButton: number;
   inputElement: HTMLElement;
 
@@ -48,6 +49,9 @@ export class Interactor{
   }
 
   private onMouseMove = (event: MouseEvent) => {
+    if (!this.enabled) {
+      return;
+    }
     mousePosition.set(event.clientX, event.clientY);
     v1.copy(prev).sub(mousePosition);
     if (this.mouseButton === 0) {
@@ -60,17 +64,26 @@ export class Interactor{
   }
 
   private onMouseDown = (event: MouseEvent) => {
+    if (!this.enabled) {
+      return;
+    }
     prev.set(event.clientX, event.clientY);
     this.mouseButton = event.button;
     event.preventDefault();
   }
 
   private onMouseUp = (event: MouseEvent) => {
+    if (!this.enabled) {
+      return;
+    }
     this.groupEmit(this.mouseUpCallBacks);
     this.mouseButton = -1;
   }
 
   private onMouseWheel = (event: MouseWheelEvent) => {
+    if (!this.enabled) {
+      return;
+    }
     let delta = 0;
     if ((event as any).wheelDelta !== void 0) {
       // WebKit / Opera / Explorer 9

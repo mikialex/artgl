@@ -21,6 +21,8 @@ export class Scene implements RenderSource {
   objectList: RenderList = new RenderList();
   // mark scene structure changed between frame render
   isFrameStructureChange: boolean = true;
+  isFrameTransformChange: boolean = true;
+  isFrameVisibleChange: boolean = true;
   onRemoveList: Set<SceneNode> = new Set();
   onAddList: Set<SceneNode> = new Set();
 
@@ -48,7 +50,14 @@ export class Scene implements RenderSource {
     this.onAddList.clear();
     this.root.traverse((node) => {
       node.scene = this;
-      if (node instanceof Mesh) {
+      if (this.isFrameStructureChange || this.isFrameTransformChange) {
+        if (node.parent !== null) {
+          node._worldMatrix.multiplyMatrices(node.parent._worldMatrix, node.transform.matrix);
+        } else {
+          node._worldMatrix.copy(node.transform.matrix);
+        }
+      }
+      if (node instanceof RenderObject) {
         this.objectList.addRenderItem(node);
       }
     });
