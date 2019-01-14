@@ -21,26 +21,18 @@ export class SceneNode {
   transform: Transformation = new Transformation();
   worldMatrix = new Matrix4();
 
-  // position = new Vector3(0, 0, 0);
-  // rotation = new Euler();
-  // quaternion = new Quaternion();
-  // scale = new Vector3(1, 1, 1);
-  // matrix = new Matrix4();
-  // isTransformDirty = true;
-
-  // updateLocalMatrix() {
-  //   this.matrix.compose(this.position, this.quaternion, this.scale);
-  // }
-
   addChild(node: SceneNode) {
     if (node === this) {
       throw 'cant add self to self';
     }
+    this.scene.isFrameStructureChange = true;
+    node.parent.removeChild(node);
     node.parent = this;
     this.children.push(node);
   }
 
   removeChild(node: SceneNode) {
+    this.scene.isFrameStructureChange = true;
     let index = this.children.indexOf(node);
     if (index !== - 1) {
       node.parent = null;

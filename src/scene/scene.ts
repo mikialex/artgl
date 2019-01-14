@@ -19,6 +19,8 @@ export class Scene implements RenderSource {
   objectList: RenderList = new RenderList();
   cameras: Camera[] = [];
 
+  isFrameStructureChange: boolean = true;
+
   getRenderList() {
     return this.objectList;
   }

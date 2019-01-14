@@ -1,3 +1,7 @@
+
+
+
+
 export class DAGNode{
   private toNode: DAGNode[];
   private fromNode: DAGNode[];
@@ -28,7 +32,26 @@ export class DAGNode{
     this.fromNode.splice(index, 1);
   }
 
-  static generateDependencyOrderList(nodeStart: DAGNode): DAGNode[] {
-    return [nodeStart];
+  generateDependencyOrderList(): DAGNode[] {
+    const allDepNodes = this.generateAllDependencyList();
+    let preventEndlessCounter = 1;
+    while (allDepNodes.length > 0 && preventEndlessCounter < 10000) {
+      
+      preventEndlessCounter++;
+    }
+    return [this];
+  }
+
+  travserseDFS(visitor: (node:DAGNode) => any) {
+    visitor(this);
+    this.fromNode.forEach(n => { n.travserseDFS(visitor) });
+  }
+
+  generateAllDependencyList(): DAGNode[] {
+    const result = [];
+    this.travserseDFS((n) => {
+      result.push(this);
+    })
+    return result;
   }
 }
