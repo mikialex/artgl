@@ -26,7 +26,6 @@ import NumberSliderEditor from './number-slider.vue';
   }
 })
 export default class Editors extends Vue {
-  name = 'editor-list'
   currentEditor = 0;
 
   get isMultiEditor(){

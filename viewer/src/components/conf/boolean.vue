@@ -8,8 +8,6 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 @Component
 export default class BooleanEditor extends Vue {
-  name = 'number-editor'
-
   @Prop() value: number;
 
   get _value(){

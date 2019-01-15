@@ -8,7 +8,6 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 @Component
 export default class NumberEditor extends Vue {
-  name = 'number-editor'
 
   @Prop() value: number;
 

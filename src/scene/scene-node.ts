@@ -4,6 +4,10 @@ import { Euler } from "../math/euler";
 import { Nullable } from "../type";
 import { Transformation } from "./transformation";
 
+interface TreeNode{
+  children: TreeNode[];
+}
+
 /**
  * a scene node in a scene tree
  * organize the scene hierachy
@@ -76,6 +80,31 @@ export class SceneNode {
       }
     }
     visit(this);
+  }
+
+  traversePair(fn: (sceneNodeParent: Nullable<SceneNode>, sceneNode: SceneNode) => any): any {
+    function visit(nodeParent: SceneNode, node: SceneNode) {
+      const result = fn(nodeParent, node);
+      for (let i = 0; i < node.children.length; i++) {
+        visit(node, node.children[i]);
+      }
+      return result;
+    }
+    return visit(this.parent, this);
+  }
+
+  map(fn: (sceneNode: SceneNode) => TreeNode) {
+    const nodes: Map<SceneNode, TreeNode> = new Map();
+    const rootNode = this.traversePair((nodeParent: SceneNode, node: SceneNode) => {
+      const mapNode = fn(node);
+      nodes.set(node, mapNode);
+      if (node.parent !== null && nodes.has(node.parent)) {
+        const mapParentNode = nodes.get(node.parent);
+        mapParentNode.children.push(mapNode);
+      }
+      return mapNode;
+    })
+    return rootNode;
   }
 
   updateWorldMatrix(force?: boolean): void {

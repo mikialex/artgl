@@ -7,6 +7,8 @@ import { GLState } from "./states/gl-state";
 import { DrawMode } from "./const";
 import { Nullable } from "../type";
 import { GLTextureManager } from "./texture-manager";
+import { GLFrameBufferManager } from "./framebuffer-manager";
+import { GLFramebuffer } from "./gl-framebuffer";
 
 export class GLRenderer {
   constructor(el?: HTMLCanvasElement, options?: any) {
@@ -57,6 +59,8 @@ export class GLRenderer {
   readonly programManager = new GLProgramManager(this);
   readonly textureManger = new GLTextureManager(this);
   readonly attributeBufferManager = new GLAttributeBufferDataManager(this);
+  readonly frambufferManager = new GLFrameBufferManager(this);
+
   createProgram(conf: GLProgramConfig): GLProgram {
     const program = new GLProgram(this, conf);
     this.programManager.addNewProgram(program);
@@ -101,6 +105,17 @@ export class GLRenderer {
     }
 
     this.state.textureSlot.resetSlotIndex();
+  }
+
+  setRenderTarget(framebuffer: GLFramebuffer) {
+    const gl = this.gl;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.wegbglFrameBuffer);
+    gl.viewport(0, 0, framebuffer.width, framebuffer.height);
+  }
+  setRenderTargetScreen() {
+    const gl = this.gl;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, this._width, this._height);
   }
 
   clear() {

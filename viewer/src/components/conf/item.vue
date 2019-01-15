@@ -34,7 +34,6 @@ import BooleanEditor from './boolean.vue';
   }
 })
 export default class ConfigItem extends Vue {
-  name = 'config-item'
   expandEditor:boolean = false;
 
   @Prop() config: any;

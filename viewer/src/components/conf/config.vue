@@ -11,7 +11,6 @@ import Folder from './folder.vue';
   components: {Folder}
 })
 export default class ConfigPanel extends Vue {
-  name = 'config-panel'
 
   @Prop() config: any;
 }

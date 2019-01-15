@@ -9,7 +9,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import ConfigPanel from './config-panel.vue'
-import ScenePanel from './scene-panel.vue'
+import ScenePanel from './scene-panel/scene-panel.vue'
 import ViewerCanvas from './viewer-canvas.vue'
 @Component({
   components:{

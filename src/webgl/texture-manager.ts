@@ -2,6 +2,15 @@ import { GLRenderer } from "./webgl-renderer";
 import { generateUUID } from "../math/uuid";
 import { TextureFilter, TextureWrap } from "./const";
 
+
+interface TextureDescriptor {
+  minFilter: TextureFilter;
+  maxFilter: TextureFilter;
+  sWrap: TextureWrap;
+  tWrap: TextureWrap;
+}
+
+
 /**
  * responsible for webgltexture resource allocation and deallocation
  * outside request create webgltexture from given source or description
@@ -50,6 +59,34 @@ export class GLTextureManager{
     return id;
   }
 
+  createTextureForRenderTarget(width: number, height: number): WebGLTexture {
+    
+    const gl = this.renderer.gl;
+
+    const texture = gl.createTexture();
+    if (texture === null) {
+      throw 'webgl texture create fail';
+    }
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    const internalFormat = gl.RGBA;
+    const border = 0;
+    const format = gl.RGBA;
+    const type = gl.UNSIGNED_BYTE;
+    const data = null;
+    gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat,
+                  width, height, border,
+                  format, type, data);
+  
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+    const id = generateUUID();
+    this.textures[id] = texture;
+    return texture;
+  }
+
   private createTexture(config: TextureDescriptor) {
     const gl = this.renderer.gl;
     const texture = gl.createTexture();
@@ -64,11 +101,4 @@ export class GLTextureManager{
         break;
     }
   }
-}
-
-interface TextureDescriptor {
-  minFilter: TextureFilter;
-  maxFilter: TextureFilter;
-  sWrap: TextureWrap;
-  tWrap: TextureWrap;
 }

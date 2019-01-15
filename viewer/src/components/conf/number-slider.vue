@@ -12,7 +12,6 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 @Component
 export default class NumberSliderEditor extends Vue {
-  name = 'number-editor'
 
   @Prop() value: number;
   @Prop() config: number;

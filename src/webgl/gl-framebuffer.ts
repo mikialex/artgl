@@ -1,8 +1,12 @@
 export class GLFramebuffer{
-  constructor() {
-    
+  constructor(width:number, height:number) {
+    this.width = width;
+    this.height = height;
   }
 
+  width: number;
+  height: number;
+  bindingWebGLTexture: WebGLTexture;
   wegbglFrameBuffer: WebGLFramebuffer;
 
   // read pixel info from this framebuffer
