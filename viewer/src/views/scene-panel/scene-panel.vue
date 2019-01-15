@@ -1,5 +1,7 @@
 <template>
   <div class="scene-panel">
+    
+    <ObjectPanel v-if="false"/>
     <div class="panel-title">
       Scene explorer
     </div>
@@ -13,11 +15,12 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { SceneView } from '../../model/scene-view';
+import ObjectPanel from '../object-panel/object-panel.vue'
 import {GLApp} from '../../application';
 import NodeView from './scene-node-view.vue';
 @Component({
   components:{
-    NodeView
+    NodeView, ObjectPanel
   }
 })
 export default class ScenePanel extends Vue {

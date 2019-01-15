@@ -1,7 +1,4 @@
 
-
-
-
 export class DAGNode{
   private toNode: DAGNode[];
   private fromNode: DAGNode[];

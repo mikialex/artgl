@@ -2,8 +2,11 @@ import ARTGL from '../../src/export';
 import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController } from '../../src/artgl';
 import { Scene } from '../../src/scene/scene';
 import { SceneNode } from '../../src/scene/scene-node';
+import { RenderGraph } from '../../src/render-graph/render-graph';
+import { DimensionType, PixelFormat } from '../../src/render-graph/interface';
 
 export class Application{
+  graph: RenderGraph = new RenderGraph();
   engine: ARTEngine;
   el: HTMLCanvasElement;
   hasInitialized: boolean = false;
@@ -23,6 +26,48 @@ export class Application{
     window.requestAnimationFrame(this.render);
     window.addEventListener('resize', this.onContainerResize);
     this.onContainerResize();
+
+    this.graph.setGraph({
+      renderTextures: [
+        {
+          name: 'Depth',
+          format: {
+            pixelFormat: PixelFormat.depth,
+            dimensionType: DimensionType.screenRelative,
+            width: 1,
+            height: 1
+          },
+        },
+        {
+          name: 'forwardScene',
+          format: {
+            pixelFormat: PixelFormat.rgba,
+            dimensionType: DimensionType.screenRelative,
+            width: 1,
+            height: 1
+          },
+        },
+      ],
+      passes: [
+        {
+          name: "Forward",
+          output: "Depth",
+          source: ['All']
+        },
+        {
+          name: "Depth",
+          output: "forwardScene",
+          source: ['All']
+        },
+        {
+          name: "DOF",
+          inputs: ["forwardScene", "Depth"],
+          technique: 'dofTech',
+          source: ['quad'],
+          output: 'screen',
+        }
+      ]
+    })
   }
 
   unintialize() {

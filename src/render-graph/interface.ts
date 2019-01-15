@@ -1,8 +1,9 @@
-export enum pixelFormat {
-  depth
+export enum PixelFormat {
+  depth,
+  rgba
 }
 
-export enum dimensionType {
+export enum DimensionType {
   screenRelative,
   fixed
 }
@@ -10,8 +11,8 @@ export enum dimensionType {
 export interface TextureDefine {
   name: string,
   format: {
-    pixelFormat: pixelFormat.depth,
-    dimensionType: dimensionType.screenRelative,
+    pixelFormat: PixelFormat,
+    dimensionType: DimensionType,
     width: number,
     height: number
   }
@@ -38,7 +39,7 @@ export interface PassDefine {
   filter?: () => boolean,
   sorter?: () => number,
   states?: stateType[],
-  overrideProgram?: 'myshaderA',
+  technique?: string,
 }
 
 export interface GraphDefine {

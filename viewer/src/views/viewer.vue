@@ -10,10 +10,11 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import ConfigPanel from './config-panel.vue'
 import ScenePanel from './scene-panel/scene-panel.vue'
+import ObjectPanel from './object-panel/object-panel.vue'
 import ViewerCanvas from './viewer-canvas.vue'
 @Component({
   components:{
-    ConfigPanel, ScenePanel, ViewerCanvas
+    ConfigPanel, ScenePanel, ViewerCanvas, ObjectPanel
   }
 })
 export default class Viewer extends Vue {

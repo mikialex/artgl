@@ -42,7 +42,7 @@ export class RenderGraph{
 
   private updateComposer() {
     const rootPassNode = this.findScreenRootPass();
-    const renderPassQueue = DAGNode.generateDependencyOrderList(rootPassNode);
+    const renderPassQueue = rootPassNode.generateDependencyOrderList();
   }
 
   getTextureDependence(name: string): TextureNode {

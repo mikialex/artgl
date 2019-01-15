@@ -1,7 +1,11 @@
 <template>
   <div class="node-view">
-    <div  @click="isExpand = !isExpand">
-      {{view.type}} - {{clampId}}
+    <div class="title">
+      <div @click="isExpand = !isExpand" :class="{'expandable': hasChildren}">
+        <span v-if="hasChildren && !isExpand"> + </span>
+        {{view.type}} - {{clampId}}
+      </div>
+      <button>*</button>
     </div>
     <div class="children" v-if="isExpand">
       <scene-node-view  
@@ -24,6 +28,10 @@ export default class BooleanEditor extends Vue {
     return this.view.uuid.slice(0, 6);
   }
   isExpand:boolean = true;
+
+  get hasChildren(){
+    return this.view.children.length;
+  }
 }
 
 </script>
@@ -31,6 +39,20 @@ export default class BooleanEditor extends Vue {
 <style lang="scss" scoped>
 .node-view{
   font-size: 13px;
+}
+
+.title{
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+}
+
+
+.expandable{
+
+  &:hover{
+    background: #f1f1f1;
+  }
 }
 
 .children{
