@@ -6,9 +6,11 @@ import { DAGNode } from "./dag/dag-node";
 import { ARTEngine } from "../engine/render-engine";
 
 export class RenderGraph{
-  constructor(engine: ARTEngine){
-    this.composer = new EffectComposer(engine);
+  constructor(engine: ARTEngine) {
+    this.engine = engine;
+    this.composer = new EffectComposer(this);
   }
+  engine: ARTEngine;
   composer: EffectComposer;
 
   private renderTextures: Map<string, TextureNode> = new Map();
@@ -44,6 +46,7 @@ export class RenderGraph{
   private updateComposer() {
     const rootPassNode = this.findScreenRootPass();
     const renderPassQueue = rootPassNode.generateDependencyOrderList();
+    this.composer.updatePasses(renderPassQueue);
   }
 
   getTextureDependence(name: string): TextureNode {

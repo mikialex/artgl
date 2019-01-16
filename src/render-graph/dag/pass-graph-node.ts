@@ -1,6 +1,7 @@
 import { DAGNode } from "./dag-node";
 import { PassDefine } from "../interface";
 import { RenderGraph } from "../render-graph";
+import { RenderPass } from "../pass";
 
 export class PassGraphNode extends DAGNode{
   constructor(graph: RenderGraph, define: PassDefine) {
@@ -28,4 +29,6 @@ export class PassGraphNode extends DAGNode{
   }
   readonly name: string;
   readonly define: PassDefine;
+
+  pass: RenderPass;
 }

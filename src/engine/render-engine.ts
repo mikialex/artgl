@@ -29,6 +29,7 @@ export class ARTEngine {
   }
 
   renderer: GLRenderer;
+  overrideTechnique: Technique;
 
 
 
@@ -147,6 +148,10 @@ export class ARTEngine {
 
   //// low level resouce binding
   connectTechnique(technique: Technique, program: GLProgram, object: RenderObject) {
+    if (this.overrideTechnique) {
+      technique = this.overrideTechnique;
+      program = this.overrideTechnique.getProgram(this);
+    }
     this.renderer.useProgram(program);
     program.setUniform('MMatrix', object.worldMatrix);
     program.setUniform('VPMatrix', this.VPMatrix);
