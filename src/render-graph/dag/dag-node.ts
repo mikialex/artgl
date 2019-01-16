@@ -2,6 +2,7 @@
 export class DAGNode{
   private toNode: DAGNode[] = [];
   private fromNode: DAGNode[] = [];
+  private fullfillList: boolean[] = [];
 
   public connectTo(node: DAGNode) {
     this.toNode.push(node);
@@ -30,24 +31,59 @@ export class DAGNode{
   }
 
   generateDependencyOrderList(): DAGNode[] {
-    const allDepNodes = this.generateAllDependencyList();
+    let allDepNodes = this.generateAllDependencyList();
+    allDepNodes.forEach(node => {
+      node.fullfillList = node.fromNode.map(n => false);
+    })
     let preventEndlessCounter = 1;
-    while (allDepNodes.length > 0 && preventEndlessCounter < 10000) {
-      
-      preventEndlessCounter++;
+    const result = [];
+    function resolveNext(node: DAGNode) {
+      result.push(node);
+      node.toNode.forEach(n => {
+        const selfIndex = n.fromNode.indexOf(node);
+        if (selfIndex === -1) {
+          throw 'comection error'
+        } 
+        n.fullfillList[selfIndex] = true;
+      })
     }
-    return [this];
+    while (allDepNodes.length > 0) {
+      allDepNodes = allDepNodes.filter(node => {
+        if (node.fullfillList.length === 0) {
+          resolveNext(node);
+          return false
+        }
+        for (let i = 0; i < node.fullfillList.length; i++) {
+          if (!node.fullfillList[i]) {
+            return true;
+          }
+        }
+        resolveNext(node);
+        return false;
+      });
+      preventEndlessCounter++;
+      if (preventEndlessCounter > 10000) {
+        throw 'generateDependencyOrderList failed';
+      }
+    }
+    return result;
   }
 
-  travserseDFS(visitor: (node:DAGNode) => any) {
-    visitor(this);
-    this.fromNode.forEach(n => { n.travserseDFS(visitor) });
+  // FIX ME, this traverse is a joke
+  travserseDFS(visitor: (node: DAGNode) => any) {
+    function visit(node: DAGNode) {
+      visitor(node);
+      node.fromNode.forEach(n => {
+        visit(n);
+      });
+    }
+    visit(this);
   }
 
   generateAllDependencyList(): DAGNode[] {
     const result = [];
     this.travserseDFS((n) => {
-      result.push(this);
+      result.push(n);
     })
     return result;
   }

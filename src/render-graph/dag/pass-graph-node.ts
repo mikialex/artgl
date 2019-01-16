@@ -16,6 +16,15 @@ export class PassGraphNode extends DAGNode{
         textureNode.connectTo(this);
       })
     }
+    if (define.output !== 'screen') {
+
+      const textureNode = graph.getTextureDependence(define.output);
+      if (textureNode === undefined) {
+        throw 'render graph build error, texture depend cant found';
+      }
+
+      this.connectTo(textureNode);
+    }
   }
   readonly name: string;
   readonly define: PassDefine;

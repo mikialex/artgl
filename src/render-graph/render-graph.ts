@@ -51,7 +51,7 @@ export class RenderGraph{
   }
 
   private findScreenRootPass(): PassGraphNode{
-    let rootPass;
+    let rootPass: PassGraphNode;
     this.passNodes.forEach(node => {
       if (node.define.output === 'screen') {
         if (rootPass !== undefined) {
