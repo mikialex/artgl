@@ -25,6 +25,7 @@ export default class ObjectPanel extends Vue {
   z-index:1;
   border-radius: 5px;
   box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.13);
+  clip-path: polygon(2% 2%, 98% 2%, 98% 98%, 2% 98%);
 }
 
 </style>

@@ -29,8 +29,9 @@ export class Technique{
     // setup default uniform value
     this.config = config;
     this.config.programConfig.uniforms.forEach(uniform => {
-      // TODO distinguish matrix unifrom ...
-      this.uniformValues[uniform.name] = uniform.default;
+      if (uniform.name !== 'MMatrix' && uniform.name !== 'VPMatrix') {
+        this.uniforms[uniform.name] = uniform.default;
+      }
     })
   }
 
@@ -42,7 +43,7 @@ export class Technique{
   needUpdate = true;
   isTransparent = false;
 
-  uniformValues: { [index: string]: any } = {};
+  uniforms: Map<string, any> = new Map();
 
 
   getProgram(engine: ARTEngine): GLProgram {

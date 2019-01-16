@@ -1,7 +1,7 @@
 <template>
   <div class="scene-panel">
     
-    <ObjectPanel v-if="false"/>
+    <ObjectPanel v-if="!true"/>
     <div class="panel-title">
       Scene explorer
     </div>

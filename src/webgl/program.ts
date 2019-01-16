@@ -76,6 +76,12 @@ export class GLProgram {
   drawCount: number = 0;
   useIndexDraw: boolean = false;
 
+  public forUniforms(cb: (uniform: GLUniform<any>) => any): void {
+    for (const key in this.textures) {
+      cb(this.uniforms[key]);
+    }
+  }
+
   public forTextures(cb: (texture: GLTexture) => any): void {
     for (const key in this.textures) {
       cb(this.textures[key]);

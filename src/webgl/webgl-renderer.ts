@@ -15,6 +15,8 @@ export class GLRenderer {
     if (el === undefined) {
       el = document.createElement('canvas');
     }
+    options = { ...options };
+    options.antialias = false;
     const ctx = el.getContext('webgl', options);
     if (ctx === null) {
       throw 'webgl context create failed';

@@ -127,9 +127,7 @@ export class ARTEngine {
     // prepare technique
     const technique = object.technique;
     const program = technique.getProgram(this);
-    this.renderer.useProgram(program);
-    program.setUniform('MMatrix', object.worldMatrix);
-    program.setUniform('VPMatrix', this.VPMatrix);
+    this.connectTechnique(technique, program, object);
 
     // prepare material
     this.connectMaterial(object.material, program);
@@ -148,6 +146,15 @@ export class ARTEngine {
 
 
   //// low level resouce binding
+  connectTechnique(technique: Technique, program: GLProgram, object: RenderObject) {
+    this.renderer.useProgram(program);
+    program.setUniform('MMatrix', object.worldMatrix);
+    program.setUniform('VPMatrix', this.VPMatrix);
+    technique.uniforms.forEach((uni, key) => {
+      program.setUniform('key', uni);
+    })
+  }
+
   connectMaterial(material: Material, program: GLProgram) {
     if (material === undefined) {
       if (program.needMaterial) {

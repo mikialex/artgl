@@ -33,7 +33,7 @@ export class RenderGraph{
 
   private constructPassGraph(passesDefine: PassDefine[]) {
     passesDefine.forEach(define => {
-      if (this.passNodes.has(define.name)) {
+      if (!this.passNodes.has(define.name)) {
         this.passNodes.set(define.name, new PassGraphNode(this, define));
       } else {
         throw 'duplicate pass define found'
