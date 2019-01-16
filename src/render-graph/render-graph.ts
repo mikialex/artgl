@@ -3,10 +3,11 @@ import { PassDefine, GraphDefine, TextureDefine } from "./interface";
 import { PassGraphNode } from "./dag/pass-graph-node";
 import { TextureNode } from "./dag/texture-node";
 import { DAGNode } from "./dag/dag-node";
+import { ARTEngine } from "../engine/render-engine";
 
 export class RenderGraph{
-  constructor(){
-
+  constructor(engine: ARTEngine){
+    this.composer = new EffectComposer(engine);
   }
   composer: EffectComposer;
 

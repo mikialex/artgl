@@ -6,7 +6,7 @@ import { RenderGraph } from '../../src/render-graph/render-graph';
 import { DimensionType, PixelFormat } from '../../src/render-graph/interface';
 
 export class Application{
-  graph: RenderGraph = new RenderGraph();
+  graph: RenderGraph;
   engine: ARTEngine;
   el: HTMLCanvasElement;
   hasInitialized: boolean = false;
@@ -17,6 +17,7 @@ export class Application{
   initialize(canvas: HTMLCanvasElement) {
     this.el = canvas;
     this.engine = new ARTEngine(canvas);
+    this.graph = new RenderGraph(this.engine);
     this.engine.camera.transform.position.set(20, 10, 10)
     this.interactor = new Interactor(canvas);
     this.orbitControler = new OrbitController(this.engine.camera as PerspectiveCamera);

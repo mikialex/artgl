@@ -19,6 +19,6 @@ export class RenderPass{
 
   execute(engine: ARTEngine) {
     engine.setRenderTarget(this.outPutTarget);
-    engine.render();
+    // engine.render();
   }
 }
