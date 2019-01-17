@@ -3,7 +3,8 @@ import { PassDefine, GraphDefine, TextureDefine } from "./interface";
 import { PassGraphNode } from "./dag/pass-graph-node";
 import { TextureNode } from "./dag/texture-node";
 import { DAGNode } from "./dag/dag-node";
-import { ARTEngine } from "../engine/render-engine";
+import { ARTEngine, RenderSource } from "../engine/render-engine";
+import { TechniqueConfig, Technique } from "../core/technique";
 
 export class RenderGraph{
   constructor(engine: ARTEngine) {
@@ -16,8 +17,8 @@ export class RenderGraph{
   private renderTextures: Map<string, TextureNode> = new Map();
   private passNodes: Map<string, PassGraphNode> = new Map();
 
-  render() {
-    this.composer.render();
+  render(source: RenderSource) {
+    this.composer.render(source);
   }
 
   reset() {
@@ -80,4 +81,17 @@ export class RenderGraph{
       this.renderTextures.set(define.name, new TextureNode(this, define));
     })
   }
+
+
+  private passTechniques: Map<string, Technique> = new Map();
+  registTechnique(name: string, technique: Technique) {
+    if (this.passTechniques.has(name)) {
+      throw 'duplicated technique registration'
+    }
+    this.passTechniques.set(name, technique);
+  }
+  getResgisteredTechnique(name: string) {
+    return this.passTechniques.get(name);
+  }
+  
 }

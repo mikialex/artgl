@@ -1,7 +1,8 @@
 import { RenderPass } from "./pass";
-import { ARTEngine } from "../engine/render-engine";
+import { ARTEngine, RenderSource } from "../engine/render-engine";
 import { RenderGraph } from "./render-graph";
 import { DAGNode } from "./dag/dag-node";
+import { PassGraphNode } from "./dag/pass-graph-node";
 
 export class EffectComposer{
   constructor(graph: RenderGraph) {
@@ -11,20 +12,23 @@ export class EffectComposer{
 
   private graph: RenderGraph;
   private engine: ARTEngine;
-  private passes: RenderPass[];
+  private passes: RenderPass[] = [];
 
   updatePasses(nodeQueue: DAGNode[]) {
-    
+    nodeQueue.forEach(node => {
+      if (node instanceof PassGraphNode) {
+        this.passes.push(node.pass);
+      }
+    })
   }
-
 
   clearPasses() {
     this.passes = [];
   }
 
-  render() {
+  render(source: RenderSource) {
     this.passes.forEach(pass => {
-      pass.execute(this.engine);
+      pass.execute(this.engine, source);
     });
   }
 }

@@ -4,7 +4,8 @@ import { Scene } from '../../src/scene/scene';
 import { SceneNode } from '../../src/scene/scene-node';
 import { RenderGraph } from '../../src/render-graph/render-graph';
 import { DimensionType, PixelFormat } from '../../src/render-graph/interface';
-
+import { DOFTechnique } from '../../src/technique/technique-lib/dof-technique';
+import { DepthTechnique } from '../../src/technique/technique-lib/depth-technique';
 export class Application{
   graph: RenderGraph;
   engine: ARTEngine;
@@ -28,6 +29,8 @@ export class Application{
     window.addEventListener('resize', this.onContainerResize);
     this.onContainerResize();
 
+    this.graph.registTechnique('depthTech', new DepthTechnique())
+    this.graph.registTechnique('dofTech', new DOFTechnique())
     this.graph.setGraph({
       renderTextures: [
         {
@@ -53,6 +56,7 @@ export class Application{
         {
           name: "Forward",
           output: "Depth",
+          technique: 'depthTech',
           source: ['All']
         },
         {
@@ -114,6 +118,7 @@ export class Application{
       this.orbitControler.update();
       this.engine.connectCamera();
       this.engine.render(this.scene);
+      this.graph.render(this.scene);
     }
     window.requestAnimationFrame(this.render);
   }

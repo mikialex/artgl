@@ -14,11 +14,11 @@ const vertexShaderSource =
 const fragmentShaderSource =
   `
     void main() {
-      gl_FragColor = vec4(vec3(depth / 1.0), 1.0);
+      gl_FragColor = vec4(vec3(depth / 10.0), 1.0);
     }
     `
 
-export class DepthTechnique extends Technique {
+export class DOFTechnique extends Technique {
   constructor() {
     const config = {
       programConfig: {

@@ -26,6 +26,8 @@ export class PassGraphNode extends DAGNode{
 
       this.connectTo(textureNode);
     }
+
+    this.pass = new RenderPass(graph, define);
   }
   readonly name: string;
   readonly define: PassDefine;

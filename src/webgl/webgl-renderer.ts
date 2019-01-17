@@ -114,6 +114,7 @@ export class GLRenderer {
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.wegbglFrameBuffer);
     gl.viewport(0, 0, framebuffer.width, framebuffer.height);
   }
+  
   setRenderTargetScreen() {
     const gl = this.gl;
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);

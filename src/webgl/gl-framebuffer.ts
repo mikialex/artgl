@@ -15,7 +15,7 @@ export class GLFramebuffer{
   wegbglFrameBuffer: WebGLFramebuffer;
 
   attachTexture() {
-    
+    // TODO
   }
 
   // read pixel info from this framebuffer

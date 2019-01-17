@@ -10,7 +10,7 @@ export const standradMeshAttributeLayout = [
   { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
 ]
 
-export interface MaterialConfig{
+export interface TechniqueConfig{
   programConfig: GLProgramConfig;
 }
 
@@ -25,7 +25,7 @@ export interface MaterialConfig{
  * @class Technique
  */
 export class Technique{
-  constructor(config: MaterialConfig) {
+  constructor(config: TechniqueConfig) {
     // setup default uniform value
     this.config = config;
     this.config.programConfig.uniforms.forEach(uniform => {
@@ -35,7 +35,7 @@ export class Technique{
     })
   }
 
-  config: MaterialConfig;
+  config: TechniqueConfig;
   name: string;
   uuid: string = generateUUID();
   programId: string;

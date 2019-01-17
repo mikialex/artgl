@@ -36,6 +36,6 @@ export class GLFrameBufferManager{
   }
 
   getFramebufferTexture(framebufferName: string): WebGLTexture{
-    return // TODO
+    return this.framebuffers.get(framebufferName).bindingWebGLTexture;
   }
 }

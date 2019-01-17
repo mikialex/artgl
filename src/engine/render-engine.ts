@@ -29,7 +29,7 @@ export class ARTEngine {
   }
 
   renderer: GLRenderer;
-  overrideTechnique: Technique;
+  overrideTechnique: Nullable<Technique> = null;
 
 
 
@@ -148,7 +148,7 @@ export class ARTEngine {
 
   //// low level resouce binding
   connectTechnique(technique: Technique, program: GLProgram, object: RenderObject) {
-    if (this.overrideTechnique) {
+    if (this.overrideTechnique !== null) {
       technique = this.overrideTechnique;
       program = this.overrideTechnique.getProgram(this);
     }
