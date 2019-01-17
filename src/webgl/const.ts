@@ -38,18 +38,18 @@ export const enum GLTextureType {
 
 
 export enum TextureFilter {
-  linear,
-  nearest,
-  NEAREST_MIPMAP_NEAREST,
-  LINEAR_MIPMAP_NEAREST,
-  NEAREST_MIPMAP_LINEAR,
-  LINEAR_MIPMAP_LINEAR
+  nearest = 0x2600,
+  linear = 0x2601,
+  NEAREST_MIPMAP_NEAREST = 0x2700,
+  LINEAR_MIPMAP_NEAREST = 0x2701,
+  NEAREST_MIPMAP_LINEAR = 0x2702,
+  LINEAR_MIPMAP_LINEAR = 0x2703
 }
 
 export enum TextureWrap {
-  repeat,
-  clampToEdge,
-  mirroredRepeat
+  repeat = 0x2901,
+  clampToEdge = 0x812F,
+  mirroredRepeat = 0x8370
 }
 
   

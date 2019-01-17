@@ -161,22 +161,27 @@ export class ARTEngine {
   }
 
   connectMaterial(material: Material, program: GLProgram) {
-    if (material === undefined) {
-      if (program.needMaterial) {
-        throw 'texture is need but not have material'
-      }
-    }
 
     program.forTextures((tex: GLTexture) => {
-      const texture = material.channel[tex.name];
-      if (texture === undefined) {
-        throw 'cant fond texture';
-      }
-      if (texture.gltextureId === undefined) {
-        texture.gltextureId = this.renderer.textureManger.createTextureFromImageElement(texture.image);
+      let webgltexture: WebGLTexture;
+
+      // aquire texuture from material or framebuffers
+      if (material !== undefined) {
+        const texture = material.getChannelTexture(tex.name);
+        if (texture.gltextureId === undefined) {
+          texture.gltextureId = this.renderer.textureManger.createTextureFromImageElement(texture.image);
+          webgltexture = this.renderer.textureManger.getGLTexture(texture.gltextureId);
+        }
+      } 
+
+      if (webgltexture === undefined) {
+        webgltexture = this.renderer.frambufferManager.getFramebufferTexture(tex.name);
       }
 
-      const webgltexture = this.renderer.textureManger.getGLTexture(texture.gltextureId);
+      if (webgltexture === undefined) {
+        throw 'texture bind failed'
+      }
+      
       tex.useTexture(webgltexture);
     })
   }

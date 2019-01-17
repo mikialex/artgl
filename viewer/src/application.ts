@@ -87,7 +87,7 @@ export class Application{
 
   createScene(scene: Scene): Scene {
     let testGeo = new ARTGL.SphereGeometry(1, 40, 40);
-    let testMat = new ARTGL.NormalTechnique();
+    let testTec = new ARTGL.NormalTechnique();
     for (let i = 0; i < 5; i++) {
       const node = new SceneNode();
       node.transform.position.x = i;
@@ -99,7 +99,7 @@ export class Application{
         for (let k = 0; k < 5; k++) {
           const testMesh = new Mesh();
           testMesh.geometry = testGeo;
-          testMesh.technique = testMat;
+          testMesh.technique = testTec;
           testMesh.transform.position.z = k;
           testMesh.transform.scale.set(0.3, 0.3, 0.3);
           node2.addChild(testMesh);

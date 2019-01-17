@@ -16,10 +16,14 @@ export class Material{
     
   // }
 
-  channel: { [index: string]: Texture } = {};
+  private channel: Map<string, Texture> = new Map();
 
   setChannel(channel: string, texture: Texture) {
     this.channel[channel] = texture;
+  }
+
+  getChannelTexture(name: string) {
+    return this.channel.get(name);
   }
 
 }

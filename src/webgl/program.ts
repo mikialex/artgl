@@ -71,7 +71,6 @@ export class GLProgram {
   private textures: { [index: string]: GLTexture } = {};
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
-  needMaterial: boolean = false;
   drawFrom: number = 0;
   drawCount: number = 0;
   useIndexDraw: boolean = false;
@@ -135,7 +134,6 @@ export class GLProgram {
     if (config.textures !== undefined) {
       config.textures.forEach(tex => {
         this.textures[tex.name] = new GLTexture(this, tex);
-        this.needMaterial = true;
       })
     }
   }
