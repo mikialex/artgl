@@ -27,6 +27,10 @@ export default class ViewerCanvas extends Vue {
     this.isRuning = GLApp.active;
   }
 
+  beforeDestroy(){
+    GLApp.unintialize();
+  }
+
   run(){
     GLApp.run();
     this.isRuning = true;

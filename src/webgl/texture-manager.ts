@@ -74,7 +74,15 @@ export class GLTextureManager{
     if (texture === null) {
       throw 'webgl texture create fail';
     }
-    gl.bindTexture(gl.TEXTURE_2D, texture);
+    this.updateRenderTargetSize(texture, width, height);
+    const id = generateUUID();
+    this.textures[id] = texture;
+    return texture;
+  }
+
+  updateRenderTargetSize(glTexture: WebGLTexture, width: number, height: number) {
+    const gl = this.renderer.gl;
+    gl.bindTexture(gl.TEXTURE_2D, glTexture);
 
     const internalFormat = gl.RGBA;
     const border = 0;
@@ -83,16 +91,13 @@ export class GLTextureManager{
     const data = null;
     // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D
     gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat,
-                  width, height, border,
-                  format, type, data);
-  
+      width, height, border,
+      format, type, data);
+
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-    const id = generateUUID();
-    this.textures[id] = texture;
-    return texture;
+    return glTexture;
   }
 
   private createTexture(config: TextureDescriptor): WebGLTexture {

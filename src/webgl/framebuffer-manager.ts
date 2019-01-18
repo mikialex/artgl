@@ -1,6 +1,5 @@
 import { GLFramebuffer } from "./gl-framebuffer";
 import { GLRenderer } from "./webgl-renderer";
-import { Texture } from "../core/texture";
 
 export class GLFrameBufferManager{
   constructor(renderer: GLRenderer) {
@@ -18,17 +17,9 @@ export class GLFrameBufferManager{
     }
     const gl = this.gl;
 
-    const framebuffer = new GLFramebuffer(name, width, height);
-
-    const fb = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-    framebuffer.wegbglFrameBuffer = fb;
-
-    const texture = this.renderer.textureManger.createTextureForRenderTarget(width, height);
-    framebuffer.bindingWebGLTexture = texture;
-
-    const attachmentPoint = gl.COLOR_ATTACHMENT0;
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, texture, 0);
+    const framebuffer = new GLFramebuffer(this.renderer, name);
+    framebuffer.setSize(width, height);
+    framebuffer.createAttachTexture(0);
 
     this.framebuffers.set(name, framebuffer);
 
@@ -36,6 +27,6 @@ export class GLFrameBufferManager{
   }
 
   getFramebufferTexture(framebufferName: string): WebGLTexture{
-    return this.framebuffers.get(framebufferName).bindingWebGLTexture;
+    return this.framebuffers.get(framebufferName).textureAttachedSlot[0].gltexture;
   }
 }

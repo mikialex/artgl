@@ -12,6 +12,9 @@ export { Material } from './core/material';
 export { Technique } from "./core/technique";
 export { BufferData } from "./core/buffer-data";
 
+// render graph
+export { RenderGraph } from './render-graph/render-graph';
+
 // geometry lib
 export { SphereGeometry } from "./geometry/geo-lib/sphere-geometry";
 export { TestGeometry } from "./geometry/test-geometery";
