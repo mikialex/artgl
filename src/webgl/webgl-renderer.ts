@@ -23,14 +23,13 @@ export class GLRenderer {
     }
     this.gl = ctx;
     this.el = el;
-    this._width = this.el.width;
-    this._height = this.el.height;
     this.glInfo = new GLInfo(this);
     this.frambufferManager = new GLFrameBufferManager(this);
     this.glInfo.createAllExtension();
     this.devicePixelRatio = window.devicePixelRatio;
     this.state = new GLState(this);
     this.textureManger.init();
+    this.setSize(this.el.offsetWidth, this.el.offsetHeight);
   }
   gl: WebGLRenderingContext;
   el: HTMLCanvasElement;
@@ -42,18 +41,19 @@ export class GLRenderer {
   // only enable this when debug draw range issue
   enableRenderErrorCatch: boolean = false;
 
+  // width height is render size, not element size
   private _width = 100;
   get width() { return this._width };
   private _height = 100;
   get height() { return this._height };
 
   devicePixelRatio = window.devicePixelRatio;
-
+  // set rendersize by real size
   setSize(width: number, height: number) {
-    this._width = width;
-    this._height = height;
-    this.el.width = this._width * this.devicePixelRatio;
-    this.el.height = this._height * this.devicePixelRatio;
+    this._width = width * this.devicePixelRatio;
+    this._height = height * this.devicePixelRatio;
+    this.el.width = this._width;
+    this.el.height = this._height;
 		this.state.setViewport( 0, 0, width * this.devicePixelRatio, height * this.devicePixelRatio );
   }
 

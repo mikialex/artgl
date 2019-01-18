@@ -25,7 +25,6 @@ export class Application{
     this.orbitControler.registerInteractor(this.interactor);
     this.hasInitialized = true;
     this.createScene(this.scene);
-    window.requestAnimationFrame(this.render);
     window.addEventListener('resize', this.onContainerResize);
     this.onContainerResize();
 
@@ -114,18 +113,22 @@ export class Application{
   }
 
   render = () => {
+    this.orbitControler.update();
+    this.engine.connectCamera();
+
+    // this.engine.renderer.setRenderTargetScreen();
+    // this.engine.render(this.scene);
+
+    this.graph.render(this.scene);
     if (this.active) {
-      this.orbitControler.update();
-      this.engine.connectCamera();
-      // this.engine.render(this.scene);
-      this.graph.render(this.scene);
+      window.requestAnimationFrame(this.render);
     }
-    window.requestAnimationFrame(this.render);
   }
 
   run() {
     this.active = true;
     this.interactor.enabled = true;
+    window.requestAnimationFrame(this.render);
   }
 
   stop() {
