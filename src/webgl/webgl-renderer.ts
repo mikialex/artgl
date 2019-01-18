@@ -26,6 +26,7 @@ export class GLRenderer {
     this._width = this.el.width;
     this._height = this.el.height;
     this.glInfo = new GLInfo(this);
+    this.frambufferManager = new GLFrameBufferManager(this);
     this.glInfo.createAllExtension();
     this.devicePixelRatio = window.devicePixelRatio;
     this.state = new GLState(this);
@@ -61,7 +62,7 @@ export class GLRenderer {
   readonly programManager = new GLProgramManager(this);
   readonly textureManger = new GLTextureManager(this);
   readonly attributeBufferManager = new GLAttributeBufferDataManager(this);
-  readonly frambufferManager = new GLFrameBufferManager(this);
+  readonly frambufferManager: GLFrameBufferManager;
 
   createProgram(conf: GLProgramConfig): GLProgram {
     const program = new GLProgram(this, conf);
@@ -109,13 +110,17 @@ export class GLRenderer {
     this.state.textureSlot.resetSlotIndex();
   }
 
+  currentFrambuffer: Nullable<GLFramebuffer> = null;
   setRenderTarget(framebuffer: GLFramebuffer) {
-    const gl = this.gl;
-    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.wegbglFrameBuffer);
-    gl.viewport(0, 0, framebuffer.width, framebuffer.height);
+    if (this.currentFrambuffer !== framebuffer) {
+      const gl = this.gl;
+      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.wegbglFrameBuffer);
+      gl.viewport(0, 0, framebuffer.width, framebuffer.height); 
+    }
   }
   
   setRenderTargetScreen() {
+    this.currentFrambuffer = null;
     const gl = this.gl;
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, this._width, this._height);

@@ -31,7 +31,7 @@ export const enum BlendingMode {
   CustomBlending = 5,
 }
 
-export const enum GLTextureType {
+export const enum GLTextureTypeRaw {
   texture2D = 0x0DE1,
   textureCubeMap = 0x8513,
 }

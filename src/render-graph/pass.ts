@@ -1,14 +1,14 @@
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { Texture } from "../core/texture";
 import { ARTEngine, RenderSource } from "../engine/render-engine";
-import { GLProgram } from "../webgl/program";
 import { Technique } from "../core/technique";
 import { RenderGraph } from "./render-graph";
 import { PassDefine } from "./interface";
+import { TextureNode } from "./dag/texture-node";
 
 export class RenderPass{
   constructor(graph: RenderGraph, define: PassDefine) {
-
+    this.define = define;
     this.name = define.name;
     if (define.technique !== undefined) {
       const overrideTechnique = graph.getResgisteredTechnique(define.technique);
@@ -17,8 +17,13 @@ export class RenderPass{
       }
       this.overrideTechnique = overrideTechnique;
     }
+
+    if (define.output !== 'screen') {
+      this.isOutputScreen = false;
+    }
   }
 
+  readonly define: PassDefine;
   public name: string;
 
   private overrideTechnique: Technique;
@@ -26,10 +31,21 @@ export class RenderPass{
   private textureDependency: Texture[];
   private framebufferDependency: GLFramebuffer[];
 
-  private outPutTarget: GLFramebuffer
+  private outputTarget: GLFramebuffer
+  private isOutputScreen: boolean = true;
+
+  setOutPutTarget(textureNode: TextureNode) {
+    this.outputTarget = textureNode.framebuffer;
+  }
 
   execute(engine: ARTEngine, source: RenderSource) {
-    engine.setRenderTarget(this.outPutTarget);
+
+    if (this.isOutputScreen) {
+      engine.renderer.setRenderTargetScreen();
+    } else {
+      engine.renderer.setRenderTarget(this.outputTarget);
+    }
+
     if (this.overrideTechnique !== undefined) {
       engine.overrideTechnique = this.overrideTechnique;
     }

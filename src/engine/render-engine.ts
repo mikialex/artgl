@@ -126,9 +126,7 @@ export class ARTEngine {
   renderObject(object: RenderObject) {
 
     // prepare technique
-    const technique = object.technique;
-    const program = technique.getProgram(this);
-    this.connectTechnique(technique, program, object);
+    const program = this.connectTechnique(object);
 
     // prepare material
     this.connectMaterial(object.material, program);
@@ -147,7 +145,9 @@ export class ARTEngine {
 
 
   //// low level resouce binding
-  connectTechnique(technique: Technique, program: GLProgram, object: RenderObject) {
+  connectTechnique(object: RenderObject): GLProgram {
+    let program: GLProgram;
+    let technique: Technique;
     if (this.overrideTechnique !== null) {
       technique = this.overrideTechnique;
       program = this.overrideTechnique.getProgram(this);
@@ -158,6 +158,7 @@ export class ARTEngine {
     technique.uniforms.forEach((uni, key) => {
       program.setUniform('key', uni);
     })
+    return program;
   }
 
   connectMaterial(material: Material, program: GLProgram) {
@@ -248,12 +249,6 @@ export class ARTEngine {
   createOrUpdateAttributeBuffer(bufferData: BufferData, useforIndex: boolean): WebGLBuffer {
     return this.renderer.attributeBufferManager.updateOrCreateBuffer(bufferData.data.buffer as ArrayBuffer, useforIndex);
   }
-
-
-  setRenderTarget(target: GLFramebuffer) {
-
-  }
-
 
 
 }

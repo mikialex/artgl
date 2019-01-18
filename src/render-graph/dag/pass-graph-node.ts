@@ -8,6 +8,9 @@ export class PassGraphNode extends DAGNode{
     super();
     this.name = define.name;
     this.define = define;
+
+    this.pass = new RenderPass(graph, define);
+
     if (define.inputs !== undefined) {
       define.inputs.forEach(textInput => {
         const textureNode = graph.getTextureDependence(textInput);
@@ -25,12 +28,13 @@ export class PassGraphNode extends DAGNode{
       }
 
       this.connectTo(textureNode);
+      this.pass.setOutPutTarget(textureNode);
     }
 
-    this.pass = new RenderPass(graph, define);
   }
   readonly name: string;
   readonly define: PassDefine;
 
   pass: RenderPass;
+  
 }

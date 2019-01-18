@@ -14,7 +14,8 @@ const vertexShaderSource =
 const fragmentShaderSource =
   `
     void main() {
-      gl_FragColor = vec4(vec3(depth / 1.0), 1.0);
+      // gl_FragColor = vec4(vec3(depth / 1.0), 1.0);
+      gl_FragColor = vec4(vec3(0.5), 1.0);
     }
     `
 

@@ -2,6 +2,7 @@ import { Technique } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { Matrix4 } from "../../math/matrix4";
+import { GLTextureType } from "../../webgl/gl-texture";
 
 const vertexShaderSource =
   `
@@ -14,7 +15,9 @@ const vertexShaderSource =
 const fragmentShaderSource =
   `
     void main() {
-      gl_FragColor = vec4(vec3(depth / 10.0), 1.0);
+      float depthColorBuffer = texture2D(depthBuffer, gl_FragCoord.xy).r;
+      gl_FragColor = vec4(vec3(depthColorBuffer / 10.0), 1.0);
+      // gl_FragColor = vec4(vec3(1.0,0.0,0.0), 1.0);
     }
     `
 
@@ -31,6 +34,9 @@ export class DOFTechnique extends Technique {
         ],
         varyings: [
           { name: 'depth', type: GLDataType.float }
+        ],
+        textures: [
+          {name: 'depthBuffer', type: GLTextureType.texture2D}
         ],
         vertexShaderString: vertexShaderSource,
         fragmentShaderString: fragmentShaderSource,

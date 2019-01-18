@@ -1,8 +1,8 @@
 import { GLRenderer } from "../webgl-renderer";
-import { GLTextureType } from "../const";
+import { GLTextureTypeRaw } from "../const";
 
 interface textureBindInfo {
-  type: GLTextureType,
+  type: GLTextureTypeRaw,
   texture: WebGLTexture
 }
 
@@ -33,7 +33,7 @@ export class GLTextureSlot{
 		}
   }
 
-  bindTexture(webglType: GLTextureType, webglTexture: WebGLTexture ) {
+  bindTexture(webglType: GLTextureTypeRaw, webglTexture: WebGLTexture ) {
 		if ( this.currentTextureSlot === null ) {
 			this.activeTexture(this.gl.TEXTURE0);
 		}
@@ -68,7 +68,7 @@ export class GLTextureSlot{
     const textureSlotToUpdate = this.findSlot(webglTexture);
     const textureSlotGLToUpdate = textureSlotMap[textureSlotToUpdate];
     this.activeTexture(textureSlotGLToUpdate);
-    this.bindTexture(GLTextureType.texture2D, webglTexture);
+    this.bindTexture(GLTextureTypeRaw.texture2D, webglTexture);
     return textureSlotToUpdate;
   }
 }

@@ -34,39 +34,40 @@ export class Application{
     this.graph.setGraph({
       renderTextures: [
         {
-          name: 'Depth',
+          name: 'depthBuffer',
           format: {
             pixelFormat: PixelFormat.depth,
-            dimensionType: DimensionType.screenRelative,
-            width: 1,
-            height: 1
+            dimensionType: DimensionType.fixed,
+            width: 500,
+            height: 500
           },
         },
         {
-          name: 'forwardScene',
+          name: 'forwardSceneBuffer',
           format: {
             pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.screenRelative,
-            width: 1,
-            height: 1
+            dimensionType: DimensionType.fixed,
+            width: 500,
+            height: 500
           },
         },
       ],
       passes: [
         {
-          name: "Forward",
-          output: "Depth",
+          name: "Depth",
+          output: "depthBuffer",
           technique: 'depthTech',
           source: ['All']
         },
-        {
-          name: "Depth",
-          output: "forwardScene",
-          source: ['All']
-        },
+        // {
+        //   name: "Depth",
+        //   output: "forwardSceneBuffer",
+        //   source: ['All'],
+        //   technique: 'dofTech',
+        // },
         {
           name: "DOF",
-          inputs: ["forwardScene", "Depth"],
+          inputs: ["depthBuffer", "forwardSceneBuffer"],
           technique: 'dofTech',
           source: ['quad'],
           output: 'screen',
@@ -117,7 +118,7 @@ export class Application{
     if (this.active) {
       this.orbitControler.update();
       this.engine.connectCamera();
-      this.engine.render(this.scene);
+      // this.engine.render(this.scene);
       this.graph.render(this.scene);
     }
     window.requestAnimationFrame(this.render);
