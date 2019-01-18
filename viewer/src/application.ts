@@ -43,7 +43,7 @@ export class Application{
           },
         },
         {
-          name: 'forwardSceneBuffer',
+          name: 'sceneBuffer',
           format: {
             pixelFormat: PixelFormat.rgba,
             dimensionType: DimensionType.fixed,
@@ -59,15 +59,14 @@ export class Application{
           technique: 'depthTech',
           source: ['All']
         },
-        // {
-        //   name: "Depth",
-        //   output: "forwardSceneBuffer",
-        //   source: ['All'],
-        //   technique: 'dofTech',
-        // },
+        {
+          name: "SceneOrigin",
+          output: "sceneBuffer",
+          source: ['All'],
+        },
         {
           name: "DOF",
-          inputs: ["depthBuffer", "forwardSceneBuffer"],
+          inputs: ["depthBuffer", "sceneBuffer"],
           technique: 'dofTech',
           source: ['quad'],
           output: 'screen',

@@ -146,12 +146,13 @@ export class ARTEngine {
 
   //// low level resouce binding
   connectTechnique(object: RenderObject): GLProgram {
-    let program: GLProgram;
     let technique: Technique;
     if (this.overrideTechnique !== null) {
       technique = this.overrideTechnique;
-      program = this.overrideTechnique.getProgram(this);
+    } else {
+      technique = object.technique;
     }
+    const program = technique.getProgram(this);
     this.renderer.useProgram(program);
     program.setUniform('MMatrix', object.worldMatrix);
     program.setUniform('VPMatrix', this.VPMatrix);

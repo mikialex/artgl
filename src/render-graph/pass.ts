@@ -50,6 +50,8 @@ export class RenderPass{
       engine.overrideTechnique = this.overrideTechnique;
     }
 
+    engine.renderer.clear();
+
     engine.render(source);
 
     engine.overrideTechnique = null;
