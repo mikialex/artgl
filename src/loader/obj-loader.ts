@@ -300,8 +300,6 @@ export class OBJLoader {
     console.log('positionBuffer:' + positionBuffer.length);
     geometry.layout = {
       dataInfo: defaultNoTexGeometryLayoutDataInfo,
-      drawCount: indexBuffer.length,
-      drawFrom: 0,
     }
 
     return geometry;

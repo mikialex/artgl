@@ -2,7 +2,7 @@ import { Technique } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { Matrix4 } from "../../math/matrix4";
-import { GLTextureType } from "../../webgl/gl-texture";
+import { GLTextureType } from "../../webgl/uniform/uniform-texture";
 
 const vertexShaderSource =
   `

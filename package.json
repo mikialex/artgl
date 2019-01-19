@@ -5,7 +5,6 @@
   "main": "src/artigl.js",
   "types": "src/artgl.d.ts",
   "scripts": {
-    "dev": "npx webpack-dev-server --port 8000 --config webpack.config.dev.js",
     "package": "npx webpack --config webpack.config.prod.js",
     "buildsrc": "npx tsc --build",
     "build": "node ./script/build.js"

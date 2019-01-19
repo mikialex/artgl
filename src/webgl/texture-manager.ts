@@ -1,4 +1,4 @@
-import { GLRenderer } from "./webgl-renderer";
+import { GLRenderer } from "./gl-renderer";
 import { generateUUID } from "../math/uuid";
 import { TextureFilter, TextureWrap } from "./const";
 

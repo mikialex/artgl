@@ -1,11 +1,11 @@
-import { GLRenderer } from "./webgl-renderer";
+import { GLRenderer } from "./gl-renderer";
 import { GLShader, ShaderType } from "./shader";
 import { generateUUID } from "../math/uuid";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
 import { GLUniform, UniformDescriptor } from "./uniform/uniform";
 import { AttributeDescriptor, GLAttribute, AttributeUsage } from "./attribute";
 import { Nullable } from "../type";
-import { GLTexture, TextureDescriptor } from "./gl-texture";
+import { GLTextureUniform, TextureDescriptor } from "./uniform/uniform-texture";
 
 export interface VaryingDescriptor {
   name: string,
@@ -68,7 +68,7 @@ export class GLProgram {
   private attributes: { [index: string]: GLAttribute } = {};
   private attributeUsageMap: { [index: number]: GLAttribute } = {};
   private uniforms: { [index: string]: GLUniform<any> } = {};
-  private textures: { [index: string]: GLTexture } = {};
+  private textures: { [index: string]: GLTextureUniform } = {};
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
   drawFrom: number = 0;
@@ -81,7 +81,7 @@ export class GLProgram {
     }
   }
 
-  public forTextures(cb: (texture: GLTexture) => any): void {
+  public forTextures(cb: (texture: GLTextureUniform) => any): void {
     for (const key in this.textures) {
       cb(this.textures[key]);
     }
@@ -133,7 +133,7 @@ export class GLProgram {
     }
     if (config.textures !== undefined) {
       config.textures.forEach(tex => {
-        this.textures[tex.name] = new GLTexture(this, tex);
+        this.textures[tex.name] = new GLTextureUniform(this, tex);
       })
     }
   }

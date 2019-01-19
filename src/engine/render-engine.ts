@@ -1,4 +1,4 @@
-import { GLRenderer } from "../webgl/webgl-renderer";
+import { GLRenderer } from "../webgl/gl-renderer";
 import { RenderList } from "./render-list";
 import { RenderObject, RenderRange } from "../core/render-object";
 import { Camera } from "../core/camera";
@@ -9,9 +9,8 @@ import { BufferData } from "../core/buffer-data";
 import { Technique } from "../core/technique";
 import { DrawMode } from "../webgl/const";
 import { Texture } from "../core/texture";
-import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { Material } from "../core/material";
-import { GLTexture } from "../webgl/gl-texture";
+import { GLTextureUniform } from "../webgl/uniform/uniform-texture";
 import { PerspectiveCamera } from "../camera/perspective-camera";
 import { Nullable } from "../type";
 
@@ -164,7 +163,7 @@ export class ARTEngine {
 
   connectMaterial(material: Material, program: GLProgram) {
 
-    program.forTextures((tex: GLTexture) => {
+    program.forTextures((tex: GLTextureUniform) => {
       let webgltexture: WebGLTexture;
 
       // aquire texuture from material or framebuffers

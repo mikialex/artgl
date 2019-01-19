@@ -1,4 +1,4 @@
-import { GLRenderer } from "../webgl-renderer";
+import { GLRenderer } from "../gl-renderer";
 import { DepthFunction } from "../const";
 
 export class GLDepthBuffer {

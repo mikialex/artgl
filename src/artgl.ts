@@ -1,6 +1,6 @@
 
 // lowlevel gl layer
-export { GLRenderer } from "./webgl/webgl-renderer";
+export { GLRenderer } from "./webgl/gl-renderer";
 export { GLProgram } from "./webgl/program";
 
 // artgl engine layer
@@ -17,7 +17,7 @@ export { RenderGraph } from './render-graph/render-graph';
 
 // geometry lib
 export { SphereGeometry } from "./geometry/geo-lib/sphere-geometry";
-export { TestGeometry } from "./geometry/test-geometery";
+export { PlaneGeometry } from "./geometry/geo-lib/plane-geometry";
 
 // technique lib
 export { TestTechnique } from "./technique/test-technique";

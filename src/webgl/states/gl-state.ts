@@ -1,4 +1,4 @@
-import { GLRenderer } from "../webgl-renderer";
+import { GLRenderer } from "../gl-renderer";
 import { Vector4 } from "../../math/vector4";
 import { CullSide } from "../const";
 import { GLColorBuffer } from "./gl-color-buffer";

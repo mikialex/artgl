@@ -2,7 +2,7 @@ import { Technique, standradMeshAttributeLayout } from "../core/technique";
 import { GLDataType } from "../webgl/shader-util";
 import { Matrix4 } from "../math/index";
 import { AttributeUsage } from "../webgl/attribute";
-import { GLTextureType } from "../webgl/gl-texture";
+import { GLTextureType } from "../webgl/uniform/uniform-texture";
 
 const vertexShaderSource =
   `

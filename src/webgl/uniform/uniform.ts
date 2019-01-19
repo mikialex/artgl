@@ -57,6 +57,7 @@ export class GLUniform<T>{
     if (this.lastReceiveData === undefined) { // this uniform never uploadever
       this.lastReceiveData = this.flattener(value, this.lastReceiveData);
       this.setter(this.gl, this.location, this.receiveData);
+      this.program.renderer.stat.uniformUpload++;
       return;
     }
 
@@ -64,10 +65,12 @@ export class GLUniform<T>{
     if (enableDiff) {
       if (this.differ(this.receiveData, this.lastReceiveData)) {
         this.setter(this.gl, this.location, this.receiveData);
+        this.program.renderer.stat.uniformUpload++;
         this.lastReceiveData = this.copyer(this.receiveData, this.lastReceiveData);
       }
     } else {
       this.setter(this.gl, this.location, this.receiveData);
+      this.program.renderer.stat.uniformUpload++;
     }
   }
 

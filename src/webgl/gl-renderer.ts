@@ -9,6 +9,7 @@ import { Nullable } from "../type";
 import { GLTextureManager } from "./texture-manager";
 import { GLFrameBufferManager } from "./framebuffer-manager";
 import { GLFramebuffer } from "./gl-framebuffer";
+import { GLStat } from "./gl-stat";
 
 export class GLRenderer {
   constructor(el?: HTMLCanvasElement, options?: any) {
@@ -58,6 +59,7 @@ export class GLRenderer {
   }
 
   state: GLState;
+  stat: GLStat = new GLStat();
   activeProgram: Nullable<GLProgram> = null;
   readonly programManager = new GLProgramManager(this);
   readonly textureManger = new GLTextureManager(this);
@@ -76,6 +78,7 @@ export class GLRenderer {
 
   useProgram(program: GLProgram) {
     if (this.activeProgram !== program) {
+      this.stat.programSwitch++;
       this.activeProgram = program;
       this.gl.useProgram(program.getProgram());
     }
@@ -99,6 +102,7 @@ export class GLRenderer {
     } else {
       this.gl.drawArrays(mode, this.activeProgram.drawFrom, this.activeProgram.drawCount);
     }
+    this.stat.drawcall++;
 
     if (this.enableRenderErrorCatch) {
       const errorCode = this.gl.getError();
@@ -113,6 +117,7 @@ export class GLRenderer {
   currentFrambuffer: Nullable<GLFramebuffer> = null;
   setRenderTarget(framebuffer: Nullable<GLFramebuffer>) {
     if (this.currentFrambuffer !== framebuffer) {
+      this.stat.framebufferSwitch++;
       this.currentFrambuffer = framebuffer;
       const gl = this.gl;
       if (framebuffer === null) {

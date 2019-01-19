@@ -1,8 +1,8 @@
-import { GLProgram } from "./program";
-import { GLRenderer } from "./webgl-renderer";
-import { Nullable } from "../type";
-import { GLTextureManager } from "./texture-manager";
-import { GLTextureSlot } from "./states/gl-texture-slot";
+import { GLProgram } from "../program";
+import { GLRenderer } from "../gl-renderer";
+import { Nullable } from "../../type";
+import { GLTextureManager } from "../texture-manager";
+import { GLTextureSlot } from "../states/gl-texture-slot";
 
 export enum GLTextureType{
   texture2D,
@@ -17,12 +17,11 @@ export interface TextureDescriptor {
  * for texture uniform uploading
  * 
  * @export
- * @class GLTexture
+ * @class GLTextureUniform
  */
-export class GLTexture{
+export class GLTextureUniform{
   constructor(program: GLProgram, descriptor: TextureDescriptor) {
     this.program = program;
-    this.textureManger = program.renderer.textureManger;
     this.slotManager = program.renderer.state.textureSlot;
     this.gl = program.getRenderer().gl;
     this.name = descriptor.name
@@ -34,7 +33,6 @@ export class GLTexture{
   }
   name: string;
   private gl: WebGLRenderingContext;
-  private textureManger: GLTextureManager;
   private slotManager: GLTextureSlot;
   private program: GLProgram;
   readonly descriptor: TextureDescriptor;
@@ -51,6 +49,7 @@ export class GLTexture{
     }
     const textureSlot = this.slotManager.updateSlotTexture(webgltexture);
     if (this.currentActiveSlot !== textureSlot) {
+      this.program.renderer.stat.uniformUpload++;
       this.currentActiveSlot = textureSlot;
       this.gl.uniform1i(this.location, textureSlot);
     }
