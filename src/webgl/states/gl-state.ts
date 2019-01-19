@@ -34,6 +34,10 @@ export class GLState{
     }
   }
 
+  public setFullScreenViewPort() {
+    this.setViewport(0,0,this.renderer.width, this.renderer.height);
+  }
+
   public setScissor(x: number, y: number, width: number, height: number) {
     this.newScissor.set(x, y, width, height);
     if (!this.newScissor.equals(this.currentScissor)) {

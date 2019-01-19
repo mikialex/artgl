@@ -5,14 +5,19 @@ import { TextureNode } from "./dag/texture-node";
 import { DAGNode } from "./dag/dag-node";
 import { ARTEngine, RenderSource } from "../engine/render-engine";
 import { TechniqueConfig, Technique } from "../core/technique";
+import { GraphDebuggingViewer } from "./graph-viewer/graph-debugging-viewer";
 
 export class RenderGraph{
   constructor(engine: ARTEngine) {
     this.engine = engine;
     this.composer = new EffectComposer(this);
+    this.debugViewer = new GraphDebuggingViewer(this);
   }
   engine: ARTEngine;
   composer: EffectComposer;
+
+  enableDebuggingView: boolean = false;
+  debugViewer: GraphDebuggingViewer;
 
   private renderTextures: Map<string, TextureNode> = new Map();
   private passNodes: Map<string, PassGraphNode> = new Map();

@@ -111,19 +111,20 @@ export class GLRenderer {
   }
 
   currentFrambuffer: Nullable<GLFramebuffer> = null;
-  setRenderTarget(framebuffer: GLFramebuffer) {
+  setRenderTarget(framebuffer: Nullable<GLFramebuffer>) {
     if (this.currentFrambuffer !== framebuffer) {
+      this.currentFrambuffer = framebuffer;
       const gl = this.gl;
-      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.wegbglFrameBuffer);
-      gl.viewport(0, 0, framebuffer.width, framebuffer.height); 
+      if (framebuffer === null) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      } else {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.wegbglFrameBuffer);
+      }
     }
   }
   
   setRenderTargetScreen() {
-    this.currentFrambuffer = null;
-    const gl = this.gl;
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, this._width, this._height);
+    this.setRenderTarget(null);
   }
 
   clear() {
