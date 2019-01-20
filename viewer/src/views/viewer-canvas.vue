@@ -1,5 +1,6 @@
 <template>
   <div class="canvas-wrap">
+    <GraphViewer/>
     <canvas id="viewer-canvas"></canvas>
     <div v-if="!isRuning" class="stop-notation"> STOPPED </div>
     <div class="command-bar">
@@ -12,11 +13,13 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import {GLApp} from '../application';
+import GraphViewer from '../components/graph-viewer/graph-viewer.vue';
 
 let engine;
 
 @Component({
   components:{
+    GraphViewer
   }
 })
 export default class ViewerCanvas extends Vue {

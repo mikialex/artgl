@@ -8,8 +8,8 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 @Component
 export default class GraphViewer extends Vue {
-@Prop() rootOffsetX:number = 0;
-@Prop() rootOffsetY:number = 0;
+@Prop() rootOffsetX:number;
+@Prop() rootOffsetY:number;
 
 
 }
