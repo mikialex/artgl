@@ -4,8 +4,9 @@ import { Scene } from '../../src/scene/scene';
 import { SceneNode } from '../../src/scene/scene-node';
 import { RenderGraph } from '../../src/render-graph/render-graph';
 import { DimensionType, PixelFormat } from '../../src/render-graph/interface';
-import { DOFTechnique } from '../../src/technique/technique-lib/dof-technique';
+import { TAATechnique } from '../../src/technique/technique-lib/taa-technique';
 import { DepthTechnique } from '../../src/technique/technique-lib/depth-technique';
+import { CopyTechnique } from '../../src/technique/technique-lib/copy-technique';
 import { Vector4 } from '../../src/math/vector4';
 export class Application{
   graph: RenderGraph;
@@ -29,9 +30,11 @@ export class Application{
     window.addEventListener('resize', this.onContainerResize);
     this.onContainerResize();
 
-    this.graph.registSource('All',this.scene)
+    this.graph.registSource('AllScreen', this.scene)
+    const TAATech = new TAATechnique();
     this.graph.registTechnique('depthTech', new DepthTechnique())
-    this.graph.registTechnique('dofTech', new DOFTechnique())
+    this.graph.registTechnique('TAATech', TAATech)
+    this.graph.registTechnique('copyTech', new CopyTechnique())
     this.graph.setGraph({
       renderTextures: [
         {
@@ -44,7 +47,7 @@ export class Application{
           },
         },
         {
-          name: 'TAAHistoryNew',
+          name: 'TAAHistoryA',
           format: {
             pixelFormat: PixelFormat.rgba,
             dimensionType: DimensionType.fixed,
@@ -53,7 +56,7 @@ export class Application{
           },
         },
         {
-          name: 'TAAHistoryOld',
+          name: 'TAAHistoryB',
           format: {
             pixelFormat: PixelFormat.rgba,
             dimensionType: DimensionType.fixed,
@@ -66,25 +69,30 @@ export class Application{
         { // general scene origin
           name: "SceneOrigin",
           output: "sceneResult",
-          source: ['All'],
+          source: ['AllScreen'],
         },
-        {
+        { // mix newrender and old samples
           name: "genNewTAAHistory",
-          inputs: ["sceneResult", "TAAHistory"],
-          technique: 'dofTech',
+          inputs: [
+            { name: "sceneResult", mapTo: "sceneResult"},
+            { name: "TAAHistoryA", mapTo: "TAAHistoryOld"}
+          ],
+          technique: 'TAATech',
           source: ['artgl.screenQuad'],
-          output: 'TAAHistory',
-          // onPassExecuted: () => {
-            
-          // }
+          output: 'TAAHistoryB',
+          enableColorClear: false,
+          onPassExecuted: () => {
+            TAATech.uniforms.get('u_sampleCount').value++;
+            this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
+          }
         },
-        { //
+        { // copy to screen
           name: "CopyToScreen",
-          inputs: ["TAAHistory", "sceneHistoryBuffer"],
+          inputs: [
+            { name: "TAAHistoryB", mapTo: "copySource" },
+          ],
           output: "screen",
-          technique: 'depthTech',
-          enableColorClear:false,
-          clearColor: new Vector4(0, 0, 0, 1),
+          technique: 'copyTech',
           source: ['artgl.screenQuad'],
         },
       ]

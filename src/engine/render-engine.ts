@@ -149,7 +149,11 @@ export class ARTEngine {
       } 
 
       if (webgltexture === undefined) {
-        webgltexture = this.renderer.frambufferManager.getFramebufferTexture(tex.name);
+        const frambufferName = program.framebufferTextureMap[tex.name];
+        if (frambufferName === undefined) {
+          throw  `cant find frambuffer for tex ${tex.name}, please define before use`
+        }
+        webgltexture = this.renderer.frambufferManager.getFramebufferTexture(frambufferName);
       }
 
       if (webgltexture === undefined) {

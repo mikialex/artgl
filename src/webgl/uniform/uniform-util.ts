@@ -51,7 +51,7 @@ function setValue1i(gl: WebGLRenderingContext, location: any, v: number) { gl.un
 function setValueM4a(gl: WebGLRenderingContext, location: any, v: any) { gl.uniformMatrix4fv(location, false, v) }
 
 function differFloat(newVal: number, oldVal: number) {
-  return newVal === oldVal;
+  return newVal !== oldVal;
 }
 function differArray(newVal: number[], oldVal: number[]) {
   if (newVal.length !== oldVal.length) {

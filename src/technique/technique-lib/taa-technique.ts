@@ -1,4 +1,4 @@
-import { Technique } from "../../core/technique";
+import { Technique, TechniqueConfig } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { Matrix4 } from "../../math/matrix4";
@@ -15,27 +15,31 @@ const vertexShaderSource =
 const fragmentShaderSource =
   `
     void main() {
-      float depthColorBuffer = texture2D(depthBuffer, v_uv).r;
-      vec3 normalBuffer = texture2D(sceneBuffer, v_uv).rgb;
-      gl_FragColor = vec4(vec3(depthColorBuffer) + normalBuffer, 1.0);
-      // gl_FragColor = vec4(vec3(1.0,0.0,0.0), 1.0);
+      vec3 oldColor = texture2D(TAAHistoryOld, v_uv).rgb;
+      vec3 newColor = texture2D(sceneResult, v_uv).rgb;
+      gl_FragColor = vec4((oldColor * u_sampleCount + newColor) / (u_sampleCount + 1.0), 1.0);
     }
     `
 
-export class DOFTechnique extends Technique {
+export class TAATechnique extends Technique {
   constructor() {
-    const config = {
+    const config: TechniqueConfig = {
       programConfig: {
         attributes: [
           { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
           { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
         ],
+        uniforms: [
+          {
+            name: 'u_sampleCount', default: 0, type: GLDataType.float
+          }
+        ],
         varyings: [
           {name:'v_uv', type: GLDataType.floatVec2},
         ],
         textures: [
-          {name: 'depthBuffer', type: GLTextureType.texture2D},
-          {name: 'sceneBuffer', type: GLTextureType.texture2D}
+          { name: 'TAAHistoryOld', type: GLTextureType.texture2D},
+          { name: 'sceneResult', type: GLTextureType.texture2D}
         ],
         vertexShaderString: vertexShaderSource,
         fragmentShaderString: fragmentShaderSource,
