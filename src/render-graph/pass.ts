@@ -20,6 +20,9 @@ export class RenderPass{
     }
 
     this.isOutputScreen = define.output === 'screen';
+    this.clearColor = define.clearColor;
+    this.enableColorClear = define.enableColorClear === undefined ? true : define.enableColorClear
+    this.enableDepthClear = define.enableDepthClear === undefined ? true : define.enableDepthClear
 
     define.source.forEach(so => {
       let renderso: RenderSource;
@@ -39,6 +42,11 @@ export class RenderPass{
   private graph: RenderGraph;
   readonly define: PassDefine;
   public name: string;
+
+  private clearColor: Vector4;
+  private enableDepthClear: boolean = true;
+  private enableColorClear: boolean = true;
+  
 
   private sourceUse: RenderSource[] = [];
   private overrideTechnique: Technique;
@@ -86,9 +94,17 @@ export class RenderPass{
       engine.overrideTechnique = this.overrideTechnique;
     }
 
-    engine.renderer.state.colorbuffer.clear();
-    if (!this.isOutputScreen && this.outputTarget.enableDepth) {
-      engine.renderer.state.depthbuffer.clear();
+    if (this.enableColorClear) {
+      if (this.clearColor !== undefined) {
+        engine.renderer.state.colorbuffer.setClearColor(this.clearColor);
+      }
+      engine.renderer.state.colorbuffer.clear();
+    }
+
+    if (this.enableDepthClear) {
+      if (!this.isOutputScreen && this.outputTarget.enableDepth) {
+        engine.renderer.state.depthbuffer.clear();
+      }
     }
 
     for (let i = 0; i < this.sourceUse.length; i++) {
@@ -97,6 +113,7 @@ export class RenderPass{
     }
 
     engine.overrideTechnique = null;
+    engine.renderer.state.colorbuffer.resetDefaultClearColor();
 
 
     if (this.graph.enableDebuggingView) {

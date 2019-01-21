@@ -1,3 +1,5 @@
+import { Vector4 } from "../math/vector4";
+
 export enum PixelFormat {
   depth,
   rgba
@@ -41,6 +43,9 @@ export interface PassDefine {
   sorter?: () => number,
   states?: stateType[],
   technique?: string,
+  enableColorClear?:boolean,
+  enableDepthClear?:boolean,
+  clearColor?: Vector4
 }
 
 export interface GraphDefine {

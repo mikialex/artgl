@@ -6,6 +6,7 @@ import { RenderGraph } from '../../src/render-graph/render-graph';
 import { DimensionType, PixelFormat } from '../../src/render-graph/interface';
 import { DOFTechnique } from '../../src/technique/technique-lib/dof-technique';
 import { DepthTechnique } from '../../src/technique/technique-lib/depth-technique';
+import { Vector4 } from '../../src/math/vector4';
 export class Application{
   graph: RenderGraph;
   engine: ARTEngine;
@@ -57,6 +58,8 @@ export class Application{
           name: "Depth",
           output: "depthBuffer",
           technique: 'depthTech',
+          enableColorClear:false,
+          clearColor: new Vector4(0, 0, 0, 1),
           source: ['All']
         },
         {
@@ -76,6 +79,8 @@ export class Application{
   }
 
   unintialize() {
+    this.active = false;
+    window.cancelAnimationFrame(this.tickId);
     window.removeEventListener('resize', this.onContainerResize);
   }
 
@@ -126,10 +131,11 @@ export class Application{
     }
   }
 
+  tickId;
   run() {
     this.active = true;
     this.interactor.enabled = true;
-    window.requestAnimationFrame(this.render);
+    this.tickId = window.requestAnimationFrame(this.render);
   }
 
   stop() {

@@ -2,8 +2,10 @@ import { GLRenderer } from "../gl-renderer";
 import { Vector4 } from "../../math/vector4";
 
 export class GLColorBuffer{
+  static defaultClearColor = new Vector4(0.5, 0.5, 0.5, 1);
   constructor(renderer: GLRenderer) {
     this.gl = renderer.gl;
+    this.resetDefaultClearColor();
   }
 
   readonly gl: WebGLRenderingContext;
@@ -36,9 +38,17 @@ export class GLColorBuffer{
     }
   }
 
+  // TODO premultimlyed alpha
   currentClearColor: Vector4 = new Vector4();
-  setClearColor(newColor: Vector4, premultipliedAlpha: boolean) {
-    
+  setClearColor(newColor: Vector4, premultipliedAlpha?: boolean) {
+    if (!newColor.equals(this.currentClearColor)) {
+      this.currentClearColor.copy(newColor);
+      this.gl.clearColor(newColor.x, newColor.y, newColor.z, newColor.w);
+    }
+  }
+
+  resetDefaultClearColor() {
+    this.setClearColor(GLColorBuffer.defaultClearColor);
   }
 
   clear() {
