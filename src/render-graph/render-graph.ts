@@ -6,6 +6,7 @@ import { DAGNode } from "./dag/dag-node";
 import { ARTEngine, RenderSource } from "../engine/render-engine";
 import { TechniqueConfig, Technique } from "../core/technique";
 import { GraphDebuggingViewer } from "./graph-viewer/graph-debugging-viewer";
+import { QuadSource } from './quad-source';
 
 export class RenderGraph{
   constructor(engine: ARTEngine) {
@@ -22,8 +23,8 @@ export class RenderGraph{
   private renderTextures: Map<string, TextureNode> = new Map();
   private passNodes: Map<string, PassGraphNode> = new Map();
 
-  render(source: RenderSource) {
-    this.composer.render(source);
+  render() {
+    this.composer.render();
   }
 
   reset() {
@@ -97,6 +98,33 @@ export class RenderGraph{
   }
   getResgisteredTechnique(name: string) {
     return this.passTechniques.get(name);
+  }
+
+  private passSources: Map<string, RenderSource> = new Map();
+  private innerSourceRegx = /^artgl.\w*$/;
+  isInnerSourceType(name: string) {
+    return this.innerSourceRegx.test(name);
+  }
+  private quadSource = new QuadSource();
+  getInnerSource(name: string): RenderSource {
+    if (name === 'artgl.screenQuad') {
+      return this.quadSource;
+    } else {
+      throw `inner source ${name} not supported`
+    }
+  }
+  registSource(name: string, source: RenderSource) {
+    if (this.isInnerSourceType(name)) {
+      throw 'start with artgl.** is inner source and should not be registered'
+    }
+
+    if (this.passSources.has(name)) {
+      throw 'duplicated source registration'
+    }
+    this.passSources.set(name, source);
+  }
+  getResgisteredSource(name: string) {
+    return this.passSources.get(name);
   }
   
 }

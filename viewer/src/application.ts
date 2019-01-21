@@ -28,6 +28,7 @@ export class Application{
     window.addEventListener('resize', this.onContainerResize);
     this.onContainerResize();
 
+    this.graph.registSource('All',this.scene)
     this.graph.registTechnique('depthTech', new DepthTechnique())
     this.graph.registTechnique('dofTech', new DOFTechnique())
     this.graph.setGraph({
@@ -67,7 +68,7 @@ export class Application{
           name: "DOF",
           inputs: ["depthBuffer", "sceneBuffer"],
           technique: 'dofTech',
-          source: ['quad'],
+          source: ['artgl.screenQuad'],
           output: 'screen',
         }
       ]
@@ -119,7 +120,7 @@ export class Application{
     // this.engine.renderer.setRenderTargetScreen();
     // this.engine.render(this.scene);
 
-    this.graph.render(this.scene);
+    this.graph.render();
     if (this.active) {
       window.requestAnimationFrame(this.render);
     }

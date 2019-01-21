@@ -28,9 +28,9 @@ export class EffectComposer{
     this.passes = [];
   }
 
-  render(source: RenderSource) {
+  render() {
     this.passes.forEach(pass => {
-      pass.execute(this.engine, source);
+      pass.execute();
     });
   }
 }

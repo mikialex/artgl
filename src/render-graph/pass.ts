@@ -19,15 +19,28 @@ export class RenderPass{
       this.overrideTechnique = overrideTechnique;
     }
 
-    if (define.output !== 'screen') {
-      this.isOutputScreen = false;
-    }
+    this.isOutputScreen = define.output === 'screen';
+
+    define.source.forEach(so => {
+      let renderso: RenderSource;
+      if (this.graph.isInnerSourceType(so)) {
+        renderso = this.graph.getInnerSource(so);
+      } else {
+        renderso = graph.getResgisteredSource(so);
+        if (renderso === undefined) {
+          throw `rendersource '${so}' not defined`
+        }
+      }
+      this.sourceUse.push(renderso);
+    })
+
   }
 
   private graph: RenderGraph;
   readonly define: PassDefine;
   public name: string;
 
+  private sourceUse: RenderSource[] = [];
   private overrideTechnique: Technique;
 
   private outputTarget: GLFramebuffer
@@ -51,7 +64,8 @@ export class RenderPass{
     this.outputTarget = textureNode.framebuffer;
   }
 
-  execute(engine: ARTEngine, source: RenderSource) {
+  execute() {
+    const engine = this.graph.engine;
 
     // setup viewport and render target
     if (this.isOutputScreen) {
@@ -74,7 +88,10 @@ export class RenderPass{
 
     engine.renderer.clear();
 
-    engine.render(source);
+    for (let i = 0; i < this.sourceUse.length; i++) {
+      const source = this.sourceUse[i];
+      engine.render(source);
+    }
 
     engine.overrideTechnique = null;
 
