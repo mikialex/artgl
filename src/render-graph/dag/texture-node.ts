@@ -1,10 +1,10 @@
 import { DAGNode } from "./dag-node";
-import { PassDefine, TextureDefine, DimensionType } from "../interface";
+import { PassDefine, RenderTextureDefine, DimensionType } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { GLFramebuffer } from "../../webgl/gl-framebuffer";
 
 export class TextureNode extends DAGNode{
-  constructor(graph: RenderGraph, define: TextureDefine) {
+  constructor(graph: RenderGraph, define: RenderTextureDefine) {
     super();
     this.name = define.name;
     this.define = define;
@@ -12,17 +12,18 @@ export class TextureNode extends DAGNode{
 
     let width: number;
     let height: number;
-    if (define.format.dimensionType = DimensionType.fixed) {
+    if (define.format.dimensionType === DimensionType.fixed) {
       width = define.format.width;
       height = define.format.height;
     }
 
+    const enableDepth = define.format.disableDepthBuffer !== undefined ? define.format.disableDepthBuffer : true;
     this.framebuffer = graph.engine.renderer.frambufferManager.createFrameBuffer(
-      this.name, width, height);
+      this.name, width, height, enableDepth);
     
   }
   readonly name: string;
-  readonly define: TextureDefine;
+  readonly define: RenderTextureDefine;
   readonly graph: RenderGraph;
 
   framebuffer: GLFramebuffer;

@@ -8,13 +8,14 @@ export enum DimensionType {
   fixed
 }
 
-export interface TextureDefine {
+export interface RenderTextureDefine {
   name: string,
   format: {
     pixelFormat: PixelFormat,
     dimensionType: DimensionType,
     width: number,
-    height: number
+    height: number,
+    disableDepthBuffer?: boolean
   }
 }
 
@@ -44,5 +45,5 @@ export interface PassDefine {
 
 export interface GraphDefine {
   passes: PassDefine[],
-  renderTextures?: TextureDefine[];
+  renderTextures?: RenderTextureDefine[];
 }

@@ -1,5 +1,5 @@
 import { EffectComposer } from "./effect-composer";
-import { PassDefine, GraphDefine, TextureDefine } from "./interface";
+import { PassDefine, GraphDefine, RenderTextureDefine } from "./interface";
 import { PassGraphNode } from "./dag/pass-graph-node";
 import { TextureNode } from "./dag/texture-node";
 import { DAGNode } from "./dag/dag-node";
@@ -76,7 +76,7 @@ export class RenderGraph{
     return rootPass;
   }
 
-  private allocateRenderTextures(textsDefine: TextureDefine[]) {
+  private allocateRenderTextures(textsDefine: RenderTextureDefine[]) {
     if (textsDefine === undefined) {
       return;
     }

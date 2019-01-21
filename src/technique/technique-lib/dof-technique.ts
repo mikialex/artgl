@@ -8,9 +8,7 @@ import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 const vertexShaderSource =
   `
     void main() {
-      vec4 worldPosition = VPMatrix * MMatrix * vec4(position, 1.0);
-      depth = worldPosition.z / worldPosition.w;
-      gl_Position = worldPosition;
+      gl_Position = vec4(position, 1.0);
       v_uv = uv;
     }
     `
@@ -32,12 +30,7 @@ export class DOFTechnique extends Technique {
           { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
           { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
         ],
-        uniformsIncludes: [
-          { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix,},
-          { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix,}
-        ],
         varyings: [
-          { name: 'depth', type: GLDataType.float },
           {name:'v_uv', type: GLDataType.floatVec2},
         ],
         textures: [

@@ -40,4 +40,8 @@ export class GLColorBuffer{
   setClearColor(newColor: Vector4, premultipliedAlpha: boolean) {
     
   }
+
+  clear() {
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+  }
 }

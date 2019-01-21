@@ -132,10 +132,6 @@ export class GLRenderer {
     this.setRenderTarget(null);
   }
 
-  clear() {
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-  }
-
   dispose() {
     this.attributeBufferManager.dispose();
     this.programManager.dispose();

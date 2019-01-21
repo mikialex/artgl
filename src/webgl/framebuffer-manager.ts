@@ -11,15 +11,18 @@ export class GLFrameBufferManager{
 
   private framebuffers: Map<string, GLFramebuffer> = new Map();
 
-  createFrameBuffer(name: string, width: number, height: number): GLFramebuffer{
+  createFrameBuffer(name: string, width: number, height: number, enableDepth: boolean): GLFramebuffer{
     if (this.framebuffers.has(name)) {
       throw 'duplicate framebuffer key name';
     }
-    const gl = this.gl;
 
     const framebuffer = new GLFramebuffer(this.renderer, name);
     framebuffer.setSize(width, height);
     framebuffer.createAttachTexture(0);
+    framebuffer.enableDepth = enableDepth;
+    if (enableDepth) {
+      framebuffer.createAttachDepthBuffer();
+    }
 
     this.framebuffers.set(name, framebuffer);
 

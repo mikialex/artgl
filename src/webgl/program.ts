@@ -54,9 +54,11 @@ export class GLProgram {
     this.createProgram(this.vertexShader, this.fragmentShader);
     this.createGLResource(config);
     
-    config.uniformsIncludes.forEach(des => {
-      this.globalUniforms.push(this.uniforms[des.name])
-    })
+    if (config.uniformsIncludes !== undefined) {
+      config.uniformsIncludes.forEach(des => {
+        this.globalUniforms.push(this.uniforms[des.name])
+      })
+    }
 
     this.config = config;
     this.useIndexDraw = config.useIndex;

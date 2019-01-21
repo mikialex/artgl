@@ -43,6 +43,7 @@ export class GLFramebuffer{
   width: number = 200;
   height: number = 200;
 
+  enableDepth: boolean = true;
   wegbglFrameBuffer: WebGLFramebuffer;
 
   textureAttachedSlot: GLFrameAttachedTexture[] = [];
@@ -71,6 +72,17 @@ export class GLFramebuffer{
     const attachmentPoint = GLAttachmentPoints[attachPoint];
     gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, attachTexture.gltexture, 0);
 
+  }
+
+  createAttachDepthBuffer() {
+    const gl = this.gl;
+    const depthBuffer = gl.createRenderbuffer();
+
+    gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width, this.height);
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.wegbglFrameBuffer);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
   }
 
   attachTexture(texture: GLFrameAttachedTexture, attachPoint: number) {

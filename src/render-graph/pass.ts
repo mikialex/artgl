@@ -86,7 +86,10 @@ export class RenderPass{
       engine.overrideTechnique = this.overrideTechnique;
     }
 
-    engine.renderer.clear();
+    engine.renderer.state.colorbuffer.clear();
+    if (!this.isOutputScreen && this.outputTarget.enableDepth) {
+      engine.renderer.state.depthbuffer.clear();
+    }
 
     for (let i = 0; i < this.sourceUse.length; i++) {
       const source = this.sourceUse[i];
