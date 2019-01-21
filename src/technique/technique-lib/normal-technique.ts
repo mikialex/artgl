@@ -2,6 +2,7 @@ import { Technique } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { Matrix4 } from "../../math/matrix4";
+import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 
 const vertexShaderSource =
   `
@@ -28,9 +29,9 @@ export class NormalTechnique extends Technique{
           { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal, stride: 3 },
           // { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
         ],
-        uniforms: [
-          { name: 'MMatrix', type: GLDataType.Mat4 , default: new Matrix4()},
-          { name: 'VPMatrix', type: GLDataType.Mat4, default: new Matrix4()},
+        uniformsIncludes: [
+          { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix,},
+          { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix,}
         ],
         varyings: [
           {name:'color', type: GLDataType.floatVec3}

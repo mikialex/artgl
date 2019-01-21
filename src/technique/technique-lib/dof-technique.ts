@@ -3,6 +3,7 @@ import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { Matrix4 } from "../../math/matrix4";
 import { GLTextureType } from "../../webgl/uniform/uniform-texture";
+import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 
 const vertexShaderSource =
   `
@@ -31,9 +32,9 @@ export class DOFTechnique extends Technique {
           { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
           { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
         ],
-        uniforms: [
-          { name: 'MMatrix', type: GLDataType.Mat4, default: new Matrix4() },
-          { name: 'VPMatrix', type: GLDataType.Mat4, default: new Matrix4() },
+        uniformsIncludes: [
+          { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix,},
+          { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix,}
         ],
         varyings: [
           { name: 'depth', type: GLDataType.float },

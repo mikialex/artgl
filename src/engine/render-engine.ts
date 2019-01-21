@@ -13,6 +13,8 @@ import { Material } from "../core/material";
 import { GLTextureUniform } from "../webgl/uniform/uniform-texture";
 import { PerspectiveCamera } from "../camera/perspective-camera";
 import { Nullable } from "../type";
+import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
+import { UniformProxy } from "./uniform-proxy";
 
 export interface RenderSource{
   getRenderList(): RenderList;
@@ -25,48 +27,14 @@ export class ARTEngine {
     if (el !== undefined) {
       (this.camera as PerspectiveCamera).aspect = el.width / el.height;
     }
+
+    InnerUniformMap.forEach((des, key) => {
+      this.globalUniforms.set(key, new UniformProxy(des.default))
+    })
   }
 
   renderer: GLRenderer;
   overrideTechnique: Nullable<Technique> = null;
-
-
-
-
-  //// frame controls
-  private userRenderFrame: Nullable<FrameRequestCallback> = null;
-  private renderFrame: FrameRequestCallback = (time) => {
-    this.frameStart();
-    this.userRenderFrame(time);
-    this.frameEnd();
-    if (this.isAutoRenderActive) {
-      window.requestAnimationFrame(this.renderFrame);
-    }
-  }
-  isAutoRenderActive = false;
-  setFrame(frame: FrameRequestCallback) {
-    this.renderFrame = frame;
-  }
-
-  run() {
-    if (!this.userRenderFrame) {
-      throw 'frame function is not set';
-    }
-    this.isAutoRenderActive = true;
-    window.requestAnimationFrame(this.renderFrame);
-  }
-
-  stop() {
-    this.isAutoRenderActive = false;
-  }
-
-  private frameStart() {
-    this.connectCamera();
-  }
-
-  private frameEnd() {
-    
-  }
 
   ////
 
@@ -97,8 +65,9 @@ export class ARTEngine {
       this.needUpdateVP = true;
     // }
     // if (this.needUpdateVP) {
-      this.VPMatrix.multiplyMatrices(this.camera.projectionMatrix, this.cameraMatrixRerverse);
-      this.needUpdateVP = false;
+    this.VPMatrix.multiplyMatrices(this.camera.projectionMatrix, this.cameraMatrixRerverse);
+    this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.VPMatrix;
+    this.needUpdateVP = false;
     // }
    
   }
@@ -144,6 +113,7 @@ export class ARTEngine {
 
 
   //// low level resouce binding
+  globalUniforms: Map<InnerSupportUniform, UniformProxy> = new Map();
   connectTechnique(object: RenderObject): GLProgram {
     let technique: Technique;
     if (this.overrideTechnique !== null) {
@@ -153,10 +123,13 @@ export class ARTEngine {
     }
     const program = technique.getProgram(this);
     this.renderer.useProgram(program);
-    program.setUniform('MMatrix', object.worldMatrix);
-    program.setUniform('VPMatrix', this.VPMatrix);
+    this.globalUniforms.get(InnerSupportUniform.MMatrix).value = object.worldMatrix;
+    program.updateInnerGlobalUniforms(this);
     technique.uniforms.forEach((uni, key) => {
-      program.setUniform('key', uni);
+      if (uni.needUpdate) {
+        program.setUniform(key, uni.value);
+        uni.resetUpdate();
+      }
     })
     return program;
   }

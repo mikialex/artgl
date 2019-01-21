@@ -2,10 +2,11 @@ import { GLRenderer } from "./gl-renderer";
 import { GLShader, ShaderType } from "./shader";
 import { generateUUID } from "../math/uuid";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
-import { GLUniform, UniformDescriptor } from "./uniform/uniform";
+import { GLUniform, UniformDescriptor, getInnerUniformDescriptor, InnerUniformMapDescriptor } from "./uniform/uniform";
 import { AttributeDescriptor, GLAttribute, AttributeUsage } from "./attribute";
 import { Nullable } from "../type";
 import { GLTextureUniform, TextureDescriptor } from "./uniform/uniform-texture";
+import { ARTEngine } from "../engine/render-engine";
 
 export interface VaryingDescriptor {
   name: string,
@@ -14,7 +15,8 @@ export interface VaryingDescriptor {
 
 export interface GLProgramConfig {
   attributes: AttributeDescriptor[];
-  uniforms?: UniformDescriptor<any>[];
+  uniforms?: UniformDescriptor[];
+  uniformsIncludes?: InnerUniformMapDescriptor[];
   varyings?: VaryingDescriptor[];
   textures?: TextureDescriptor[];
   vertexShaderString: string;
@@ -26,6 +28,14 @@ export interface GLProgramConfig {
 function fullfillProgramConfig(config: GLProgramConfig){
   if (config.useIndex === undefined) {
     config.useIndex = true;
+  }
+  if (config.uniforms === undefined) {
+    config.uniforms = [];
+  }
+  if (config.uniformsIncludes !== undefined) {
+    config.uniformsIncludes.forEach(ui => {
+      config.uniforms.push(getInnerUniformDescriptor(ui));
+    })
   }
   return config;
 }
@@ -44,6 +54,10 @@ export class GLProgram {
     this.createProgram(this.vertexShader, this.fragmentShader);
     this.createGLResource(config);
     
+    config.uniformsIncludes.forEach(des => {
+      this.globalUniforms.push(this.uniforms[des.name])
+    })
+
     this.config = config;
     this.useIndexDraw = config.useIndex;
     renderer.programManager.addNewProgram(this);
@@ -67,7 +81,8 @@ export class GLProgram {
   private config: GLProgramConfig;
   private attributes: { [index: string]: GLAttribute } = {};
   private attributeUsageMap: { [index: number]: GLAttribute } = {};
-  private uniforms: { [index: string]: GLUniform<any> } = {};
+  private uniforms: { [index: string]: GLUniform } = {};
+  private globalUniforms: GLUniform[] = [];
   private textures: { [index: string]: GLTextureUniform } = {};
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
@@ -75,7 +90,7 @@ export class GLProgram {
   drawCount: number = 0;
   useIndexDraw: boolean = false;
 
-  public forUniforms(cb: (uniform: GLUniform<any>) => any): void {
+  public forUniforms(cb: (uniform: GLUniform) => any): void {
     for (const key in this.textures) {
       cb(this.uniforms[key]);
     }
@@ -161,6 +176,12 @@ export class GLProgram {
 
   setUniform(name: string, data: GLData) {
     this.uniforms[name].set(data);
+  }
+
+  updateInnerGlobalUniforms(engine: ARTEngine) {
+    this.globalUniforms.forEach(uni => {
+      uni.set(engine.globalUniforms.get(uni.innerGlobal).value)
+    })
   }
 
   useIndexBuffer(buffer: WebGLBuffer) {

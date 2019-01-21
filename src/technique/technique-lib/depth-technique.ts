@@ -2,6 +2,7 @@ import { Technique } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { Matrix4 } from "../../math/matrix4";
+import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 
 const vertexShaderSource =
   `
@@ -26,9 +27,9 @@ export class DepthTechnique extends Technique {
         attributes: [
           { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
         ],
-        uniforms: [
-          { name: 'MMatrix', type: GLDataType.Mat4, default: new Matrix4() },
-          { name: 'VPMatrix', type: GLDataType.Mat4, default: new Matrix4() },
+        uniformsIncludes: [
+          { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix,},
+          { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix,}
         ],
         varyings: [
           { name: 'depth', type: GLDataType.float }

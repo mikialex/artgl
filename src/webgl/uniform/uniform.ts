@@ -1,54 +1,97 @@
 import { GLProgram } from "../program";
 import { findUniformSetter, findUniformFlattener, findUniformDiffer, findUniformCopyer } from "./uniform-util";
 import { GLDataType } from "../shader-util";
+import { Matrix4 } from "../../math/matrix4";
 
 export type uniformUploadType = number | Float32Array | number[]
 export type flattenerType= (value: any, receiveData: uniformUploadType) => uniformUploadType;
+export type setterType= (gl: WebGLRenderingContext, localtion: WebGLUniformLocation, data: uniformUploadType) => void
+export type copyerType= (newValue: uniformUploadType, target: uniformUploadType) => void;
+export type differType= (newValue: uniformUploadType, oldValue: uniformUploadType) => boolean;
 
+export const enum InnerSupportUniform{
+  MMatrix,
+  VPMatrix
+}
 
-export interface UniformDescriptor<T> {
+export interface InnerUniformMapDescriptor{
+  name: string,
+  mapInner: InnerSupportUniform,     
+}
+
+export interface UniformDescriptor {
   name: string,
   type: GLDataType,
-  default: T,
+  default: any,
   flattener?: flattenerType
+  setter?: setterType,
+  copyer?: copyerType,
+  differ?: differType
+  _innerGlobalUniform?: InnerSupportUniform
 }
 
-export function createUniform<T>(program: GLProgram, descriptor: UniformDescriptor<T>): GLUniform<T>{
-  return new GLUniform<T>(program, descriptor);
+
+export function createUniform(program: GLProgram, descriptor: UniformDescriptor): GLUniform{
+  return new GLUniform(program, descriptor);
 }
 
-export class GLUniform<T>{
-  constructor(program: GLProgram, descriptor: UniformDescriptor<T>) {
+export const InnerUniformMap: Map<InnerSupportUniform, UniformDescriptor> = new Map();
+InnerUniformMap.set(InnerSupportUniform.MMatrix, {
+  name: 'MMatrix', type: GLDataType.Mat4, default: new Matrix4()
+})
+InnerUniformMap.set(InnerSupportUniform.VPMatrix, {
+  name: 'VPMatrix', type: GLDataType.Mat4, default: new Matrix4()
+})
+
+export function getInnerUniformDescriptor(des: InnerUniformMapDescriptor): UniformDescriptor {
+  const temdescritor = InnerUniformMap.get(des.mapInner);
+  const descritor = {
+    name: des.name,
+    type: temdescritor.type,
+    default: temdescritor.default,
+    _innerGlobalUniform: des.mapInner
+  }
+  return descritor;
+}
+
+export class GLUniform{
+  constructor(program: GLProgram, descriptor: UniformDescriptor) {
     this.program = program;
     this.gl = program.getRenderer().gl;
     const glProgram = program.getProgram();
     const location = this.gl.getUniformLocation(glProgram, descriptor.name);
     this.isActive = location !== null;
     this.location = location;
-    this.setter = findUniformSetter(descriptor.type);
-    this.differ = findUniformDiffer(descriptor.type);
-    this.copyer = findUniformCopyer(descriptor.type);
-    if (descriptor.flattener !== undefined) {
-      this.flattener = descriptor.flattener;
-    } else {
-      this.flattener = findUniformFlattener(descriptor.type);
-    }
+    
+    this.flattener = descriptor.flattener !== undefined ?
+    descriptor.flattener : findUniformFlattener(descriptor.type);
 
+    this.setter = descriptor.setter !== undefined ?
+      descriptor.setter : findUniformSetter(descriptor.type);
+    
+    this.differ = descriptor.differ !== undefined ?
+    descriptor.differ : findUniformDiffer(descriptor.type);
+  
+    this.copyer = descriptor.copyer !== undefined ?
+    descriptor.copyer : findUniformCopyer(descriptor.type);
+
+    this.innerGlobal = descriptor._innerGlobalUniform;
   }
   private gl: WebGLRenderingContext;
   program: GLProgram;
-  descriptor: UniformDescriptor<T>;
+  descriptor: UniformDescriptor;
   location: WebGLUniformLocation;
-  value: T;
+  innerGlobal?: InnerSupportUniform; 
+  value: any;
   lastReceiveData: uniformUploadType;
   receiveData: uniformUploadType;
-  private setter: (gl: WebGLRenderingContext, localtion: WebGLUniformLocation, data: uniformUploadType) => void;
+  private setter: setterType;
   private flattener: flattenerType
-  private differ;
-  private copyer;
+  private differ: differType;
+  private copyer: copyerType;
   isActive: boolean;
 
-  set(value: T): void {
+  set(value: any): void {
     if (!this.isActive) {
       return;
     }
@@ -66,7 +109,7 @@ export class GLUniform<T>{
       if (this.differ(this.receiveData, this.lastReceiveData)) {
         this.setter(this.gl, this.location, this.receiveData);
         this.program.renderer.stat.uniformUpload++;
-        this.lastReceiveData = this.copyer(this.receiveData, this.lastReceiveData);
+        this.copyer(this.receiveData, this.lastReceiveData);
       }
     } else {
       this.setter(this.gl, this.location, this.receiveData);

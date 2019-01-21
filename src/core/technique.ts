@@ -3,6 +3,7 @@ import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { GLDataType } from "../webgl/shader-util";
 import { AttributeUsage } from "../webgl/attribute";
 import { ARTEngine } from "../engine/render-engine";
+import { UniformProxy } from "../engine/uniform-proxy";
 
 export const standradMeshAttributeLayout = [
   { name:'position',type:GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
@@ -28,11 +29,11 @@ export class Technique{
   constructor(config: TechniqueConfig) {
     // setup default uniform value
     this.config = config;
-    this.config.programConfig.uniforms.forEach(uniform => {
-      if (uniform.name !== 'MMatrix' && uniform.name !== 'VPMatrix') {
-        this.uniforms[uniform.name] = uniform.default;
-      }
-    })
+    if (this.config.programConfig.uniforms !== undefined) {
+      this.config.programConfig.uniforms.forEach(uniform => {
+        this.uniforms.set(uniform.name, new UniformProxy(uniform.default));
+      })
+    }
   }
 
   config: TechniqueConfig;
@@ -43,7 +44,7 @@ export class Technique{
   needUpdate = true;
   isTransparent = false;
 
-  uniforms: Map<string, any> = new Map();
+  uniforms: Map<string, UniformProxy> = new Map();
 
 
   getProgram(engine: ARTEngine): GLProgram {
