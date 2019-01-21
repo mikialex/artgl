@@ -35,16 +35,25 @@ export class Application{
     this.graph.setGraph({
       renderTextures: [
         {
-          name: 'depthBuffer',
+          name: 'sceneResult',
           format: {
-            pixelFormat: PixelFormat.depth,
+            pixelFormat: PixelFormat.rgba,
             dimensionType: DimensionType.fixed,
             width: 500,
             height: 500
           },
         },
         {
-          name: 'sceneBuffer',
+          name: 'TAAHistoryNew',
+          format: {
+            pixelFormat: PixelFormat.rgba,
+            dimensionType: DimensionType.fixed,
+            width: 500,
+            height: 500
+          },
+        },
+        {
+          name: 'TAAHistoryOld',
           format: {
             pixelFormat: PixelFormat.rgba,
             dimensionType: DimensionType.fixed,
@@ -54,26 +63,30 @@ export class Application{
         },
       ],
       passes: [
-        {
-          name: "Depth",
-          output: "depthBuffer",
-          technique: 'depthTech',
-          enableColorClear:false,
-          clearColor: new Vector4(0, 0, 0, 1),
-          source: ['All']
-        },
-        {
+        { // general scene origin
           name: "SceneOrigin",
-          output: "sceneBuffer",
+          output: "sceneResult",
           source: ['All'],
         },
         {
-          name: "DOF",
-          inputs: ["depthBuffer", "sceneBuffer"],
+          name: "genNewTAAHistory",
+          inputs: ["sceneResult", "TAAHistory"],
           technique: 'dofTech',
           source: ['artgl.screenQuad'],
-          output: 'screen',
-        }
+          output: 'TAAHistory',
+          // onPassExecuted: () => {
+            
+          // }
+        },
+        { //
+          name: "CopyToScreen",
+          inputs: ["TAAHistory", "sceneHistoryBuffer"],
+          output: "screen",
+          technique: 'depthTech',
+          enableColorClear:false,
+          clearColor: new Vector4(0, 0, 0, 1),
+          source: ['artgl.screenQuad'],
+        },
       ]
     })
   }
