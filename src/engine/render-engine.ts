@@ -51,6 +51,7 @@ export class ARTEngine {
   };
   private cameraMatrixRerverse = new Matrix4();
   private VPMatrix = new Matrix4();
+  private LastVPMatrix = new Matrix4();
   private needUpdateVP = true;
 
   connectCamera() {
@@ -65,6 +66,8 @@ export class ARTEngine {
       this.needUpdateVP = true;
     // }
     // if (this.needUpdateVP) {
+    this.LastVPMatrix.copy(this.VPMatrix);
+    this.globalUniforms.get(InnerSupportUniform.LastVPMatrix).value = this.VPMatrix;
     this.VPMatrix.multiplyMatrices(this.camera.projectionMatrix, this.cameraMatrixRerverse);
     this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.VPMatrix;
     this.needUpdateVP = false;

@@ -14,10 +14,30 @@ const vertexShaderSource =
     `
 const fragmentShaderSource =
   `
+  
+    float UnpackDepth( const in vec4 enc ) {
+        const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
+        float decoded = dot( enc, bit_shift );
+        return decoded;
+    }
+
+    vec4 getWorldPosition(vec2 cood){
+      float depth = UnpackDepth(texture2D(TAAHistoryOld, cood));
+      return vec4(cood, depth, 1.0);
+    }
+
+    vec2 getLastPixelPosition(vec2 cood){
+      vec4 worldPosition = VPMatrixInverse * getWorldPosition(cood);
+      vec4 oldGPositon = LastVPMatrix * worldPosition;
+      return oldGPositon.xy;
+    }
+
     void main() {
+      vec2 cood = getLastPixelPosition(v_uv);
       vec3 oldColor = texture2D(TAAHistoryOld, v_uv).rgb;
       vec3 newColor = texture2D(sceneResult, v_uv).rgb;
-      gl_FragColor = vec4((oldColor * u_sampleCount + newColor) / (u_sampleCount + 1.0), 1.0);
+      // gl_FragColor = vec4((oldColor * u_sampleCount + newColor) / (u_sampleCount + 1.0), 1.0);
+      gl_FragColor = vec4(newColor * 0.9 + (1.0 - 0.9) * oldColor, 1.0);
     }
     `
 
@@ -31,15 +51,23 @@ export class TAATechnique extends Technique {
         ],
         uniforms: [
           {
-            name: 'u_sampleCount', default: 0, type: GLDataType.float
+            name: 'u_sampleCount', default: 0, type: GLDataType.float,
+          },
+          {
+            name: 'VPMatrixInverse', default: new Matrix4(), type: GLDataType.Mat4,
           }
+        ],
+        uniformsIncludes: [
+          { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix,},
+          { name: 'LastVPMatrix', mapInner: InnerSupportUniform.LastVPMatrix,},
         ],
         varyings: [
           {name:'v_uv', type: GLDataType.floatVec2},
         ],
         textures: [
           { name: 'TAAHistoryOld', type: GLTextureType.texture2D},
-          { name: 'sceneResult', type: GLTextureType.texture2D}
+          { name: 'sceneResult', type: GLTextureType.texture2D},
+          { name: 'depthResult', type: GLTextureType.texture2D},
         ],
         vertexShaderString: vertexShaderSource,
         fragmentShaderString: fragmentShaderSource,

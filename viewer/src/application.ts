@@ -1,5 +1,5 @@
 import ARTGL from '../../src/export';
-import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController } from '../../src/artgl';
+import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4 } from '../../src/artgl';
 import { Scene } from '../../src/scene/scene';
 import { SceneNode } from '../../src/scene/scene-node';
 import { RenderGraph } from '../../src/render-graph/render-graph';
@@ -8,6 +8,7 @@ import { TAATechnique } from '../../src/technique/technique-lib/taa-technique';
 import { DepthTechnique } from '../../src/technique/technique-lib/depth-technique';
 import { CopyTechnique } from '../../src/technique/technique-lib/copy-technique';
 import { Vector4 } from '../../src/math/vector4';
+import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
 export class Application{
   graph: RenderGraph;
   engine: ARTEngine;
@@ -34,11 +35,21 @@ export class Application{
     const TAATech = new TAATechnique();
     this.graph.registTechnique('depthTech', new DepthTechnique())
     this.graph.registTechnique('TAATech', TAATech)
-    this.graph.registTechnique('copyTech', new CopyTechnique())
+    this.graph.registTechnique('copyTech', new CopyTechnique());
+    let sample = 0;
     this.graph.setGraph({
       renderTextures: [
         {
           name: 'sceneResult',
+          format: {
+            pixelFormat: PixelFormat.rgba,
+            dimensionType: DimensionType.fixed,
+            width: 500,
+            height: 500
+          },
+        },
+        {
+          name: 'depthResult',
           format: {
             pixelFormat: PixelFormat.rgba,
             dimensionType: DimensionType.fixed,
@@ -71,10 +82,17 @@ export class Application{
           output: "sceneResult",
           source: ['AllScreen'],
         },
+        { // depth
+          name: "Depth",
+          technique: 'depthTech',
+          output: "depthResult",
+          source: ['AllScreen'],
+        },
         { // mix newrender and old samples
           name: "genNewTAAHistory",
           inputs: [
             { name: "sceneResult", mapTo: "sceneResult"},
+            { name: "depthResult", mapTo: "depthResult"},
             { name: "TAAHistoryA", mapTo: "TAAHistoryOld"}
           ],
           technique: 'TAATech',
@@ -82,7 +100,12 @@ export class Application{
           output: 'TAAHistoryB',
           enableColorClear: false,
           onPassExecuted: () => {
-            TAATech.uniforms.get('u_sampleCount').value++;
+            sample++;
+            TAATech.uniforms.get('u_sampleCount').value = sample ;
+            const VPInv: Matrix4 = TAATech.uniforms.get('VPMatrixInverse').value;
+            const VP: Matrix4 = this.engine.globalUniforms.get(InnerSupportUniform.VPMatrix).value
+            VPInv.getInverse(VP, true);
+            TAATech.uniforms.get('VPMatrixInverse').needUpdate = true;
             this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
           }
         },
