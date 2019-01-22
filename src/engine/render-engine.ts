@@ -54,6 +54,15 @@ export class ARTEngine {
   private LastVPMatrix = new Matrix4();
   private needUpdateVP = true;
 
+  private ditheringVP = new Matrix4();
+
+  ditherVPMatrix() {
+    this.ditheringVP.copy(this.VPMatrix);
+    this.ditheringVP.elements[8] += ((2 * Math.random() - 1) / 20);
+    this.ditheringVP.elements[9] += ((2 * Math.random() - 1) / 20);
+    this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.ditheringVP;
+  }
+
   connectCamera() {
     // if (this.camera.projectionMatrixNeedUpdate) {
       this.camera.updateProjectionMatrix();
@@ -127,7 +136,7 @@ export class ARTEngine {
     const program = technique.getProgram(this);
     this.renderer.useProgram(program);
     this.globalUniforms.get(InnerSupportUniform.MMatrix).value = object.worldMatrix;
-    program.updateInnerGlobalUniforms(this);
+    program.updateInnerGlobalUniforms(this); // TODO optimize here
     technique.uniforms.forEach((uni, key) => {
       if (uni.needUpdate) {
         program.setUniform(key, uni.value);

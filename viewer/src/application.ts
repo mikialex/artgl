@@ -117,6 +117,9 @@ export class Application{
           output: "screen",
           technique: 'copyTech',
           source: ['artgl.screenQuad'],
+          onPassExecuted: () => {
+            // this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
+          }
         },
       ]
     })
@@ -165,6 +168,7 @@ export class Application{
   render = () => {
     this.orbitControler.update();
     this.engine.connectCamera();
+    this.engine.ditherVPMatrix();
 
     // this.engine.renderer.setRenderTargetScreen();
     // this.engine.render(this.scene);

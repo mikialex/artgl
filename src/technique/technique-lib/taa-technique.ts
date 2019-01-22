@@ -37,7 +37,8 @@ const fragmentShaderSource =
       vec3 oldColor = texture2D(TAAHistoryOld, v_uv).rgb;
       vec3 newColor = texture2D(sceneResult, v_uv).rgb;
       // gl_FragColor = vec4((oldColor * u_sampleCount + newColor) / (u_sampleCount + 1.0), 1.0);
-      gl_FragColor = vec4(newColor * 0.9 + (1.0 - 0.9) * oldColor, 1.0);
+      // gl_FragColor = vec4((oldColor + newColor) / 2.0, 1.0);
+      gl_FragColor = vec4(newColor*0.1 + (1.0 -0.1) * oldColor, 1.0);
     }
     `
 

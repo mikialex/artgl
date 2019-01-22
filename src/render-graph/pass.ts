@@ -111,7 +111,7 @@ export class RenderPass{
       if (this.clearColor !== undefined) {
         engine.renderer.state.colorbuffer.setClearColor(this.clearColor);
       }
-      // engine.renderer.state.colorbuffer.clear();
+      engine.renderer.state.colorbuffer.clear();
     }
 
     if (this.enableDepthClear) {
