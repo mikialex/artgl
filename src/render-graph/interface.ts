@@ -51,7 +51,8 @@ export interface PassDefine {
   enableColorClear?:boolean,
   enableDepthClear?:boolean,
   clearColor?: Vector4,
-  onPassExecuted?: () => any,
+  afterPassExecute?: () => any,
+  beforePassExecute?: () => any,
 }
 
 export interface GraphDefine {

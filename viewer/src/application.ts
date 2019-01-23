@@ -99,14 +99,17 @@ export class Application{
           source: ['artgl.screenQuad'],
           output: 'TAAHistoryB',
           enableColorClear: false,
-          onPassExecuted: () => {
-            sample++;
-            TAATech.uniforms.get('u_sampleCount').value = sample ;
+          beforePassExecute: () => {
+            this.engine.unjit();
             const VPInv: Matrix4 = TAATech.uniforms.get('VPMatrixInverse').value;
             const VP: Matrix4 = this.engine.globalUniforms.get(InnerSupportUniform.VPMatrix).value
             VPInv.getInverse(VP, true);
             TAATech.uniforms.get('VPMatrixInverse').needUpdate = true;
-            this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
+          },
+          afterPassExecute: () => {
+            sample++;
+            TAATech.uniforms.get('u_sampleCount').value = sample ;
+            // this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
           }
         },
         { // copy to screen
@@ -117,8 +120,10 @@ export class Application{
           output: "screen",
           technique: 'copyTech',
           source: ['artgl.screenQuad'],
-          onPassExecuted: () => {
-            // this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
+          beforePassExecute: () => {
+          },
+          afterPassExecute: () => {
+            this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
           }
         },
       ]
@@ -168,7 +173,7 @@ export class Application{
   render = () => {
     this.orbitControler.update();
     this.engine.connectCamera();
-    this.engine.ditherVPMatrix();
+    this.engine.jitterProjectionMatrix();
 
     // this.engine.renderer.setRenderTargetScreen();
     // this.engine.render(this.scene);

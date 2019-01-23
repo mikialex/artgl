@@ -29,7 +29,8 @@ export class RenderPass{
     this.enableColorClear = define.enableColorClear === undefined ? true : define.enableColorClear
     this.enableDepthClear = define.enableDepthClear === undefined ? true : define.enableDepthClear
 
-    this.onPassExecuted = define.onPassExecuted;
+    this.beforePassExecute = define.beforePassExecute;
+    this.afterPassExecute = define.afterPassExecute;
 
     define.source.forEach(so => {
       let renderso: RenderSource;
@@ -54,7 +55,8 @@ export class RenderPass{
   private enableDepthClear: boolean = true;
   private enableColorClear: boolean = true;
 
-  private onPassExecuted: () => any;
+  private afterPassExecute: () => any;
+  private beforePassExecute: () => any;
   
 
   private sourceUse: RenderSource[] = [];
@@ -120,6 +122,10 @@ export class RenderPass{
       }
     }
 
+    if (this.beforePassExecute !== undefined) {
+      this.beforePassExecute();
+    }
+
     //////  render //////
     for (let i = 0; i < this.sourceUse.length; i++) {
       const source = this.sourceUse[i];
@@ -127,8 +133,8 @@ export class RenderPass{
     }
     /////////////////////
 
-    if (this.onPassExecuted !== undefined) {
-      this.onPassExecuted();
+    if (this.afterPassExecute !== undefined) {
+      this.afterPassExecute();
     }
 
     engine.overrideTechnique = null;

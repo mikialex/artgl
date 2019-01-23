@@ -50,23 +50,31 @@ export class ARTEngine {
     this.isCameraChanged = true;
   };
   private cameraMatrixRerverse = new Matrix4();
+  private PMatirx = new Matrix4();
   private VPMatrix = new Matrix4();
   private LastVPMatrix = new Matrix4();
   private needUpdateVP = true;
 
-  private ditheringVP = new Matrix4();
+  private jitterPMatrix = new Matrix4();
+  private jitterVPMatrix = new Matrix4();
 
-  ditherVPMatrix() {
-    this.ditheringVP.copy(this.VPMatrix);
-    this.ditheringVP.elements[8] += ((2 * Math.random() - 1) / 20);
-    this.ditheringVP.elements[9] += ((2 * Math.random() - 1) / 20);
-    this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.ditheringVP;
+  jitterProjectionMatrix() {
+    this.jitterPMatrix.copy(this.PMatirx);
+    this.jitterPMatrix.elements[8] += ((2 * Math.random() - 1) / 500);
+    this.jitterPMatrix.elements[9] += ((2 * Math.random() - 1) / 500);
+    this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.cameraMatrixRerverse);
+    this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.jitterVPMatrix;
+  }
+
+  unjit() {
+    this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.VPMatrix;
   }
 
   connectCamera() {
     // if (this.camera.projectionMatrixNeedUpdate) {
-      this.camera.updateProjectionMatrix();
-      this.needUpdateVP = true;
+    this.camera.updateProjectionMatrix();
+    this.PMatirx.copy(this.camera.projectionMatrix);
+    this.needUpdateVP = true;
     // }
     // todo
     this.camera.updateWorldMatrix(true);
@@ -76,8 +84,8 @@ export class ARTEngine {
     // }
     // if (this.needUpdateVP) {
     this.LastVPMatrix.copy(this.VPMatrix);
-    this.globalUniforms.get(InnerSupportUniform.LastVPMatrix).value = this.VPMatrix;
-    this.VPMatrix.multiplyMatrices(this.camera.projectionMatrix, this.cameraMatrixRerverse);
+    this.globalUniforms.get(InnerSupportUniform.LastVPMatrix).value = this.LastVPMatrix;
+    this.VPMatrix.multiplyMatrices(this.PMatirx, this.cameraMatrixRerverse);
     this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.VPMatrix;
     this.needUpdateVP = false;
     // }

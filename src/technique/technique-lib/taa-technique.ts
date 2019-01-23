@@ -22,7 +22,7 @@ const fragmentShaderSource =
     }
 
     vec4 getWorldPosition(vec2 cood){
-      float depth = UnpackDepth(texture2D(TAAHistoryOld, cood));
+      float depth = UnpackDepth(texture2D(depthResult, cood));
       return vec4(cood, depth, 1.0);
     }
 
@@ -34,11 +34,12 @@ const fragmentShaderSource =
 
     void main() {
       vec2 cood = getLastPixelPosition(v_uv);
-      vec3 oldColor = texture2D(TAAHistoryOld, v_uv).rgb;
+      vec3 oldColor = texture2D(TAAHistoryOld, cood).rgb;
       vec3 newColor = texture2D(sceneResult, v_uv).rgb;
       // gl_FragColor = vec4((oldColor * u_sampleCount + newColor) / (u_sampleCount + 1.0), 1.0);
       // gl_FragColor = vec4((oldColor + newColor) / 2.0, 1.0);
-      gl_FragColor = vec4(newColor*0.1 + (1.0 -0.1) * oldColor, 1.0);
+      gl_FragColor = vec4(newColor*0.3 + (1.0 -0.3) * oldColor, 1.0);
+      // gl_FragColor = vec4(vec3(UnpackDepth(texture2D(depthResult, v_uv))), 1.0);
     }
     `
 
