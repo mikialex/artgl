@@ -14,9 +14,23 @@ const vertexShaderSource =
     `
 const fragmentShaderSource =
   `
+  
+    vec4 PackDepth(in float frag_depth) {
+      vec4 bitSh = vec4(256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0);
+      vec4 bitMsk = vec4(0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0);
+      vec4 enc = fract(frag_depth * bitSh);
+      enc -= enc.xxyz * bitMsk;
+      return enc;
+    }
+
+    float UnpackDepth( const in vec4 enc ) {
+        const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
+        float decoded = dot( enc, bit_shift );
+        return decoded;
+    }
+
     void main() {
-      // gl_FragColor = vec4(vec3(depth / 1.0), 1.0);
-      gl_FragColor = vec4(vec3(0.5), 1.0);
+      gl_FragColor = PackDepth(depth);
     }
     `
 

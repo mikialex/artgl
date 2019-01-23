@@ -2,7 +2,7 @@ import { GLRenderer } from "../gl-renderer";
 import { Vector4 } from "../../math/vector4";
 
 export class GLColorBuffer{
-  static defaultClearColor = new Vector4(0.5, 0.5, 0.5, 1);
+  static defaultClearColor = new Vector4(0.8, 0.8, 0.8, 1);
   constructor(renderer: GLRenderer) {
     this.gl = renderer.gl;
     this.resetDefaultClearColor();

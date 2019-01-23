@@ -19,10 +19,18 @@ export class RenderPass{
       this.overrideTechnique = overrideTechnique;
     }
 
+    if (define.inputs !== undefined) {
+      define.inputs.forEach(inputInfo => {
+        this.inputTarget.set(inputInfo.name, inputInfo.mapTo)
+      })
+    }
     this.isOutputScreen = define.output === 'screen';
     this.clearColor = define.clearColor;
     this.enableColorClear = define.enableColorClear === undefined ? true : define.enableColorClear
     this.enableDepthClear = define.enableDepthClear === undefined ? true : define.enableDepthClear
+
+    this.beforePassExecute = define.beforePassExecute;
+    this.afterPassExecute = define.afterPassExecute;
 
     define.source.forEach(so => {
       let renderso: RenderSource;
@@ -46,12 +54,19 @@ export class RenderPass{
   private clearColor: Vector4;
   private enableDepthClear: boolean = true;
   private enableColorClear: boolean = true;
+
+  private afterPassExecute: () => any;
+  private beforePassExecute: () => any;
   
 
   private sourceUse: RenderSource[] = [];
   private overrideTechnique: Technique;
 
+  inputTarget: Map<string, string> = new Map();
   private outputTarget: GLFramebuffer
+  setOutPutTarget(textureNode: TextureNode) {
+    this.outputTarget = textureNode.framebuffer;
+  }
   private isOutputScreen: boolean = true;
 
   private debuggingViewport: Vector4 = new Vector4();
@@ -68,9 +83,6 @@ export class RenderPass{
     );
   }
 
-  setOutPutTarget(textureNode: TextureNode) {
-    this.outputTarget = textureNode.framebuffer;
-  }
 
   execute() {
     const engine = this.graph.engine;
@@ -88,10 +100,13 @@ export class RenderPass{
       engine.renderer.state.setViewport(0, 0, this.outputTarget.width, this.outputTarget.height);
     }
   
-
-
     if (this.overrideTechnique !== undefined) {
       engine.overrideTechnique = this.overrideTechnique;
+      this.inputTarget.forEach((inputFrambufferName, uniformName) => {
+        engine.overrideTechnique.getProgram(engine).defineFrameBufferTextureDep(
+          uniformName, inputFrambufferName
+        );
+      })
     }
 
     if (this.enableColorClear) {
@@ -107,9 +122,19 @@ export class RenderPass{
       }
     }
 
+    if (this.beforePassExecute !== undefined) {
+      this.beforePassExecute();
+    }
+
+    //////  render //////
     for (let i = 0; i < this.sourceUse.length; i++) {
       const source = this.sourceUse[i];
       engine.render(source);
+    }
+    /////////////////////
+
+    if (this.afterPassExecute !== undefined) {
+      this.afterPassExecute();
     }
 
     engine.overrideTechnique = null;

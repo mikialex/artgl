@@ -1,12 +1,14 @@
 import ARTGL from '../../src/export';
-import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController } from '../../src/artgl';
+import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4 } from '../../src/artgl';
 import { Scene } from '../../src/scene/scene';
 import { SceneNode } from '../../src/scene/scene-node';
 import { RenderGraph } from '../../src/render-graph/render-graph';
 import { DimensionType, PixelFormat } from '../../src/render-graph/interface';
-import { DOFTechnique } from '../../src/technique/technique-lib/dof-technique';
+import { TAATechnique } from '../../src/technique/technique-lib/taa-technique';
 import { DepthTechnique } from '../../src/technique/technique-lib/depth-technique';
+import { CopyTechnique } from '../../src/technique/technique-lib/copy-technique';
 import { Vector4 } from '../../src/math/vector4';
+import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
 export class Application{
   graph: RenderGraph;
   engine: ARTEngine;
@@ -29,22 +31,42 @@ export class Application{
     window.addEventListener('resize', this.onContainerResize);
     this.onContainerResize();
 
-    this.graph.registSource('All',this.scene)
+    this.graph.registSource('AllScreen', this.scene)
+    const TAATech = new TAATechnique();
     this.graph.registTechnique('depthTech', new DepthTechnique())
-    this.graph.registTechnique('dofTech', new DOFTechnique())
+    this.graph.registTechnique('TAATech', TAATech)
+    this.graph.registTechnique('copyTech', new CopyTechnique());
     this.graph.setGraph({
       renderTextures: [
         {
-          name: 'depthBuffer',
+          name: 'sceneResult',
           format: {
-            pixelFormat: PixelFormat.depth,
+            pixelFormat: PixelFormat.rgba,
             dimensionType: DimensionType.fixed,
             width: 500,
             height: 500
           },
         },
         {
-          name: 'sceneBuffer',
+          name: 'depthResult',
+          format: {
+            pixelFormat: PixelFormat.rgba,
+            dimensionType: DimensionType.fixed,
+            width: 500,
+            height: 500
+          },
+        },
+        {
+          name: 'TAAHistoryA',
+          format: {
+            pixelFormat: PixelFormat.rgba,
+            dimensionType: DimensionType.fixed,
+            width: 500,
+            height: 500
+          },
+        },
+        {
+          name: 'TAAHistoryB',
           format: {
             pixelFormat: PixelFormat.rgba,
             dimensionType: DimensionType.fixed,
@@ -54,26 +76,57 @@ export class Application{
         },
       ],
       passes: [
-        {
-          name: "Depth",
-          output: "depthBuffer",
-          technique: 'depthTech',
-          enableColorClear:false,
-          clearColor: new Vector4(0, 0, 0, 1),
-          source: ['All']
-        },
-        {
+        { // general scene origin
           name: "SceneOrigin",
-          output: "sceneBuffer",
-          source: ['All'],
+          output: "sceneResult",
+          source: ['AllScreen'],
         },
-        {
-          name: "DOF",
-          inputs: ["depthBuffer", "sceneBuffer"],
-          technique: 'dofTech',
+        { // depth
+          name: "Depth",
+          technique: 'depthTech',
+          output: "depthResult",
+          source: ['AllScreen'],
+        },
+        { // mix newrender and old samples
+          name: "genNewTAAHistory",
+          inputs: [
+            { name: "sceneResult", mapTo: "sceneResult"},
+            { name: "depthResult", mapTo: "depthResult"},
+            { name: "TAAHistoryA", mapTo: "TAAHistoryOld"}
+          ],
+          technique: 'TAATech',
           source: ['artgl.screenQuad'],
-          output: 'screen',
-        }
+          output: 'TAAHistoryB',
+          enableColorClear: false,
+          beforePassExecute: () => {
+            this.engine.unjit();
+            const VPInv: Matrix4 = TAATech.uniforms.get('VPMatrixInverse').value;
+            const VP: Matrix4 = this.engine.globalUniforms.get(InnerSupportUniform.VPMatrix).value
+            VPInv.getInverse(VP, true);
+            TAATech.uniforms.get('VPMatrixInverse').needUpdate = true;
+
+            console.log(this.sampleCount)
+            TAATech.uniforms.get('u_sampleCount').value = this.sampleCount;
+          },
+          afterPassExecute: () => {
+            // this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
+            this.sampleCount++;
+          }
+        },
+        { // copy to screen
+          name: "CopyToScreen",
+          inputs: [
+            { name: "TAAHistoryB", mapTo: "copySource" },
+          ],
+          output: "screen",
+          technique: 'copyTech',
+          source: ['artgl.screenQuad'],
+          beforePassExecute: () => {
+          },
+          afterPassExecute: () => {
+            this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
+          }
+        },
       ]
     })
   }
@@ -93,6 +146,39 @@ export class Application{
   notifyResize() {
     this.onContainerResize();
   }
+
+  private sampleCount = 0;
+  render = () => {
+    this.orbitControler.update();
+    this.engine.connectCamera();
+    if (this.engine.isCameraChanged) {
+      this.sampleCount = 0;
+    }
+    this.engine.jitterProjectionMatrix();
+
+    // this.engine.renderer.setRenderTargetScreen();
+    // this.engine.render(this.scene);
+
+    if (this.sampleCount <= 100) {
+      this.graph.render();
+    }
+    if (this.active) {
+      window.requestAnimationFrame(this.render);
+    }
+  }
+
+  tickId;
+  run() {
+    this.active = true;
+    this.interactor.enabled = true;
+    this.tickId = window.requestAnimationFrame(this.render);
+  }
+
+  stop() {
+    this.active = false;
+    this.interactor.enabled = false;
+  }
+
 
   createScene(scene: Scene): Scene {
     let testGeo = new ARTGL.SphereGeometry(1, 40, 40);
@@ -116,31 +202,6 @@ export class Application{
       }
     }
     return scene;
-  }
-
-  render = () => {
-    this.orbitControler.update();
-    this.engine.connectCamera();
-
-    // this.engine.renderer.setRenderTargetScreen();
-    // this.engine.render(this.scene);
-
-    this.graph.render();
-    if (this.active) {
-      window.requestAnimationFrame(this.render);
-    }
-  }
-
-  tickId;
-  run() {
-    this.active = true;
-    this.interactor.enabled = true;
-    this.tickId = window.requestAnimationFrame(this.render);
-  }
-
-  stop() {
-    this.active = false;
-    this.interactor.enabled = false;
   }
 
 }

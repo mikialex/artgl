@@ -1,8 +1,8 @@
 
 export class DAGNode{
-  private toNode: DAGNode[] = [];
-  private fromNode: DAGNode[] = [];
-  private fullfillList: boolean[] = [];
+  protected toNode: DAGNode[] = [];
+  protected fromNode: DAGNode[] = [];
+  protected fullfillList: boolean[] = [];
 
   public connectTo(node: DAGNode) {
     this.toNode.push(node);

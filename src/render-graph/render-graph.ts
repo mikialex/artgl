@@ -7,6 +7,7 @@ import { ARTEngine, RenderSource } from "../engine/render-engine";
 import { TechniqueConfig, Technique } from "../core/technique";
 import { GraphDebuggingViewer } from "./graph-viewer/graph-debugging-viewer";
 import { QuadSource } from './quad-source';
+import { GLFramebuffer } from '../webgl/gl-framebuffer';
 
 export class RenderGraph{
   constructor(engine: ARTEngine) {
@@ -31,6 +32,23 @@ export class RenderGraph{
     this.renderTextures.clear();
     this.passNodes.clear();
     this.composer.clearPasses();
+  }
+
+  swapRenderTexture(from: string, to: string) {
+    const fromTexture = this.renderTextures.get(from);
+    const toTexture = this.renderTextures.get(to);
+    const frambufferFrom = fromTexture.framebuffer.name;
+    const frambufferTo = toTexture.framebuffer.name;
+
+    // swap on node graph
+    let temp: GLFramebuffer;
+    temp = fromTexture.framebuffer;
+    fromTexture.framebuffer = toTexture.framebuffer;
+    toTexture.framebuffer = temp;
+
+    // update pass
+    fromTexture.updateConnectedPassFramebuffer(frambufferFrom, frambufferTo);
+    toTexture.updateConnectedPassFramebuffer(frambufferTo, frambufferFrom);
   }
 
   public setGraph(graphDefine: GraphDefine) {

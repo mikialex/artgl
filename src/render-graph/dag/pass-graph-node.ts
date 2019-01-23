@@ -12,10 +12,10 @@ export class PassGraphNode extends DAGNode{
     this.pass = new RenderPass(graph, define);
 
     if (define.inputs !== undefined) {
-      define.inputs.forEach(textInput => {
-        const textureNode = graph.getTextureDependence(textInput);
+      define.inputs.forEach(inputInfo => {
+        const textureNode = graph.getTextureDependence(inputInfo.name);
         if (textureNode === undefined) {
-          throw 'render graph build error, texture depend cant found';
+          throw `render graph build error, texture depend ${inputInfo.name} cant found`;
         }
         textureNode.connectTo(this);
       })
@@ -24,7 +24,7 @@ export class PassGraphNode extends DAGNode{
 
       const textureNode = graph.getTextureDependence(define.output);
       if (textureNode === undefined) {
-        throw 'render graph build error, texture depend cant found';
+        throw `render graph build error, texture output ${define.output} cant found`;
       }
 
       this.connectTo(textureNode);

@@ -88,6 +88,12 @@ export class GLProgram {
   private textures: { [index: string]: GLTextureUniform } = {};
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
+
+  framebufferTextureMap: { [index: string]: string } = {};
+  public defineFrameBufferTextureDep(frambufferName: string, uniformName: string) {
+    this.framebufferTextureMap[uniformName] = frambufferName;
+  }
+
   drawFrom: number = 0;
   drawCount: number = 0;
   useIndexDraw: boolean = false;

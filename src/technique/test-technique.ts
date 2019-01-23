@@ -7,10 +7,10 @@ import { GLTextureType } from "../webgl/uniform/uniform-texture";
 const vertexShaderSource =
   `
     void main() {
-      vec4 worldPosition = VPMatrix * MMatrix * vec4(position, 1.0);
+      vec4 gPosition = VPMatrix * MMatrix * vec4(position, 1.0);
       color = vec3(normal.xyz);
       v_uv = uv;
-      gl_Position = worldPosition;
+      gl_Position = gPosition;
       gl_PointSize = 10.0;
     }
     ` 

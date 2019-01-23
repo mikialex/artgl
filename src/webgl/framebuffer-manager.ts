@@ -30,6 +30,10 @@ export class GLFrameBufferManager{
   }
 
   getFramebufferTexture(framebufferName: string): WebGLTexture{
-    return this.framebuffers.get(framebufferName).textureAttachedSlot[0].gltexture;
+    const frambuffer = this.framebuffers.get(framebufferName);
+    if (frambuffer === undefined) {
+      throw `cant find frambuffer ${framebufferName}`
+    }
+    return frambuffer.textureAttachedSlot[0].gltexture;
   }
 }

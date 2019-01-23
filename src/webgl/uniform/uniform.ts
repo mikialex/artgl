@@ -11,13 +11,27 @@ export type differType= (newValue: uniformUploadType, oldValue: uniformUploadTyp
 
 export const enum InnerSupportUniform{
   MMatrix,
-  VPMatrix
+  VPMatrix,
+  LastVPMatrix
 }
 
 export interface InnerUniformMapDescriptor{
   name: string,
   mapInner: InnerSupportUniform,     
 }
+
+export const InnerUniformMap: Map<InnerSupportUniform, UniformDescriptor> = new Map();
+InnerUniformMap.set(InnerSupportUniform.MMatrix, {
+  name: 'MMatrix', type: GLDataType.Mat4, default: new Matrix4()
+})
+InnerUniformMap.set(InnerSupportUniform.VPMatrix, {
+  name: 'VPMatrix', type: GLDataType.Mat4, default: new Matrix4()
+})
+InnerUniformMap.set(InnerSupportUniform.LastVPMatrix, {
+  name: 'LastVPMatrix', type: GLDataType.Mat4, default: new Matrix4()
+})
+
+
 
 export interface UniformDescriptor {
   name: string,
@@ -34,14 +48,6 @@ export interface UniformDescriptor {
 export function createUniform(program: GLProgram, descriptor: UniformDescriptor): GLUniform{
   return new GLUniform(program, descriptor);
 }
-
-export const InnerUniformMap: Map<InnerSupportUniform, UniformDescriptor> = new Map();
-InnerUniformMap.set(InnerSupportUniform.MMatrix, {
-  name: 'MMatrix', type: GLDataType.Mat4, default: new Matrix4()
-})
-InnerUniformMap.set(InnerSupportUniform.VPMatrix, {
-  name: 'VPMatrix', type: GLDataType.Mat4, default: new Matrix4()
-})
 
 export function getInnerUniformDescriptor(des: InnerUniformMapDescriptor): UniformDescriptor {
   const temdescritor = InnerUniformMap.get(des.mapInner);
@@ -104,7 +110,7 @@ export class GLUniform{
       return;
     }
 
-    const enableDiff = true;
+    const enableDiff = false;
     if (enableDiff) {
       if (this.differ(this.receiveData, this.lastReceiveData)) {
         this.setter(this.gl, this.location, this.receiveData);

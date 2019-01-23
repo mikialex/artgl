@@ -34,9 +34,14 @@ enum stateType {
   DisableAlphaWrite
 }
 
+export interface PassInputMapInfo{
+  name: string,
+  mapTo: string
+}
+
 export interface PassDefine {
   name: string,
-  inputs?: string[],
+  inputs?: PassInputMapInfo[],
   output: string,
   source: string[],
   filter?: () => boolean,
@@ -45,7 +50,9 @@ export interface PassDefine {
   technique?: string,
   enableColorClear?:boolean,
   enableDepthClear?:boolean,
-  clearColor?: Vector4
+  clearColor?: Vector4,
+  afterPassExecute?: () => any,
+  beforePassExecute?: () => any,
 }
 
 export interface GraphDefine {

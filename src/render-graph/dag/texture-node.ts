@@ -2,6 +2,7 @@ import { DAGNode } from "./dag-node";
 import { PassDefine, RenderTextureDefine, DimensionType } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { GLFramebuffer } from "../../webgl/gl-framebuffer";
+import { PassGraphNode } from './pass-graph-node';
 
 export class TextureNode extends DAGNode{
   constructor(graph: RenderGraph, define: RenderTextureDefine) {
@@ -27,4 +28,19 @@ export class TextureNode extends DAGNode{
   readonly graph: RenderGraph;
 
   framebuffer: GLFramebuffer;
+
+  updateConnectedPassFramebuffer(oldFrambufferName:string, newFrambufferName: string) {
+    this.toNode.forEach(node => {
+      if (node instanceof PassGraphNode) {
+        const uniformMaped = node.pass.inputTarget.get(oldFrambufferName);
+        node.pass.inputTarget.delete(oldFrambufferName);
+        node.pass.inputTarget.set(newFrambufferName, uniformMaped);
+      }
+    })
+    this.fromNode.forEach(node => {
+      if (node instanceof PassGraphNode) {
+        node.pass.setOutPutTarget(this);
+      }
+    })
+  }
 }
