@@ -14,32 +14,46 @@ const vertexShaderSource =
     `
 const fragmentShaderSource =
   `
-  
+    float lightness(vec3 color){
+      return 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b;
+    }
+
     float UnpackDepth( const in vec4 enc ) {
         const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
         float decoded = dot( enc, bit_shift );
         return decoded;
     }
 
-    vec4 getWorldPosition(vec2 cood){
+    vec4 getNDCPosition(vec2 cood){
       float depth = UnpackDepth(texture2D(depthResult, cood));
       return vec4(cood, depth, 1.0);
     }
 
     vec2 getLastPixelPosition(vec2 cood){
-      vec4 worldPosition = VPMatrixInverse * getWorldPosition(cood);
+      vec4 ndcPosition = getNDCPosition(cood);
+      if(ndcPosition.z > 0.99){ // we consider frag too far is background
+        return cood;
+      }
+      vec4 worldPosition = VPMatrixInverse * ndcPosition;
       vec4 oldGPositon = LastVPMatrix * worldPosition;
-      return oldGPositon.xy;
+      return  oldGPositon.xy / oldGPositon.w;
     }
 
     void main() {
       vec2 cood = getLastPixelPosition(v_uv);
       vec3 oldColor = texture2D(TAAHistoryOld, cood).rgb;
       vec3 newColor = texture2D(sceneResult, v_uv).rgb;
+      // if(abs(lightness(newColor) - lightness(oldColor)) > 0.1){
+      //   rate = 1.0;
+      // }
+      float rate = 0.3;
+      if(u_sampleCount < 0.1){
+        gl_FragColor = vec4(newColor * rate + (1.0 - rate) * oldColor, 1.0);
+      } else{
+        gl_FragColor = vec4((oldColor * u_sampleCount + newColor) / (u_sampleCount + 1.0), 1.0);
+      }
+      // gl_FragColor = vec4(newColor * rate + (1.0 - rate) * oldColor, 1.0);
       // gl_FragColor = vec4((oldColor * u_sampleCount + newColor) / (u_sampleCount + 1.0), 1.0);
-      // gl_FragColor = vec4((oldColor + newColor) / 2.0, 1.0);
-      gl_FragColor = vec4(newColor*0.3 + (1.0 -0.3) * oldColor, 1.0);
-      // gl_FragColor = vec4(vec3(UnpackDepth(texture2D(depthResult, v_uv))), 1.0);
     }
     `
 

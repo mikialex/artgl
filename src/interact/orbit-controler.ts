@@ -40,22 +40,29 @@ export class OrbitController extends Controler {
     const viewHeight = this.camera.height * 5000;
     this.spherical.azim += offset.x / viewWidth * Math.PI * RotateAngleFactor;
     this.spherical.polar = MathUtil.clamp(this.spherical.polar + offset.y / viewHeight * Math.PI * RotateAngleFactor, MinPolarAngle, MaxPolarAngle);
+    this.needUpdate = true;
   }
 
   private zoom = (factor: number) => {
     this.spherical.radius *= factor;
+    this.needUpdate = true;
   }
 
   private move = (offset: Vector2) => {
     offset.rotate(-this.spherical.azim).multiplyScalar(this.spherical.radius * 0.002);
     this.spherical.center.x += offset.x;
     this.spherical.center.z += offset.y;
+    this.needUpdate = true;
   }
 
+  public needUpdate: boolean = true;
   public update() {
-    tempVec.setFromSpherical(this.spherical).add(this.spherical.center);
-    this.camera.transform.position.copy(tempVec);
-    this.camera.lookAt(this.spherical.center);
+    if (this.needUpdate) { 
+      tempVec.setFromSpherical(this.spherical).add(this.spherical.center);
+      this.camera.transform.position.copy(tempVec);
+      this.camera.lookAt(this.spherical.center);
+    }
+    this.needUpdate = false;
   }
 
 }

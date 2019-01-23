@@ -43,7 +43,7 @@ export class ARTEngine {
 
   //// camera related
   _camera: Camera = new PerspectiveCamera();
-  private isCameraChanged = true;
+  public isCameraChanged = true;
   get camera() { return this._camera };
   set camera(camera) {
     this._camera = camera;
@@ -71,24 +71,28 @@ export class ARTEngine {
   }
 
   connectCamera() {
-    // if (this.camera.projectionMatrixNeedUpdate) {
-    this.camera.updateProjectionMatrix();
-    this.PMatirx.copy(this.camera.projectionMatrix);
-    this.needUpdateVP = true;
-    // }
-    // todo
-    this.camera.updateWorldMatrix(true);
-    // if (this.isCameraChanged) { // TODO camera matrix change
+    if (this.camera.projectionMatrixNeedUpdate) {
+      this.camera.updateProjectionMatrix();
+      this.PMatirx.copy(this.camera.projectionMatrix);
+      this.needUpdateVP = true;
+    }
+    if (this.camera.transform.transformFrameChanged) {
+      this.camera.transform.matrix;
+      this.camera.updateWorldMatrix(true);
       this.cameraMatrixRerverse.getInverse(this.camera.worldMatrix, true);
       this.needUpdateVP = true;
-    // }
-    // if (this.needUpdateVP) {
+    }
+    if (this.needUpdateVP) {
+      this.VPMatrix.multiplyMatrices(this.PMatirx, this.cameraMatrixRerverse);
+      this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.VPMatrix;
+      this.needUpdateVP = false;
+      this.isCameraChanged = true;
+    } else {
+      this.isCameraChanged = false;
+    }
+
     this.LastVPMatrix.copy(this.VPMatrix);
     this.globalUniforms.get(InnerSupportUniform.LastVPMatrix).value = this.LastVPMatrix;
-    this.VPMatrix.multiplyMatrices(this.PMatirx, this.cameraMatrixRerverse);
-    this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.VPMatrix;
-    this.needUpdateVP = false;
-    // }
    
   }
   ////

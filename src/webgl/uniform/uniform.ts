@@ -110,7 +110,7 @@ export class GLUniform{
       return;
     }
 
-    const enableDiff = true;
+    const enableDiff = false;
     if (enableDiff) {
       if (this.differ(this.receiveData, this.lastReceiveData)) {
         this.setter(this.gl, this.location, this.receiveData);

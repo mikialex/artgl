@@ -36,7 +36,6 @@ export class Application{
     this.graph.registTechnique('depthTech', new DepthTechnique())
     this.graph.registTechnique('TAATech', TAATech)
     this.graph.registTechnique('copyTech', new CopyTechnique());
-    let sample = 0;
     this.graph.setGraph({
       renderTextures: [
         {
@@ -105,11 +104,13 @@ export class Application{
             const VP: Matrix4 = this.engine.globalUniforms.get(InnerSupportUniform.VPMatrix).value
             VPInv.getInverse(VP, true);
             TAATech.uniforms.get('VPMatrixInverse').needUpdate = true;
+
+            console.log(this.sampleCount)
+            TAATech.uniforms.get('u_sampleCount').value = this.sampleCount;
           },
           afterPassExecute: () => {
-            sample++;
-            TAATech.uniforms.get('u_sampleCount').value = sample ;
             // this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
+            this.sampleCount++;
           }
         },
         { // copy to screen
@@ -146,6 +147,39 @@ export class Application{
     this.onContainerResize();
   }
 
+  private sampleCount = 0;
+  render = () => {
+    this.orbitControler.update();
+    this.engine.connectCamera();
+    if (this.engine.isCameraChanged) {
+      this.sampleCount = 0;
+    }
+    this.engine.jitterProjectionMatrix();
+
+    // this.engine.renderer.setRenderTargetScreen();
+    // this.engine.render(this.scene);
+
+    if (this.sampleCount <= 100) {
+      this.graph.render();
+    }
+    if (this.active) {
+      window.requestAnimationFrame(this.render);
+    }
+  }
+
+  tickId;
+  run() {
+    this.active = true;
+    this.interactor.enabled = true;
+    this.tickId = window.requestAnimationFrame(this.render);
+  }
+
+  stop() {
+    this.active = false;
+    this.interactor.enabled = false;
+  }
+
+
   createScene(scene: Scene): Scene {
     let testGeo = new ARTGL.SphereGeometry(1, 40, 40);
     let testTec = new ARTGL.NormalTechnique();
@@ -168,32 +202,6 @@ export class Application{
       }
     }
     return scene;
-  }
-
-  render = () => {
-    this.orbitControler.update();
-    this.engine.connectCamera();
-    this.engine.jitterProjectionMatrix();
-
-    // this.engine.renderer.setRenderTargetScreen();
-    // this.engine.render(this.scene);
-
-    this.graph.render();
-    if (this.active) {
-      window.requestAnimationFrame(this.render);
-    }
-  }
-
-  tickId;
-  run() {
-    this.active = true;
-    this.interactor.enabled = true;
-    this.tickId = window.requestAnimationFrame(this.render);
-  }
-
-  stop() {
-    this.active = false;
-    this.interactor.enabled = false;
   }
 
 }
