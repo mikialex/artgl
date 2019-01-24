@@ -1,5 +1,5 @@
 import ARTGL from '../../src/export';
-import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4 } from '../../src/artgl';
+import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4, PlaneGeometry } from '../../src/artgl';
 import { Scene } from '../../src/scene/scene';
 import { SceneNode } from '../../src/scene/scene-node';
 import { RenderGraph } from '../../src/render-graph/render-graph';
@@ -105,7 +105,6 @@ export class Application{
             VPInv.getInverse(VP, true);
             TAATech.uniforms.get('VPMatrixInverse').needUpdate = true;
 
-            console.log(this.sampleCount)
             TAATech.uniforms.get('u_sampleCount').value = this.sampleCount;
           },
           afterPassExecute: () => {
@@ -153,8 +152,9 @@ export class Application{
     this.engine.connectCamera();
     if (this.engine.isCameraChanged) {
       this.sampleCount = 0;
+    } else {
+      this.engine.jitterProjectionMatrix();
     }
-    this.engine.jitterProjectionMatrix();
 
     // this.engine.renderer.setRenderTargetScreen();
     // this.engine.render(this.scene);
@@ -182,7 +182,12 @@ export class Application{
 
   createScene(scene: Scene): Scene {
     let testGeo = new ARTGL.SphereGeometry(1, 40, 40);
+    let testPlane = new PlaneGeometry(10, 10, 10, 10);
     let testTec = new ARTGL.NormalTechnique();
+    const planeMesh = new Mesh();
+    planeMesh.geometry = testPlane;
+    planeMesh.technique = testTec;
+    scene.root.addChild(planeMesh);
     for (let i = 0; i < 5; i++) {
       const node = new SceneNode();
       node.transform.position.x = i;

@@ -82,6 +82,10 @@ export class ARTEngine {
       this.cameraMatrixRerverse.getInverse(this.camera.worldMatrix, true);
       this.needUpdateVP = true;
     }
+
+    this.LastVPMatrix.copy(this.VPMatrix);
+    this.globalUniforms.get(InnerSupportUniform.LastVPMatrix).value = this.LastVPMatrix;
+
     if (this.needUpdateVP) {
       this.VPMatrix.multiplyMatrices(this.PMatirx, this.cameraMatrixRerverse);
       this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.VPMatrix;
@@ -90,9 +94,6 @@ export class ARTEngine {
     } else {
       this.isCameraChanged = false;
     }
-
-    this.LastVPMatrix.copy(this.VPMatrix);
-    this.globalUniforms.get(InnerSupportUniform.LastVPMatrix).value = this.LastVPMatrix;
    
   }
   ////
