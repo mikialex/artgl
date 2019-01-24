@@ -15,9 +15,15 @@ import { PerspectiveCamera } from "../camera/perspective-camera";
 import { Nullable } from "../type";
 import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
 import { UniformProxy } from "./uniform-proxy";
+import { Observable } from "../core/observable";
 
 export interface RenderSource{
   getRenderList(): RenderList;
+}
+
+export interface Size{
+  width: number;
+  height: number;
 }
 
 export class ARTEngine {
@@ -33,7 +39,26 @@ export class ARTEngine {
     })
   }
 
-  renderer: GLRenderer;
+  readonly renderer: GLRenderer;
+
+  // resize
+  readonly resizeObservable: Observable<Size> = new Observable<Size>();
+  setSize(width:number, height: number) {
+    if (this.renderer.setSize(width, height)) {
+      this.resizeObservable.notifyObservers({
+        width, height
+      })
+    }
+  }
+  setActualSize(width: number, height: number) {
+    if (this.renderer.setRawRenderSize(width, height)) {
+      this.resizeObservable.notifyObservers({
+        width, height
+      })
+    }
+  }
+
+
   overrideTechnique: Nullable<Technique> = null;
 
   ////
@@ -50,16 +75,15 @@ export class ARTEngine {
     this.isCameraChanged = true;
   };
   private cameraMatrixRerverse = new Matrix4();
-  private PMatirx = new Matrix4();
+  private ProjectionMatirx = new Matrix4();
   private VPMatrix = new Matrix4();
   private LastVPMatrix = new Matrix4();
-  private needUpdateVP = true;
 
   private jitterPMatrix = new Matrix4();
   private jitterVPMatrix = new Matrix4();
 
   jitterProjectionMatrix() {
-    this.jitterPMatrix.copy(this.PMatirx);
+    this.jitterPMatrix.copy(this.ProjectionMatirx);
     this.jitterPMatrix.elements[8] += ((2 * Math.random() - 1) / 500);
     this.jitterPMatrix.elements[9] += ((2 * Math.random() - 1) / 500);
     this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.cameraMatrixRerverse);
@@ -70,26 +94,34 @@ export class ARTEngine {
     this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.VPMatrix;
   }
 
+  /**
+   * call this to update enginelayer camera related render info
+   * such as matrix global uniform.
+   *
+   * @memberof ARTEngine
+   */
   connectCamera() {
+    let needUpdateVP = false;
+    // 
     if (this.camera.projectionMatrixNeedUpdate) {
       this.camera.updateProjectionMatrix();
-      this.PMatirx.copy(this.camera.projectionMatrix);
-      this.needUpdateVP = true;
+      this.ProjectionMatirx.copy(this.camera.projectionMatrix);
+      needUpdateVP = true;
     }
     if (this.camera.transform.transformFrameChanged) {
       this.camera.transform.matrix;
       this.camera.updateWorldMatrix(true);
       this.cameraMatrixRerverse.getInverse(this.camera.worldMatrix, true);
-      this.needUpdateVP = true;
+      needUpdateVP = true;
     }
 
     this.LastVPMatrix.copy(this.VPMatrix);
     this.globalUniforms.get(InnerSupportUniform.LastVPMatrix).value = this.LastVPMatrix;
 
-    if (this.needUpdateVP) {
-      this.VPMatrix.multiplyMatrices(this.PMatirx, this.cameraMatrixRerverse);
+    if (needUpdateVP) {
+      this.VPMatrix.multiplyMatrices(this.ProjectionMatirx, this.cameraMatrixRerverse);
       this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.VPMatrix;
-      this.needUpdateVP = false;
+      needUpdateVP = false;
       this.isCameraChanged = true;
     } else {
       this.isCameraChanged = false;
@@ -226,6 +258,9 @@ export class ARTEngine {
     program.drawCount = count;
   }
 
+
+
+  //  GL resouce aqusition
   getGLTexture(texture: Texture): WebGLTexture {
     const id = texture.gltextureId;
     return this.renderer.getGLTexture(id);
@@ -250,6 +285,12 @@ export class ARTEngine {
 
   createOrUpdateAttributeBuffer(bufferData: BufferData, useforIndex: boolean): WebGLBuffer {
     return this.renderer.attributeBufferManager.updateOrCreateBuffer(bufferData.data.buffer as ArrayBuffer, useforIndex);
+  }
+
+
+  dispose() {
+    this.resizeObservable.clear();
+    this.renderer.dispose();
   }
 
 

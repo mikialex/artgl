@@ -28,7 +28,7 @@ export class RenderGraph{
     this.composer.render();
   }
 
-  reset() {
+  reset() {``
     this.renderTextures.clear();
     this.passNodes.clear();
     this.composer.clearPasses();
