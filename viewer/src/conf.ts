@@ -5,22 +5,54 @@ export default {
     {
       name: 'canvas',
       value: [
-  
+        {
+          name: 'renderSize',
+          value: [
+            {
+              name: 'width',
+              value: 100,
+              editors: [
+                {
+                  type: 'slider',
+                  min: 10,
+                  max: 500,
+                  step: 1
+                },
+              ]
+            },
+            {
+              name: 'height',
+              value: 100,
+              editors: [
+                {
+                  type: 'slider',
+                  min: 10,
+                  max: 500,
+                  step: 1
+                },
+              ]
+            },
+          ]
+        },
       ]
     },
     {
       name: 'engine',
       value: [
         {
-          name: 'useThree',
+          name: 'enableUniformDiffUpload',
           value: false,
           description: 'this is a demo description'
         },
         {
-          name: 'detailCulling',
+          name: 'TAA',
           value: [
             {
-              name: 'size',
+              name: 'enable',
+              value: true,
+            },
+            {
+              name: 'maxStableSampleCount',
               value: 100,
               editors: [
                 {
@@ -31,10 +63,6 @@ export default {
                 },
               ]
             },
-            {
-              name: 'enable',
-              value: true,
-            }
           ]
         }
       ]

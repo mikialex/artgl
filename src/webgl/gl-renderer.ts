@@ -49,10 +49,14 @@ export class GLRenderer {
   get height() { return this._height };
 
   devicePixelRatio = window.devicePixelRatio;
-  // set rendersize by real size
+
+  // set rendersize by device logic size
   setSize(width: number, height: number) {
-    this._width = width * this.devicePixelRatio;
-    this._height = height * this.devicePixelRatio;
+    this.setRawRenderSize(width * this.devicePixelRatio, height * this.devicePixelRatio);
+  }
+  setRawRenderSize(width: number, height: number) {
+    this._width = width;
+    this._height = width;
     this.el.width = this._width;
     this.el.height = this._height;
 		this.state.setViewport( 0, 0, width * this.devicePixelRatio, height * this.devicePixelRatio );
