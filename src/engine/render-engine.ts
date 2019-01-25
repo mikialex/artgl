@@ -84,14 +84,14 @@ export class ARTEngine {
 
   jitterProjectionMatrix() {
     this.jitterPMatrix.copy(this.ProjectionMatirx);
-    this.jitterPMatrix.elements[8] += ((2 * Math.random() - 1) / 500);
-    this.jitterPMatrix.elements[9] += ((2 * Math.random() - 1) / 500);
+    this.jitterPMatrix.elements[8] += ((2 * Math.random() - 1) / this.renderer.width);
+    this.jitterPMatrix.elements[9] += ((2 * Math.random() - 1) / this.renderer.height);
     this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.cameraMatrixRerverse);
-    this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.jitterVPMatrix;
+    this.globalUniforms.get(InnerSupportUniform.VPMatrix).setValue(this.jitterVPMatrix);
   }
 
   unjit() {
-    this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.VPMatrix;
+    this.globalUniforms.get(InnerSupportUniform.VPMatrix).setValue(this.VPMatrix);
   }
 
   /**
@@ -116,11 +116,11 @@ export class ARTEngine {
     }
 
     this.LastVPMatrix.copy(this.VPMatrix);
-    this.globalUniforms.get(InnerSupportUniform.LastVPMatrix).value = this.LastVPMatrix;
+    this.globalUniforms.get(InnerSupportUniform.LastVPMatrix).setValue(this.LastVPMatrix);
 
     if (needUpdateVP) {
       this.VPMatrix.multiplyMatrices(this.ProjectionMatirx, this.cameraMatrixRerverse);
-      this.globalUniforms.get(InnerSupportUniform.VPMatrix).value = this.VPMatrix;
+      this.globalUniforms.get(InnerSupportUniform.VPMatrix).setValue(this.VPMatrix);
       needUpdateVP = false;
       this.isCameraChanged = true;
     } else {
@@ -180,10 +180,10 @@ export class ARTEngine {
     }
     const program = technique.getProgram(this);
     this.renderer.useProgram(program);
-    this.globalUniforms.get(InnerSupportUniform.MMatrix).value = object.worldMatrix;
-    program.updateInnerGlobalUniforms(this); // TODO optimize here
+    this.globalUniforms.get(InnerSupportUniform.MMatrix).setValue(object.worldMatrix);
+    program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
     technique.uniforms.forEach((uni, key) => {
-      if (uni.needUpdate) {
+      if (uni._needUpdate) {
         program.setUniform(key, uni.value);
         uni.resetUpdate();
       }

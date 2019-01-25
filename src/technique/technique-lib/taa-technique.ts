@@ -39,9 +39,6 @@ const fragmentShaderSource =
       return  oldGPositon.xy / oldGPositon.w;
     }
 
-    const float screenPixelXStep = 1.0 / (500. * 2.0);
-    const float screenPixelYStep = 1.0 / (500. * 2.0);
-
     vec3 getClampColor(vec2 cood, vec3 colorToClamp){
       vec3 right = texture2D(sceneResult, cood + vec2(screenPixelXStep, 0.)).rgb;
       vec3 left = texture2D(sceneResult, cood + vec2(-screenPixelXStep, 0.)).rgb;
@@ -85,6 +82,12 @@ export class TAATechnique extends Technique {
           },
           {
             name: 'VPMatrixInverse', default: new Matrix4(), type: GLDataType.Mat4,
+          },
+          {
+            name: 'screenPixelXStep', default: 1 / 1000, type: GLDataType.float,
+          },
+          {
+            name: 'screenPixelYStep', default: 1 / 1000, type: GLDataType.float,
           }
         ],
         uniformsIncludes: [

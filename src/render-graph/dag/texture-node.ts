@@ -1,5 +1,5 @@
 import { DAGNode } from "./dag-node";
-import { PassDefine, RenderTextureDefine, DimensionType } from "../interface";
+import { RenderTextureDefine, DimensionType } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { GLFramebuffer } from "../../webgl/gl-framebuffer";
 import { PassGraphNode } from './pass-graph-node';
@@ -14,8 +14,8 @@ export class TextureNode extends DAGNode{
     let width: number;
     let height: number;
     if (define.format.dimensionType === DimensionType.fixed) {
-      width = define.format.width;
-      height = define.format.height;
+      width = define.format.width !== undefined ? define.format.width : graph.engine.renderer.width;
+      height = define.format.height !== undefined ? define.format.height : graph.engine.renderer.height;
     }
 
     const enableDepth = define.format.disableDepthBuffer !== undefined ? define.format.disableDepthBuffer : true;

@@ -1,15 +1,26 @@
+
+/**
+ * wrap class for uniform change cache and needupdate optimize
+ *
+ * @export
+ * @class UniformProxy
+ */
 export class UniformProxy{
-  constructor(value) {
+  constructor(value:any) {
     this._value = value;
   }
 
   _value: any;
-  // TODO needUpdate may relate with program
-  needUpdate: boolean = true;
+  // _needUpdate is ignored by global uniform uploading
+  _needUpdate: boolean = true;
 
-  set value(val: any) {
+  setValue(val: any) {
     this._value = val;
-    this.needUpdate = true;
+    this._needUpdate = true;
+  }
+
+  setValueNeedUpdate() {
+    this._needUpdate = true;
   }
 
   get value() {
@@ -17,6 +28,6 @@ export class UniformProxy{
   }
 
   resetUpdate() {
-    this.needUpdate = false;
+    this._needUpdate = false;
   }
 }
