@@ -39,6 +39,16 @@ const fragmentShaderSource =
       return  oldGPositon.xy / oldGPositon.w;
     }
 
+    vec3 getClampColor(vec2 cood, vec3 colorToClamp){
+      vec3 right = texture2D(sceneResult, cood + vec2(screenPixelXStep, 0.)).rgb;
+      vec3 left = texture2D(sceneResult, cood + vec2(-screenPixelXStep, 0.)).rgb;
+      vec3 top = texture2D(sceneResult, cood + vec2(0., screenPixelYStep)).rgb;
+      vec3 bottom = texture2D(sceneResult, cood + vec2(0., -screenPixelYStep)).rgb;
+      vec3 max = max(max(max(left, right), top), bottom);
+      vec3 min = min(min(min(left, right), top), bottom);
+      return clamp(colorToClamp, min, max);
+    }
+
     void main() {
       vec2 cood = getLastPixelPosition(v_uv);
       vec3 oldColor = texture2D(TAAHistoryOld, cood).rgb;
@@ -46,12 +56,14 @@ const fragmentShaderSource =
       // if(abs(lightness(newColor) - lightness(oldColor)) > 0.1){
       //   rate = 1.0;
       // }
-      float rate = 0.3;
+      float rate = 0.05;
       if(u_sampleCount < 0.1){
-        gl_FragColor = vec4(newColor * rate + (1.0 - rate) * oldColor, 1.0);
+        vec3 clampedOldColor = getClampColor(v_uv, oldColor);
+        gl_FragColor = vec4(newColor * rate + (1.0 - rate) * clampedOldColor, 1.0);
       } else{
         gl_FragColor = vec4((oldColor * u_sampleCount + newColor) / (u_sampleCount + 1.0), 1.0);
       }
+      // gl_FragColor = vec4(newColor, 1.0);
       // gl_FragColor = vec4(newColor * rate + (1.0 - rate) * oldColor, 1.0);
       // gl_FragColor = vec4((oldColor * u_sampleCount + newColor) / (u_sampleCount + 1.0), 1.0);
     }
@@ -71,6 +83,12 @@ export class TAATechnique extends Technique {
           },
           {
             name: 'VPMatrixInverse', default: new Matrix4(), type: GLDataType.Mat4,
+          },
+          {
+            name: 'screenPixelXStep', default: 1 / 1000, type: GLDataType.float,
+          },
+          {
+            name: 'screenPixelYStep', default: 1 / 1000, type: GLDataType.float,
           }
         ],
         uniformsIncludes: [

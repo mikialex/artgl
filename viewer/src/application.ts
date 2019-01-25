@@ -1,5 +1,5 @@
 import ARTGL from '../../src/export';
-import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4 } from '../../src/artgl';
+import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4, PlaneGeometry } from '../../src/artgl';
 import { Scene } from '../../src/scene/scene';
 import { SceneNode } from '../../src/scene/scene-node';
 import { RenderGraph } from '../../src/render-graph/render-graph';
@@ -7,7 +7,6 @@ import { DimensionType, PixelFormat } from '../../src/render-graph/interface';
 import { TAATechnique } from '../../src/technique/technique-lib/taa-technique';
 import { DepthTechnique } from '../../src/technique/technique-lib/depth-technique';
 import { CopyTechnique } from '../../src/technique/technique-lib/copy-technique';
-import { Vector4 } from '../../src/math/vector4';
 import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
 export class Application{
   graph: RenderGraph;
@@ -18,6 +17,7 @@ export class Application{
   active: boolean = false;
   interactor: Interactor;
   orbitControler: OrbitController;
+  taaTech: TAATechnique;
   initialize(canvas: HTMLCanvasElement) {
     this.el = canvas;
     this.engine = new ARTEngine(canvas);
@@ -28,11 +28,10 @@ export class Application{
     this.orbitControler.registerInteractor(this.interactor);
     this.hasInitialized = true;
     this.createScene(this.scene);
-    window.addEventListener('resize', this.onContainerResize);
-    this.onContainerResize();
 
     this.graph.registSource('AllScreen', this.scene)
     const TAATech = new TAATechnique();
+    this.taaTech = TAATech;
     this.graph.registTechnique('depthTech', new DepthTechnique())
     this.graph.registTechnique('TAATech', TAATech)
     this.graph.registTechnique('copyTech', new CopyTechnique());
@@ -42,36 +41,28 @@ export class Application{
           name: 'sceneResult',
           format: {
             pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.fixed,
-            width: 500,
-            height: 500
+            dimensionType: DimensionType.bindRenderSize,
           },
         },
         {
           name: 'depthResult',
           format: {
             pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.fixed,
-            width: 500,
-            height: 500
+            dimensionType: DimensionType.bindRenderSize,
           },
         },
         {
           name: 'TAAHistoryA',
           format: {
             pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.fixed,
-            width: 500,
-            height: 500
+            dimensionType: DimensionType.bindRenderSize,
           },
         },
         {
           name: 'TAAHistoryB',
           format: {
             pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.fixed,
-            width: 500,
-            height: 500
+            dimensionType: DimensionType.bindRenderSize,
           },
         },
       ],
@@ -88,7 +79,7 @@ export class Application{
           source: ['AllScreen'],
         },
         { // mix newrender and old samples
-          name: "genNewTAAHistory",
+          name: "TAA",
           inputs: [
             { name: "sceneResult", mapTo: "sceneResult"},
             { name: "depthResult", mapTo: "depthResult"},
@@ -103,13 +94,10 @@ export class Application{
             const VPInv: Matrix4 = TAATech.uniforms.get('VPMatrixInverse').value;
             const VP: Matrix4 = this.engine.globalUniforms.get(InnerSupportUniform.VPMatrix).value
             VPInv.getInverse(VP, true);
-            TAATech.uniforms.get('VPMatrixInverse').needUpdate = true;
-
-            console.log(this.sampleCount)
-            TAATech.uniforms.get('u_sampleCount').value = this.sampleCount;
+            TAATech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
+            TAATech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
           },
           afterPassExecute: () => {
-            // this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
             this.sampleCount++;
           }
         },
@@ -121,14 +109,15 @@ export class Application{
           output: "screen",
           technique: 'copyTech',
           source: ['artgl.screenQuad'],
-          beforePassExecute: () => {
-          },
           afterPassExecute: () => {
             this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
           }
         },
       ]
     })
+
+    window.addEventListener('resize', this.onContainerResize);
+    this.onContainerResize();
   }
 
   unintialize() {
@@ -140,8 +129,11 @@ export class Application{
   private onContainerResize = () => {
     const width = this.el.offsetWidth;
     const height = this.el.offsetHeight;
-    this.engine.renderer.setSize(width, height);
+    this.engine.setSize(width, height);
     (this.engine.camera as PerspectiveCamera).aspect = width / height;
+
+    this.taaTech.uniforms.get('screenPixelXStep').setValue(1 / ( 2 * window.devicePixelRatio * width));
+    this.taaTech.uniforms.get('screenPixelYStep').setValue(1 / ( 2 * window.devicePixelRatio * height));
   }
   notifyResize() {
     this.onContainerResize();
@@ -153,8 +145,9 @@ export class Application{
     this.engine.connectCamera();
     if (this.engine.isCameraChanged) {
       this.sampleCount = 0;
+    } else {
+      this.engine.jitterProjectionMatrix();
     }
-    this.engine.jitterProjectionMatrix();
 
     // this.engine.renderer.setRenderTargetScreen();
     // this.engine.render(this.scene);
@@ -167,7 +160,7 @@ export class Application{
     }
   }
 
-  tickId;
+  private tickId: number;
   run() {
     this.active = true;
     this.interactor.enabled = true;
@@ -182,7 +175,12 @@ export class Application{
 
   createScene(scene: Scene): Scene {
     let testGeo = new ARTGL.SphereGeometry(1, 40, 40);
+    let testPlane = new PlaneGeometry(10, 10, 10, 10);
     let testTec = new ARTGL.NormalTechnique();
+    const planeMesh = new Mesh();
+    planeMesh.geometry = testPlane;
+    planeMesh.technique = testTec;
+    scene.root.addChild(planeMesh);
     for (let i = 0; i < 5; i++) {
       const node = new SceneNode();
       node.transform.position.x = i;

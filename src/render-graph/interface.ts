@@ -6,7 +6,7 @@ export enum PixelFormat {
 }
 
 export enum DimensionType {
-  screenRelative,
+  bindRenderSize,
   fixed
 }
 
@@ -15,8 +15,8 @@ export interface RenderTextureDefine {
   format: {
     pixelFormat: PixelFormat,
     dimensionType: DimensionType,
-    width: number,
-    height: number,
+    width?: number,
+    height?: number,
     disableDepthBuffer?: boolean
   }
 }
