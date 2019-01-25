@@ -36,7 +36,6 @@ export class GLTextureManager{
     this.renderer = renderer;
   }
   readonly renderer: GLRenderer;
-  readonly gl: WebGLRenderingContext;
   private textures: { [index: string]: WebGLTexture } = {};
 
   init() {
@@ -50,7 +49,8 @@ export class GLTextureManager{
 
   deleteGLTexture(storeId: string) {
     const texture = this.getGLTexture(storeId);
-    this.gl.deleteTexture(texture);
+    this.renderer.gl.deleteTexture(texture);
+    this.textures[storeId] = undefined;
   }
 
   createTextureFromImageElement(image: HTMLImageElement, config?: TextureDescriptor): string {
@@ -66,7 +66,7 @@ export class GLTextureManager{
     return id;
   }
 
-  createTextureForRenderTarget(width: number, height: number): WebGLTexture {
+  createTextureForRenderTarget(width: number, height: number): string {
     
     const gl = this.renderer.gl;
 
@@ -74,13 +74,14 @@ export class GLTextureManager{
     if (texture === null) {
       throw 'webgl texture create fail';
     }
-    this.updateRenderTargetSize(texture, width, height);
+    this.fillRenderTarget(texture, width, height);
     const id = generateUUID();
     this.textures[id] = texture;
-    return texture;
+    return id;
   }
+  // updateRenderTargetSize
 
-  updateRenderTargetSize(glTexture: WebGLTexture, width: number, height: number) {
+  fillRenderTarget(glTexture: WebGLTexture, width: number, height: number) {
     const gl = this.renderer.gl;
     gl.bindTexture(gl.TEXTURE_2D, glTexture);
 

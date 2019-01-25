@@ -63,6 +63,7 @@ const fragmentShaderSource =
       } else{
         gl_FragColor = vec4((oldColor * u_sampleCount + newColor) / (u_sampleCount + 1.0), 1.0);
       }
+      // gl_FragColor = vec4(newColor, 1.0);
       // gl_FragColor = vec4(newColor * rate + (1.0 - rate) * oldColor, 1.0);
       // gl_FragColor = vec4((oldColor * u_sampleCount + newColor) / (u_sampleCount + 1.0), 1.0);
     }

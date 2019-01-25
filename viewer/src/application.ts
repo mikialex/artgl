@@ -41,28 +41,28 @@ export class Application{
           name: 'sceneResult',
           format: {
             pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.fixed,
+            dimensionType: DimensionType.bindRenderSize,
           },
         },
         {
           name: 'depthResult',
           format: {
             pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.fixed,
+            dimensionType: DimensionType.bindRenderSize,
           },
         },
         {
           name: 'TAAHistoryA',
           format: {
             pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.fixed,
+            dimensionType: DimensionType.bindRenderSize,
           },
         },
         {
           name: 'TAAHistoryB',
           format: {
             pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.fixed,
+            dimensionType: DimensionType.bindRenderSize,
           },
         },
       ],
@@ -98,7 +98,6 @@ export class Application{
             TAATech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
           },
           afterPassExecute: () => {
-            this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
             this.sampleCount++;
           }
         },
@@ -110,6 +109,9 @@ export class Application{
           output: "screen",
           technique: 'copyTech',
           source: ['artgl.screenQuad'],
+          afterPassExecute: () => {
+            this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
+          }
         },
       ]
     })
