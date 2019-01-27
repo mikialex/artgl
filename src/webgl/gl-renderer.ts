@@ -41,6 +41,7 @@ export class GLRenderer {
   // enable this will cause great performance issue
   // only enable this when debug draw range issue
   enableRenderErrorCatch: boolean = false;
+  enableUniformDiff: boolean = true;
 
   // width height is render size, not element size
   private _width = 100;

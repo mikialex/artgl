@@ -100,6 +100,7 @@ export class Application{
             const VP: Matrix4 = this.engine.globalUniforms.get(InnerSupportUniform.VPMatrix).value
             VPInv.getInverse(VP, true);
             TAATech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
+            // console.log(this.sampleCount)
             TAATech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
           },
           afterPassExecute: () => {
