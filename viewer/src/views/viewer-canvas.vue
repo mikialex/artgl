@@ -15,8 +15,6 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import {GLApp} from '../application';
 import GraphViewer from '../components/graph-viewer/graph-viewer.vue';
 
-let engine;
-
 @Component({
   components:{
     GraphViewer
@@ -24,16 +22,6 @@ let engine;
 })
 export default class ViewerCanvas extends Vue {
   isRuning:boolean = false;
-  mounted(){
-    const canvas = this.$el.querySelector('#viewer-canvas') as HTMLCanvasElement;
-    GLApp.initialize(canvas);
-    this.isRuning = GLApp.active;
-  }
-
-  beforeDestroy(){
-    GLApp.unintialize();
-  }
-
   run(){
     GLApp.run();
     this.isRuning = true;

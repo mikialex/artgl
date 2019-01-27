@@ -3,21 +3,20 @@
     <div class="panel-title">
       Render configuration
     </div>
-    <Config :config="demoConfig"/>
+    <Config :config="appConfig"/>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import Config from '../components/conf/config.vue';
-import demoConfig from '../conf';
 @Component({
   components:{
     Config
   }
 })
 export default class ConfigPanel extends Vue {
-  demoConfig = demoConfig
+  @Prop() appConfig;
 }
 </script>
 

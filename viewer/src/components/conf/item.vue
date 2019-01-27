@@ -7,10 +7,10 @@
       <div class="inline-editor">
         <NumberEditor
           v-if="typeof config.value === 'number'"
-          v-model="config.value"/>
+          v-model="configValue"/>
         <BooleanEditor
           v-if="typeof config.value === 'boolean'"
-          v-model="config.value"/>
+          v-model="configValue"/>
           <button  
           @click="expandEditor = !expandEditor"
           v-if="shouldHaveCustomEditor">&</button>
@@ -19,7 +19,7 @@
 
     <Editors v-if="shouldHaveCustomEditor && expandEditor"
     :editorConfig="config.editors" 
-    v-model="config.value"/>
+    v-model="configValue"/>
   </div>
 </template>
 
@@ -37,6 +37,17 @@ export default class ConfigItem extends Vue {
   expandEditor:boolean = false;
 
   @Prop() config: any;
+
+  get configValue(){
+    return this.config.value;
+  }
+
+  set configValue(newValue){
+    if(this.config.onChange !== undefined){
+      this.config.onChange(newValue);
+    }
+    this.config.value = newValue;
+  }
 
   get shouldHaveCustomEditor(){
     return this.config.editors !== undefined

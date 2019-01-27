@@ -1,6 +1,7 @@
 import { RenderGraph } from '../../src/artgl';
+import { Application } from './application';
 
-export function getBindedConf(graph: RenderGraph) {
+export function createConf(app: Application) {
   return {
     name: 'root',
     type: 'folder',
@@ -13,7 +14,11 @@ export function getBindedConf(graph: RenderGraph) {
             value: [
               {
                 name: 'width',
-                value: 100,
+                value: app.engine.renderer.width,
+                onChange: (value) => {
+                  app.sampleCount = 0;
+                  app.graph.engine.setActualSize(value, app.graph.engine.renderer.height);
+                },
                 editors: [
                   {
                     type: 'slider',
@@ -25,7 +30,11 @@ export function getBindedConf(graph: RenderGraph) {
               },
               {
                 name: 'height',
-                value: 100,
+                value: app.engine.renderer.height,
+                onChange: (value) => {
+                  app.sampleCount = 0;
+                  app.graph.engine.setActualSize(app.graph.engine.renderer.width, value);
+                },
                 editors: [
                   {
                     type: 'slider',
@@ -88,6 +97,9 @@ const conf = {
             {
               name: 'width',
               value: 100,
+              onChange: (value) => {
+                console.log(value)
+              },
               editors: [
                 {
                   type: 'slider',
