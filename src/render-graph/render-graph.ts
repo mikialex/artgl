@@ -9,7 +9,7 @@ import { GraphDebuggingViewer } from "./graph-viewer/graph-debugging-viewer";
 import { QuadSource } from './quad-source';
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
 
-export class RenderGraph{
+export class RenderGraph {
   constructor(engine: ARTEngine) {
     this.engine = engine;
     this.composer = new EffectComposer(this);
@@ -21,7 +21,8 @@ export class RenderGraph{
   enableDebuggingView: boolean = false;
   debugViewer: GraphDebuggingViewer;
 
-  private renderTargets: Map<string, RenderTargetNode> = new Map();
+  private screenNode: RenderTargetNode;
+  private renderTargetNodes: Map<string, RenderTargetNode> = new Map();
   private passNodes: Map<string, PassGraphNode> = new Map();
 
   render() {
@@ -29,14 +30,14 @@ export class RenderGraph{
   }
 
   reset() {
-    this.renderTargets.clear();
+    this.renderTargetNodes.clear();
     this.passNodes.clear();
     this.composer.clearPasses();
   }
 
   swapRenderTexture(from: string, to: string) {
-    const fromTexture = this.renderTargets.get(from);
-    const toTexture = this.renderTargets.get(to);
+    const fromTexture = this.renderTargetNodes.get(from);
+    const toTexture = this.renderTargetNodes.get(to);
     const frambufferFrom = fromTexture.framebuffer.name;
     const frambufferTo = toTexture.framebuffer.name;
 
@@ -53,8 +54,13 @@ export class RenderGraph{
 
   public setGraph(graphDefine: GraphDefine) {
     this.reset();
-    this.allocaterenderTargets(graphDefine.renderTargets);
+    this.allocaterenderTargetNodes(graphDefine.renderTargets);
     this.constructPassGraph(graphDefine.passes);
+    this.update();
+  }
+
+  public update() {
+    this.updateNodesConnection();
     this.updateComposer();
   }
 
@@ -68,45 +74,51 @@ export class RenderGraph{
     })
   }
 
+  private updateNodesConnection() {
+    this.passNodes.forEach(node => {
+      node.updateDependNode();
+    });
+    this.renderTargetNodes.forEach(node => {
+      node.updateDependNode();
+    });
+  }
+
   private updateComposer() {
-    const rootPassNode = this.findScreenRootPass();
-    const renderPassQueue = rootPassNode.generateDependencyOrderList();
+    const renderPassQueue = this.screenNode.generateDependencyOrderList();
     this.composer.updatePasses(renderPassQueue);
   }
 
-  getTextureDependence(name: string): RenderTargetNode {
-    return this.renderTargets.get(name);
+  getRenderTargetDependence(name: string): RenderTargetNode {
+    return this.renderTargetNodes.get(name);
   }
 
-  private findScreenRootPass(): PassGraphNode{
-    let rootPass: PassGraphNode;
-    this.passNodes.forEach(node => {
-      if (node.define.output === 'screen') {
-        if (rootPass !== undefined) {
-          throw 'render graph build error, dupilcate root screen pass '
-        }
-        rootPass = node;
-      }
-    });
-    if (rootPass === undefined) {
-      throw 'render graph build error, miss root screen pass '
-    }
-    return rootPass;
+  getRenderPassDependence(name: string): PassGraphNode {
+    return this.passNodes.get(name);
   }
 
-  private allocaterenderTargets(textsDefine: RenderTextureDefine[]) {
-    if (textsDefine === undefined) {
-      return;
-    }
+  private allocaterenderTargetNodes(textsDefine: RenderTextureDefine[]) {
     textsDefine.forEach(define => {
-      if (this.renderTargets.has(define.name)) {
+      if (this.renderTargetNodes.has(define.name)) {
         throw 'render graph build error, dupilcate texture key namefound '
       }
-      this.renderTargets.set(define.name, new RenderTargetNode(this, define));
+      const renderTargetNode = new RenderTargetNode(this, define);
+      if (define.name === 'screen') {
+        if (this.screenNode !== undefined) {
+          throw "duplicate screen root node"
+        }
+        this.screenNode = renderTargetNode
+      }
+      this.renderTargetNodes.set(define.name, renderTargetNode);
     })
+
+    if (this.screenNode === undefined) {
+      throw "screen root not found"
+    }
   }
 
 
+
+  // pass technique registration
   private passTechniques: Map<string, Technique> = new Map();
   registTechnique(name: string, technique: Technique) {
     if (this.passTechniques.has(name)) {
@@ -118,6 +130,9 @@ export class RenderGraph{
     return this.passTechniques.get(name);
   }
 
+
+
+  // pass source registration
   private passSources: Map<string, RenderSource> = new Map();
   private innerSourceRegx = /^artgl.\w*$/;
   isInnerSourceType(name: string) {
@@ -144,5 +159,5 @@ export class RenderGraph{
   getResgisteredSource(name: string) {
     return this.passSources.get(name);
   }
-  
+
 }

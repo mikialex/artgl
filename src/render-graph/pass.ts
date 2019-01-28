@@ -19,7 +19,6 @@ export class RenderPass{
       this.overrideTechnique = overrideTechnique;
     }
 
-    this.isOutputScreen = define.output === 'screen';
     this.clearColor = define.clearColor;
     this.enableColorClear = define.enableColorClear === undefined ? true : define.enableColorClear
     this.enableDepthClear = define.enableDepthClear === undefined ? true : define.enableDepthClear
@@ -106,7 +105,7 @@ export class RenderPass{
       engine.overrideTechnique = this.overrideTechnique;
       this.inputTarget.forEach((inputFrambufferName, uniformName) => {
         engine.overrideTechnique.getProgram(engine).defineFrameBufferTextureDep(
-          uniformName, inputFrambufferName
+          inputFrambufferName, uniformName
         );
       })
     }

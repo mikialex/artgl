@@ -13,33 +13,34 @@ export class PassGraphNode extends DAGNode{
     this.pass = new RenderPass(graph, define);
 
     if (define.inputs !== undefined) {
-      this.inputGetter = define.inputs;
+      this.inputsGetter = define.inputs;
       this.updateDependNode();
-    }
-
-    if (define.output !== 'screen') {
-      const renderTargetNode = graph.getTextureDependence(define.output);
-      if (renderTargetNode === undefined) {
-        throw `render graph build error, texture output ${define.output} cant found`;
-      }
-
-      this.connectTo(renderTargetNode);
-      this.pass.setOutPutTarget(renderTargetNode);
     }
 
   }
   readonly graph: RenderGraph;
-  readonly inputGetter: () => PassInputMapInfo
-  private inputs: PassInputMapInfo
+  private inputsGetter: () => PassInputMapInfo
+  private inputs: PassInputMapInfo = {}
   readonly name: string;
   readonly define: PassDefine;
 
   updateDependNode() {
-    this.inputs = this.inputGetter();
-    Object.keys(this.inputs).forEach(inputKey => {
-      const renderTargetNode = this.graph.getTextureDependence(inputKey);
+    Object.keys(this.inputs).forEach(inputUniformKey => {
+      const frambufferName = this.inputs[inputUniformKey]
+      const renderTargetNode = this.graph.getRenderTargetDependence(frambufferName);
       if (renderTargetNode === undefined) {
-        throw `render graph build error, texture depend ${inputKey} cant found`;
+        throw `render graph updating error, renderTarget depend ${frambufferName} cant found`;
+      }
+      renderTargetNode.deConnectTo(this);
+    })
+    if (this.inputsGetter !== undefined) {
+      this.inputs = this.inputsGetter();
+    }
+    Object.keys(this.inputs).forEach(inputUniformKey => {
+      const frambufferName = this.inputs[inputUniformKey]
+      const renderTargetNode = this.graph.getRenderTargetDependence(frambufferName);
+      if (renderTargetNode === undefined) {
+        throw `render graph updating error, renderTarget depend ${frambufferName} cant found`;
       }
       renderTargetNode.connectTo(this);
     })

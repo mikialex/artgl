@@ -15,6 +15,13 @@ export class RenderTargetNode extends DAGNode{
     this.define = define;
     this.graph = graph;
 
+    this.fromGetter = define.from;
+
+    if (define.name === 'screen') {
+      this.isScreenNode = true;
+      return
+    }
+
     let width: number;
     let height: number;
     if (define.format.dimensionType === DimensionType.fixed) {
@@ -35,6 +42,7 @@ export class RenderTargetNode extends DAGNode{
       this.name, width, height, enableDepth);
     
   }
+  readonly isScreenNode: boolean;
   readonly name: string;
   readonly define: RenderTextureDefine;
   readonly graph: RenderGraph;
@@ -50,6 +58,24 @@ export class RenderTargetNode extends DAGNode{
   }
 
   framebuffer: GLFramebuffer;
+
+  private fromGetter: () => Nullable<string>
+  private from: string = null;
+
+  updateDependNode() {
+    if (this.from !== null) {
+      const passNode = this.graph.getRenderPassDependence(this.from);
+      passNode.deConnectTo(this);
+    }
+
+    this.from = this.fromGetter();
+
+    if (this.from !== null) {
+      const passNode = this.graph.getRenderPassDependence(this.from);
+      passNode.connectTo(this);
+    }
+    
+  }
 
   updateConnectedPassFramebuffer(oldFrambufferName:string, newFrambufferName: string) {
     this.toNode.forEach(node => {

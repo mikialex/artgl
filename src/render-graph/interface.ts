@@ -1,4 +1,5 @@
 import { Vector4 } from "../math/vector4";
+import { Nullable } from "../type";
 
 export enum PixelFormat {
   depth,
@@ -12,7 +13,8 @@ export enum DimensionType {
 
 export interface RenderTextureDefine {
   name: string,
-  format: {
+  from: () => Nullable<string>
+  format?: {
     pixelFormat: PixelFormat,
     dimensionType: DimensionType,
     width?: number,
@@ -41,7 +43,6 @@ export interface PassInputMapInfo{
 export interface PassDefine {
   name: string,
   inputs?: () => PassInputMapInfo,
-  output: string,
   source: string[],
   filter?: () => boolean,
   sorter?: () => number,
@@ -56,5 +57,5 @@ export interface PassDefine {
 
 export interface GraphDefine {
   passes: PassDefine[],
-  renderTargets?: RenderTextureDefine[];
+  renderTargets: RenderTextureDefine[];
 }

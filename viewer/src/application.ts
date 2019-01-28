@@ -22,7 +22,8 @@ export class Application {
   interactor: Interactor;
   orbitControler: OrbitController;
   taaTech: TAATechnique;
-  conf
+  conf;
+  private tickNum = 0;
   initialize(canvas: HTMLCanvasElement) {
     this.el = canvas;
     this.engine = new ARTEngine(canvas);
@@ -43,7 +44,12 @@ export class Application {
     this.graph.setGraph({
       renderTargets: [
         {
+          name: 'screen',
+          from: () => 'CopyToScreen',
+        },
+        {
           name: 'sceneResult',
+          from: () => 'SceneOrigin',
           format: {
             pixelFormat: PixelFormat.rgba,
             dimensionType: DimensionType.bindRenderSize,
@@ -51,6 +57,7 @@ export class Application {
         },
         {
           name: 'depthResult',
+          from: () => 'Depth',
           format: {
             pixelFormat: PixelFormat.rgba,
             dimensionType: DimensionType.bindRenderSize,
@@ -58,6 +65,7 @@ export class Application {
         },
         {
           name: 'TAAHistoryA',
+          from: () => this.tickNum % 2 === 0 ? null : 'TAA',
           format: {
             pixelFormat: PixelFormat.rgba,
             dimensionType: DimensionType.bindRenderSize,
@@ -65,6 +73,7 @@ export class Application {
         },
         {
           name: 'TAAHistoryB',
+          from: () => this.tickNum % 2 === 0 ? 'TAA' : null,
           format: {
             pixelFormat: PixelFormat.rgba,
             dimensionType: DimensionType.bindRenderSize,
@@ -74,13 +83,11 @@ export class Application {
       passes: [
         { // general scene origin
           name: "SceneOrigin",
-          output: "sceneResult",
           source: ['AllScreen'],
         },
         { // depth
           name: "Depth",
           technique: 'depthTech',
-          output: "depthResult",
           source: ['AllScreen'],
         },
         { // mix newrender and old samples
@@ -89,12 +96,11 @@ export class Application {
             return {
               sceneResult: "sceneResult",
               depthResult: "depthResult",
-              TAAHistoryA: "TAAHistoryOld"
+              TAAHistoryOld: this.tickNum % 2 === 0 ? "TAAHistoryA" : "TAAHistoryB"
             }
           },
           technique: 'TAATech',
           source: ['artgl.screenQuad'],
-          output: 'TAAHistoryB',
           enableColorClear: false,
           beforePassExecute: () => {
             this.engine.unjit();
@@ -112,15 +118,11 @@ export class Application {
           name: "CopyToScreen",
           inputs: () => {
             return {
-              TAAHistoryB: "copySource"
+              copySource: this.tickNum % 2 === 0 ? "TAAHistoryB" : "TAAHistoryA"
             }
           },
-          output: "screen",
           technique: 'copyTech',
           source: ['artgl.screenQuad'],
-          afterPassExecute: () => {
-            this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
-          }
         },
       ]
     })
@@ -153,6 +155,7 @@ export class Application {
   render = () => {
     this.orbitControler.update();
     this.engine.connectCamera();
+    this.tickNum++;
     if (this.engine.isCameraChanged) {
       this.sampleCount = 0;
     } else {
@@ -160,6 +163,7 @@ export class Application {
     }
 
     if (this.sampleCount <= 100) {
+      this.graph.update();
       this.graph.render();
     }
     if (this.active) {
