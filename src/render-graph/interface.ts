@@ -41,7 +41,7 @@ export interface PassInputMapInfo{
 
 export interface PassDefine {
   name: string,
-  inputs?: PassInputMapInfo[],
+  inputs?: () => PassInputMapInfo[],
   output: string,
   source: string[],
   filter?: () => boolean,
@@ -57,5 +57,5 @@ export interface PassDefine {
 
 export interface GraphDefine {
   passes: PassDefine[],
-  renderTextures?: RenderTextureDefine[];
+  renderTargets?: RenderTextureDefine[];
 }

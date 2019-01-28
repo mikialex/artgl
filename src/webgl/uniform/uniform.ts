@@ -6,7 +6,7 @@ import { Matrix4 } from "../../math/matrix4";
 export type uniformUploadType = number | Float32Array | number[]
 export type flattenerType= (value: any, receiveData: uniformUploadType) => uniformUploadType;
 export type setterType= (gl: WebGLRenderingContext, localtion: WebGLUniformLocation, data: uniformUploadType) => void
-export type copyerType= (newValue: uniformUploadType, target: uniformUploadType) => void;
+export type copyerType = (newValue: uniformUploadType, target: uniformUploadType) => uniformUploadType;
 export type differType= (newValue: uniformUploadType, oldValue: uniformUploadType) => boolean;
 
 export const enum InnerSupportUniform{
@@ -63,6 +63,7 @@ export function getInnerUniformDescriptor(des: InnerUniformMapDescriptor): Unifo
 export class GLUniform{
   constructor(program: GLProgram, descriptor: UniformDescriptor) {
     this.program = program;
+    this.name = descriptor.name;
     this.gl = program.getRenderer().gl;
     const glProgram = program.getProgram();
     const location = this.gl.getUniformLocation(glProgram, descriptor.name);
@@ -83,6 +84,7 @@ export class GLUniform{
 
     this.innerGlobal = descriptor._innerGlobalUniform;
   }
+  name: string;
   private gl: WebGLRenderingContext;
   program: GLProgram;
   descriptor: UniformDescriptor;
@@ -110,12 +112,11 @@ export class GLUniform{
       return;
     }
 
-    const enableDiff = false;
-    if (enableDiff) {
+    if (this.program.renderer.enableUniformDiff) {
       if (this.differ(this.receiveData, this.lastReceiveData)) {
         this.setter(this.gl, this.location, this.receiveData);
         this.program.renderer.stat.uniformUpload++;
-        this.copyer(this.receiveData, this.lastReceiveData);
+        this.lastReceiveData = this.copyer(this.receiveData, this.lastReceiveData);
       }
     } else {
       this.setter(this.gl, this.location, this.receiveData);

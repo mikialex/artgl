@@ -8,6 +8,10 @@ import { TAATechnique } from '../../src/technique/technique-lib/taa-technique';
 import { DepthTechnique } from '../../src/technique/technique-lib/depth-technique';
 import { CopyTechnique } from '../../src/technique/technique-lib/copy-technique';
 import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
+import hierachyBallBuilder from './scene/hierachy-balls';
+import { createConf } from './conf';
+
+
 export class Application{
   graph: RenderGraph;
   engine: ARTEngine;
@@ -18,6 +22,7 @@ export class Application{
   interactor: Interactor;
   orbitControler: OrbitController;
   taaTech: TAATechnique;
+  conf
   initialize(canvas: HTMLCanvasElement) {
     this.el = canvas;
     this.engine = new ARTEngine(canvas);
@@ -36,7 +41,7 @@ export class Application{
     this.graph.registTechnique('TAATech', TAATech)
     this.graph.registTechnique('copyTech', new CopyTechnique());
     this.graph.setGraph({
-      renderTextures: [
+      renderTargets: [
         {
           name: 'sceneResult',
           format: {
@@ -80,11 +85,11 @@ export class Application{
         },
         { // mix newrender and old samples
           name: "TAA",
-          inputs: [
-            { name: "sceneResult", mapTo: "sceneResult"},
-            { name: "depthResult", mapTo: "depthResult"},
-            { name: "TAAHistoryA", mapTo: "TAAHistoryOld"}
-          ],
+          inputs: () => [
+              { name: "sceneResult", mapTo: "sceneResult" },
+              { name: "depthResult", mapTo: "depthResult" },
+              { name: "TAAHistoryA", mapTo: "TAAHistoryOld" }
+            ],
           technique: 'TAATech',
           source: ['artgl.screenQuad'],
           output: 'TAAHistoryB',
@@ -103,7 +108,7 @@ export class Application{
         },
         { // copy to screen
           name: "CopyToScreen",
-          inputs: [
+          inputs: () => [
             { name: "TAAHistoryB", mapTo: "copySource" },
           ],
           output: "screen",
@@ -118,6 +123,7 @@ export class Application{
 
     window.addEventListener('resize', this.onContainerResize);
     this.onContainerResize();
+    this.conf = createConf(this);
   }
 
   unintialize() {
@@ -139,7 +145,7 @@ export class Application{
     this.onContainerResize();
   }
 
-  private sampleCount = 0;
+  sampleCount = 0;
   render = () => {
     this.orbitControler.update();
     this.engine.connectCamera();
@@ -148,9 +154,6 @@ export class Application{
     } else {
       this.engine.jitterProjectionMatrix();
     }
-
-    // this.engine.renderer.setRenderTargetScreen();
-    // this.engine.render(this.scene);
 
     if (this.sampleCount <= 100) {
       this.graph.render();
@@ -172,33 +175,8 @@ export class Application{
     this.interactor.enabled = false;
   }
 
-
   createScene(scene: Scene): Scene {
-    let testGeo = new ARTGL.SphereGeometry(1, 40, 40);
-    let testPlane = new PlaneGeometry(10, 10, 10, 10);
-    let testTec = new ARTGL.NormalTechnique();
-    const planeMesh = new Mesh();
-    planeMesh.geometry = testPlane;
-    planeMesh.technique = testTec;
-    scene.root.addChild(planeMesh);
-    for (let i = 0; i < 5; i++) {
-      const node = new SceneNode();
-      node.transform.position.x = i;
-      scene.root.addChild(node);
-      for (let j = 0; j < 5; j++) {
-        const node2 = new SceneNode();
-        node2.transform.position.y = j;
-        node.addChild(node2);
-        for (let k = 0; k < 5; k++) {
-          const testMesh = new Mesh();
-          testMesh.geometry = testGeo;
-          testMesh.technique = testTec;
-          testMesh.transform.position.z = k;
-          testMesh.transform.scale.set(0.3, 0.3, 0.3);
-          node2.addChild(testMesh);
-        }
-      }
-    }
+    hierachyBallBuilder(scene.root);
     return scene;
   }
 

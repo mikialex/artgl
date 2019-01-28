@@ -3,7 +3,7 @@ import { ARTEngine, RenderSource } from "../engine/render-engine";
 import { Technique } from "../core/technique";
 import { RenderGraph } from "./render-graph";
 import { PassDefine } from "./interface";
-import { TextureNode } from "./dag/texture-node";
+import { RenderTargetNode } from "./dag/render-target-node";
 import { Vector4 } from "../math/vector4";
 
 export class RenderPass{
@@ -20,7 +20,7 @@ export class RenderPass{
     }
 
     if (define.inputs !== undefined) {
-      define.inputs.forEach(inputInfo => {
+      define.inputs().forEach(inputInfo => {
         this.inputTarget.set(inputInfo.name, inputInfo.mapTo)
       })
     }
@@ -64,8 +64,8 @@ export class RenderPass{
 
   inputTarget: Map<string, string> = new Map();
   private outputTarget: GLFramebuffer
-  setOutPutTarget(textureNode: TextureNode) {
-    this.outputTarget = textureNode.framebuffer;
+  setOutPutTarget(renderTargetNode: RenderTargetNode) {
+    this.outputTarget = renderTargetNode.framebuffer;
   }
   private isOutputScreen: boolean = true;
 
