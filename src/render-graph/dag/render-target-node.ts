@@ -8,7 +8,7 @@ import { Observer } from "../../core/observable";
 import { Size } from "../../engine/render-engine";
 import { Nullable } from "../../type";
 
-export class TextureNode extends DAGNode{
+export class RenderTargetNode extends DAGNode{
   constructor(graph: RenderGraph, define: RenderTextureDefine) {
     super();
     this.name = define.name;

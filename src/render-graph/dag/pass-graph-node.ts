@@ -1,5 +1,5 @@
 import { DAGNode } from "./dag-node";
-import { PassDefine } from "../interface";
+import { PassDefine, PassInputMapInfo } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { RenderPass } from "../pass";
 
@@ -12,29 +12,34 @@ export class PassGraphNode extends DAGNode{
     this.pass = new RenderPass(graph, define);
 
     if (define.inputs !== undefined) {
-      define.inputs.forEach(inputInfo => {
-        const textureNode = graph.getTextureDependence(inputInfo.name);
-        if (textureNode === undefined) {
+      define.inputs().forEach(inputInfo => {
+        const renderTargetNode = graph.getTextureDependence(inputInfo.name);
+        if (renderTargetNode === undefined) {
           throw `render graph build error, texture depend ${inputInfo.name} cant found`;
         }
-        textureNode.connectTo(this);
+        renderTargetNode.connectTo(this);
       })
     }
     if (define.output !== 'screen') {
 
-      const textureNode = graph.getTextureDependence(define.output);
-      if (textureNode === undefined) {
+      const renderTargetNode = graph.getTextureDependence(define.output);
+      if (renderTargetNode === undefined) {
         throw `render graph build error, texture output ${define.output} cant found`;
       }
 
-      this.connectTo(textureNode);
-      this.pass.setOutPutTarget(textureNode);
+      this.connectTo(renderTargetNode);
+      this.pass.setOutPutTarget(renderTargetNode);
     }
 
   }
   readonly name: string;
   readonly define: PassDefine;
 
+  checkUpdateDependNode() {
+    
+  }
+
+  private inputs: () => PassInputMapInfo[]
   pass: RenderPass;
   
 }

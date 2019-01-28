@@ -1,7 +1,7 @@
 import { EffectComposer } from "./effect-composer";
 import { PassDefine, GraphDefine, RenderTextureDefine } from "./interface";
 import { PassGraphNode } from "./dag/pass-graph-node";
-import { TextureNode } from "./dag/texture-node";
+import { RenderTargetNode } from "./dag/render-target-node";
 import { DAGNode } from "./dag/dag-node";
 import { ARTEngine, RenderSource } from "../engine/render-engine";
 import { TechniqueConfig, Technique } from "../core/technique";
@@ -21,22 +21,22 @@ export class RenderGraph{
   enableDebuggingView: boolean = false;
   debugViewer: GraphDebuggingViewer;
 
-  private renderTextures: Map<string, TextureNode> = new Map();
+  private renderTargets: Map<string, RenderTargetNode> = new Map();
   private passNodes: Map<string, PassGraphNode> = new Map();
 
   render() {
     this.composer.render();
   }
 
-  reset() {``
-    this.renderTextures.clear();
+  reset() {
+    this.renderTargets.clear();
     this.passNodes.clear();
     this.composer.clearPasses();
   }
 
   swapRenderTexture(from: string, to: string) {
-    const fromTexture = this.renderTextures.get(from);
-    const toTexture = this.renderTextures.get(to);
+    const fromTexture = this.renderTargets.get(from);
+    const toTexture = this.renderTargets.get(to);
     const frambufferFrom = fromTexture.framebuffer.name;
     const frambufferTo = toTexture.framebuffer.name;
 
@@ -53,7 +53,7 @@ export class RenderGraph{
 
   public setGraph(graphDefine: GraphDefine) {
     this.reset();
-    this.allocateRenderTextures(graphDefine.renderTextures);
+    this.allocaterenderTargets(graphDefine.renderTargets);
     this.constructPassGraph(graphDefine.passes);
     this.updateComposer();
   }
@@ -74,8 +74,8 @@ export class RenderGraph{
     this.composer.updatePasses(renderPassQueue);
   }
 
-  getTextureDependence(name: string): TextureNode {
-    return this.renderTextures.get(name);
+  getTextureDependence(name: string): RenderTargetNode {
+    return this.renderTargets.get(name);
   }
 
   private findScreenRootPass(): PassGraphNode{
@@ -94,15 +94,15 @@ export class RenderGraph{
     return rootPass;
   }
 
-  private allocateRenderTextures(textsDefine: RenderTextureDefine[]) {
+  private allocaterenderTargets(textsDefine: RenderTextureDefine[]) {
     if (textsDefine === undefined) {
       return;
     }
     textsDefine.forEach(define => {
-      if (this.renderTextures.has(define.name)) {
+      if (this.renderTargets.has(define.name)) {
         throw 'render graph build error, dupilcate texture key namefound '
       }
-      this.renderTextures.set(define.name, new TextureNode(this, define));
+      this.renderTargets.set(define.name, new RenderTargetNode(this, define));
     })
   }
 

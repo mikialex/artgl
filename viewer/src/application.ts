@@ -41,7 +41,7 @@ export class Application{
     this.graph.registTechnique('TAATech', TAATech)
     this.graph.registTechnique('copyTech', new CopyTechnique());
     this.graph.setGraph({
-      renderTextures: [
+      renderTargets: [
         {
           name: 'sceneResult',
           format: {
@@ -85,11 +85,11 @@ export class Application{
         },
         { // mix newrender and old samples
           name: "TAA",
-          inputs: [
-            { name: "sceneResult", mapTo: "sceneResult"},
-            { name: "depthResult", mapTo: "depthResult"},
-            { name: "TAAHistoryA", mapTo: "TAAHistoryOld"}
-          ],
+          inputs: () => [
+              { name: "sceneResult", mapTo: "sceneResult" },
+              { name: "depthResult", mapTo: "depthResult" },
+              { name: "TAAHistoryA", mapTo: "TAAHistoryOld" }
+            ],
           technique: 'TAATech',
           source: ['artgl.screenQuad'],
           output: 'TAAHistoryB',
@@ -100,7 +100,6 @@ export class Application{
             const VP: Matrix4 = this.engine.globalUniforms.get(InnerSupportUniform.VPMatrix).value
             VPInv.getInverse(VP, true);
             TAATech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
-            // console.log(this.sampleCount)
             TAATech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
           },
           afterPassExecute: () => {
@@ -109,7 +108,7 @@ export class Application{
         },
         { // copy to screen
           name: "CopyToScreen",
-          inputs: [
+          inputs: () => [
             { name: "TAAHistoryB", mapTo: "copySource" },
           ],
           output: "screen",

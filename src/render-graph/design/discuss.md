@@ -6,6 +6,9 @@ import { Matrix4 } from "../math/matrix4";
 const textures = [
   {
     "name": "DepthBuffer",
+    from: ()=>{
+      return ""
+    }
     "format": {
       "pixelFormat": "Depth",
       "dimensionType": "ScreenRelative",
@@ -66,27 +69,51 @@ const entity = [
 
 
 const graph = [
-  {
-    "name": "DepthPrePass",
-    "textureOutputs": ["DepthBuffer"],
-    "states": [
-      "DisableColorWrite",
-      "DisableAlphaWrite"
-    ],
-    program: 'myshaderA',
-    entity: ['forwardAllOpaque', 'forwardAllOpaque']
-  },
-  {
-    "name": "Forward",
-    "textureInputs": ["DepthBuffer"],
-    "textureOutputs": ["LitScene"],
-    entity: ['forwardAllOpaque', 'forwardAllOpaque']
-  },
-  {
-    "name": "DOF",
-    "textureInputs": ["DepthBuffer", "LitScene"],
-    program: 'myshaderC',
-    "outputs": 'screen',
-  }
-]
+        { // general scene origin
+          name: "SceneOrigin",
+          output: "sceneResult",
+          source: ['AllScreen'],
+        },
+        { // depth
+          name: "Depth",
+          technique: 'depthTech',
+          output: "depthResult",
+          source: ['AllScreen'],
+        },
+        { // mix newrender and old samples
+          name: "TAA",
+          inputs: [ 
+            { name: "sceneResult", mapTo: "sceneResult"},
+            { name: "depthResult", mapTo: "depthResult"},
+            { name: "TAAHistoryA", mapTo: "TAAHistoryOld"}
+          ],
+          technique: 'TAATech',
+          source: ['artgl.screenQuad'],
+          output: 'TAAHistoryB',
+          enableColorClear: false,
+          beforePassExecute: () => {
+            this.engine.unjit();
+            const VPInv: Matrix4 = TAATech.uniforms.get('VPMatrixInverse').value;
+            const VP: Matrix4 = this.engine.globalUniforms.get(InnerSupportUniform.VPMatrix).value
+            VPInv.getInverse(VP, true);
+            TAATech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
+            TAATech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
+          },
+          afterPassExecute: () => {
+            this.sampleCount++;
+          }
+        },
+        { // copy to screen
+          name: "CopyToScreen",
+          inputs: [
+            { name: "TAAHistoryB", mapTo: "copySource" },
+          ],
+          output: "screen",
+          technique: 'copyTech',
+          source: ['artgl.screenQuad'],
+          afterPassExecute: () => {
+            this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
+          }
+        },
+      ]
 ```
