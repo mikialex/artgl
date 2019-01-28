@@ -35,13 +35,12 @@ enum stateType {
 }
 
 export interface PassInputMapInfo{
-  name: string,
-  mapTo: string
+  [index:string]: string
 }
 
 export interface PassDefine {
   name: string,
-  inputs?: () => PassInputMapInfo[],
+  inputs?: () => PassInputMapInfo,
   output: string,
   source: string[],
   filter?: () => boolean,

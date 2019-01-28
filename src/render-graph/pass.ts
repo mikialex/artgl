@@ -2,7 +2,7 @@ import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { ARTEngine, RenderSource } from "../engine/render-engine";
 import { Technique } from "../core/technique";
 import { RenderGraph } from "./render-graph";
-import { PassDefine } from "./interface";
+import { PassDefine, PassInputMapInfo } from "./interface";
 import { RenderTargetNode } from "./dag/render-target-node";
 import { Vector4 } from "../math/vector4";
 
@@ -19,11 +19,6 @@ export class RenderPass{
       this.overrideTechnique = overrideTechnique;
     }
 
-    if (define.inputs !== undefined) {
-      define.inputs().forEach(inputInfo => {
-        this.inputTarget.set(inputInfo.name, inputInfo.mapTo)
-      })
-    }
     this.isOutputScreen = define.output === 'screen';
     this.clearColor = define.clearColor;
     this.enableColorClear = define.enableColorClear === undefined ? true : define.enableColorClear
@@ -45,6 +40,13 @@ export class RenderPass{
       this.sourceUse.push(renderso);
     })
 
+  }
+
+  updateInputTargets(inputs: PassInputMapInfo) {
+    Object.keys(inputs).forEach(inputKey => {
+      const mapTo = inputs[inputKey];
+      this.inputTarget.set(inputKey, mapTo)
+    })
   }
 
   private graph: RenderGraph;

@@ -12,7 +12,7 @@ import hierachyBallBuilder from './scene/hierachy-balls';
 import { createConf } from './conf';
 
 
-export class Application{
+export class Application {
   graph: RenderGraph;
   engine: ARTEngine;
   el: HTMLCanvasElement;
@@ -85,11 +85,13 @@ export class Application{
         },
         { // mix newrender and old samples
           name: "TAA",
-          inputs: () => [
-              { name: "sceneResult", mapTo: "sceneResult" },
-              { name: "depthResult", mapTo: "depthResult" },
-              { name: "TAAHistoryA", mapTo: "TAAHistoryOld" }
-            ],
+          inputs: () => {
+            return {
+              sceneResult: "sceneResult",
+              depthResult: "depthResult",
+              TAAHistoryA: "TAAHistoryOld"
+            }
+          },
           technique: 'TAATech',
           source: ['artgl.screenQuad'],
           output: 'TAAHistoryB',
@@ -108,9 +110,11 @@ export class Application{
         },
         { // copy to screen
           name: "CopyToScreen",
-          inputs: () => [
-            { name: "TAAHistoryB", mapTo: "copySource" },
-          ],
+          inputs: () => {
+            return {
+              TAAHistoryB: "copySource"
+            }
+          },
           output: "screen",
           technique: 'copyTech',
           source: ['artgl.screenQuad'],
@@ -138,8 +142,8 @@ export class Application{
     this.engine.setSize(width, height);
     (this.engine.camera as PerspectiveCamera).aspect = width / height;
 
-    this.taaTech.uniforms.get('screenPixelXStep').setValue(1 / ( 2 * window.devicePixelRatio * width));
-    this.taaTech.uniforms.get('screenPixelYStep').setValue(1 / ( 2 * window.devicePixelRatio * height));
+    this.taaTech.uniforms.get('screenPixelXStep').setValue(1 / (2 * window.devicePixelRatio * width));
+    this.taaTech.uniforms.get('screenPixelYStep').setValue(1 / (2 * window.devicePixelRatio * height));
   }
   notifyResize() {
     this.onContainerResize();
