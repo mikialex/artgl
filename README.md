@@ -28,4 +28,4 @@ Write a json like config for renderGraph, we handle all things. make multi pass 
 
 posts (zh/cn)：
 
-[关于ARTGL](./design/about)
+[关于ARTGL](./design/about.md)
