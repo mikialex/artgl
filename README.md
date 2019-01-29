@@ -22,7 +22,10 @@ This is a facet of 'extentable', You can replace part of things like scene struc
 
 ### declaretive and powerful render pipline by renderGraph
 
-Write a json like config for renderGraph, we handle all things. make multi pass rendering, tweaking effects, debug performence, more delightful. Make the whole render pipeline configurable.
+Write a json like config for renderGraph, we handle all things. make multi pass rendering, add custom optimzer, tweaking effects, debug performence, more delightful. Make the whole render pipeline configurable.
 
 ....
 
+posts (zh/cn)：
+
+[关于ARTGL](./design/about)
