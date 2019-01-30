@@ -22,6 +22,7 @@ export class Application {
   interactor: Interactor;
   orbitControler: OrbitController;
   taaTech: TAATechnique;
+  enableTAA = false;
   conf;
   private tickNum = 0;
   get isEvenTick() {
@@ -104,8 +105,14 @@ export class Application {
         { // copy to screen
           name: "CopyToScreen",
           inputs: () => {
+            let cs: string;
+            if (this.enableTAA) {
+              cs = this.isEvenTick ? "TAAHistoryB" : "TAAHistoryA"
+            } else {
+              cs = "sceneResult"
+            }
             return {
-              copySource: this.isEvenTick ? "TAAHistoryB" : "TAAHistoryA"
+              copySource: cs
             }
           },
           technique: 'copyTech',
@@ -147,8 +154,14 @@ export class Application {
     if (this.engine.isCameraChanged) {
       this.sampleCount = 0;
     } else {
-      this.engine.jitterProjectionMatrix();
+      if (this.enableTAA) {
+        this.engine.jitterProjectionMatrix();
+      }
     }
+
+    // this.engine.renderer.state.colorbuffer.clear();
+    // this.engine.renderer.state.depthbuffer.clear();
+    // this.engine.render(this.scene)
 
     if (this.sampleCount <= 100) {
       this.graph.update();

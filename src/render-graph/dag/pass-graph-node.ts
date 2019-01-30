@@ -2,6 +2,7 @@ import { DAGNode } from "./dag-node";
 import { PassDefine, PassInputMapInfo } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { RenderPass } from "../pass";
+import { RenderTargetNode } from './render-target-node';
 
 export class PassGraphNode extends DAGNode{
   constructor(graph: RenderGraph, define: PassDefine) {
@@ -47,7 +48,24 @@ export class PassGraphNode extends DAGNode{
       }
       renderTargetNode.connectTo(this);
     })
+  }
+
+  updatePass(activeNodes: DAGNode[]) {
     this.pass.updateInputTargets(this.inputs);
+    let hasFoundTarget = false;
+    this.toNode.forEach(node => {
+      if (node instanceof RenderTargetNode) {
+        for (let i = 0; i < activeNodes.length; i++) {
+          if (activeNodes[i] === node) {
+            if (hasFoundTarget) {
+              throw 'output recive multiple active pass'
+            }
+            hasFoundTarget === true
+            this.pass.setOutPutTarget(node);
+          }
+        }
+      }
+    })
   }
 
   pass: RenderPass;

@@ -65,19 +65,13 @@ export function createConf(app: Application): RenderConfig {
             value: [
               {
                 name: 'enable',
-                value: true,
-              },
-              {
-                name: 'maxStableSampleCount',
-                value: 100,
-                editors: [
-                  {
-                    type: 'slider',
-                    min: 0,
-                    max: 50,
-                    step: 1
-                  },
-                ]
+                value: app.enableTAA,
+                onChange: (value: boolean) => {
+                  app.enableTAA = value;
+                  if (!value) {
+                    app.sampleCount = 0;
+                  }
+                },
               },
             ]
           }

@@ -20,6 +20,7 @@ export class EffectComposer{
     this.nodeQueue = nodeQueue;
     nodeQueue.forEach(node => {
       if (node instanceof PassGraphNode) {
+        node.updatePass(nodeQueue);
         this.passes.push(node.pass);
       }
     })

@@ -30,6 +30,12 @@ export class DAGNode{
     node._removeFromRef(this);
   }
 
+  public clearAllTo() {
+    this.toNode.forEach(node => {
+      this.deConnectTo(node);
+    })
+  }
+
   public _removeFromRef(node: DAGNode) {
     const index = this.fromNode.indexOf(node);
     if (index === undefined) {
