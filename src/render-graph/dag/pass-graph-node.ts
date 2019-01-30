@@ -20,11 +20,12 @@ export class PassGraphNode extends DAGNode{
   }
   readonly graph: RenderGraph;
   private inputsGetter: () => PassInputMapInfo
-  private inputs: PassInputMapInfo = {}
+  inputs: PassInputMapInfo = {}
   readonly name: string;
   readonly define: PassDefine;
 
   updateDependNode() {
+    // deconnect all depends node
     Object.keys(this.inputs).forEach(inputUniformKey => {
       const frambufferName = this.inputs[inputUniformKey]
       const renderTargetNode = this.graph.getRenderTargetDependence(frambufferName);
@@ -33,9 +34,11 @@ export class PassGraphNode extends DAGNode{
       }
       renderTargetNode.deConnectTo(this);
     })
+    // reeval getter
     if (this.inputsGetter !== undefined) {
       this.inputs = this.inputsGetter();
     }
+    // connect new depends node
     Object.keys(this.inputs).forEach(inputUniformKey => {
       const frambufferName = this.inputs[inputUniformKey]
       const renderTargetNode = this.graph.getRenderTargetDependence(frambufferName);

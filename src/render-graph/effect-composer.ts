@@ -16,6 +16,7 @@ export class EffectComposer{
   private nodeQueue: DAGNode[];
 
   updatePasses(nodeQueue: DAGNode[]) {
+    this.clearPasses();
     this.nodeQueue = nodeQueue;
     nodeQueue.forEach(node => {
       if (node instanceof PassGraphNode) {

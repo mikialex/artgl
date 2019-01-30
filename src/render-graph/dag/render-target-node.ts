@@ -82,23 +82,9 @@ export class RenderTargetNode extends DAGNode{
     if (this.from !== null) {
       const passNode = this.graph.getRenderPassDependence(this.from);
       passNode.connectTo(this);
+      passNode.pass.setOutPutTarget(this);
     }
     
-  }
-
-  updateConnectedPassFramebuffer(oldFrambufferName:string, newFrambufferName: string) {
-    this.toNode.forEach(node => {
-      if (node instanceof PassGraphNode) {
-        const uniformMaped = node.pass.inputTarget.get(oldFrambufferName);
-        node.pass.inputTarget.delete(oldFrambufferName);
-        node.pass.inputTarget.set(newFrambufferName, uniformMaped);
-      }
-    })
-    this.fromNode.forEach(node => {
-      if (node instanceof PassGraphNode) {
-        node.pass.setOutPutTarget(this);
-      }
-    })
   }
 
   dispose() {

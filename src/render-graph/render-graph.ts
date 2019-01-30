@@ -35,23 +35,6 @@ export class RenderGraph {
     this.composer.clearPasses();
   }
 
-  swapRenderTexture(from: string, to: string) {
-    const fromTexture = this.renderTargetNodes.get(from);
-    const toTexture = this.renderTargetNodes.get(to);
-    const frambufferFrom = fromTexture.framebuffer.name;
-    const frambufferTo = toTexture.framebuffer.name;
-
-    // swap on node graph
-    let temp: GLFramebuffer;
-    temp = fromTexture.framebuffer;
-    fromTexture.framebuffer = toTexture.framebuffer;
-    toTexture.framebuffer = temp;
-
-    // update pass
-    fromTexture.updateConnectedPassFramebuffer(frambufferFrom, frambufferTo);
-    toTexture.updateConnectedPassFramebuffer(frambufferTo, frambufferFrom);
-  }
-
   public setGraph(graphDefine: GraphDefine) {
     this.reset();
     this.allocaterenderTargetNodes(graphDefine.renderTargets);

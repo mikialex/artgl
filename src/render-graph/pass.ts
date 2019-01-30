@@ -43,6 +43,7 @@ export class RenderPass{
   }
 
   updateInputTargets(inputs: PassInputMapInfo) {
+    this.inputTarget.clear();
     Object.keys(inputs).forEach(inputKey => {
       const mapTo = inputs[inputKey];
       this.inputTarget.set(inputKey, mapTo)
@@ -67,9 +68,15 @@ export class RenderPass{
   // key: uniformName ;   value: inputFrambufferName
   private inputTarget: Map<string, string> = new Map();
   private outputTarget: GLFramebuffer
-  // setOutPutTarget(renderTargetNode: RenderTargetNode) {
-  //   this.outputTarget = renderTargetNode.framebuffer;
-  // }
+  setOutPutTarget(renderTargetNode: RenderTargetNode) {
+    if (renderTargetNode.name === 'screen') {
+      this.outputTarget = undefined;
+      this.isOutputScreen = true;
+    } else {
+      this.outputTarget = renderTargetNode.framebuffer;
+      this.isOutputScreen = false;
+    }
+  }
   private isOutputScreen: boolean = true;
 
   private debuggingViewport: Vector4 = new Vector4();
@@ -86,20 +93,6 @@ export class RenderPass{
     );
   }
 
-  updateDependsAndOutPut(node: PassGraphNode) {
-    this.inputTarget.clear();
-    node.forFromNode((node) => {
-      if(node instanceof RenderTargetNode)
-      this.inputTarget.set()
-    })
-    node.forToNode((node) => {
-      if (node instanceof RenderTargetNode) {
-        this.outputTarget = node.framebuffer
-      }
-    })
-  }
-
-
   execute() {
     const engine = this.graph.engine;
 
@@ -115,6 +108,8 @@ export class RenderPass{
       engine.renderer.setRenderTarget(this.outputTarget);
       engine.renderer.state.setViewport(0, 0, this.outputTarget.width, this.outputTarget.height);
     }
+
+    this.checkIsValid();
   
     // input binding 
     if (this.overrideTechnique !== undefined) {
@@ -162,5 +157,17 @@ export class RenderPass{
       this.renderDebugResult(engine);
     }
 
+  }
+
+  checkIsValid() {
+    if (this.isOutputScreen) {
+      return
+    }
+    const target = this.outputTarget.name;
+    this.inputTarget.forEach(input => {
+      if (input === target) {
+        throw 'not valid'
+      }
+    })
   }
 }
