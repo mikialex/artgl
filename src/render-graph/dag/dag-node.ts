@@ -4,6 +4,14 @@ export class DAGNode{
   protected fromNode: DAGNode[] = [];
   protected fullfillList: boolean[] = [];
 
+  public forFromNode(visitor: (node: DAGNode)=>any) {
+    this.fromNode.forEach(visitor);
+  }
+
+  public forToNode(visitor: (node: DAGNode)=>any) {
+    this.toNode.forEach(visitor);
+  }
+
   public connectTo(node: DAGNode) {
     this.toNode.push(node);
     node._addFromRef(this);

@@ -5,6 +5,7 @@ import { RenderGraph } from "./render-graph";
 import { PassDefine, PassInputMapInfo } from "./interface";
 import { RenderTargetNode } from "./dag/render-target-node";
 import { Vector4 } from "../math/vector4";
+import { PassGraphNode } from "./dag/pass-graph-node";
 
 export class RenderPass{
   constructor(graph: RenderGraph, define: PassDefine) {
@@ -63,11 +64,12 @@ export class RenderPass{
   private sourceUse: RenderSource[] = [];
   private overrideTechnique: Technique;
 
-  inputTarget: Map<string, string> = new Map();
+  // key: uniformName ;   value: inputFrambufferName
+  private inputTarget: Map<string, string> = new Map();
   private outputTarget: GLFramebuffer
-  setOutPutTarget(renderTargetNode: RenderTargetNode) {
-    this.outputTarget = renderTargetNode.framebuffer;
-  }
+  // setOutPutTarget(renderTargetNode: RenderTargetNode) {
+  //   this.outputTarget = renderTargetNode.framebuffer;
+  // }
   private isOutputScreen: boolean = true;
 
   private debuggingViewport: Vector4 = new Vector4();
@@ -82,6 +84,19 @@ export class RenderPass{
       this.debuggingViewport.x, this.debuggingViewport.y,
       this.debuggingViewport.z, this.debuggingViewport.w
     );
+  }
+
+  updateDependsAndOutPut(node: PassGraphNode) {
+    this.inputTarget.clear();
+    node.forFromNode((node) => {
+      if(node instanceof RenderTargetNode)
+      this.inputTarget.set()
+    })
+    node.forToNode((node) => {
+      if (node instanceof RenderTargetNode) {
+        this.outputTarget = node.framebuffer
+      }
+    })
   }
 
 
@@ -101,6 +116,7 @@ export class RenderPass{
       engine.renderer.state.setViewport(0, 0, this.outputTarget.width, this.outputTarget.height);
     }
   
+    // input binding 
     if (this.overrideTechnique !== undefined) {
       engine.overrideTechnique = this.overrideTechnique;
       this.inputTarget.forEach((inputFrambufferName, uniformName) => {
@@ -110,13 +126,13 @@ export class RenderPass{
       })
     }
 
+    // clear setting
     if (this.enableColorClear) {
       if (this.clearColor !== undefined) {
         engine.renderer.state.colorbuffer.setClearColor(this.clearColor);
       }
       engine.renderer.state.colorbuffer.clear();
     }
-
     if (this.enableDepthClear) {
       if (!this.isOutputScreen && this.outputTarget.enableDepth) {
         engine.renderer.state.depthbuffer.clear();

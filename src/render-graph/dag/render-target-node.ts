@@ -1,5 +1,5 @@
 import { DAGNode } from "./dag-node";
-import { RenderTextureDefine, DimensionType } from "../interface";
+import { RenderTextureDefine, DimensionType, PixelFormat } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { GLFramebuffer } from "../../webgl/gl-framebuffer";
 import { PassGraphNode } from './pass-graph-node';
@@ -22,8 +22,17 @@ export class RenderTargetNode extends DAGNode{
       return
     }
 
+    // set a default format config
+    if (define.format === undefined) {
+      define.format = {
+        pixelFormat: PixelFormat.rgba,
+        dimensionType: DimensionType.bindRenderSize,
+      }
+    }
+
     let width: number;
     let height: number;
+    // decide inital size and create resize observer
     if (define.format.dimensionType === DimensionType.fixed) {
       width = define.format.width !== undefined ? define.format.width : graph.engine.renderer.width;
       height = define.format.height !== undefined ? define.format.height : graph.engine.renderer.height;

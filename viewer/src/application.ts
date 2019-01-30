@@ -24,6 +24,9 @@ export class Application {
   taaTech: TAATechnique;
   conf;
   private tickNum = 0;
+  get isEvenTick() {
+    return this.tickNum % 2 === 0;
+  }
   initialize(canvas: HTMLCanvasElement) {
     this.el = canvas;
     this.engine = new ARTEngine(canvas);
@@ -50,34 +53,18 @@ export class Application {
         {
           name: 'sceneResult',
           from: () => 'SceneOrigin',
-          format: {
-            pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.bindRenderSize,
-          },
         },
         {
           name: 'depthResult',
           from: () => 'Depth',
-          format: {
-            pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.bindRenderSize,
-          },
         },
         {
           name: 'TAAHistoryA',
-          from: () => this.tickNum % 2 === 0 ? null : 'TAA',
-          format: {
-            pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.bindRenderSize,
-          },
+          from: () => this.isEvenTick ? null : 'TAA',
         },
         {
           name: 'TAAHistoryB',
-          from: () => this.tickNum % 2 === 0 ? 'TAA' : null,
-          format: {
-            pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.bindRenderSize,
-          },
+          from: () => this.isEvenTick ? 'TAA' : null,
         },
       ],
       passes: [
@@ -96,7 +83,7 @@ export class Application {
             return {
               sceneResult: "sceneResult",
               depthResult: "depthResult",
-              TAAHistoryOld: this.tickNum % 2 === 0 ? "TAAHistoryA" : "TAAHistoryB"
+              TAAHistoryOld: this.isEvenTick ? "TAAHistoryA" : "TAAHistoryB"
             }
           },
           technique: 'TAATech',
@@ -118,7 +105,7 @@ export class Application {
           name: "CopyToScreen",
           inputs: () => {
             return {
-              copySource: this.tickNum % 2 === 0 ? "TAAHistoryB" : "TAAHistoryA"
+              copySource: this.isEvenTick ? "TAAHistoryB" : "TAAHistoryA"
             }
           },
           technique: 'copyTech',
@@ -153,9 +140,10 @@ export class Application {
 
   sampleCount = 0;
   render = () => {
-    this.orbitControler.update();
-    this.engine.connectCamera();
     this.tickNum++;
+    this.orbitControler.update();
+
+    this.engine.connectCamera();
     if (this.engine.isCameraChanged) {
       this.sampleCount = 0;
     } else {
