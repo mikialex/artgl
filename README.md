@@ -12,13 +12,9 @@ ArtGL is an underdeveloping next generation advance webGL framework .
 
 As easy as threejs. You can regard this project as a better threejs, with better design and better code quality.
 
-### extentable architecture
+### extentable pluggable architecture
 
-We make a general framework, not a specific renderer for specific usage, or a general renderer that hard to extent features. You can easily customize it to meet you real needs;
-
-### support multiple levels of render abstraction
-
-This is a facet of 'extentable', You can replace part of things like scene structure, muti pass structure by your own implementation;
+We make a general framework, not a specific renderer for specific usage, or a general renderer that hard to extent features. You can easily customize it to meet you real needs; By supporting of multiple levels of render abstraction, you can even replace whole layer level implementation.
 
 ### declaretive and powerful render pipline by renderGraph
 
@@ -29,3 +25,5 @@ Write a json like config for renderGraph, we handle all things. make multi pass 
 posts (zh/cn)：
 
 [关于ARTGL](./design/about.md)
+
+[概念模型](./design/concept.md)
