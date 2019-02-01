@@ -6,6 +6,7 @@
       Scene explorer
     </div>
     <button @click="inspect">inspect</button>
+    <button @click="loadObj">load obj</button>
     <div class="tree-view-wrap">
       <NodeView v-if="sceneView" :view="sceneView.root" />
     </div>
@@ -18,6 +19,11 @@ import { SceneView } from '../../model/scene-view';
 import ObjectPanel from '../object-panel/object-panel.vue'
 import {GLApp} from '../../application';
 import NodeView from './scene-node-view.vue';
+import { OBJLoader } from '../../../../src/artgl';
+import {loadStringFromFile} from '../../../../src/util/file-io';
+
+const objLoader = new OBJLoader();
+
 @Component({
   components:{
     NodeView, ObjectPanel
@@ -28,6 +34,15 @@ export default class ScenePanel extends Vue {
   inspect(){
     this.sceneView = SceneView.create(GLApp.scene);
     console.log(this.sceneView);
+  }
+
+  async loadObj(){
+    const objstr = await loadStringFromFile();
+    if(!objstr && objstr.length === 0){
+      return ;
+    }
+    const result = objLoader.parse(objstr);
+    GLApp.addGeomotry(result);
   }
 }
 </script>

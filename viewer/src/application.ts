@@ -1,5 +1,5 @@
 import ARTGL from '../../src/export';
-import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4, PlaneGeometry } from '../../src/artgl';
+import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4, PlaneGeometry, Geometry, NormalTechnique } from '../../src/artgl';
 import { Scene } from '../../src/scene/scene';
 import { SceneNode } from '../../src/scene/scene-node';
 import { RenderGraph } from '../../src/render-graph/render-graph';
@@ -187,6 +187,13 @@ export class Application {
   createScene(scene: Scene): Scene {
     hierachyBallBuilder(scene.root);
     return scene;
+  }
+
+  addGeomotry(geo: Geometry) {
+    const mesh = new Mesh();
+    mesh.geometry = geo;
+    mesh.technique = new NormalTechnique();
+    this.scene.root.addChild(mesh);
   }
 
 }
