@@ -1,5 +1,5 @@
 import ARTGL from '../../src/export';
-import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4, PlaneGeometry } from '../../src/artgl';
+import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4, PlaneGeometry, Geometry, NormalTechnique, OBJLoader } from '../../src/artgl';
 import { Scene } from '../../src/scene/scene';
 import { SceneNode } from '../../src/scene/scene-node';
 import { RenderGraph } from '../../src/render-graph/render-graph';
@@ -11,6 +11,7 @@ import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
 import hierachyBallBuilder from './scene/hierachy-balls';
 import { createConf } from './conf';
 
+export const STATICSERVER = "http://localhost:3000/"
 
 export class Application {
   graph: RenderGraph;
@@ -18,7 +19,7 @@ export class Application {
   el: HTMLCanvasElement;
   hasInitialized: boolean = false;
   scene: Scene = new Scene();
-  active: boolean = false;
+  active: boolean = true;
   interactor: Interactor;
   orbitControler: OrbitController;
   taaTech: TAATechnique;
@@ -124,6 +125,9 @@ export class Application {
     window.addEventListener('resize', this.onContainerResize);
     this.onContainerResize();
     this.conf = createConf(this);
+    if (this.active) {
+      this.run();
+    }
   }
 
   unintialize() {
@@ -186,7 +190,23 @@ export class Application {
 
   createScene(scene: Scene): Scene {
     hierachyBallBuilder(scene.root);
+    this.loadOBJFromURL();
     return scene;
+  }
+
+  async loadOBJFromURL() {
+    const objLoader = new OBJLoader();
+    const response = await fetch(STATICSERVER + 'obj/chair.obj');
+    const result = await response.text();
+    const geo = objLoader.parse(result);
+    this.addGeomotry(geo);
+  }
+
+  addGeomotry(geo: Geometry) {
+    const mesh = new Mesh();
+    mesh.geometry = geo;
+    mesh.technique = new NormalTechnique();
+    this.scene.root.addChild(mesh);
   }
 
 }

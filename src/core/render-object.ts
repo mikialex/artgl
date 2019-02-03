@@ -32,7 +32,7 @@ export class RenderRange{
 
 
 /**
- * render drawcall decription 
+ * render drawcall decription,  
  * which is decribe all drawable things
  * a drawable thing should have a geomemtry to define what to draw
  * and a technique to defined how to draw
@@ -43,8 +43,17 @@ export class RenderRange{
  * @extends {SceneNode}
  */
 export class RenderObject extends SceneNode{
-  constructor() {
+  constructor(
+    technique?: Technique,
+    geometry?: Geometry,
+    material?: Material,
+    range?: RenderRange
+  ) {
     super();
+    this.technique = technique;
+    this.geometry = geometry;
+    this.material = material;
+    this.range = range;
   }
 
   material: Material;

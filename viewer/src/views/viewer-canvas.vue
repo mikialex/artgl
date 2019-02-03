@@ -21,7 +21,8 @@ import GraphViewer from '../components/graph-viewer/graph-viewer.vue';
   }
 })
 export default class ViewerCanvas extends Vue {
-  isRuning:boolean = false;
+  isRuning:boolean = GLApp.active;
+
   run(){
     GLApp.run();
     this.isRuning = true;
