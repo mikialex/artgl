@@ -103,7 +103,7 @@ export class GLRenderer {
       this.gl.drawElements(
         mode,
         this.activeProgram.drawCount,
-        this.gl.UNSIGNED_SHORT,
+        this.activeProgram.indexUINT ? this.gl.UNSIGNED_INT : this.gl.UNSIGNED_SHORT,
         0
       );
     } else {

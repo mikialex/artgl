@@ -2,7 +2,7 @@ import { Geometry, defaultNoTexGeometryLayoutDataInfo } from "../core/geometry";
 import { Vector3 } from "../math/vector3";
 import { Vector2 } from "../math/vector2";
 import { loadStringFromFile } from "../util/file-io";
-import { Float32BufferData, Uint16BufferData } from "../core/buffer-data";
+import { Float32BufferData, Uint16BufferData, Uint32BufferData } from "../core/buffer-data";
 import { generateNormalFromPostion } from "../util/normal-generation";
 import { StandradGeometry } from "../geometry/standrad-geometry";
 
@@ -86,7 +86,8 @@ export class OBJLoader {
     normalsVectorFromOBJ: Vector3
   ) {
     //Check if this tuple already exists in the list of tuples
-    const index = this.isInArray(indicePositionFromObj, indiceNormalFromObj);
+    // const index = this.isInArray(indicePositionFromObj, indiceNormalFromObj);
+    const index = -1
     
     //If it not exists
     if (index === -1) {
@@ -94,18 +95,12 @@ export class OBJLoader {
       //The array of indices is only an array with his length equal to the number of triangles - 1.
       //We add vertices data in this order
       this.indicesForBabylon.push(this.wrappedPositionForBabylon.length);
-      //Push the position of vertice for Babylon
-      //Each element is a BABYLON.Vector3(x,y,z)
       this.wrappedPositionForBabylon.push(positionVectorFromOBJ);
-      //Push the uvs for Babylon
-      //Each element is a BABYLON.Vector3(u,v)
       this.wrappedUvsForBabylon.push(textureVectorFromOBJ);
-      //Push the normals for Babylon
-      //Each element is a BABYLON.Vector3(x,y,z)
       this.wrappedNormalsForBabylon.push(normalsVectorFromOBJ);
       //Add the tuple in the comparison list
-      this.tuplePosNorm[indicePositionFromObj].normals.push(indiceNormalFromObj);
-      this.tuplePosNorm[indicePositionFromObj].idx.push(this.curPositionInIndices);
+      // this.tuplePosNorm[indicePositionFromObj].normals.push(indiceNormalFromObj);
+      // this.tuplePosNorm[indicePositionFromObj].idx.push(this.curPositionInIndices);
       this.curPositionInIndices++
     } else {
       //The tuple already exists
@@ -287,15 +282,21 @@ export class OBJLoader {
     })
     const positionBuffer = new Float32Array(position);
     const normalBuffer = new Float32Array(normal);
-    const indexBuffer = new Uint16Array(this.indicesForBabylon);
+    let indexBuffer;
+    if (this.indicesForBabylon.length > 65535) {
+      indexBuffer = new Uint32Array(this.indicesForBabylon);
+      geometry.indexBuffer = new Uint32BufferData(indexBuffer);
+    } else {
+      indexBuffer = new Uint16Array(this.indicesForBabylon);
+      geometry.indexBuffer = new Uint16BufferData(indexBuffer);
+    }
     geometry.bufferDatas.position = new Float32BufferData(positionBuffer);
-    const useGeneraetNormal = true;
+    const useGeneraetNormal = false;
     if (useGeneraetNormal) {
       geometry.bufferDatas.normal = new Float32BufferData(generateNormalFromPostion(positionBuffer));
     } else {
       geometry.bufferDatas.normal = new Float32BufferData(normalBuffer);
     }
-    geometry.indexBuffer = new Uint16BufferData(indexBuffer);
     console.log('indexlength:' + indexBuffer.length);
     console.log('positionBuffer:' + positionBuffer.length);
     geometry.layout = {
