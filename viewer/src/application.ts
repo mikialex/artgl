@@ -189,7 +189,7 @@ export class Application {
   }
 
   createScene(scene: Scene): Scene {
-    // hierachyBallBuilder(scene.root);
+    hierachyBallBuilder(scene.root);
     this.loadOBJFromURL();
     return scene;
   }

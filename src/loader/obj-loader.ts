@@ -5,6 +5,7 @@ import { loadStringFromFile } from "../util/file-io";
 import { Float32BufferData, Uint16BufferData, Uint32BufferData } from "../core/buffer-data";
 import { generateNormalFromPostion } from "../util/normal-generation";
 import { StandradGeometry } from "../geometry/standrad-geometry";
+import { GeometryLoader } from "../core/loader";
 
 export async function loadObjFile(): Promise<Geometry> {
   const loader = new OBJLoader();
@@ -12,7 +13,7 @@ export async function loadObjFile(): Promise<Geometry> {
   return loader.parse(str);
 }
 
-export class OBJLoader {
+export class OBJLoader extends GeometryLoader{
   private vertexPattern = /v( +[\d|\.|\+|\-|e|E]+)( +[\d|\.|\+|\-|e|E]+)( +[\d|\.|\+|\-|e|E]+)/;
   // vn float float float
 
@@ -56,14 +57,26 @@ export class OBJLoader {
     }
   }
 
+  reset() {
+    this.positions = [];
+    this.normals = [];
+    this.uvs = [];
+    this.indicesForArtgl = [];
+    this.wrappedPositionForArtgl = [];
+    this.wrappedUvsForArtgl = [];
+    this.wrappedNormalsForArtgl = [];
+    this.tuplePosNorm = [];
+    this.curPositionInIndices = 0;
+  }
+
   private positions: Vector3[] = [];
   private normals: Vector3[] = [];
   private uvs: Vector2[] = [];
 
-  private indicesForBabylon: number[] = [];         //The list of indices for VertexData
-  private wrappedPositionForBabylon: Vector3[] = [];//The list of position in vectors
-  private wrappedUvsForBabylon: Vector2[] = [];     //Array with all value of uvs to match with the indices
-  private wrappedNormalsForBabylon: Vector3[] = []; //Array with all value of normals to match with the indices
+  private indicesForArtgl: number[] = [];         //The list of indices for VertexData
+  private wrappedPositionForArtgl: Vector3[] = [];//The list of position in vectors
+  private wrappedUvsForArtgl: Vector2[] = [];     //Array with all value of uvs to match with the indices
+  private wrappedNormalsForArtgl: Vector3[] = []; //Array with all value of normals to match with the indices
   //Create a tuple with indice of Position, Normal, UV  [pos, norm, uvs]
   private tuplePosNorm: Array<{ normals: Array<number>; idx: Array<number> }> = [];
   private curPositionInIndices: number = 0;
@@ -94,10 +107,10 @@ export class OBJLoader {
       //Add an new indice.
       //The array of indices is only an array with his length equal to the number of triangles - 1.
       //We add vertices data in this order
-      this.indicesForBabylon.push(this.wrappedPositionForBabylon.length);
-      this.wrappedPositionForBabylon.push(positionVectorFromOBJ);
-      this.wrappedUvsForBabylon.push(textureVectorFromOBJ);
-      this.wrappedNormalsForBabylon.push(normalsVectorFromOBJ);
+      this.indicesForArtgl.push(this.wrappedPositionForArtgl.length);
+      this.wrappedPositionForArtgl.push(positionVectorFromOBJ);
+      this.wrappedUvsForArtgl.push(textureVectorFromOBJ);
+      this.wrappedNormalsForArtgl.push(normalsVectorFromOBJ);
       //Add the tuple in the comparison list
       // this.tuplePosNorm[indicePositionFromObj].normals.push(indiceNormalFromObj);
       // this.tuplePosNorm[indicePositionFromObj].idx.push(this.curPositionInIndices);
@@ -106,7 +119,7 @@ export class OBJLoader {
       //The tuple already exists
       //Add the index of the already existing tuple
       //At this index we can get the value of position, normal and uvs of vertex
-      this.indicesForBabylon.push(index);
+      this.indicesForArtgl.push(index);
     }
   };
 
@@ -193,6 +206,7 @@ export class OBJLoader {
   };
 
   parse(objStr: string): Geometry {
+    this.reset();
 
     //Split the file into lines
     const lines = objStr.split('\n');
@@ -259,7 +273,7 @@ export class OBJLoader {
         );
 
         //Define a mesh or an object
-        //Each time this keyword is analysed, create a new Object with all data for creating a babylonMesh
+        //Each time this keyword is analysed, create a new Object with all data for creating a ArtglMesh
       } else {
         //If there is another possibility
         console.log("Unhandled expression at line : " + line);
@@ -268,14 +282,14 @@ export class OBJLoader {
     }
     const geometry = new StandradGeometry();
     const position = [];
-    this.wrappedPositionForBabylon.forEach(po => {
+    this.wrappedPositionForArtgl.forEach(po => {
       position.push(po.x);
       position.push(po.y);
       position.push(po.z);
     })
 
     const normal = [];
-    this.wrappedNormalsForBabylon.forEach(po => {
+    this.wrappedNormalsForArtgl.forEach(po => {
       normal.push(po.x);
       normal.push(po.y);
       normal.push(po.z);
@@ -283,11 +297,11 @@ export class OBJLoader {
     const positionBuffer = new Float32Array(position);
     const normalBuffer = new Float32Array(normal);
     let indexBuffer;
-    if (this.indicesForBabylon.length > 65535) {
-      indexBuffer = new Uint32Array(this.indicesForBabylon);
+    if (this.indicesForArtgl.length > 65535) {
+      indexBuffer = new Uint32Array(this.indicesForArtgl);
       geometry.indexBuffer = new Uint32BufferData(indexBuffer);
     } else {
-      indexBuffer = new Uint16Array(this.indicesForBabylon);
+      indexBuffer = new Uint16Array(this.indicesForArtgl);
       geometry.indexBuffer = new Uint16BufferData(indexBuffer);
     }
     geometry.bufferDatas.position = new Float32BufferData(positionBuffer);
