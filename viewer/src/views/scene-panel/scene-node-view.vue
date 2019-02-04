@@ -1,23 +1,27 @@
 <template>
   <div class="node-view">
-    <div class="title">
-      <div @click="isExpand = !isExpand" :class="{'expandable': hasChildren}">
+    <div class="title" >
+      <div 
+      :class="{'expandable': hasChildren}"
+      @click="isExpand = !isExpand">
         <span v-if="hasChildren && !isExpand"> + </span>
+        <span v-if="hasChildren && isExpand"> = </span>
+
         {{view.type}} - {{clampId}}
       </div>
       <button @click="showMenu = true">*</button>
     </div>
     <div class="menu" v-if="showMenu">
       <!-- <button>edit</button> -->
-      <button @click="emitdelete(view.uuid)">delete</button>
-      <!-- <button>load obj here</button> -->
+      <button @click="emitDelete">delete</button>
+      <button @click="emitLoadObj">loadobj</button>
     </div>
     <div class="mask" v-if="showMenu" @click="showMenu = false"></div>
     <div class="children" v-if="isExpand">
       <scene-node-view  
         v-for="child in view.children" 
         :key="child.uuid"
-        @deleteNode="emitdelete"
+        @nodeChange="emitChange"
        :view="child"/>
     </div>
   </div>
@@ -43,8 +47,22 @@ export default class BooleanEditor extends Vue {
     return this.view.children.length;
   }
 
-  emitdelete(id){
-    this.$emit('deleteNode', id);
+  emitLoadObj(){
+    this.emitChange({
+      type: 'load',
+      id: this.view.uuid
+    })
+  }
+
+  emitDelete(){
+    this.emitChange({
+      type: 'delete',
+      id: this.view.uuid
+    })
+  }
+
+  emitChange(info){
+    this.$emit('nodeChange', info);
     this.showMenu = false;
   }
 }
@@ -55,10 +73,10 @@ export default class BooleanEditor extends Vue {
 .node-view{
   font-size: 13px;
   position: relative;
+  border-top:1px solid rgb(234, 234, 234);
 }
 
 .title{
-  cursor: pointer;
   display: flex;
   justify-content: space-between;
 }
@@ -83,9 +101,9 @@ export default class BooleanEditor extends Vue {
 }
 
 .expandable{
-
+  cursor: pointer;
   &:hover{
-    background: #f1f1f1;
+    color: #36a0e3;
   }
 }
 

@@ -27,6 +27,10 @@ export class BufferData{
   getGLAttribute(engine: ARTEngine): WebGLBuffer {
     return engine.getGLAttributeBuffer(this);
   }
+
+  getDataSizeByte() {
+    return this.data.byteLength;
+  }
 }
 
 export class Float32BufferData extends BufferData{
