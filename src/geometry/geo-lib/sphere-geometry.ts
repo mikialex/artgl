@@ -22,6 +22,7 @@ export class SphereGeometry extends Geometry {
     }
     this.populate();
   }
+  name = 'SphereGeometry'
   radius = 1;
   widthSegments = 10;
   heightSegments = 10;

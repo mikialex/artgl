@@ -1,5 +1,9 @@
 # viewer
 
+This viewer's static resource depends another repo: https://github.com/mikialex/gfx-resource
+
+Clone that repo , yarn, and yarn serve.
+
 ## Project setup
 ```
 yarn install

@@ -19,7 +19,7 @@ export class Application {
   el: HTMLCanvasElement;
   hasInitialized: boolean = false;
   scene: Scene = new Scene();
-  active: boolean = true;
+  active: boolean = false;
   interactor: Interactor;
   orbitControler: OrbitController;
   taaTech: TAATechnique;

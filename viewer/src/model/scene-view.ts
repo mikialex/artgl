@@ -14,10 +14,12 @@ interface BufferView{
 }
 export class GeometryView{
   uuid: string;
+  name: string;
   buffers: BufferView[]
   static create(geometry: Geometry): GeometryView {
     const view = new GeometryView();
     view.uuid = geometry.uuid;
+    view.name = geometry.name === undefined ? 'unnamed' : geometry.name;
     view.buffers = [];
     for (const key in geometry.bufferDatas) {
       if (geometry.bufferDatas.hasOwnProperty(key)) {
@@ -28,6 +30,13 @@ export class GeometryView{
           dataByteSize: bufferdata.getDataSizeByte()
         })
       }
+    }
+    if (geometry.indexBuffer) {
+      view.buffers.push({
+        name: 'index',
+        type: 'indexbuffer',
+        dataByteSize: geometry.indexBuffer.getDataSizeByte()
+      })
     }
     geometry.bufferDatas
     return view;

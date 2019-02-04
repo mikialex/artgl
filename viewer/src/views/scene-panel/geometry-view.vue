@@ -2,9 +2,12 @@
   <div class="geometry-view">
     <div v-for="geometry in geometrylist"
     :key="geometry.uuid"
-    >
-      {{geometry.uuid.slice(0, 6)}}
-      <div class="buffer-detail">
+    > 
+    <span>
+      {{geometry.name}}-{{geometry.uuid.slice(0, 6)}}
+    </span>
+      
+      <div class="buffer-detail" v-if="expandDetail">
         <div v-for ="bufferinfo in geometry.buffers"
         :key="bufferinfo.name"
         >
@@ -26,6 +29,8 @@ import { SceneView, GeometryView } from "../../model/scene-view";
 export default class GeometryViewPanel extends Vue {
   @Prop() view: SceneView
 
+  expandDetail = true;
+
   get geometrylist(){
     const list = [];
     this.view.geometries.forEach(geo =>{
@@ -39,5 +44,7 @@ export default class GeometryViewPanel extends Vue {
 <style scoped lang="scss">
 .buffer-detail{
   padding-left: 10px;
+  background: #eee;
 }
+
 </style>

@@ -123,8 +123,6 @@ export class GLProgram {
     if (conf.autoInjectHeader) {
       conf.vertexShaderString = injectVertexShaderHeaders(conf, conf.vertexShaderString);
       conf.fragmentShaderString = injectFragmentShaderHeaders(conf, conf.fragmentShaderString);
-      console.log(conf.vertexShaderString);
-      console.log(conf.fragmentShaderString);
     }
     this.vertexShader.compileShader(conf.vertexShaderString);
     this.fragmentShader.compileShader(conf.fragmentShaderString);

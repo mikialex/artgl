@@ -28,6 +28,7 @@ export class GLShader {
     if (!gl.getShaderParameter(this.shader, gl.COMPILE_STATUS)) {
       let log = gl.getShaderInfoLog(this.shader);
       if (log) {
+        logDebugShaderSource(source);
         throw new Error(log);
       }
     }
@@ -41,4 +42,8 @@ export class GLShader {
     this.renderer.gl.deleteShader(this.shader);
   }
 
+}
+
+function logDebugShaderSource(source: string) {
+  console.log(source);
 }
