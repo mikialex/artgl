@@ -19,6 +19,7 @@ export class PlaneGeometry extends Geometry {
 
     this.populate();
   }
+  name = 'PlaneGeometry'
   width: number;
   height: number;
   widthSegments: number;

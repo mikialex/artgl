@@ -239,6 +239,8 @@ export class ARTEngine {
       const geometryIndexBuffer = geometry.indexBuffer;
       if (geometryIndexBuffer instanceof Uint32BufferData) {
         program.indexUINT = true;
+      } else {
+        program.indexUINT = false;
       }
       let glBuffer = this.getGLAttributeBuffer(geometryIndexBuffer);
       if (glBuffer === undefined) {

@@ -70,7 +70,7 @@ export class Scene implements RenderSource {
   }
 
   setRootNode(node: SceneNode) {
-    if (!node.scene) {
+    if (node.scene) {
       throw 'node has set to scene, abort';
     }
     this.root = node;

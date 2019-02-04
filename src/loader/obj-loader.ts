@@ -205,7 +205,7 @@ export class OBJLoader extends GeometryLoader{
     }
   };
 
-  parse(objStr: string): Geometry {
+  parse(objStr: string, fileName?:string): Geometry {
     this.reset();
 
     //Split the file into lines
@@ -317,6 +317,11 @@ export class OBJLoader extends GeometryLoader{
       dataInfo: defaultNoTexGeometryLayoutDataInfo,
     }
 
+    if (fileName) {
+      geometry.name = "Objfile-" + fileName;
+    } else {
+      geometry.name = "Objfile-unnamed";
+    }
     return geometry;
   }
 }

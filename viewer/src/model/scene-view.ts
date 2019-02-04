@@ -1,17 +1,98 @@
 import { Vector3 } from '../../../src/math';
 import { SceneNode } from '../../../src/scene/scene-node';
 import { Scene } from '../../../src/scene/scene';
-import { Mesh } from '../../../src/artgl';
+import { Mesh, OBJLoader, NormalTechnique, Geometry } from '../../../src/artgl';
+import { loadStringFromFile } from '../../../src/util/file-io';
 
  
+const objLoader = new OBJLoader();
+
+interface BufferView{
+  name: string
+  type: string,
+  dataByteSize: number;
+}
+export class GeometryView{
+  uuid: string;
+  name: string;
+  buffers: BufferView[]
+  static create(geometry: Geometry): GeometryView {
+    const view = new GeometryView();
+    view.uuid = geometry.uuid;
+    view.name = geometry.name === undefined ? 'unnamed' : geometry.name;
+    view.buffers = [];
+    for (const key in geometry.bufferDatas) {
+      if (geometry.bufferDatas.hasOwnProperty(key)) {
+        const bufferdata = geometry.bufferDatas[key];
+        view.buffers.push({
+          name: key,
+          type: 'bufferdata',
+          dataByteSize: bufferdata.getDataSizeByte()
+        })
+      }
+    }
+    if (geometry.indexBuffer) {
+      view.buffers.push({
+        name: 'index',
+        type: 'indexbuffer',
+        dataByteSize: geometry.indexBuffer.getDataSizeByte()
+      })
+    }
+    geometry.bufferDatas
+    return view;
+  }
+}
+
 export class SceneView{
   root: SceneNodeView
+  geometries: Map<string, GeometryView> = new Map();
+  
+  collectEntity(node: SceneNode) {
+    if (node instanceof Mesh) {
+      const geometry = node.geometry;
+      if (geometry !== undefined) {
+        if (!this.geometries.has(geometry.uuid)) {
+          this.geometries.set(geometry.uuid, GeometryView.create(geometry));
+        }
+      }
+    }
+  }
+
   static create(scene: Scene): SceneView {
     const view = new SceneView();
     view.root = scene.root.map((node: SceneNode) => {
+      view.collectEntity(node);
       return SceneNodeView.create(node);
     })
     return view;
+  }
+
+  static deleteNode(id: string, scene: Scene) {
+    const result = scene.root.findSubNode(id);
+    if (result === undefined) {
+      return;
+    }
+    if (result.parent) {
+      result.parent.removeChild(result);
+    } else { // scene root
+      scene.setRootNode(new SceneNode())
+    }
+  }
+
+  static async loadObj(id: string, scene: Scene) {
+    const node = scene.root.findSubNode(id);
+    if (node === undefined) {
+      return;
+    }
+    const objstr = await loadStringFromFile();
+    if(!objstr && objstr.length === 0){
+      return ;
+    }
+    const geo = objLoader.parse(objstr);
+    const mesh = new Mesh();
+    mesh.geometry = geo;
+    mesh.technique = new NormalTechnique();
+    node.addChild(mesh);
   }
 }
 
@@ -30,4 +111,5 @@ export class SceneNodeView{
     }
     return nodeview;
   }
+
 }

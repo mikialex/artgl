@@ -2,6 +2,7 @@ import { BufferData } from "./buffer-data";
 import { AttributeUsage } from "../webgl/attribute";
 import { Box3 } from "../math/entity/box3";
 import { Sphere } from "../math/entity/sphere";
+import { generateUUID } from '../math/uuid';
 
 interface LayoutInfo{
   usage: AttributeUsage,
@@ -23,6 +24,8 @@ export interface GeometryDataLayout {
 export abstract class Geometry {
   constructor() {
   }
+  name: string
+  uuid = generateUUID();
   readonly bufferDatas: { [index: string]: BufferData } = {};
   indexBuffer: BufferData;
   layout: GeometryDataLayout;

@@ -19,7 +19,7 @@ export class Application {
   el: HTMLCanvasElement;
   hasInitialized: boolean = false;
   scene: Scene = new Scene();
-  active: boolean = true;
+  active: boolean = false;
   interactor: Interactor;
   orbitControler: OrbitController;
   taaTech: TAATechnique;
@@ -186,6 +186,11 @@ export class Application {
   stop() {
     this.active = false;
     this.interactor.enabled = false;
+    window.cancelAnimationFrame(this.tickId);
+  }
+
+  step() {
+    this.render();
   }
 
   createScene(scene: Scene): Scene {
@@ -199,10 +204,6 @@ export class Application {
     const response = await fetch(STATICSERVER + 'obj/chair.obj');
     const result = await response.text();
     const geo = objLoader.parse(result);
-    this.addGeomotry(geo);
-  }
-
-  addGeomotry(geo: Geometry) {
     const mesh = new Mesh();
     mesh.geometry = geo;
     mesh.technique = new NormalTechnique();

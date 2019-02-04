@@ -5,7 +5,8 @@
     <div v-if="!isRuning" class="stop-notation"> STOPPED </div>
     <div class="command-bar">
       <button @click="run" v-if="!isRuning">run</button>
-      <button @click="stop" v-else>stop</button>
+      <button @click="stop" v-if="isRuning">stop</button>
+      <button @click="step" v-if="!isRuning">step next frame</button>
     </div>
   </div>
 </template>
@@ -31,6 +32,10 @@ export default class ViewerCanvas extends Vue {
   stop(){
     GLApp.stop();
     this.isRuning = false;
+  }
+
+  step(){
+    GLApp.step();
   }
 
 }
