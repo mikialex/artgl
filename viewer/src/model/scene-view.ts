@@ -13,6 +13,18 @@ export class SceneView{
     })
     return view;
   }
+
+  deleteNode(id: string, scene: Scene) {
+    const result = scene.root.findSubNode(id);
+    if (result === undefined) {
+      return;
+    }
+    if (result.parent) {
+      result.parent.removeChild(result);
+    } else { // scene root
+      scene.setRootNode(new SceneNode())
+    }
+  }
 }
 
 export class SceneNodeView{
@@ -30,4 +42,5 @@ export class SceneNodeView{
     }
     return nodeview;
   }
+
 }

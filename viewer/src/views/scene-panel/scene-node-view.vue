@@ -5,12 +5,19 @@
         <span v-if="hasChildren && !isExpand"> + </span>
         {{view.type}} - {{clampId}}
       </div>
-      <button>*</button>
+      <button @click="showMenu = true">*</button>
     </div>
+    <div class="menu" v-if="showMenu">
+      <!-- <button>edit</button> -->
+      <button @click="emitdelete(view.uuid)">delete</button>
+      <!-- <button>load obj here</button> -->
+    </div>
+    <div class="mask" v-if="showMenu" @click="showMenu = false"></div>
     <div class="children" v-if="isExpand">
       <scene-node-view  
         v-for="child in view.children" 
         :key="child.uuid"
+        @deleteNode="emitdelete"
        :view="child"/>
     </div>
   </div>
@@ -24,6 +31,9 @@ import { SceneNodeView } from '../../model/scene-view';
 })
 export default class BooleanEditor extends Vue {
   @Prop() view: SceneNodeView;
+
+  showMenu = false;
+
   get clampId(){
     return this.view.uuid.slice(0, 6);
   }
@@ -32,6 +42,11 @@ export default class BooleanEditor extends Vue {
   get hasChildren(){
     return this.view.children.length;
   }
+
+  emitdelete(id){
+    this.$emit('deleteNode', id);
+    this.showMenu = false;
+  }
 }
 
 </script>
@@ -39,6 +54,7 @@ export default class BooleanEditor extends Vue {
 <style lang="scss" scoped>
 .node-view{
   font-size: 13px;
+  position: relative;
 }
 
 .title{
@@ -47,6 +63,24 @@ export default class BooleanEditor extends Vue {
   justify-content: space-between;
 }
 
+.menu{
+  position: absolute;
+  right:0px;
+  width: 150px;
+  height: 50px;
+  background: #fff;
+  z-index: 2;
+  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.096);
+}
+
+.mask{
+  position:fixed;
+  top:0px;
+  left:0px;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
 
 .expandable{
 

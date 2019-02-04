@@ -113,7 +113,8 @@ export class GLRenderer {
 
     if (this.enableRenderErrorCatch) {
       const errorCode = this.gl.getError();
-      if ( errorCode !== this.gl.NO_ERROR) {
+      if (errorCode !== this.gl.NO_ERROR) {
+        // debugger
         throw `gl draw error: ${ errorCode }`;
       }
     }

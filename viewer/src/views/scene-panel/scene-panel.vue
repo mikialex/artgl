@@ -8,7 +8,11 @@
     <button @click="inspect">inspect</button>
     <button @click="loadObj">load obj</button>
     <div class="tree-view-wrap">
-      <NodeView v-if="sceneView" :view="sceneView.root" />
+      <NodeView 
+      v-if="sceneView" 
+      :view="sceneView.root" 
+      @deleteNode="deleteNode"
+      />
     </div>
   </div>
 </template>
@@ -34,6 +38,11 @@ export default class ScenePanel extends Vue {
   inspect(){
     this.sceneView = SceneView.create(GLApp.scene);
     console.log(this.sceneView);
+  }
+
+  deleteNode(nodeId){
+    this.sceneView.deleteNode(nodeId, GLApp.scene);
+    this.inspect();
   }
 
   async loadObj(){
