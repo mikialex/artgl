@@ -198,7 +198,10 @@ export class ARTEngine {
 
       // aquire texuture from material or framebuffers
       if (material !== undefined) {
-        const texture = material.getChannelTexture(tex.name);
+        if (tex.channel === undefined) {
+          throw 'use texture in material / use material to render should set textureuniform channel type'
+        }
+        const texture = material.getChannelTexture(tex.channel);
         if (texture.gltextureId === undefined) {
           texture.gltextureId = this.renderer.textureManger.createTextureFromImageElement(texture.image);
           webgltexture = this.renderer.textureManger.getGLTexture(texture.gltextureId);

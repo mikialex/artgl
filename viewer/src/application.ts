@@ -10,6 +10,7 @@ import { CopyTechnique } from '../../src/technique/technique-lib/copy-technique'
 import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
 import hierachyBallBuilder from './scene/hierachy-balls';
 import { createConf } from './conf';
+import { Observable } from '../../src/core/observable';
 
 export const STATICSERVER = "http://localhost:3000/"
 
@@ -150,7 +151,10 @@ export class Application {
   }
 
   sampleCount = 0;
+  beforeRender: Observable<ARTEngine> = new Observable();
+  afterRender: Observable<ARTEngine> = new Observable();
   render = () => {
+    this.beforeRender.notifyObservers(this.engine);
     this.tickNum++;
     this.orbitControler.update();
 
@@ -163,14 +167,14 @@ export class Application {
       }
     }
 
-    // this.engine.renderer.state.colorbuffer.clear();
-    // this.engine.renderer.state.depthbuffer.clear();
-    // this.engine.render(this.scene)
-
     if (this.sampleCount <= 100) {
       this.graph.update();
       this.graph.render();
     }
+
+    this.afterRender.notifyObservers(this.engine);
+    this.engine.renderer.stat.reset();
+
     if (this.active) {
       window.requestAnimationFrame(this.render);
     }
