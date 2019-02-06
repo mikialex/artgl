@@ -1,5 +1,5 @@
 import ARTGL from '../../src/export';
-import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4, PlaneGeometry } from '../../src/artgl';
+import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4, PlaneGeometry, Geometry, NormalTechnique, OBJLoader } from '../../src/artgl';
 import { Scene } from '../../src/scene/scene';
 import { SceneNode } from '../../src/scene/scene-node';
 import { RenderGraph } from '../../src/render-graph/render-graph';
@@ -11,8 +11,9 @@ import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
 import hierachyBallBuilder from './scene/hierachy-balls';
 import { createConf } from './conf';
 
+export const STATICSERVER = "http://localhost:3000/"
 
-export class Application{
+export class Application {
   graph: RenderGraph;
   engine: ARTEngine;
   el: HTMLCanvasElement;
@@ -22,7 +23,12 @@ export class Application{
   interactor: Interactor;
   orbitControler: OrbitController;
   taaTech: TAATechnique;
-  conf
+  enableTAA = false;
+  conf;
+  private tickNum = 0;
+  get isEvenTick() {
+    return this.tickNum % 2 === 0;
+  }
   initialize(canvas: HTMLCanvasElement) {
     this.el = canvas;
     this.engine = new ARTEngine(canvas);
@@ -43,56 +49,47 @@ export class Application{
     this.graph.setGraph({
       renderTargets: [
         {
+          name: 'screen',
+          from: () => 'CopyToScreen',
+        },
+        {
           name: 'sceneResult',
-          format: {
-            pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.bindRenderSize,
-          },
+          from: () => 'SceneOrigin',
         },
         {
           name: 'depthResult',
-          format: {
-            pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.bindRenderSize,
-          },
+          from: () => 'Depth',
         },
         {
           name: 'TAAHistoryA',
-          format: {
-            pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.bindRenderSize,
-          },
+          from: () => this.isEvenTick ? null : 'TAA',
         },
         {
           name: 'TAAHistoryB',
-          format: {
-            pixelFormat: PixelFormat.rgba,
-            dimensionType: DimensionType.bindRenderSize,
-          },
+          from: () => this.isEvenTick ? 'TAA' : null,
         },
       ],
       passes: [
         { // general scene origin
           name: "SceneOrigin",
-          output: "sceneResult",
           source: ['AllScreen'],
         },
         { // depth
           name: "Depth",
           technique: 'depthTech',
-          output: "depthResult",
           source: ['AllScreen'],
         },
         { // mix newrender and old samples
           name: "TAA",
-          inputs: () => [
-              { name: "sceneResult", mapTo: "sceneResult" },
-              { name: "depthResult", mapTo: "depthResult" },
-              { name: "TAAHistoryA", mapTo: "TAAHistoryOld" }
-            ],
+          inputs: () => {
+            return {
+              sceneResult: "sceneResult",
+              depthResult: "depthResult",
+              TAAHistoryOld: this.isEvenTick ? "TAAHistoryA" : "TAAHistoryB"
+            }
+          },
           technique: 'TAATech',
           source: ['artgl.screenQuad'],
-          output: 'TAAHistoryB',
           enableColorClear: false,
           beforePassExecute: () => {
             this.engine.unjit();
@@ -108,15 +105,19 @@ export class Application{
         },
         { // copy to screen
           name: "CopyToScreen",
-          inputs: () => [
-            { name: "TAAHistoryB", mapTo: "copySource" },
-          ],
-          output: "screen",
+          inputs: () => {
+            let cs: string;
+            if (this.enableTAA) {
+              cs = this.isEvenTick ? "TAAHistoryB" : "TAAHistoryA"
+            } else {
+              cs = "sceneResult"
+            }
+            return {
+              copySource: cs
+            }
+          },
           technique: 'copyTech',
           source: ['artgl.screenQuad'],
-          afterPassExecute: () => {
-            this.graph.swapRenderTexture('TAAHistoryA', 'TAAHistoryB');
-          }
         },
       ]
     })
@@ -124,6 +125,9 @@ export class Application{
     window.addEventListener('resize', this.onContainerResize);
     this.onContainerResize();
     this.conf = createConf(this);
+    if (this.active) {
+      this.run();
+    }
   }
 
   unintialize() {
@@ -138,8 +142,8 @@ export class Application{
     this.engine.setSize(width, height);
     (this.engine.camera as PerspectiveCamera).aspect = width / height;
 
-    this.taaTech.uniforms.get('screenPixelXStep').setValue(1 / ( 2 * window.devicePixelRatio * width));
-    this.taaTech.uniforms.get('screenPixelYStep').setValue(1 / ( 2 * window.devicePixelRatio * height));
+    this.taaTech.uniforms.get('screenPixelXStep').setValue(1 / (2 * window.devicePixelRatio * width));
+    this.taaTech.uniforms.get('screenPixelYStep').setValue(1 / (2 * window.devicePixelRatio * height));
   }
   notifyResize() {
     this.onContainerResize();
@@ -147,15 +151,24 @@ export class Application{
 
   sampleCount = 0;
   render = () => {
+    this.tickNum++;
     this.orbitControler.update();
+
     this.engine.connectCamera();
     if (this.engine.isCameraChanged) {
       this.sampleCount = 0;
     } else {
-      this.engine.jitterProjectionMatrix();
+      if (this.enableTAA) {
+        this.engine.jitterProjectionMatrix();
+      }
     }
 
+    // this.engine.renderer.state.colorbuffer.clear();
+    // this.engine.renderer.state.depthbuffer.clear();
+    // this.engine.render(this.scene)
+
     if (this.sampleCount <= 100) {
+      this.graph.update();
       this.graph.render();
     }
     if (this.active) {
@@ -173,11 +186,28 @@ export class Application{
   stop() {
     this.active = false;
     this.interactor.enabled = false;
+    window.cancelAnimationFrame(this.tickId);
+  }
+
+  step() {
+    this.render();
   }
 
   createScene(scene: Scene): Scene {
     hierachyBallBuilder(scene.root);
+    this.loadOBJFromURL();
     return scene;
+  }
+
+  async loadOBJFromURL() {
+    const objLoader = new OBJLoader();
+    const response = await fetch(STATICSERVER + 'obj/chair.obj');
+    const result = await response.text();
+    const geo = objLoader.parse(result);
+    const mesh = new Mesh();
+    mesh.geometry = geo;
+    mesh.technique = new NormalTechnique();
+    this.scene.root.addChild(mesh);
   }
 
 }

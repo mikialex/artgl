@@ -90,13 +90,16 @@ export class GLProgram {
   private fragmentShader: GLShader;
 
   framebufferTextureMap: { [index: string]: string } = {};
-  public defineFrameBufferTextureDep(frambufferName: string, uniformName: string) {
-    this.framebufferTextureMap[uniformName] = frambufferName;
-  }
 
   drawFrom: number = 0;
   drawCount: number = 0;
   useIndexDraw: boolean = false;
+  indexUINT: boolean = false;
+
+
+  public defineFrameBufferTextureDep(frambufferName: string, uniformName: string) {
+    this.framebufferTextureMap[uniformName] = frambufferName;
+  }
 
   public forUniforms(cb: (uniform: GLUniform) => any): void {
     for (const key in this.textures) {
@@ -120,8 +123,6 @@ export class GLProgram {
     if (conf.autoInjectHeader) {
       conf.vertexShaderString = injectVertexShaderHeaders(conf, conf.vertexShaderString);
       conf.fragmentShaderString = injectFragmentShaderHeaders(conf, conf.fragmentShaderString);
-      console.log(conf.vertexShaderString);
-      console.log(conf.fragmentShaderString);
     }
     this.vertexShader.compileShader(conf.vertexShaderString);
     this.fragmentShader.compileShader(conf.fragmentShaderString);

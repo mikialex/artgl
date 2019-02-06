@@ -1,5 +1,5 @@
 import { DAGNode } from "./dag-node";
-import { RenderTextureDefine, DimensionType } from "../interface";
+import { RenderTextureDefine, DimensionType, PixelFormat } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { GLFramebuffer } from "../../webgl/gl-framebuffer";
 import { PassGraphNode } from './pass-graph-node';
@@ -15,8 +15,24 @@ export class RenderTargetNode extends DAGNode{
     this.define = define;
     this.graph = graph;
 
+    this.fromGetter = define.from;
+
+    if (define.name === 'screen') {
+      this.isScreenNode = true;
+      return
+    }
+
+    // set a default format config
+    if (define.format === undefined) {
+      define.format = {
+        pixelFormat: PixelFormat.rgba,
+        dimensionType: DimensionType.bindRenderSize,
+      }
+    }
+
     let width: number;
     let height: number;
+    // decide inital size and create resize observer
     if (define.format.dimensionType === DimensionType.fixed) {
       width = define.format.width !== undefined ? define.format.width : graph.engine.renderer.width;
       height = define.format.height !== undefined ? define.format.height : graph.engine.renderer.height;
@@ -35,6 +51,7 @@ export class RenderTargetNode extends DAGNode{
       this.name, width, height, enableDepth);
     
   }
+  readonly isScreenNode: boolean;
   readonly name: string;
   readonly define: RenderTextureDefine;
   readonly graph: RenderGraph;
@@ -51,19 +68,22 @@ export class RenderTargetNode extends DAGNode{
 
   framebuffer: GLFramebuffer;
 
-  updateConnectedPassFramebuffer(oldFrambufferName:string, newFrambufferName: string) {
-    this.toNode.forEach(node => {
-      if (node instanceof PassGraphNode) {
-        const uniformMaped = node.pass.inputTarget.get(oldFrambufferName);
-        node.pass.inputTarget.delete(oldFrambufferName);
-        node.pass.inputTarget.set(newFrambufferName, uniformMaped);
-      }
-    })
-    this.fromNode.forEach(node => {
-      if (node instanceof PassGraphNode) {
-        node.pass.setOutPutTarget(this);
-      }
-    })
+  private fromGetter: () => Nullable<string>
+  private from: string = null;
+
+  updateDependNode() {
+    if (this.from !== null) {
+      const passNode = this.graph.getRenderPassDependence(this.from);
+      passNode.deConnectTo(this);
+    }
+
+    this.from = this.fromGetter();
+
+    if (this.from !== null) {
+      const passNode = this.graph.getRenderPassDependence(this.from);
+      passNode.connectTo(this);
+    }
+    
   }
 
   dispose() {

@@ -74,9 +74,10 @@ export class SceneNode {
 
   traverse(fn: (sceneNode: SceneNode) => any) {
     function visit(node: SceneNode) {
-      fn(node);
-      for (let i = 0; i < node.children.length; i++) {
-        visit(node.children[i]);
+      if (fn(node) !== false) {
+        for (let i = 0; i < node.children.length; i++) {
+          visit(node.children[i]);
+        }
       }
     }
     visit(this);
@@ -105,6 +106,17 @@ export class SceneNode {
       return mapNode;
     })
     return rootNode;
+  }
+
+  findSubNode(id: string) {
+    let result: SceneNode;
+    this.traverse(node => {
+      if (node.uuid === id) {
+        result = node;
+        return false;
+      }
+    })
+    return result;
   }
 
   updateWorldMatrix(force?: boolean): void {

@@ -2,9 +2,10 @@ import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { ARTEngine, RenderSource } from "../engine/render-engine";
 import { Technique } from "../core/technique";
 import { RenderGraph } from "./render-graph";
-import { PassDefine } from "./interface";
+import { PassDefine, PassInputMapInfo } from "./interface";
 import { RenderTargetNode } from "./dag/render-target-node";
 import { Vector4 } from "../math/vector4";
+import { PassGraphNode } from "./dag/pass-graph-node";
 
 export class RenderPass{
   constructor(graph: RenderGraph, define: PassDefine) {
@@ -19,12 +20,6 @@ export class RenderPass{
       this.overrideTechnique = overrideTechnique;
     }
 
-    if (define.inputs !== undefined) {
-      define.inputs().forEach(inputInfo => {
-        this.inputTarget.set(inputInfo.name, inputInfo.mapTo)
-      })
-    }
-    this.isOutputScreen = define.output === 'screen';
     this.clearColor = define.clearColor;
     this.enableColorClear = define.enableColorClear === undefined ? true : define.enableColorClear
     this.enableDepthClear = define.enableDepthClear === undefined ? true : define.enableDepthClear
@@ -47,6 +42,14 @@ export class RenderPass{
 
   }
 
+  updateInputTargets(inputs: PassInputMapInfo) {
+    this.inputTarget.clear();
+    Object.keys(inputs).forEach(inputKey => {
+      const mapTo = inputs[inputKey];
+      this.inputTarget.set(inputKey, mapTo)
+    })
+  }
+
   private graph: RenderGraph;
   readonly define: PassDefine;
   public name: string;
@@ -62,10 +65,17 @@ export class RenderPass{
   private sourceUse: RenderSource[] = [];
   private overrideTechnique: Technique;
 
-  inputTarget: Map<string, string> = new Map();
+  // key: uniformName ;   value: inputFrambufferName
+  private inputTarget: Map<string, string> = new Map();
   private outputTarget: GLFramebuffer
   setOutPutTarget(renderTargetNode: RenderTargetNode) {
-    this.outputTarget = renderTargetNode.framebuffer;
+    if (renderTargetNode.name === 'screen') {
+      this.outputTarget = undefined;
+      this.isOutputScreen = true;
+    } else {
+      this.outputTarget = renderTargetNode.framebuffer;
+      this.isOutputScreen = false;
+    }
   }
   private isOutputScreen: boolean = true;
 
@@ -83,7 +93,6 @@ export class RenderPass{
     );
   }
 
-
   execute() {
     const engine = this.graph.engine;
 
@@ -99,23 +108,26 @@ export class RenderPass{
       engine.renderer.setRenderTarget(this.outputTarget);
       engine.renderer.state.setViewport(0, 0, this.outputTarget.width, this.outputTarget.height);
     }
+
+    this.checkIsValid();
   
+    // input binding 
     if (this.overrideTechnique !== undefined) {
       engine.overrideTechnique = this.overrideTechnique;
       this.inputTarget.forEach((inputFrambufferName, uniformName) => {
         engine.overrideTechnique.getProgram(engine).defineFrameBufferTextureDep(
-          uniformName, inputFrambufferName
+          inputFrambufferName, uniformName
         );
       })
     }
 
+    // clear setting
     if (this.enableColorClear) {
       if (this.clearColor !== undefined) {
         engine.renderer.state.colorbuffer.setClearColor(this.clearColor);
       }
       engine.renderer.state.colorbuffer.clear();
     }
-
     if (this.enableDepthClear) {
       if (!this.isOutputScreen && this.outputTarget.enableDepth) {
         engine.renderer.state.depthbuffer.clear();
@@ -145,5 +157,17 @@ export class RenderPass{
       this.renderDebugResult(engine);
     }
 
+  }
+
+  checkIsValid() {
+    if (this.isOutputScreen) {
+      return
+    }
+    const target = this.outputTarget.name;
+    this.inputTarget.forEach(input => {
+      if (input === target) {
+        throw 'not valid'
+      }
+    })
   }
 }

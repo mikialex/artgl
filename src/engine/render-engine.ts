@@ -5,7 +5,7 @@ import { Camera } from "../core/camera";
 import { Matrix4 } from "../math/matrix4";
 import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
-import { BufferData } from "../core/buffer-data";
+import { BufferData, Uint32BufferData } from "../core/buffer-data";
 import { Technique } from "../core/technique";
 import { DrawMode } from "../webgl/const";
 import { Texture } from "../core/texture";
@@ -236,9 +236,15 @@ export class ARTEngine {
       if (geometry.indexBuffer === null) {
         throw 'indexBuffer not found for index draw'
       }
-      let glBuffer = this.getGLAttributeBuffer(geometry.indexBuffer);
+      const geometryIndexBuffer = geometry.indexBuffer;
+      if (geometryIndexBuffer instanceof Uint32BufferData) {
+        program.indexUINT = true;
+      } else {
+        program.indexUINT = false;
+      }
+      let glBuffer = this.getGLAttributeBuffer(geometryIndexBuffer);
       if (glBuffer === undefined) {
-        glBuffer = this.createOrUpdateAttributeBuffer(geometry.indexBuffer, true);
+        glBuffer = this.createOrUpdateAttributeBuffer(geometryIndexBuffer, true);
       }
       program.useIndexBuffer(glBuffer);
     }

@@ -6,6 +6,7 @@ import { Nullable } from "../type";
 import { RenderSource } from "../engine/render-engine";
 import { RenderList } from "../engine/render-list";
 import { Mesh } from "../object/mesh";
+import { GeometryLoader } from "../core/loader";
 
 /**
  * scene data management
@@ -69,7 +70,7 @@ export class Scene implements RenderSource {
   }
 
   setRootNode(node: SceneNode) {
-    if (!node.scene) {
+    if (node.scene) {
       throw 'node has set to scene, abort';
     }
     this.root = node;
@@ -84,6 +85,10 @@ export class Scene implements RenderSource {
       node.scene = null;
     });
     this.root = null;
+  }
+
+  registGeometryLoader(loader: GeometryLoader) {
+    
   }
 
 }

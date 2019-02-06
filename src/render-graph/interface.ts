@@ -1,4 +1,29 @@
 import { Vector4 } from "../math/vector4";
+import { Nullable } from "../type";
+export interface GraphDefine {
+  passes: PassDefine[],
+  renderTargets: RenderTextureDefine[];
+}
+
+export interface PassInputMapInfo{
+  [index:string]: string
+}
+
+export interface PassDefine {
+  name: string,
+  inputs?: () => PassInputMapInfo,
+  source: string[],
+  filter?: () => boolean,
+  sorter?: () => number,
+  states?: stateType[],
+  technique?: string,
+  enableColorClear?:boolean,
+  enableDepthClear?:boolean,
+  clearColor?: Vector4,
+  afterPassExecute?: () => any,
+  beforePassExecute?: () => any,
+}
+
 
 export enum PixelFormat {
   depth,
@@ -12,7 +37,8 @@ export enum DimensionType {
 
 export interface RenderTextureDefine {
   name: string,
-  format: {
+  from: () => Nullable<string>
+  format?: {
     pixelFormat: PixelFormat,
     dimensionType: DimensionType,
     width?: number,
@@ -32,30 +58,4 @@ export interface SourceDefine {
 enum stateType {
   DisableColorWrite,
   DisableAlphaWrite
-}
-
-export interface PassInputMapInfo{
-  name: string,
-  mapTo: string
-}
-
-export interface PassDefine {
-  name: string,
-  inputs?: () => PassInputMapInfo[],
-  output: string,
-  source: string[],
-  filter?: () => boolean,
-  sorter?: () => number,
-  states?: stateType[],
-  technique?: string,
-  enableColorClear?:boolean,
-  enableDepthClear?:boolean,
-  clearColor?: Vector4,
-  afterPassExecute?: () => any,
-  beforePassExecute?: () => any,
-}
-
-export interface GraphDefine {
-  passes: PassDefine[],
-  renderTargets?: RenderTextureDefine[];
 }
