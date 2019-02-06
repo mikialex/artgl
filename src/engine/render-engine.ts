@@ -183,10 +183,10 @@ export class ARTEngine {
     this.globalUniforms.get(InnerSupportUniform.MMatrix).setValue(object.worldMatrix);
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
     technique.uniforms.forEach((uni, key) => {
-      if (uni._needUpdate) {
+      // if (uni._needUpdate) {
         program.setUniform(key, uni.value);
         uni.resetUpdate();
-      }
+      // }
     })
     return program;
   }
@@ -274,17 +274,14 @@ export class ARTEngine {
     const id = texture.gltextureId;
     return this.renderer.getGLTexture(id);
   }
-
+  private programTechniqueMap: Map<Technique, GLProgram> = new Map();
   getProgram(technique: Technique): GLProgram {
-    const id = technique.programId;
-    const program = this.renderer.getProgram(id);
-    return program;
+    return this.programTechniqueMap.get(technique);
   }
 
   createProgram(technique: Technique): GLProgram  {
     const program = this.renderer.createProgram(technique.config.programConfig);
-    technique.programId = program.id;
-    technique.needUpdate = false;
+    this.programTechniqueMap.set(technique, program);
     return program;
   }
 
