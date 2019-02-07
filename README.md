@@ -1,6 +1,4 @@
 
-<img  src="./artgl.svg" style="margin:30px; width: 200px"></img>
-
 
 ## About Project
 
