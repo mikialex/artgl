@@ -1,6 +1,6 @@
 
-<img style="width: 200px" src="./artgl.svg" 
-style="margin:30px; width: 500px"></img>
+<img  src="./artgl.svg" style="margin:30px; width: 200px"></img>
+
 
 ## About Project
 
