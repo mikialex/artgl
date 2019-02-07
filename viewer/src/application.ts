@@ -106,6 +106,7 @@ export class Application {
         },
         { // copy to screen
           name: "CopyToScreen",
+          enableColorClear: false,
           inputs: () => {
             let cs: string;
             if (this.enableTAA) {
@@ -167,10 +168,10 @@ export class Application {
       }
     }
 
-    if (this.sampleCount <= 100) {
+    // if (this.sampleCount <= 100) {
       this.graph.update();
       this.graph.render();
-    }
+    // }
 
     this.afterRender.notifyObservers(this.engine);
     this.engine.renderer.stat.reset();

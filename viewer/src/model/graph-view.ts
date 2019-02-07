@@ -27,8 +27,8 @@ export class GraphView {
 export class GraphNodeView {
   name: string;
   uuid: string;
-  width: number = 100;
-  height: number = 100;
+  width: number = 200;
+  height: number = 200;
   positionX: number = 0;
   positionY: number = 0;
   inputsID: string[];
@@ -43,6 +43,7 @@ export class GraphNodeView {
 
     if (node instanceof PassGraphNode) {
       view.name = node.name;
+      view.height = 20;
     } else if (node instanceof RenderTargetNode) {
       view.name = node.name;
     }

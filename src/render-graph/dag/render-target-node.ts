@@ -7,6 +7,7 @@ import { MathUtil } from '../../math/util'
 import { Observer } from "../../core/observable";
 import { Size } from "../../engine/render-engine";
 import { Nullable } from "../../type";
+import { Vector4 } from '../../math/vector4';
 
 export class RenderTargetNode extends DAGNode{
   constructor(graph: RenderGraph, define: RenderTextureDefine) {
@@ -55,6 +56,8 @@ export class RenderTargetNode extends DAGNode{
   readonly name: string;
   readonly define: RenderTextureDefine;
   readonly graph: RenderGraph;
+
+  debugViewPort: Vector4 = new Vector4(0, 0, 200, 200);
 
   autoWidthRatio: number = 0;
   autoHeightRatio: number = 0;

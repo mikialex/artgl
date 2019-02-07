@@ -45,6 +45,8 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { GraphNodeView, GraphView } from '../../model/graph-view';
+import { Vector4 } from "../../../../src/math/vector4";
+import { GLApp } from "../../application";
 
 @Component({
   name: 'NodeWrap'
@@ -74,10 +76,26 @@ export default class NodeUIWrap extends Vue {
   originY = 0;
   screenOriginX = 0;
   screenOriginY = 0;
+  viewport = new Vector4();
+  updateViewPortToGraph(){
+    this.viewport.set(
+      this.node.positionX, 
+      this.boardInfo.height - this.node.positionY - this.node.height, 
+      this.node.width, 
+      this.node.height, 
+    )
+    this.viewport.multiplyScalar(window.devicePixelRatio);
+    GLApp.graph.updateRenderTargetDebugView(this.node.uuid, this.viewport);
+  }
+
+  mounted(){
+    this.updateViewPortToGraph();
+  }
+
   dragging(e: MouseEvent) {
     this.node.positionX = this.originX + e.screenX - this.screenOriginX;
     this.node.positionY = this.originY + e.screenY - this.screenOriginY;
-    console.log(this.originX)
+    this.updateViewPortToGraph();
   }
   startdrag(e: MouseEvent) {
     this.isDraging = true;
@@ -97,15 +115,16 @@ export default class NodeUIWrap extends Vue {
 
 <style scoped lang="scss">
 .node-wrap {
+  pointer-events: auto;
   width: 100px;
   min-height: 50px;
   border: 1px solid #999;
   border-radius: 3px;
   position: absolute;
-  background: #fff;
   user-select: none;
   font-size: 12px;
   > .node-title {
+    background: #fff;
     height: 20px;
     display: flex;
     cursor: grab;

@@ -5,21 +5,20 @@ import { RenderTargetNode } from "./dag/render-target-node";
 import { DAGNode } from "./dag/dag-node";
 import { ARTEngine, RenderSource } from "../engine/render-engine";
 import { TechniqueConfig, Technique } from "../core/technique";
-import { GraphDebuggingViewer } from "./graph-viewer/graph-debugging-viewer";
 import { QuadSource } from './quad-source';
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
+import { Vector4 } from "../math/vector4";
+import { RenderPass } from "./pass";
 
 export class RenderGraph {
   constructor(engine: ARTEngine) {
     this.engine = engine;
     this.composer = new EffectComposer(this);
-    this.debugViewer = new GraphDebuggingViewer(this);
   }
   engine: ARTEngine;
   composer: EffectComposer;
 
   enableDebuggingView: boolean = false;
-  debugViewer: GraphDebuggingViewer;
 
   private screenNode: RenderTargetNode;
   renderTargetNodes: Map<string, RenderTargetNode> = new Map();
@@ -141,6 +140,20 @@ export class RenderGraph {
   }
   getResgisteredSource(name: string) {
     return this.passSources.get(name);
+  }
+
+
+  updateRenderTargetDebugView(nodeId: string, viewPort: Vector4) {
+    if (this.screenNode.uuid === nodeId) {
+      RenderPass.screenDebugViewPort.copy(viewPort);
+      return
+    }
+
+    this.renderTargetNodes.forEach(node => {
+      if (node.uuid === nodeId) {
+        node.framebuffer.debuggingViewport.copy(viewPort);
+      }
+    })
   }
 
 }

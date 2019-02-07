@@ -16,6 +16,9 @@ import { Nullable } from "../type";
 import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
 import { UniformProxy } from "./uniform-proxy";
 import { Observable } from "../core/observable";
+import { GLFramebuffer } from '../webgl/gl-framebuffer';
+import { QuadSource } from '../render-graph/quad-source';
+import { CopyTechnique } from '../technique/technique-lib/copy-technique';
 
 export interface RenderSource{
   getRenderList(): RenderList;
@@ -25,6 +28,10 @@ export interface Size{
   width: number;
   height: number;
 }
+
+
+const copyTechnique = new CopyTechnique();
+const quad = new QuadSource();
 
 export class ARTEngine {
   constructor(el?: HTMLCanvasElement, options?: any) {
@@ -163,6 +170,22 @@ export class ARTEngine {
 
     // render
     this.renderer.render(DrawMode.TRIANGLES, program.useIndexDraw);
+  }
+
+  renderDebugFrameBuffer(framebuffer: GLFramebuffer) {
+    this.renderer.setRenderTargetScreen();
+    const debugViewPort = framebuffer.debuggingViewport;
+    this.renderer.state.setViewport(
+      debugViewPort.x, debugViewPort.y,
+      debugViewPort.z, debugViewPort.w
+    );
+
+    this.overrideTechnique = copyTechnique;
+    this.overrideTechnique.getProgram(this).defineFrameBufferTextureDep(
+      framebuffer.name, 'copySource'
+    );
+    this.render(quad);
+    this.overrideTechnique = null;
   }
   ////
 
