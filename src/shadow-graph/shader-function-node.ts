@@ -13,11 +13,18 @@ export interface ShaderFunctionDefine{
   returnType: GLDataType
 }
 
+
 export enum GLFragmentInnerVar{
 
 }
 
 
+/**
+ * Define a shader
+ *
+ * @export
+ * @class ShaderFunction
+ */
 export class ShaderFunction{
   constructor(define: ShaderFunctionDefine) {
     this.define = define;
@@ -43,6 +50,7 @@ export class ShaderFunctionNode{
   }
 }
 
+// this should be more simple by use a glsl parser
 const depthPackFunction = new ShaderFunction({
   name: 'depthPack',
   description: 'pack depth to RGBA output',
