@@ -11,7 +11,7 @@ export const standradMeshAttributeLayout = [
   { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
 ]
 
-export interface TechniqueConfig{
+export interface TechniqueConfig {
   programConfig: GLProgramConfig;
 }
 
@@ -39,6 +39,7 @@ export class Technique{
   config: TechniqueConfig;
   name: string;
   uuid: string = generateUUID();
+  _techniqueId: string;
 
   isTransparent = false;
 

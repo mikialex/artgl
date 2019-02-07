@@ -22,8 +22,8 @@ export class RenderGraph {
   debugViewer: GraphDebuggingViewer;
 
   private screenNode: RenderTargetNode;
-  private renderTargetNodes: Map<string, RenderTargetNode> = new Map();
-  private passNodes: Map<string, PassGraphNode> = new Map();
+  renderTargetNodes: Map<string, RenderTargetNode> = new Map();
+  passNodes: Map<string, PassGraphNode> = new Map();
 
   render() {
     this.composer.render();
