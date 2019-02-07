@@ -1,5 +1,7 @@
+import { generateUUID } from '../../math/uuid';
 
-export class DAGNode{
+export class DAGNode {
+  uuid:string = generateUUID();
   protected toNode: DAGNode[] = [];
   protected fromNode: DAGNode[] = [];
   protected fullfillList: boolean[] = [];

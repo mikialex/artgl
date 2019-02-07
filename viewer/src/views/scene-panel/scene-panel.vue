@@ -17,6 +17,24 @@
       <GeometryViewPanel v-if="currentNav === 'geometry'" 
       :view="sceneView" 
       />
+      <MaterialViewPanel v-if="currentNav === 'material'" 
+      :view="sceneView" 
+      />
+    </div>
+    <div v-if="renderView">
+      <div class="panel-title">RenderInfo</div>
+      <div>
+        activeProgramCount: {{renderView.compiledPrograms}}
+      </div>
+      <div>
+        programswitch: {{renderView.programSwitchCount}}
+      </div>
+      <div>
+        drawcall: {{renderView.drawcall}}
+      </div>
+      <div>
+        uniformUpload: {{renderView.uniformUpload}}
+      </div>
     </div>
 
   </div>
@@ -25,26 +43,46 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { SceneView } from "../../model/scene-view";
+import { RenderView } from "../../model/render-view";
 import GeometryViewPanel from './geometry-view.vue';
+import MaterialViewPanel from './material-view.vue';
 import ObjectPanel from "../object-panel/object-panel.vue";
 import { GLApp } from "../../application";
 import NodeView from "./scene-node-view.vue";
+import { Observer } from "../../../../src/core/observable";
+import { ARTEngine } from "../../../../src/artgl";
 
 @Component({
   components: {
     NodeView,
     ObjectPanel,
-    GeometryViewPanel
+    GeometryViewPanel,
+    MaterialViewPanel
   }
 })
 export default class ScenePanel extends Vue {
   sceneView: SceneView = null;
+  renderView: RenderView = null;
+  afterObs:Observer<ARTEngine>
 
   nav = ['hierarchy', 'technique','geometry','material'];
   currentNav = 'hierarchy'
 
   sync() {
     this.sceneView = SceneView.create(GLApp.scene);
+    this.renderView = RenderView.create(GLApp.engine);
+    if(this.afterObs){
+      GLApp.afterRender.remove(this.afterObs);
+    }
+    this.afterObs = GLApp.afterRender.add((engine:ARTEngine)=>{
+      this.renderView.updateFrameInfo(engine);
+    });
+  }
+
+  beforeDestroy(){
+    if(this.afterObs){
+      GLApp.afterRender.remove(this.afterObs);
+    }
   }
 
   async catchChange(info) {
@@ -79,6 +117,7 @@ export default class ScenePanel extends Vue {
 .view-wrap {
   height: calc(100% - 200px);
   overflow-y: scroll;
+  border: 1px solid #ddd;
 }
 
 .scene-nav{

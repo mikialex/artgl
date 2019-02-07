@@ -1,11 +1,11 @@
 <template>
   <div class="top-nav">
-    <h3>ART.GL</h3> 
+    <img src="../../assets/art.svg" alt="">
     <div class="current-project">
       <!-- <div>
         demoscene.gltf 
       </div> -->
-      <router-link active-class="current" to="/">Viewer</router-link>
+      <!-- <router-link active-class="current" to="/">Viewer</router-link> -->
       <!-- <router-link to="/about">RenderGraph</router-link> -->
     </div>
   </div>
@@ -25,6 +25,11 @@ export default class TopNav extends Vue {
   height: 40px;
   display: flex;
   align-items: center;
+  >img{
+    height: 40px;
+    padding: 10px;
+    opacity: 0.2;
+  }
 }
 
 .current-project{

@@ -6,19 +6,22 @@ export class GLProgramManager{
     this.renderer = renderer;
   }
   private renderer: GLRenderer;
-  private programs: { [index: string]: GLProgram } = {};
+  private programs: Map<string, GLProgram> = new Map();
 
   addNewProgram(program: GLProgram) {
-    this.programs[program.id] = program;
+    this.programs.set(program.id, program);
   }
 
   getProgram(storeId: string) {
-    return this.programs[storeId];
+    return this.programs.get(storeId);
+  }
+
+  get compiledProgramsCount() {
+    return this.programs.size;
   }
 
   dispose() {
-    Object.keys(this.programs).forEach(programKey => {
-      const program = this.programs[programKey];
+    this.programs.forEach(program => {
       program.dispose();
     })
   }

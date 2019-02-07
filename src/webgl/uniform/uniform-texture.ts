@@ -1,8 +1,7 @@
 import { GLProgram } from "../program";
-import { GLRenderer } from "../gl-renderer";
 import { Nullable } from "../../type";
-import { GLTextureManager } from "../texture-manager";
 import { GLTextureSlot } from "../states/gl-texture-slot";
+import { ChannelType } from "../../core/material";
 
 export enum GLTextureType{
   texture2D,
@@ -10,6 +9,7 @@ export enum GLTextureType{
 
 export interface TextureDescriptor {
   name: string,
+  channelType?: ChannelType,
   type: GLTextureType,
 }
 
@@ -25,6 +25,7 @@ export class GLTextureUniform{
     this.slotManager = program.renderer.state.textureSlot;
     this.gl = program.getRenderer().gl;
     this.name = descriptor.name
+    this.channel = descriptor.channelType;
     const glProgram = program.getProgram();
     const location = this.gl.getUniformLocation(glProgram, descriptor.name);
     this.isActive = location !== null;
@@ -32,6 +33,7 @@ export class GLTextureUniform{
     this.currentActiveSlot = -1;
   }
   name: string;
+  channel: ChannelType;
   private gl: WebGLRenderingContext;
   private slotManager: GLTextureSlot;
   private program: GLProgram;

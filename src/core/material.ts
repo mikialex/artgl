@@ -1,7 +1,11 @@
 import { Texture } from "./texture";
+import { generateUUID } from "../math/uuid";
 
-interface materialConfig{
-
+export const enum ChannelType{
+  diffuse = 'diffuse',
+  roughness = 'roughness',
+  metalic = 'metalic',
+  ao = 'ao'
 }
 
 
@@ -12,18 +16,16 @@ interface materialConfig{
  * @class Material
  */
 export class Material{
-  // constructor(conf: materialConfig) {
-    
-  // }
 
-  private channel: Map<string, Texture> = new Map();
+  uuid = generateUUID();
+  private channel: Map<ChannelType, Texture> = new Map();
 
-  setChannel(channel: string, texture: Texture) {
+  setChannel(channel: ChannelType, texture: Texture) {
     this.channel[channel] = texture;
   }
 
-  getChannelTexture(name: string) {
-    return this.channel.get(name);
+  getChannelTexture(type: ChannelType) {
+    return this.channel.get(type);
   }
 
 }
