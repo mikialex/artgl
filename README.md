@@ -1,5 +1,5 @@
 
-<img src="./logo.svg" 
+<img style="width: 200px" src="./artgl.svg" 
 style="margin:30px; width: 500px"></img>
 
 ## About Project
