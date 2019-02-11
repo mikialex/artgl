@@ -21,19 +21,24 @@
       :view="sceneView" 
       />
     </div>
-    <div v-if="renderView">
+    <div class="render-info">
       <div class="panel-title">RenderInfo</div>
-      <div>
-        activeProgramCount: {{renderView.compiledPrograms}}
+      <div v-if="renderView" class="render-info-group">
+        <div>
+          activeProgramCount: {{renderView.compiledPrograms}}
+        </div>
+        <div>
+          programswitch: {{renderView.programSwitchCount}}
+        </div>
+        <div>
+          drawcall: {{renderView.drawcall}}
+        </div>
+        <div>
+          uniformUpload: {{renderView.uniformUpload}}
+        </div>
       </div>
-      <div>
-        programswitch: {{renderView.programSwitchCount}}
-      </div>
-      <div>
-        drawcall: {{renderView.drawcall}}
-      </div>
-      <div>
-        uniformUpload: {{renderView.uniformUpload}}
+      <div v-else class="render-info-group">
+        sync scene to get synced render info stat
       </div>
     </div>
 
@@ -103,7 +108,7 @@ export default class ScenePanel extends Vue {
 .panel-title {
   font-weight: bold;
   padding: 5px;
-  font-size: 15px;
+  font-size: 14px;
   display: flex;
   justify-content: space-between;
 }
@@ -134,5 +139,13 @@ export default class ScenePanel extends Vue {
   >.current-nav{
     color: #36a0e3;
   }
+}
+
+.render-info{
+  font-size: 12px
+}
+
+.render-info-group{
+  padding-left: 10px;
 }
 </style>

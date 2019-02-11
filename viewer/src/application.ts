@@ -11,6 +11,7 @@ import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
 import hierachyBallBuilder from './scene/hierachy-balls';
 import { createConf } from './conf';
 import { Observable } from '../../src/core/observable';
+import { RenderConfig } from './components/conf/interface';
 
 export const STATICSERVER = "http://localhost:3000/"
 
@@ -25,7 +26,7 @@ export class Application {
   orbitControler: OrbitController;
   taaTech: TAATechnique;
   enableTAA = false;
-  conf;
+  conf: RenderConfig;
   private tickNum = 0;
   get isEvenTick() {
     return this.tickNum % 2 === 0;

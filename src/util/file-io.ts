@@ -2,6 +2,15 @@ export function downloadStringAsFile(content: string){
 
 }
 
+// this is not working when preserveDrawingBuffer set false
+export function downloadCanvasPNGImage(canvas: HTMLCanvasElement, name: string) {
+  const link = document.createElement('a');
+  link.setAttribute('download', name + '.png');
+  link.setAttribute('href', canvas.toDataURL("image/png")
+     .replace("image/png", "image/octet-stream"));
+  link.click();
+}
+
 async function getStringContentFromFile(file) {
   const reader = new FileReader();
   return new Promise<string>(function (resolve, _) {

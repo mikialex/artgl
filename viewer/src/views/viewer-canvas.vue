@@ -7,7 +7,9 @@
       <button @click="run" v-if="!isRuning">run</button>
       <button @click="stop" v-if="isRuning">stop</button>
       <button @click="step" v-if="!isRuning">step next frame</button>
+      <button @click="screenshot" v-if="!isRuning" disabled>download screenshot</button>
       <button @click="inspectGraph" >inspectGraph</button>
+      <button @click="closeGraphInspector" v-if="graphView">closeGraphViewer</button>
     </div>
   </div>
 </template>
@@ -31,6 +33,10 @@ export default class ViewerCanvas extends Vue {
     this.graphView = GraphView.create(GLApp.graph);
   }
 
+  closeGraphInspector(){
+    this.graphView = null;
+  }
+
   run(){
     GLApp.run();
     this.isRuning = true;
@@ -43,6 +49,10 @@ export default class ViewerCanvas extends Vue {
 
   step(){
     GLApp.step();
+  }
+
+  screenshot(){
+    GLApp.engine.downloadCurrentRender();
   }
 
 }
@@ -72,7 +82,7 @@ export default class ViewerCanvas extends Vue {
   height: calc(100% - 40px);
   top:0px;
   font-size: 20px;
-  border: 3px solid rgb(235, 90, 90);
+  border: 3px solid rgb(237, 185, 185);
   color:  rgb(235, 90, 90);
   box-sizing: border-box;
 }

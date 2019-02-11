@@ -5,7 +5,7 @@
       <!-- <div>
         demoscene.gltf 
       </div> -->
-      <!-- <router-link active-class="current" to="/">Viewer</router-link> -->
+      <router-link active-class="current" to="/">Viewer</router-link>
       <!-- <router-link to="/about">RenderGraph</router-link> -->
     </div>
   </div>
@@ -26,18 +26,18 @@ export default class TopNav extends Vue {
   display: flex;
   align-items: center;
   >img{
-    height: 40px;
+    height: 25px;
     padding: 10px;
-    opacity: 0.2;
+    opacity: 0.4;
+    &:hover{
+      opacity: 0.6;
+    }
   }
 }
 
 .current-project{
   display: flex;
   align-items: center;
-  border-top: 1px solid #eee;
-  border-left: 1px solid #eee;
-  border-right: 1px solid #eee;
   width: calc(100vw - 200px);
 }
 
@@ -46,15 +46,18 @@ h3{
 }
 
 a{
+  font-size: 14px;
   text-decoration: none;
   padding: 5px;
   color:#444;
-  &:hover{
+  border-radius: 2px;
     background: #eee;
+  &:hover{
+    background: #ddd;
   }
 }
 
 .current{
-  background: #eee;
+  font-weight: bold;
 }
 </style>

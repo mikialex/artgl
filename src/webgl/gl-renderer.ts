@@ -18,6 +18,7 @@ export class GLRenderer {
     }
     options = { ...options };
     options.antialias = false;
+    // options.preserveDrawingBuffer = true; // for screen shot
     const ctx = el.getContext('webgl', options);
     if (ctx === null) {
       throw 'webgl context create failed';

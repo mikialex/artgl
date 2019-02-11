@@ -1,4 +1,3 @@
-import { RenderGraph } from '../../src/artgl';
 import { Application } from './application';
 import { RenderConfig } from './components/conf/interface'
 

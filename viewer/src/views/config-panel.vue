@@ -24,7 +24,7 @@ export default class ConfigPanel extends Vue {
 .panel-title{
   font-weight: bold;
   padding: 5px;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .config-panel{

@@ -19,6 +19,7 @@ import { Observable } from "../core/observable";
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
 import { QuadSource } from '../render-graph/quad-source';
 import { CopyTechnique } from '../technique/technique-lib/copy-technique';
+import { downloadCanvasPNGImage } from "../util/file-io";
 
 export interface RenderSource{
   getRenderList(): RenderList;
@@ -314,6 +315,12 @@ export class ARTEngine {
 
   createOrUpdateAttributeBuffer(bufferData: BufferData, useforIndex: boolean): WebGLBuffer {
     return this.renderer.attributeBufferManager.updateOrCreateBuffer(bufferData.data.buffer as ArrayBuffer, useforIndex);
+  }
+
+
+
+  downloadCurrentRender() {
+    downloadCanvasPNGImage(this.renderer.el, 'artgl-renderscreenshot');
   }
 
 
