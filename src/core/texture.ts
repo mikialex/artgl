@@ -7,12 +7,15 @@ import { ARTEngine } from "../engine/render-engine";
  * @class Texture
  */
 export class Texture {
-  constructor() {
-    
-  }
 
   image: HTMLImageElement;
+  textureData: Uint8ClampedArray;
   gltextureId: string;
+  updateVersionId: number = 0;
+
+  setNeedUpdate() {
+    this.updateVersionId++;
+  }
 
   getGLTexture(engine: ARTEngine): WebGLTexture {
 

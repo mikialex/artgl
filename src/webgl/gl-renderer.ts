@@ -1,6 +1,5 @@
 import { GLInfo } from "./gl-info";
 import { GLProgram, GLProgramConfig } from "./program";
-import { Matrix4 } from "../math/index";
 import { GLProgramManager } from "./program-manager";
 import { GLAttributeBufferDataManager } from "./attribute-buffer-manager";
 import { GLState } from "./states/gl-state";
@@ -33,11 +32,10 @@ export class GLRenderer {
     this.textureManger.init();
     this.setSize(this.el.offsetWidth, this.el.offsetHeight);
   }
-  gl: WebGLRenderingContext;
-  el: HTMLCanvasElement;
+  readonly gl: WebGLRenderingContext;
+  readonly el: HTMLCanvasElement;
 
-  projectionMatrix = new Matrix4();
-  glInfo: GLInfo;
+  readonly glInfo: GLInfo;
 
   // enable this will cause great performance issue
   // only enable this when debug draw range issue
@@ -50,7 +48,7 @@ export class GLRenderer {
   private _height = 100;
   get height() { return this._height };
 
-  devicePixelRatio = window.devicePixelRatio;
+  private devicePixelRatio = window.devicePixelRatio;
 
   // set rendersize by device logic size
   setSize(width: number, height: number): boolean {
@@ -66,9 +64,11 @@ export class GLRenderer {
     return isChanged;
   }
 
-  state: GLState;
-  stat: GLStat = new GLStat();
-  activeProgram: Nullable<GLProgram> = null;
+  readonly state: GLState;
+  readonly stat: GLStat = new GLStat();
+  private activeProgram: Nullable<GLProgram> = null;
+
+  // resource managers
   readonly programManager = new GLProgramManager(this);
   readonly textureManger = new GLTextureManager(this);
   readonly attributeBufferManager = new GLAttributeBufferDataManager(this);

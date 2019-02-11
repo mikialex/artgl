@@ -1,5 +1,6 @@
 import { Texture } from "./texture";
 import { generateUUID } from "../math/uuid";
+import { Vector3 } from "../math/index";
 
 export const enum ChannelType{
   diffuse = 'diffuse',
@@ -20,7 +21,16 @@ export class Material{
   uuid = generateUUID();
   private channel: Map<ChannelType, Texture> = new Map();
 
-  setChannel(channel: ChannelType, texture: Texture) {
+  setChannelColor(channel: ChannelType, color: Vector3) {
+    let channelTexture = this.channel.get(channel);
+    if (channelTexture === undefined) {
+      channelTexture = generateTextureToPureColor(color);
+    } else {
+      updateTextureToPureColor(channelTexture, color);
+    }
+  }
+
+  setChannelTexture(channel: ChannelType, texture: Texture) {
     this.channel[channel] = texture;
   }
 
@@ -28,4 +38,13 @@ export class Material{
     return this.channel.get(type);
   }
 
+}
+
+function generateTextureToPureColor(color: Vector3): Texture {
+  const texture = new Texture();
+  return texture;
+}
+
+function updateTextureToPureColor(texture: Texture, color: Vector3): Texture {
+  return texture;
 }
