@@ -5,6 +5,7 @@ import { SceneNode } from '../../src/scene/scene-node';
 import { RenderGraph } from '../../src/render-graph/render-graph';
 import { DimensionType, PixelFormat } from '../../src/render-graph/interface';
 import { TAATechnique } from '../../src/technique/technique-lib/taa-technique';
+import { SSAOTechnique } from '../../src/technique/technique-lib/ssao-technique';
 import { DepthTechnique } from '../../src/technique/technique-lib/depth-technique';
 import { CopyTechnique } from '../../src/technique/technique-lib/copy-technique';
 import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
@@ -25,7 +26,7 @@ export class Application {
   interactor: Interactor;
   orbitControler: OrbitController;
   taaTech: TAATechnique;
-  enableTAA = false;
+  enableTAA = true;
   conf: RenderConfig;
   private tickNum = 0;
   get isEvenTick() {
@@ -44,9 +45,11 @@ export class Application {
 
     this.graph.registSource('AllScreen', this.scene)
     const TAATech = new TAATechnique();
+    const SSAOTech = new SSAOTechnique();
     this.taaTech = TAATech;
     this.graph.registTechnique('depthTech', new DepthTechnique())
     this.graph.registTechnique('TAATech', TAATech)
+    this.graph.registTechnique('SSAO', SSAOTech)
     this.graph.registTechnique('copyTech', new CopyTechnique());
     this.graph.setGraph({
       renderTargets: [
@@ -70,6 +73,14 @@ export class Application {
           name: 'TAAHistoryB',
           from: () => this.isEvenTick ? 'TAA' : null,
         },
+        {
+          name: 'SSAOHistoryA',
+          from: () => this.isEvenTick ? null : 'SSAO',
+        },
+        {
+          name: 'SSAOHistoryB',
+          from: () => this.isEvenTick ? 'SSAO' : null,
+        },
       ],
       passes: [
         { // general scene origin
@@ -87,7 +98,8 @@ export class Application {
             return {
               sceneResult: "sceneResult",
               depthResult: "depthResult",
-              TAAHistoryOld: this.isEvenTick ? "TAAHistoryA" : "TAAHistoryB"
+              TAAHistoryOld: this.isEvenTick ? "TAAHistoryA" : "TAAHistoryB",
+              AOAcc: this.isEvenTick ? "SSAOHistoryB" : "SSAOHistoryA",
             }
           },
           technique: 'TAATech',
@@ -101,23 +113,43 @@ export class Application {
             TAATech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
             TAATech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
           },
-          afterPassExecute: () => {
-            this.sampleCount++;
-          }
+        },
+        { // mix newrender and old samples
+          name: "SSAO",
+          inputs: () => {
+            return {
+              depthResult: "depthResult",
+              AOAcc: this.isEvenTick ? "SSAOHistoryA" : "SSAOHistoryB",
+            }
+          },
+          technique: 'SSAO',
+          source: ['artgl.screenQuad'],
+          enableColorClear: false,
+          beforePassExecute: () => {
+            const VPInv: Matrix4 = SSAOTech.uniforms.get('VPMatrixInverse').value;
+            const VP: Matrix4 = this.engine.globalUniforms.get(InnerSupportUniform.VPMatrix).value
+            VPInv.getInverse(VP, true);
+            SSAOTech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
+            SSAOTech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
+          },
         },
         { // copy to screen
           name: "CopyToScreen",
           enableColorClear: false,
           inputs: () => {
             let cs: string;
-            if (this.enableTAA) {
-              cs = this.isEvenTick ? "TAAHistoryB" : "TAAHistoryA"
-            } else {
-              cs = "sceneResult"
-            }
+            // if (this.enableTAA) {
+            //   cs = this.isEvenTick ? "TAAHistoryB" : "TAAHistoryA"
+            // } else {
+            //   cs = "sceneResult"
+            // }
+            cs = this.isEvenTick ? "SSAOHistoryB" : "SSAOHistoryA"
             return {
               copySource: cs
             }
+          },
+          afterPassExecute: () => {
+            this.sampleCount++;
           },
           technique: 'copyTech',
           source: ['artgl.screenQuad'],
