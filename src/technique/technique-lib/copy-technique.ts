@@ -17,7 +17,7 @@ const fragmentShaderSource =
     void main() {
       vec3 color = texture2D(basic, v_uv).rgb;
       vec3 aocolor = texture2D(tssao, v_uv).rgb;
-      aocolor = vec3(1.0) - u_tssaoComposeRate * (vec3(1.0) - aocolor);
+      aocolor = vec3(1.0) - u_tssaoComposeRate * (vec3(1.0) - aocolor) * vec3(min(u_sampleCount / u_tssaoShowThreshold, 1.0));
       aocolor = clamp(aocolor + vec3(u_tssaoComposeThreshold), vec3(0.0), vec3(1.0));
       gl_FragColor = vec4(color * aocolor, 1.0);
     }
@@ -34,6 +34,8 @@ export class CopyTechnique extends Technique {
         uniforms:[
           {name: 'u_tssaoComposeRate',  default: 1.0, type: GLDataType.float},
           {name: 'u_tssaoComposeThreshold',  default: 0.5, type: GLDataType.float},
+          {name: 'u_tssaoShowThreshold',  default: 200, type: GLDataType.float},
+          {name: 'u_sampleCount',  default: 0, type: GLDataType.float},
         ],
         varyings: [
           { name: 'v_uv', type: GLDataType.floatVec2 },

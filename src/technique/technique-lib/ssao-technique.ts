@@ -21,8 +21,7 @@ const fragmentShaderSource =
         return decoded;
     }
 
-    vec4 getWorldPosition(vec2 cood){
-      float depth = UnpackDepth(texture2D(depthResult, cood));
+    vec4 getWorldPosition(vec2 cood, float depth){
       float clipW = VPMatrix[2][3] * depth + VPMatrix[3][3];
       return VPMatrixInverse * (vec4(cood * 2.0 - 1.0, depth, 1.0) * clipW);
     }
@@ -40,16 +39,19 @@ const fragmentShaderSource =
       );
     }
 
-    const float AORadius = 1.0;
     vec3 sampleAO(vec2 cood){
-      vec4 worldPosition = getWorldPosition(cood);
+      float depth =  UnpackDepth(texture2D(depthResult, cood));
+      if (depth >0.999){
+        return vec3(0.5);
+      }
+      vec4 worldPosition = getWorldPosition(cood, depth);
       worldPosition = worldPosition/ worldPosition.w;
-      vec4 newSamplePosition = vec4(AORadius * rand(cood.x + u_sampleCount) * randDir(), 0.0) + worldPosition;
-      // vec4 newSamplePosition = vec4(AORadius * randDir(), 0.0) + worldPosition;
+      vec4 newSamplePosition = vec4(u_aoRadius * rand(cood.x + u_sampleCount) * randDir(), 0.0) + worldPosition;
+      // vec4 newSamplePosition = vec4(u_aoRadius * randDir(), 0.0) + worldPosition;
       vec4 newNDC = VPMatrix * newSamplePosition;
       newNDC = newNDC / newNDC.w;
-      float depth = UnpackDepth(texture2D(depthResult, vec2(newNDC.x / 2.0 + 0.5, newNDC.y / 2.0 + 0.5)));
-      float rate =  newNDC.z > depth ? 0.0 : 1.0;
+      float newDepth = UnpackDepth(texture2D(depthResult, vec2(newNDC.x / 2.0 + 0.5, newNDC.y / 2.0 + 0.5)));
+      float rate =  newNDC.z > newDepth ? 0.0 : 1.0;
       return vec3(rate);
     }
 
@@ -69,23 +71,20 @@ export class SSAOTechnique extends Technique {
           { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
         ],
         uniforms: [
-          {
-            name: 'u_sampleCount', default: 0, type: GLDataType.float,
-          },
-          {
-            name: 'VPMatrixInverse', default: new Matrix4(), type: GLDataType.Mat4,
-          },
+          { name: 'u_sampleCount', default: 0, type: GLDataType.float, },
+          { name: 'VPMatrixInverse', default: new Matrix4(), type: GLDataType.Mat4, },
+          { name: 'u_aoRadius', default: 1.0, type: GLDataType.float, },
         ],
         uniformsIncludes: [
-          { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix,},
-          { name: 'LastVPMatrix', mapInner: InnerSupportUniform.LastVPMatrix,},
+          { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix, },
+          { name: 'LastVPMatrix', mapInner: InnerSupportUniform.LastVPMatrix, },
         ],
         varyings: [
-          {name:'v_uv', type: GLDataType.floatVec2},
+          { name: 'v_uv', type: GLDataType.floatVec2 },
         ],
         textures: [
-          { name: 'depthResult', type: GLTextureType.texture2D},
-          { name: 'AOAcc', type: GLTextureType.texture2D},
+          { name: 'depthResult', type: GLTextureType.texture2D },
+          { name: 'AOAcc', type: GLTextureType.texture2D },
         ],
         vertexShaderString: vertexShaderSource,
         fragmentShaderString: fragmentShaderSource,

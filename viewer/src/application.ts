@@ -160,6 +160,9 @@ export class Application {
             }
             return {basic, tssao}
           },
+          beforePassExecute: () =>{
+            copyTech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
+          },
           afterPassExecute: () => {
             this.sampleCount++;
           },
