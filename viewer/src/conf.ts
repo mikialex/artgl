@@ -73,6 +73,53 @@ export function createConf(app: Application): RenderConfig {
                 },
               },
             ]
+          },
+          {
+            name: 'TSSAO',
+            value: [
+              {
+                name: 'enable',
+                value: app.enableTSSAO,
+                onChange: (value: boolean) => {
+                  app.enableTSSAO = value;
+                  if (!value) {
+                    app.composeTech.uniforms.get('u_tssaoComposeRate').setValue(0);
+                  } else {
+                    app.composeTech.uniforms.get('u_tssaoComposeRate').setValue(1.0);
+                  }
+                },
+              },
+              {
+                name: 'composeRate',
+                value: app.composeTech.uniforms.get('u_tssaoComposeRate').value,
+                onChange: (value: number) => {
+                  app.composeTech.uniforms.get('u_tssaoComposeRate').setValue(value);
+                },
+                editors: [
+                  {
+                    type: 'slider',
+                    min: 0,
+                    max: 2,
+                    step: 0.1
+                  },
+                ]
+              },
+              {
+                name: 'composeThreshold',
+                value: app.composeTech.uniforms.get('u_tssaoComposeThreshold').value,
+                onChange: (value: number) => {
+                  app.composeTech.uniforms.get('u_tssaoComposeThreshold').setValue(value);
+                },
+                editors: [
+                  {
+                    type: 'slider',
+                    min: 0,
+                    max: 1,
+                    step: 0.05
+                  },
+                ]
+              },
+            ]
           }
         ]
       },

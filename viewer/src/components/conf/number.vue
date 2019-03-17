@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="number-editor">
     <input type="number" v-model="_value">
   </div>
 </template>
@@ -25,3 +25,10 @@ export default class NumberEditor extends Vue {
 
 
 </script>
+
+<style lang="scss" scoped>
+.number-editor{
+  width: 80px;
+}
+</style>
+
