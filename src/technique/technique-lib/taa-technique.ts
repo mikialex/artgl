@@ -53,7 +53,6 @@ const fragmentShaderSource =
       vec2 cood = getLastPixelPosition(v_uv);
       vec3 oldColor = texture2D(TAAHistoryOld, cood).rgb;
       vec3 newColor = texture2D(sceneResult, v_uv).rgb;
-      newColor -= texture2D(AOAcc, cood).rgb * 0.1;
       // if(abs(lightness(newColor) - lightness(oldColor)) > 0.1){
       //   rate = 1.0;
       // }
@@ -103,7 +102,6 @@ export class TAATechnique extends Technique {
           { name: 'TAAHistoryOld', type: GLTextureType.texture2D},
           { name: 'sceneResult', type: GLTextureType.texture2D},
           { name: 'depthResult', type: GLTextureType.texture2D},
-          { name: 'AOAcc', type: GLTextureType.texture2D},
         ],
         vertexShaderString: vertexShaderSource,
         fragmentShaderString: fragmentShaderSource,

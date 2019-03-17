@@ -73,6 +73,84 @@ export function createConf(app: Application): RenderConfig {
                 },
               },
             ]
+          },
+          {
+            name: 'TSSAO',
+            value: [
+              {
+                name: 'enable',
+                value: app.enableTSSAO,
+                onChange: (value: boolean) => {
+                  app.enableTSSAO = value;
+                  if (!value) {
+                    app.composeTech.uniforms.get('u_tssaoComposeRate').setValue(0);
+                  } else {
+                    app.composeTech.uniforms.get('u_tssaoComposeRate').setValue(1.0);
+                  }
+                },
+              },
+              {
+                name: 'composeRate',
+                value: app.composeTech.uniforms.get('u_tssaoComposeRate').value,
+                onChange: (value: number) => {
+                  app.composeTech.uniforms.get('u_tssaoComposeRate').setValue(value);
+                },
+                editors: [
+                  {
+                    type: 'slider',
+                    min: 0,
+                    max: 2,
+                    step: 0.1
+                  },
+                ]
+              },
+              {
+                name: 'composeThreshold',
+                value: app.composeTech.uniforms.get('u_tssaoComposeThreshold').value,
+                onChange: (value: number) => {
+                  app.composeTech.uniforms.get('u_tssaoComposeThreshold').setValue(value);
+                },
+                editors: [
+                  {
+                    type: 'slider',
+                    min: 0,
+                    max: 1,
+                    step: 0.05
+                  },
+                ]
+              },
+              {
+                name: 'radius',
+                value: app.tssaoTech.uniforms.get('u_aoRadius').value,
+                onChange: (value: number) => {
+                  app.tssaoTech.uniforms.get('u_aoRadius').setValue(value);
+                  app.sampleCount = 0;
+                },
+                editors: [
+                  {
+                    type: 'slider',
+                    min: 0.1,
+                    max: 10,
+                    step: 0.1
+                  },
+                ]
+              },
+              {
+                name: 'sample_count_to_show',
+                value: app.composeTech.uniforms.get('u_tssaoShowThreshold').value,
+                onChange: (value: number) => {
+                  app.composeTech.uniforms.get('u_tssaoShowThreshold').setValue(value);
+                },
+                editors: [
+                  {
+                    type: 'slider',
+                    min: 1,
+                    max: 1000,
+                    step: 20
+                  },
+                ]
+              },
+            ]
           }
         ]
       },

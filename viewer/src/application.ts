@@ -25,8 +25,15 @@ export class Application {
   active: boolean = false;
   interactor: Interactor;
   orbitControler: OrbitController;
+
   taaTech: TAATechnique;
   enableTAA = true;
+
+  enableTSSAO = true;
+  tssaoTech: SSAOTechnique;
+
+  composeTech: CopyTechnique;
+
   conf: RenderConfig;
   private tickNum = 0;
   get isEvenTick() {
@@ -46,11 +53,14 @@ export class Application {
     this.graph.registSource('AllScreen', this.scene)
     const TAATech = new TAATechnique();
     const SSAOTech = new SSAOTechnique();
+    const copyTech = new CopyTechnique();
     this.taaTech = TAATech;
+    this.tssaoTech = SSAOTech;
+    this.composeTech = copyTech;
     this.graph.registTechnique('depthTech', new DepthTechnique())
     this.graph.registTechnique('TAATech', TAATech)
     this.graph.registTechnique('SSAO', SSAOTech)
-    this.graph.registTechnique('copyTech', new CopyTechnique());
+    this.graph.registTechnique('copyTech', copyTech);
     this.graph.setGraph({
       renderTargets: [
         {
@@ -99,7 +109,6 @@ export class Application {
               sceneResult: "sceneResult",
               depthResult: "depthResult",
               TAAHistoryOld: this.isEvenTick ? "TAAHistoryA" : "TAAHistoryB",
-              AOAcc: this.isEvenTick ? "SSAOHistoryB" : "SSAOHistoryA",
             }
           },
           technique: 'TAATech',
@@ -137,16 +146,22 @@ export class Application {
           name: "CopyToScreen",
           enableColorClear: false,
           inputs: () => {
-            let cs: string;
-            // if (this.enableTAA) {
-            //   cs = this.isEvenTick ? "TAAHistoryB" : "TAAHistoryA"
-            // } else {
-            //   cs = "sceneResult"
-            // }
-            cs = this.isEvenTick ? "SSAOHistoryB" : "SSAOHistoryA"
-            return {
-              copySource: cs
+            let basic: string;
+            let tssao: string;
+            if (this.enableTAA) {
+              basic = this.isEvenTick ? "TAAHistoryB" : "TAAHistoryA"
+            } else {
+              basic = "sceneResult"
             }
+            if (this.enableTSSAO){
+              tssao = this.isEvenTick ? "SSAOHistoryB" : "SSAOHistoryA"
+            }else{
+              tssao = "sceneResult" // TODO consider design a way to bind default empty source? or recompile shader?
+            }
+            return {basic, tssao}
+          },
+          beforePassExecute: () =>{
+            copyTech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
           },
           afterPassExecute: () => {
             this.sampleCount++;
