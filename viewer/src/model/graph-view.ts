@@ -19,9 +19,53 @@ export class GraphView {
       view.passNodeMap.set(node.uuid, nodeView)
       view.passNodes.push(nodeView);
     })
+
+    view.passNodes.forEach(node => {
+      node.inputsID.forEach(id => {
+        node.inputs.push(view.passNodeMap.get(id));
+      })
+    })
+
+    genGraphLayout(view, view.passNodeMap.get(graph.getRootScreenTargetNode().uuid))
+
     return view;
   }
 
+}
+
+function genGraphLayout(view: GraphView, rootNode: GraphNodeView) {
+  const horizonArray = [];
+  function addNode(node: GraphNodeView, horiPosition: number) {
+    let arr = horizonArray[horiPosition];
+    if (arr === undefined) {
+      horizonArray[horiPosition] = [];
+      arr = horizonArray[horiPosition];
+    }
+    let found = false;
+    for (let i = 0; i < arr.length; i++) {
+      const element = arr[i];
+      if (element === node) {
+        found = true;
+      }
+    }
+    if (!found) {
+      arr.push(node) 
+    }
+    node.inputs.forEach(input => {
+      addNode(input, horiPosition + 1);
+    })
+  }
+  addNode(rootNode, 0);
+  const rightBorder = 1500;
+  const canvasHeigth = 800;
+  const gridSize = 300;
+  horizonArray.reverse().forEach((row, indexRow) => {
+    const perItemHeight = canvasHeigth / row.length;
+    row.forEach((item: GraphNodeView, indexY: number) => {
+      item.positionX = indexRow * gridSize;
+      item.positionY = indexY * perItemHeight
+    })
+  })
 }
 
 export class GraphNodeView {
@@ -31,7 +75,8 @@ export class GraphNodeView {
   height: number = 200;
   positionX: number = 0;
   positionY: number = 0;
-  inputsID: string[];
+  inputsID: string[] = [];
+  inputs: GraphNodeView[] = [];
 
   static create(node: DAGNode) {
     const view = new GraphNodeView();

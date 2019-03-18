@@ -2,7 +2,6 @@
   <NodeWrap 
   :node="view"
   :boardInfo="boardInfo">
-
   </NodeWrap>
 </template>
 

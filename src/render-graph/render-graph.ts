@@ -78,6 +78,16 @@ export class RenderGraph {
     return this.passNodes.get(name);
   }
 
+  getRootScreenTargetNode() {
+    let screenNode;
+    this.renderTargetNodes.forEach(node => {
+      if (node.isScreenNode) {
+        screenNode = node;
+      }
+    })
+    return screenNode;
+  }
+
   private allocaterenderTargetNodes(textsDefine: RenderTextureDefine[]) {
     textsDefine.forEach(define => {
       if (this.renderTargetNodes.has(define.name)) {
