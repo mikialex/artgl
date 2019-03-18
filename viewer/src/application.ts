@@ -7,7 +7,7 @@ import { DimensionType, PixelFormat } from '../../src/render-graph/interface';
 import { TAATechnique } from '../../src/technique/technique-lib/taa-technique';
 import { SSAOTechnique } from '../../src/technique/technique-lib/ssao-technique';
 import { DepthTechnique } from '../../src/technique/technique-lib/depth-technique';
-import { CopyTechnique } from '../../src/technique/technique-lib/copy-technique';
+import { BlendTechnique } from '../../src/technique/technique-lib/blend-technique';
 import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
 import hierachyBallBuilder from './scene/hierachy-balls';
 import { createConf } from './conf';
@@ -32,7 +32,7 @@ export class Application {
   enableTSSAO = true;
   tssaoTech: SSAOTechnique;
 
-  composeTech: CopyTechnique;
+  composeTech: BlendTechnique;
 
   conf: RenderConfig;
   private tickNum = 0;
@@ -53,7 +53,7 @@ export class Application {
     this.graph.registSource('AllScreen', this.scene)
     const TAATech = new TAATechnique();
     const SSAOTech = new SSAOTechnique();
-    const copyTech = new CopyTechnique();
+    const copyTech = new BlendTechnique();
     this.taaTech = TAATech;
     this.tssaoTech = SSAOTech;
     this.composeTech = copyTech;
