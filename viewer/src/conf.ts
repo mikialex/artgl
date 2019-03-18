@@ -99,7 +99,7 @@ export function createConf(app: Application): RenderConfig {
                   {
                     type: 'slider',
                     min: 0,
-                    max: 2,
+                    max: 4,
                     step: 0.1
                   },
                 ]
@@ -114,8 +114,8 @@ export function createConf(app: Application): RenderConfig {
                   {
                     type: 'slider',
                     min: 0,
-                    max: 1,
-                    step: 0.05
+                    max: 4,
+                    step: 0.1
                   },
                 ]
               },
