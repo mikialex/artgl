@@ -79,16 +79,8 @@ export default class NodeUIWrap extends Vue {
   originY = 0;
   screenOriginX = 0;
   screenOriginY = 0;
-  viewport = new Vector4();
   updateViewPortToGraph() {
-    this.viewport.set(
-      this.node.positionX,
-      this.boardInfo.height - this.node.positionY - this.node.height,
-      this.node.width,
-      this.node.height
-    );
-    this.viewport.multiplyScalar(window.devicePixelRatio);
-    GLApp.graph.updateRenderTargetDebugView(this.node.uuid, this.viewport);
+    this.$emit("updateviewport", this.node)
   }
 
   mounted() {

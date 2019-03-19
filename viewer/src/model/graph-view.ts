@@ -7,6 +7,7 @@ export class GraphView {
   passNodes: GraphNodeView[] = [];
   targetNodes: GraphNodeView[] = [];
   passNodeMap: Map<string, GraphNodeView> = new Map();
+  rootNode: GraphNodeView
   static create(graph: RenderGraph) {
     const view = new GraphView;
     graph.passNodes.forEach(node => {
@@ -25,15 +26,18 @@ export class GraphView {
         node.inputs.push(view.passNodeMap.get(id));
       })
     })
+    view.rootNode = view.passNodeMap.get(graph.getRootScreenTargetNode().uuid)
 
-    genGraphLayout(view, view.passNodeMap.get(graph.getRootScreenTargetNode().uuid))
-
+    view.layout();
     return view;
   }
 
+  layout() {
+    genGraphLayout(this.rootNode)
+  }
 }
 
-function genGraphLayout(view: GraphView, rootNode: GraphNodeView) {
+function genGraphLayout(rootNode: GraphNodeView) {
   const horizonArray = [];
   function removeItem(node: GraphNodeView){
     horizonArray.forEach((row: GraphNodeView[])=> {

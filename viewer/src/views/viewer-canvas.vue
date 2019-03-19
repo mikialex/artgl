@@ -31,10 +31,12 @@ export default class ViewerCanvas extends Vue {
 
   inspectGraph(){
     this.graphView = GraphView.create(GLApp.graph);
+    GLApp.graph.enableDebuggingView = true;
   }
 
   closeGraphInspector(){
     this.graphView = null;
+    GLApp.graph.enableDebuggingView = false;
   }
 
   run(){

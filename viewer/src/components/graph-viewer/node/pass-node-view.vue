@@ -1,7 +1,9 @@
 <template>
   <NodeWrap 
   :node="view"
-  :boardInfo="boardInfo">
+  :boardInfo="boardInfo"
+  @updateviewport = "reEmit"
+  >
   </NodeWrap>
 </template>
 
@@ -17,6 +19,10 @@ import NodeWrap from '../node-view.vue';
 export default class PassNodeView extends Vue {
 @Prop() view;
 @Prop() boardInfo;
+
+reEmit(node){
+  this.$emit("updateviewport", node)
+}
 
 }
 </script>

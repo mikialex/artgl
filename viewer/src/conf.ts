@@ -154,19 +154,6 @@ export function createConf(app: Application): RenderConfig {
           }
         ]
       },
-
-      {
-        name: 'renderGraph',
-        value: [
-          {
-            name: 'enableDebugView',
-            value: app.graph.enableDebuggingView,
-            onChange: (value: boolean) => {
-              app.graph.enableDebuggingView = value;
-            },
-          },
-        ]
-      },
     ]
 
   }

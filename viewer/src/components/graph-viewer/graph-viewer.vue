@@ -11,6 +11,7 @@
         :key="node.uuid"
         :view="node"
         :boardInfo="board"
+         @updateviewport = "updateViewport"
       />
 
       <PassNode
@@ -18,6 +19,7 @@
         :key="node.uuid"
         :view="node"
         :boardInfo="board"
+        @updateviewport = "updateViewport"
       />
     </div>
 
@@ -37,24 +39,24 @@
     <div class="mask"
       v-if="showMove"
       @mousedown ="startDrag"
-    ></div>
-    <button 
-    class="popbutton"
-    v-if="!showMove"
-     @click="showMove = true">move</button>
+    >
+    </div>
 
-    <button 
-    class="popbutton"
-    v-if="showMove"
-     @click="showMove = false">unmove</button>
+    <div class="ops">
+      <button v-if="!showMove" @click="showMove = true">move</button>
+      <button  v-if="showMove" @click="showMove = false">unmove</button>
+      <button  @click="layout">relayout</button>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { GraphView } from "../../model/graph-view";
+import { GraphView, GraphNodeView } from "../../model/graph-view";
 import PassNode from "./node/pass-node-view.vue";
+import { Vector4 } from "../../../../src/math/vector4";
 import NodeWrap from "./node-view.vue";
+import { GLApp } from "../../application";
 
 @Component({
   components: {
@@ -99,9 +101,35 @@ export default class GraphViewer extends Vue {
   }
 
   dragging(e){
-    console.log(e.screenX)
     this.board.transformX = this.originTransformX + e.screenX - this.screenOriginX;
     this.board.transformY = this.originTransformY + e.screenY - this.screenOriginY;
+    this.updateAllViewports();
+  }
+
+  updateViewport(node: GraphNodeView){
+    const viewport = new Vector4();
+    viewport.set(
+      node.positionX + this.board.transformX,
+      this.board.height - node.positionY - node.height - this.board.transformY,
+      node.width,
+      node.height
+    );
+    viewport.multiplyScalar(window.devicePixelRatio);
+    GLApp.graph.updateRenderTargetDebugView(node.uuid, viewport);
+  }
+
+  updateAllViewports(){
+    this.graphview.targetNodes.forEach(node =>{
+      this.updateViewport(node)
+    })
+    this.graphview.passNodes.forEach(node =>{
+      this.updateViewport(node)
+    })
+  }
+
+  layout(){
+    this.graphview.layout()
+    this.updateAllViewports();
   }
 
   mounted() {
@@ -109,6 +137,7 @@ export default class GraphViewer extends Vue {
     this.board.offsetY = this.$el.getBoundingClientRect().top;
     this.board.width = this.$el.clientWidth;
     this.board.height = this.$el.clientHeight;
+    this.updateAllViewports();
   }
 
   get lines() {
@@ -158,7 +187,7 @@ export default class GraphViewer extends Vue {
   pointer-events: auto;
 }
 
-.popbutton{
+.ops{
   top:0px;
   left:0px;
   position: absolute;
