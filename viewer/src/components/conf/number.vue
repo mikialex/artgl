@@ -28,7 +28,10 @@ export default class NumberEditor extends Vue {
 
 <style lang="scss" scoped>
 .number-editor{
-  width: 80px;
+  width: 100px;
+  >input{
+    width: 80px;
+  }
 }
 </style>
 

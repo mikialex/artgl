@@ -1,30 +1,52 @@
 <template>
-  <div class="graph-viewer">
-    <PassNode 
-    v-for="node in graphview.passNodes" 
-    :key="node.uuid" 
-    :view="node" 
-    :boardInfo="board"/>
+  <div class="graph-viewer" 
+  tabindex="-1">
+    <div class="graph-wrap"
+      :style="{
+          transform
+        }"
+    >
+      <PassNode
+        v-for="node in graphview.passNodes"
+        :key="node.uuid"
+        :view="node"
+        :boardInfo="board"
+      />
 
-    <PassNode
-      v-for="node in graphview.targetNodes"
-      :key="node.uuid"
-      :view="node"
-      :boardInfo="board"
-    />
+      <PassNode
+        v-for="node in graphview.targetNodes"
+        :key="node.uuid"
+        :view="node"
+        :boardInfo="board"
+      />
+    </div>
 
-    <svg class="connection" 
-    :width="board.width + 'px'" 
-    :height="board.height + 'px'">
-      <path
-        class="connect"
-        v-for="line in lines"
-        :key="line.id"
-        :d="line.line"
-        stroke="black"
-        fill="transparent"
-      ></path>
-    </svg>
+      <svg class="connection"
+      :width="board.width + 'px'" 
+      :height="board.height + 'px'">
+        <path
+          class="connect"
+          v-for="line in lines"
+          :key="line.id"
+          :d="line.line"
+          stroke="black"
+          fill="transparent"
+        ></path>
+      </svg>
+
+    <div class="mask"
+      v-if="showMove"
+      @mousedown ="startDrag"
+    ></div>
+    <button 
+    class="popbutton"
+    v-if="!showMove"
+     @click="showMove = true">move</button>
+
+    <button 
+    class="popbutton"
+    v-if="showMove"
+     @click="showMove = false">unmove</button>
   </div>
 </template>
 
@@ -47,8 +69,40 @@ export default class GraphViewer extends Vue {
     offsetX: 0,
     offsetY: 0,
     width: 10,
-    height: 10
+    height: 10,
+    transformX :100,
+    transformY :100,
   };
+
+  get transform(){
+    return `translate(${this.board.transformX}px, ${this.board.transformY}px)`
+  }
+
+  showMove = false;
+
+  isDraging = false;
+  originTransformX: number;
+  originTransformY: number;
+  screenOriginX:number;
+  screenOriginY:number;
+  startDrag(e){
+    this.isDraging = true;
+    this.screenOriginX = e.screenX;
+    this.screenOriginY = e.screenY;
+    this.originTransformX = this.board.transformX;
+    this.originTransformY = this.board.transformY;
+    window.addEventListener("mousemove", this.dragging);
+    window.addEventListener("mouseup", e => {
+      this.isDraging = false;
+      window.removeEventListener("mousemove", this.dragging);
+    });
+  }
+
+  dragging(e){
+    console.log(e.screenX)
+    this.board.transformX = this.originTransformX + e.screenX - this.screenOriginX;
+    this.board.transformY = this.originTransformY + e.screenY - this.screenOriginY;
+  }
 
   mounted() {
     this.board.offsetX = this.$el.getBoundingClientRect().left;
@@ -60,10 +114,10 @@ export default class GraphViewer extends Vue {
   get lines() {
     let lines = [];
     this.graphview.passNodes.forEach(node => {
-      lines = lines.concat(node.getConnectionLines(this.graphview));
+      lines = lines.concat(node.getConnectionLines(this.graphview, this.board));
     });
     this.graphview.targetNodes.forEach(node => {
-      lines = lines.concat(node.getConnectionLines(this.graphview));
+      lines = lines.concat(node.getConnectionLines(this.graphview, this.board));
     });
     return lines;
   }
@@ -78,6 +132,7 @@ export default class GraphViewer extends Vue {
   left: 0px;
   width: 100%;
   height: calc(100% - 40px);
+  overflow: hidden;
 }
 
 .connector {
@@ -87,5 +142,26 @@ export default class GraphViewer extends Vue {
   width: 100%;
   height: calc(100% - 40px);
   z-index: -10;
+}
+
+.graph-wrap {
+  // position: relative;
+}
+
+.mask {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  top:0px;
+  left:0px;
+  position: absolute;
+  pointer-events: auto;
+}
+
+.popbutton{
+  top:0px;
+  left:0px;
+  position: absolute;
+  pointer-events: auto;
 }
 </style>

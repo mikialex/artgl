@@ -35,22 +35,22 @@ export class GraphView {
 
 function genGraphLayout(view: GraphView, rootNode: GraphNodeView) {
   const horizonArray = [];
+  function removeItem(node: GraphNodeView){
+    horizonArray.forEach((row: GraphNodeView[])=> {
+      row = row.filter(item => {
+        return item !== node;
+      })
+    })
+  }
   function addNode(node: GraphNodeView, horiPosition: number) {
     let arr = horizonArray[horiPosition];
     if (arr === undefined) {
       horizonArray[horiPosition] = [];
       arr = horizonArray[horiPosition];
     }
-    let found = false;
-    for (let i = 0; i < arr.length; i++) {
-      const element = arr[i];
-      if (element === node) {
-        found = true;
-      }
-    }
-    if (!found) {
-      arr.push(node) 
-    }
+    removeItem(node);
+    arr.push(node) 
+    
     node.inputs.forEach(input => {
       addNode(input, horiPosition + 1);
     })
@@ -95,16 +95,16 @@ export class GraphNodeView {
     return view;
   }
 
-  getConnectionLines(graph: GraphView) {
+  getConnectionLines(graph: GraphView, boardInfo) {
     return this.inputsID.map(id => {
       const inputNode = graph.passNodeMap.get(id);
       return {
         id: this.uuid + inputNode.uuid,
         line: createConectionSVGLine(
-          inputNode.positionX + inputNode.width,
-          inputNode.positionY + inputNode.height / 2,
-          this.positionX,
-          this.positionY + this.height / 2
+          inputNode.positionX + inputNode.width + boardInfo.transformX,
+          inputNode.positionY + inputNode.height / 2 + boardInfo.transformY,
+          this.positionX + boardInfo.transformX,
+          this.positionY + this.height / 2 + boardInfo.transformY
         )
       }
     })
@@ -115,7 +115,8 @@ export class GraphNodeView {
 
 function createConectionSVGLine(
   x1: number, y1: number,
-  x2: number, y2: number) {
+  x2: number, y2: number,
+  ) {
   const anchorStartX = (x1 + x2) * 0.5;
   return 'M ' + x1 + ' ' +
     y1 +

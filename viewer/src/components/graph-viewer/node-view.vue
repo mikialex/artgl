@@ -1,15 +1,19 @@
 <template>
-  <div class="node-wrap"
-  :style="{
+  <div
+    class="node-wrap"
+    :style="{
     left: viewPositionX,
     top: viewPositionY,
     width: viewWidth,
     height: viewHeight,
-  }">
-
-    <div class="node-title" @mousedown="startdrag"
+  }"
+  >
+    <div
+      class="node-title"
+      @mousedown="startdrag"
       :style="{cursor: this.isDraging? 'grabbing': ''}"
-    :class="{'canteval-node':!node.cashadowl}">
+      :class="{'canteval-node':!node.cashadowl}"
+    >
       <span>{{node.name}}</span>
     </div>
 
@@ -36,20 +40,19 @@
         @click="removeDependency(input)"></div>
         {{input.name}}
       </div>
-    </div> -->
-
+    </div>-->
     <slot></slot>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { GraphNodeView, GraphView } from '../../model/graph-view';
+import { GraphNodeView, GraphView } from "../../model/graph-view";
 import { Vector4 } from "../../../../src/math/vector4";
 import { GLApp } from "../../application";
 
 @Component({
-  name: 'NodeWrap'
+  name: "NodeWrap"
 })
 export default class NodeUIWrap extends Vue {
   @Prop() node: GraphNodeView;
@@ -64,10 +67,10 @@ export default class NodeUIWrap extends Vue {
     return this.node.positionY + "px";
   }
 
-  get viewWidth(){
+  get viewWidth() {
     return this.node.width + "px";
-  } 
-  get viewHeight(){
+  }
+  get viewHeight() {
     return this.node.height + "px";
   }
 
@@ -77,30 +80,32 @@ export default class NodeUIWrap extends Vue {
   screenOriginX = 0;
   screenOriginY = 0;
   viewport = new Vector4();
-  updateViewPortToGraph(){
+  updateViewPortToGraph() {
     this.viewport.set(
-      this.node.positionX, 
-      this.boardInfo.height - this.node.positionY - this.node.height, 
-      this.node.width, 
-      this.node.height, 
-    )
+      this.node.positionX,
+      this.boardInfo.height - this.node.positionY - this.node.height,
+      this.node.width,
+      this.node.height
+    );
     this.viewport.multiplyScalar(window.devicePixelRatio);
     GLApp.graph.updateRenderTargetDebugView(this.node.uuid, this.viewport);
   }
 
-  mounted(){
+  mounted() {
     this.updateViewPortToGraph();
   }
 
   dragging(e: MouseEvent) {
-    this.node.positionX = this.originX + e.screenX - this.screenOriginX;
-    this.node.positionY = this.originY + e.screenY - this.screenOriginY;
+    this.node.positionX = this.originX + e.screenX - this.screenOriginX - this.boardInfo.transformX;
+    this.node.positionY = this.originY + e.screenY - this.screenOriginY - this.boardInfo.transformY;
     this.updateViewPortToGraph();
   }
   startdrag(e: MouseEvent) {
     this.isDraging = true;
-    this.originX = this.$el.getBoundingClientRect().left - this.boardInfo.offsetX ;
-    this.originY = this.$el.getBoundingClientRect().top - this.boardInfo.offsetY;
+    this.originX =
+      this.$el.getBoundingClientRect().left - this.boardInfo.offsetX;
+    this.originY =
+      this.$el.getBoundingClientRect().top - this.boardInfo.offsetY;
     this.screenOriginX = e.screenX;
     this.screenOriginY = e.screenY;
     window.addEventListener("mousemove", this.dragging);
@@ -109,7 +114,6 @@ export default class NodeUIWrap extends Vue {
       window.removeEventListener("mousemove", this.dragging);
     });
   }
-
 }
 </script>
 
