@@ -1,7 +1,7 @@
 import { Vector3 } from '../../../src/math';
 import { SceneNode } from '../../../src/scene/scene-node';
 import { Scene } from '../../../src/scene/scene';
-import { Mesh, OBJLoader, NormalTechnique, Geometry } from '../../../src/artgl';
+import { Mesh, OBJLoader, NormalTechnique, Geometry, Material } from '../../../src/artgl';
 import { loadStringFromFile } from '../../../src/util/file-io';
 
  
@@ -38,7 +38,28 @@ export class GeometryView{
         dataByteSize: geometry.indexBuffer.getDataSizeByte()
       })
     }
-    geometry.bufferDatas
+    return view;
+  }
+}
+
+export class MaterialView{
+  uuid: string;
+  name: string;
+  static create(material: Material): MaterialView {
+    const view = new MaterialView();
+    view.uuid = material.uuid;
+    // view.name = geometry.name === undefined ? 'unnamed' : geometry.name;
+    // view.buffers = [];
+    // for (const key in geometry.bufferDatas) {
+    //   if (geometry.bufferDatas.hasOwnProperty(key)) {
+    //     const bufferdata = geometry.bufferDatas[key];
+    //     view.buffers.push({
+    //       name: key,
+    //       type: 'bufferdata',
+    //       dataByteSize: bufferdata.getDataSizeByte()
+    //     })
+    //   }
+    // }
     return view;
   }
 }
@@ -46,13 +67,20 @@ export class GeometryView{
 export class SceneView{
   root: SceneNodeView
   geometries: Map<string, GeometryView> = new Map();
+  materials: Map<string, MaterialView> = new Map();
   
   collectEntity(node: SceneNode) {
     if (node instanceof Mesh) {
       const geometry = node.geometry;
+      const material = node.material;
       if (geometry !== undefined) {
         if (!this.geometries.has(geometry.uuid)) {
           this.geometries.set(geometry.uuid, GeometryView.create(geometry));
+        }
+      }
+      if (material !== undefined) {
+        if (!this.geometries.has(material.uuid)) {
+          this.materials.set(material.uuid, MaterialView.create(material));
         }
       }
     }

@@ -11,7 +11,7 @@
         <BooleanEditor
           v-if="typeof config.value === 'boolean'"
           v-model="configValue"/>
-          <button  
+        <button class="expand-editor"
           @click="expandEditor = !expandEditor"
           v-if="shouldHaveCustomEditor">&</button>
       </div>
@@ -76,6 +76,7 @@ export default class ConfigItem extends Vue {
 .item-name{
   color:#444;
 }
+
 </style>
 
 

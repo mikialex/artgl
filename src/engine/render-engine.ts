@@ -16,6 +16,10 @@ import { Nullable } from "../type";
 import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
 import { UniformProxy } from "./uniform-proxy";
 import { Observable } from "../core/observable";
+import { GLFramebuffer } from '../webgl/gl-framebuffer';
+import { QuadSource } from '../render-graph/quad-source';
+import { CopyTechnique } from '../technique/technique-lib/copy-technique';
+import { downloadCanvasPNGImage } from "../util/file-io";
 
 export interface RenderSource{
   getRenderList(): RenderList;
@@ -25,6 +29,10 @@ export interface Size{
   width: number;
   height: number;
 }
+
+
+const copyTechnique = new CopyTechnique();
+const quad = new QuadSource();
 
 export class ARTEngine {
   constructor(el?: HTMLCanvasElement, options?: any) {
@@ -164,6 +172,22 @@ export class ARTEngine {
     // render
     this.renderer.render(DrawMode.TRIANGLES, program.useIndexDraw);
   }
+
+  renderDebugFrameBuffer(framebuffer: GLFramebuffer) {
+    this.renderer.setRenderTargetScreen();
+    const debugViewPort = framebuffer.debuggingViewport;
+    this.renderer.state.setViewport(
+      debugViewPort.x, debugViewPort.y,
+      debugViewPort.z, debugViewPort.w
+    );
+
+    this.overrideTechnique = copyTechnique;
+    this.overrideTechnique.getProgram(this).defineFrameBufferTextureDep(
+      framebuffer.name, 'copySource'
+    );
+    this.render(quad);
+    this.overrideTechnique = null;
+  }
   ////
 
 
@@ -183,10 +207,10 @@ export class ARTEngine {
     this.globalUniforms.get(InnerSupportUniform.MMatrix).setValue(object.worldMatrix);
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
     technique.uniforms.forEach((uni, key) => {
-      if (uni._needUpdate) {
+      // if (uni._needUpdate) {
         program.setUniform(key, uni.value);
         uni.resetUpdate();
-      }
+      // }
     })
     return program;
   }
@@ -198,7 +222,10 @@ export class ARTEngine {
 
       // aquire texuture from material or framebuffers
       if (material !== undefined) {
-        const texture = material.getChannelTexture(tex.name);
+        if (tex.channel === undefined) {
+          throw 'use texture in material / use material to render should set textureuniform channel type'
+        }
+        const texture = material.getChannelTexture(tex.channel);
         if (texture.gltextureId === undefined) {
           texture.gltextureId = this.renderer.textureManger.createTextureFromImageElement(texture.image);
           webgltexture = this.renderer.textureManger.getGLTexture(texture.gltextureId);
@@ -271,17 +298,14 @@ export class ARTEngine {
     const id = texture.gltextureId;
     return this.renderer.getGLTexture(id);
   }
-
+  private programTechniqueMap: Map<Technique, GLProgram> = new Map();
   getProgram(technique: Technique): GLProgram {
-    const id = technique.programId;
-    const program = this.renderer.getProgram(id);
-    return program;
+    return this.programTechniqueMap.get(technique);
   }
 
   createProgram(technique: Technique): GLProgram  {
     const program = this.renderer.createProgram(technique.config.programConfig);
-    technique.programId = program.id;
-    technique.needUpdate = false;
+    this.programTechniqueMap.set(technique, program);
     return program;
   }
 
@@ -291,6 +315,12 @@ export class ARTEngine {
 
   createOrUpdateAttributeBuffer(bufferData: BufferData, useforIndex: boolean): WebGLBuffer {
     return this.renderer.attributeBufferManager.updateOrCreateBuffer(bufferData.data.buffer as ArrayBuffer, useforIndex);
+  }
+
+
+
+  downloadCurrentRender() {
+    downloadCanvasPNGImage(this.renderer.el, 'artgl-renderscreenshot');
   }
 
 

@@ -28,6 +28,10 @@ export class GLFrameBufferManager{
     return framebuffer;
   }
 
+  getFramebuffer(framebufferName: string) {
+    return this.framebuffers.get(framebufferName);
+  }
+
   getFramebufferTexture(framebufferName: string): WebGLTexture{
     const frambuffer = this.framebuffers.get(framebufferName);
     if (frambuffer === undefined) {

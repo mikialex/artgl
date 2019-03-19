@@ -1,6 +1,7 @@
 import { GLRenderer } from "./gl-renderer";
 import { generateUUID } from "../math/uuid";
 import { TextureFilter, TextureWrap } from "./const";
+import { Texture } from "../core/texture";
 
 enum TextureFormat {
   RGBA,
@@ -24,6 +25,11 @@ const DefaultTextureDescriptor = {
   tWrap: TextureWrap.clampToEdge,
 }
 
+interface WebGLTextureWithVersionIDWrap{
+  version: number;
+  texture: WebGLTexture;
+}
+
 /**
  * responsible for webgltexture resource allocation and deallocation
  * outside request create webgltexture from given source or description
@@ -37,6 +43,7 @@ export class GLTextureManager{
   }
   readonly renderer: GLRenderer;
   private textures: { [index: string]: WebGLTexture } = {};
+  // private textures: Map<Texture, WebGLTextureWithVersionIDWrap> = new Map();
 
   init() {
     const gl = this.renderer.gl;

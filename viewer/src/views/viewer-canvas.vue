@@ -1,12 +1,15 @@
 <template>
   <div class="canvas-wrap">
-    <GraphViewer/>
     <canvas id="viewer-canvas"></canvas>
     <div v-if="!isRuning" class="stop-notation"> STOPPED </div>
+    <GraphViewer v-if="graphView" :graphview="graphView"/>
     <div class="command-bar">
       <button @click="run" v-if="!isRuning">run</button>
       <button @click="stop" v-if="isRuning">stop</button>
       <button @click="step" v-if="!isRuning">step next frame</button>
+      <button @click="screenshot" v-if="!isRuning" disabled>download screenshot</button>
+      <button @click="inspectGraph" >inspectGraph</button>
+      <button @click="closeGraphInspector" v-if="graphView">closeGraphViewer</button>
     </div>
   </div>
 </template>
@@ -14,6 +17,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import {GLApp} from '../application';
+import { GraphView } from '../model/graph-view';
 import GraphViewer from '../components/graph-viewer/graph-viewer.vue';
 
 @Component({
@@ -23,6 +27,15 @@ import GraphViewer from '../components/graph-viewer/graph-viewer.vue';
 })
 export default class ViewerCanvas extends Vue {
   isRuning:boolean = GLApp.active;
+  graphView: GraphView = null;
+
+  inspectGraph(){
+    this.graphView = GraphView.create(GLApp.graph);
+  }
+
+  closeGraphInspector(){
+    this.graphView = null;
+  }
 
   run(){
     GLApp.run();
@@ -36,6 +49,10 @@ export default class ViewerCanvas extends Vue {
 
   step(){
     GLApp.step();
+  }
+
+  screenshot(){
+    GLApp.engine.downloadCurrentRender();
   }
 
 }
@@ -65,7 +82,7 @@ export default class ViewerCanvas extends Vue {
   height: calc(100% - 40px);
   top:0px;
   font-size: 20px;
-  border: 3px solid rgb(235, 90, 90);
+  border: 3px solid rgb(237, 185, 185);
   color:  rgb(235, 90, 90);
   box-sizing: border-box;
 }

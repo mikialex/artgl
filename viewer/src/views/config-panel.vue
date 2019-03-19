@@ -3,7 +3,9 @@
     <div class="panel-title">
       Render configuration
     </div>
-    <Config :config="appConfig"/>
+    <div class="config-wrap">
+      <Config :config="appConfig"/>
+    </div>
   </div>
 </template>
 
@@ -24,11 +26,16 @@ export default class ConfigPanel extends Vue {
 .panel-title{
   font-weight: bold;
   padding: 5px;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .config-panel{
   border: 1px solid #ddd;
+}
+
+.config-wrap{
+  overflow-y: scroll;
+  height: 100%;
 }
 
 </style>

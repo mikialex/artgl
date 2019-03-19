@@ -6,6 +6,8 @@ import { PassDefine, PassInputMapInfo } from "./interface";
 import { RenderTargetNode } from "./dag/render-target-node";
 import { Vector4 } from "../math/vector4";
 import { PassGraphNode } from "./dag/pass-graph-node";
+import { CopyTechnique } from "../technique/technique-lib/copy-technique";
+import { QuadSource } from "./quad-source";
 
 export class RenderPass{
   constructor(graph: RenderGraph, define: PassDefine) {
@@ -79,29 +81,37 @@ export class RenderPass{
   }
   private isOutputScreen: boolean = true;
 
-  private debuggingViewport: Vector4 = new Vector4();
-
   renderDebugResult(engine: ARTEngine) {
-    if (!this.graph.debugViewer.shouldDrawPassDebug) {
-      return;
-    }
-    engine.renderer.setRenderTargetScreen();
-    this.graph.debugViewer.updatePassDebugViewport(this);
-    engine.renderer.state.setViewport(
-      this.debuggingViewport.x, this.debuggingViewport.y,
-      this.debuggingViewport.z, this.debuggingViewport.w
-    );
+    engine.renderDebugFrameBuffer(this.outputTarget)
+    // this will cause no use draw TODO
+    this.inputTarget.forEach((inputFrambufferName, uniformName) => {
+      const framebuffer = engine.renderer.frambufferManager.getFramebuffer(inputFrambufferName);
+      engine.renderDebugFrameBuffer(framebuffer)
+    })
   }
 
+  renderDebugFramebuffer(engine, framebuffer: GLFramebuffer) {
+    engine.renderer.setRenderTargetScreen();
+  }
+
+  static screenDebugViewPort = new Vector4(200, 0, 200, 200)
   execute() {
     const engine = this.graph.engine;
+    // if (this.isOutputScreen) {
+    //   return
+    // }
 
     // setup viewport and render target
     if (this.isOutputScreen) {
+      engine.renderer.setRenderTargetScreen();
       if (this.graph.enableDebuggingView) {
-        // when debug is true , we should use texture to render screen target pass
+        const debugViewPort = RenderPass.screenDebugViewPort;
+        engine.renderer.state.setViewport(
+          debugViewPort.x, debugViewPort.y,
+          debugViewPort.z, debugViewPort.w
+        );
+
       } else {
-        engine.renderer.setRenderTargetScreen();
         engine.renderer.state.setFullScreenViewPort();
       }
     } else {
@@ -153,7 +163,7 @@ export class RenderPass{
     engine.renderer.state.colorbuffer.resetDefaultClearColor();
 
 
-    if (this.graph.enableDebuggingView) {
+    if (this.graph.enableDebuggingView && !this.isOutputScreen) {
       this.renderDebugResult(engine);
     }
 

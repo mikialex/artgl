@@ -11,7 +11,7 @@ export const standradMeshAttributeLayout = [
   { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
 ]
 
-export interface TechniqueConfig{
+export interface TechniqueConfig {
   programConfig: GLProgramConfig;
 }
 
@@ -39,19 +39,19 @@ export class Technique{
   config: TechniqueConfig;
   name: string;
   uuid: string = generateUUID();
-  programId: string;
+  _techniqueId: string;
 
-  needUpdate = true;
   isTransparent = false;
 
   uniforms: Map<string, UniformProxy> = new Map();
 
 
   getProgram(engine: ARTEngine): GLProgram {
-    if (this.needUpdate) {
-      engine.createProgram(this);
+    const program = engine.getProgram(this);
+    if (program === undefined) {
+      return engine.createProgram(this);
     }
-    return engine.getProgram(this);
+    return program;
   }
 
   dispose(engine: ARTEngine): void {

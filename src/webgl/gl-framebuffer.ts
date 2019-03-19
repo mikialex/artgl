@@ -1,4 +1,5 @@
 import { GLRenderer } from "./gl-renderer";
+import { Vector4 } from "../math/vector4";
 
 
 
@@ -75,6 +76,8 @@ export class GLFramebuffer{
   wegbglFrameBuffer: WebGLFramebuffer;
 
   textureAttachedSlot: GLFrameAttachedTexture[] = [];
+
+  debuggingViewport: Vector4 = new Vector4(0,0,200,200);
 
   resize(width:number, height:number) {
     if (this.width !== width || this.height !== height) {

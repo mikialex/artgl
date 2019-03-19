@@ -1,6 +1,6 @@
 <template>
   <div class="top-nav">
-    <h3>ART.GL</h3> 
+    <img src="../../assets/art.svg" alt="">
     <div class="current-project">
       <!-- <div>
         demoscene.gltf 
@@ -25,14 +25,19 @@ export default class TopNav extends Vue {
   height: 40px;
   display: flex;
   align-items: center;
+  >img{
+    height: 25px;
+    padding: 10px;
+    opacity: 0.4;
+    &:hover{
+      opacity: 0.6;
+    }
+  }
 }
 
 .current-project{
   display: flex;
   align-items: center;
-  border-top: 1px solid #eee;
-  border-left: 1px solid #eee;
-  border-right: 1px solid #eee;
   width: calc(100vw - 200px);
 }
 
@@ -41,15 +46,18 @@ h3{
 }
 
 a{
+  font-size: 14px;
   text-decoration: none;
   padding: 5px;
   color:#444;
-  &:hover{
+  border-radius: 2px;
     background: #eee;
+  &:hover{
+    background: #ddd;
   }
 }
 
 .current{
-  background: #eee;
+  font-weight: bold;
 }
 </style>
