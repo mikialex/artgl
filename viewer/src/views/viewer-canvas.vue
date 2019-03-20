@@ -8,7 +8,7 @@
       <button @click="stop" v-if="isRuning">stop</button>
       <button @click="step" v-if="!isRuning">step next frame</button>
       <button @click="screenshot" v-if="!isRuning" disabled>download screenshot</button>
-      <button @click="inspectGraph" >inspectGraph</button>
+      <button @click="inspectGraph" v-if="!graphView">inspectGraph</button>
       <button @click="closeGraphInspector" v-if="graphView">closeGraphViewer</button>
     </div>
   </div>

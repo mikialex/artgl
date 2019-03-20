@@ -14,7 +14,7 @@
          @updateviewport = "updateViewport"
       />
 
-      <PassNode
+      <RenderTargetNode
         v-for="node in graphview.targetNodes"
         :key="node.uuid"
         :view="node"
@@ -54,6 +54,7 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { GraphView, GraphNodeView } from "../../model/graph-view";
 import PassNode from "./node/pass-node-view.vue";
+import RenderTargetNode from "./node/render-target-node-view.vue";
 import { Vector4 } from "../../../../src/math/vector4";
 import NodeWrap from "./node-view.vue";
 import { GLApp } from "../../application";
@@ -61,7 +62,8 @@ import { GLApp } from "../../application";
 @Component({
   components: {
     PassNode,
-    NodeWrap
+    NodeWrap,
+    RenderTargetNode
   }
 })
 export default class GraphViewer extends Vue {
@@ -133,6 +135,15 @@ export default class GraphViewer extends Vue {
   }
 
   mounted() {
+    this.updateBoard();
+    window.addEventListener("resize", this.updateBoard)
+  }
+
+  beforeDestroy(){
+    window.removeEventListener("resize", this.updateBoard)
+  }
+
+  updateBoard(){
     this.board.offsetX = this.$el.getBoundingClientRect().left;
     this.board.offsetY = this.$el.getBoundingClientRect().top;
     this.board.width = this.$el.clientWidth;
