@@ -69,6 +69,14 @@ export class RenderTargetNode extends DAGNode{
     return Math.max(5, this.graph.engine.renderer.height * this.autoHeightRatio);
   }
 
+  get width() {
+    return this.framebuffer.width
+  }
+
+  get height() {
+    return this.framebuffer.height
+  }
+
   framebuffer: GLFramebuffer;
 
   private fromGetter: () => Nullable<string>

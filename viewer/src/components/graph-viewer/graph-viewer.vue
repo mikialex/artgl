@@ -20,6 +20,8 @@
         :view="node"
         :boardInfo="board"
         @updateviewport = "updateViewport"
+        @actualSize = "actualSize"
+        @defaultSize = "defaultSize"
       />
     </div>
 
@@ -106,6 +108,19 @@ export default class GraphViewer extends Vue {
     this.board.transformX = this.originTransformX + e.screenX - this.screenOriginX;
     this.board.transformY = this.originTransformY + e.screenY - this.screenOriginY;
     this.updateAllViewports();
+  }
+
+  actualSize(node: GraphNodeView){
+    const targetNode = GLApp.graph.getNodeByID(node.uuid);
+    node.width = targetNode.width / window.devicePixelRatio / 2;
+    node.height =  targetNode.height / window.devicePixelRatio / 2;
+    this.updateViewport(node);
+  }
+
+  defaultSize(node: GraphNodeView){
+    node.width = 200;
+    node.height = 200;
+    this.updateViewport(node);
   }
 
   updateViewport(node: GraphNodeView){

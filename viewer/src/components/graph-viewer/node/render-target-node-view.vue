@@ -5,7 +5,7 @@
   @updateviewport = "reEmit"
   >
   <button @click="actualSize">actual size</button>
-  <button>default size</button>
+  <button @click="defaultSize">default size</button>
   </NodeWrap>
 </template>
 
@@ -28,6 +28,10 @@ reEmit(node){
 
 actualSize(){
   this.$emit("actualSize", this.view)
+}
+
+defaultSize(){
+  this.$emit("defaultSize", this.view)
 }
 
 }
