@@ -208,7 +208,7 @@ export class Application {
     this.orbitControler.update();
 
     this.engine.connectCamera();
-    if (this.engine.isCameraChanged) {
+    if (this.engine.isCameraChanged || this.scene.isFrameChange) {
       this.sampleCount = 0;
     } else {
       if (this.enableTAA) {

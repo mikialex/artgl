@@ -118,8 +118,8 @@ export default class GraphViewer extends Vue {
   }
 
   defaultSize(node: GraphNodeView){
-    node.width = 200;
-    node.height = 200;
+    node.width = GraphView.targetNodeDefaultSize;
+    node.height = GraphView.targetNodeDefaultSize;
     this.updateViewport(node);
   }
 

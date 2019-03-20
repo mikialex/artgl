@@ -24,17 +24,22 @@ export class Scene implements RenderSource {
   isFrameStructureChange: boolean = true;
   isFrameTransformChange: boolean = true;
   isFrameVisibleChange: boolean = true;
+  get isFrameChange(){
+    return this.isFrameStructureChange || this.isFrameTransformChange || this.isFrameVisibleChange
+  }
   onRemoveList: Set<SceneNode> = new Set();
   onAddList: Set<SceneNode> = new Set();
 
   addNode(object: SceneNode) {
     this.onRemoveList.delete(object);
     this.onAddList.add(object);
+    this.isFrameStructureChange = true;
   }
 
   removeNode(object: SceneNode) {
     this.onAddList.delete(object);
     this.onRemoveList.add(object);
+    this.isFrameStructureChange = true;
   }
   
   getRenderList() {
@@ -62,6 +67,9 @@ export class Scene implements RenderSource {
         this.objectList.addRenderItem(node);
       }
     });
+    this.isFrameStructureChange = false;
+    this.isFrameTransformChange = false;
+    this.isFrameVisibleChange = false;
 
   }
 

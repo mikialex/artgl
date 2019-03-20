@@ -8,6 +8,8 @@ export class GraphView {
   targetNodes: GraphNodeView[] = [];
   nodeMap: Map<string, GraphNodeView> = new Map();
   rootNode: GraphNodeView
+
+  static targetNodeDefaultSize = 200;
   static create(graph: RenderGraph) {
     const view = new GraphView;
     graph.passNodes.forEach(node => {
@@ -38,6 +40,10 @@ export class GraphView {
   }
 
   layout() {
+    this.targetNodes.forEach(node => {
+      node.width = GraphView.targetNodeDefaultSize;
+      node.height = GraphView.targetNodeDefaultSize;
+    })
     genGraphLayout(this.rootNode)
   }
 }
