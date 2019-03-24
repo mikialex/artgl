@@ -46,7 +46,7 @@ artgl提供了一套场景树的实现。场景树以树的形式组织场景结
 
   如何得知场景发生变动？ 
 
-  很简单，对于我们关心的属性，使用getter和setter捕获变动。对于数组属性，处于性能考虑，提供额外的接口通知变动，并不建议用户访问
+  很简单，对于我们关心的属性，使用getter和setter捕获变动。对于数组属性，处于性能考虑，提供额外的接口通知变动，并不建议用户直接进行数组操作。
   
   关心的场景变动类型：
 
@@ -60,15 +60,15 @@ artgl提供了一套场景树的实现。场景树以树的形式组织场景结
 
   这些其实就是我们之前提到的渲染数据。上层的场景数据描述系统，不仅要实现场景的描述，不仅需要向下层提供renderlist， 还需要提供与之相关的配套逐个drawcall的渲染数据，以实现渲染优化。 在每次实际渲染之前，需要完成场景数据到渲染数据的更新。
 
-  目前我的实践以及一些想法是： 通过getter setter和额外接口，细粒度的提供变动信息。 使用两个set来记录一帧之间用户对场景树节点的增删情况，并同步到renderlist。实际的renderlist并不简简单单是一个array，而是一系列提供了标记删除自动扩容功能的typedarray。drawcall记录的基本信息以非常紧凑的形式记录在typedarray中， 对其他资源的依赖以索引的形式存储。 
+  目前我的实践以及一些想法是： 通过getter setter和额外接口，细粒度的提供变动信息。 使用两个set来记录一帧之间用户对场景树节点的增删情况，并同步到renderlist。实际的renderlist并不简简单单是一个array，而是一系列提供了标记删除自动扩容功能的typedarray。drawcall以及配套的渲染信息以非常紧凑的形式记录在typedarray中， 对其他资源的依赖以索引的形式存储。 
 
   使用typedarray存储渲染数据至少有以下的好处 
 
-  1 方便实现renderlist排序， 在typedArray中的数据经过组合可以天然作为 radix sort的 sortkey，可以避免快速排序的开销， 例如对program的依赖事实上反映在了shader的index上，对于状态的依赖事实上反映在状态的key上。我们直接评估各种状态切换的成本，来调整array中数据存储的布局，直接影响排序的结果，已经渲染的性能。
+  1 方便实现renderlist排序， 在typedArray中的数据经过组合可以天然作为 radix sort的 sortkey，可以避免快速排序的开销， 例如对program的依赖事实上反映在了shader的index上，对于状态的依赖事实上反映在状态的key上。我们直接评估各种状态切换的成本，来调整array中数据存储的布局，直接影响排序的结果，以及渲染的性能。
 
   2 typedArray实现了标记删除和扩容，可以非常确定的保证GC。而普通的js array做不到这一点。数据在typedArray存储非常紧凑，不会有js引擎优化实现带来的心智负担
 
-  3 方便直接transfer到webworker中。即便有些数据不可避免还是需要复制，直接slice进行复制，比浏览器的自己的复制要快。 在某些地方我们可以实现typedArray双缓冲的机制，主线程写，worker用，worker用完结束transfer回来主线程立刻把新的transfer过去，同时使用workertransfer回来的来覆盖写，同时避免数据复制和GC。
+  3 方便直接传递到webworker中。即便有些数据不可避免还是需要复制，直接slice进行复制，比浏览器的自己的复制要快。 在某些地方我们可以实现typedArray双缓冲的机制，主线程写，worker用，worker用完结束transfer回来主线程立刻把新的transfer过去，同时使用workertransfer回来的来覆盖写，同时避免数据复制和GC。
 
   4 方便直接发送给webAssembly模块进行重计算
 
