@@ -1,12 +1,14 @@
 # 设想基于 offscreen canvas 的异步渲染引擎
 
-chrome 70 release了一项非常重要的 feature 叫 Offscreen [Canvas](https://developers.google.com/web/updates/2018/08/offscreen-canvas)， 概括的来说： 你可以在webworker中执行渲染了。这是一个非常巨大的改变，能够带来非常巨大的潜在性能提升。
+chrome 70 release了一项非常重要的 feature 叫 [Offscreen Canvas](https://developers.google.com/web/updates/2018/08/offscreen-canvas)， 概括的来说： 你可以在webworker中执行渲染了。这是一个非常巨大的改变，能够带来非常巨大的潜在性能提升。[参考](https://zhuanlan.zhihu.com/p/34698375)
+
+
 
 在一般的3d应用中，我们业务逻辑， 业务数据到dom， 业务数据到场景树，准备和执行渲染，这一系列工作几乎全部在主线程中执行。除了一些非常重的计算可能会优化到webworker中进行，但是general的来说，web 3d应用几乎都难以利用到现代处理器多核心的优势。从我在业务中的实践而言， 主线程约 60% ~ 70% 的时间是在 业务数据到dom， 业务数据到场景树更新等业务耗时， 剩下的主要是渲染耗时。设想一下，如果我们把渲染的耗时全部搬到webworker中，那岂不是一个巨大的稳定的性能飞跃？
 
 一个初步的想法是用户在主线程中操作和构造场景数据，每一帧结束后，对场景数据的操作累积起来并提交给渲染worker，并在后续帧完成渲染。worker读取主线程上一帧的更新信息， 完成实际的渲染数据更新和renderlist生成，并执行渲染。这样，虽然渲染worker始终执行上一帧的场景，但整个渲染流程就可以全部和主线程的UI和业务逻辑等并行起来了。
 
-还有一些细节： 实际的场景数据，诸如buffer和texture也存储在webworker中，如果主线程的业务逻辑需要和这些数据，比如raycast之类的，那么渲染worker似乎还需要负责这部分的需求。这样看一方面是好事情，因为主线程的负担又被减轻了，但是因为异步的原因，则导致主线程很多的代码做出调整。
+还有一些细节： 实际的场景数据，诸如buffer和texture也存储在webworker中，如果主线程的业务逻辑需要和这些数据，比如raycast之类的，那么渲染worker似乎还需要负责这部分的需求。这样看一方面是好事情，因为主线程的负担又被减轻了，但是因为异步的原因，则需要主线程很多的代码做出调整。
 
 # WebAssembly 渲染引擎
 
