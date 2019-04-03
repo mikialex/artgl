@@ -1,4 +1,5 @@
 import { GLDataType } from "../webgl/shader-util";
+import { DAGNode } from "../render-graph/dag/dag-node";
 
 export interface ShaderFunctionInput{
   name: string
@@ -15,13 +16,14 @@ export interface ShaderFunctionDefine{
 
 
 export enum GLFragmentInnerVar{
-
+  
 }
 
 
 /**
- * Define a shader
- *
+ *  Define a shader function node factory
+ *  that with depend some input 
+ *  and output
  * @export
  * @class ShaderFunction
  */
@@ -38,7 +40,8 @@ export class ShaderFunction{
 
 }
 
-export class ShaderFunctionNode{
+
+export class ShaderFunctionNode extends DAGNode{
 
   // create a fragmentshader from this node
   makeFragmentShader() {
