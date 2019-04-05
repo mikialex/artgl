@@ -41,6 +41,14 @@ export class ShaderFunction{
 }
 
 
+/**
+ * A node instance of a shaderfunction
+ * used in shadergraph for connection
+ *
+ * @export
+ * @class ShaderFunctionNode
+ * @extends {DAGNode}
+ */
 export class ShaderFunctionNode extends DAGNode{
 
   // create a fragmentshader from this node
@@ -52,29 +60,3 @@ export class ShaderFunctionNode extends DAGNode{
     
   }
 }
-
-// this should be more simple by use a glsl parser
-const depthPackFunction = new ShaderFunction({
-  name: 'depthPack',
-  description: 'pack depth to RGBA output',
-  source: `
-    vec4 bitSh = vec4(256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0);
-    vec4 bitMsk = vec4(0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0);
-    vec4 enc = fract(frag_depth * bitSh);
-    enc -= enc.xxyz * bitMsk;
-    return enc;
-  `,
-  inputs: [
-    {
-      name: "frag_depth",
-      type: GLDataType.float
-    }
-  ],
-  returnType: GLDataType.floatVec4
-})
-
-const depthPackNode = depthPackFunction.createNode();
-depthPackNode.fillInput("frag_depth", 1)
-
-depthPackNode.makeFragmentShader();
-

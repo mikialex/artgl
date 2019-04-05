@@ -1,4 +1,4 @@
-import { ShaderFunctionNode } from "./shader-function-node";
+import { ShaderFunctionNode } from "./shader-function";
 import { getIndent } from './util/indent';
 import { NodeGraph } from '@/core/node-graph';
 import { convertToValidName } from './util/convert';
