@@ -6,6 +6,7 @@
         demoscene.gltf 
       </div> -->
       <router-link active-class="current" to="/">Viewer</router-link>
+      <router-link active-class="current" to="/shader">Shader Graph</router-link>
       <!-- <router-link to="/about">RenderGraph</router-link> -->
     </div>
   </div>
@@ -51,7 +52,8 @@ a{
   padding: 5px;
   color:#444;
   border-radius: 2px;
-    background: #eee;
+  background: #eee;
+  margin: 3px;
   &:hover{
     background: #ddd;
   }

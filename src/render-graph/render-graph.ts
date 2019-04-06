@@ -2,11 +2,9 @@ import { EffectComposer } from "./effect-composer";
 import { PassDefine, GraphDefine, RenderTextureDefine } from "./interface";
 import { PassGraphNode } from "./dag/pass-graph-node";
 import { RenderTargetNode } from "./dag/render-target-node";
-import { DAGNode } from "./dag/dag-node";
 import { ARTEngine, RenderSource } from "../engine/render-engine";
-import { TechniqueConfig, Technique } from "../core/technique";
+import { Technique } from "../core/technique";
 import { QuadSource } from './quad-source';
-import { GLFramebuffer } from '../webgl/gl-framebuffer';
 import { Vector4 } from "../math/vector4";
 import { RenderPass } from "./pass";
 

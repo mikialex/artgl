@@ -248,7 +248,7 @@ export class Application {
 
   createScene(scene: Scene): Scene {
     hierachyBallBuilder(scene.root);
-    this.loadOBJFromURL();
+    // this.loadOBJFromURL();
     return scene;
   }
 

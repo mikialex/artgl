@@ -1,51 +1,60 @@
-import { ShaderFunction } from "./shader-function";
-import { Technique } from "../core/technique";
+import { ShaderFunction, ShaderFunctionNode } from "./shader-function";
 import { GLDataType } from "../webgl/shader-util";
-import { AttributeUsage } from "../webgl/attribute";
-import { InnerSupportUniform } from "../webgl/uniform/uniform";
+import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
+import { InnerSupportUniform, InnerUniformMapDescriptor } from "../webgl/uniform/uniform";
+import { GLProgramConfig } from "../webgl/program";
 
 export interface ShaderGraphDefine {
   effect,
   transform,
-  uniform,
-  attribute,
 
 }
 
 
 export class ShaderGraph {
 
+  graph: ShaderFunctionNode[] = [];
+
+  // map shaderNodes define name to 
+  passNodes: Map<string, ShaderFunctionNode> = new Map();
+
   setGraph(define: ShaderGraphDefine): void {
 
   }
 
-  compile(): Technique {
-    return new Technique({
-      programConfig: {
-        attributes: [
-          { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
-          { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal, stride: 3 },
-          // { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
-        ],
-        uniformsIncludes: [
-          { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix, },
-          { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix, }
-        ],
-        varyings: [
-          { name: 'color', type: GLDataType.floatVec3 }
-        ],
-        vertexShaderString: this.compileVertexSource(define),
-        fragmentShaderString: this.compileFragSource(define),
-        autoInjectHeader: true,
-      }
-    });
+  compile(): GLProgramConfig {
+    return {
+      attributes: this.collectAttributeDepend(),
+      uniformsIncludes: this.collectInnerUniformDepend(),
+      varyings: [
+        { name: 'color', type: GLDataType.floatVec3 }
+      ],
+      vertexShaderString: this.compileVertexSource(),
+      fragmentShaderString: this.compileFragSource(),
+      autoInjectHeader: true,
+    };
   }
 
-  compileVertexSource(define: ShaderGraphDefine): string {
+  collectAttributeDepend(): AttributeDescriptor[]{
+    return [
+      { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
+      { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal, stride: 3 },
+      // { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
+    ]
+  }
+
+  collectInnerUniformDepend(): InnerUniformMapDescriptor[] {
+    return [
+      { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix, },
+      { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix, }
+    ]
+  }
+
+  compileVertexSource(): string {
     return ""
   }
 
-  compileFragSource(define: ShaderGraphDefine): string {
+  compileFragSource(): string {
     return ""
   }
 
@@ -119,16 +128,7 @@ graph.setGraph({
     },
   ],
 
-  // declare the sourceing you want used in your shader
-  uniform: {
-    VPMatrix: {
-      type: 'inner',
-      innerValue: InnerSupportUniform.VPMatrix
-    }
-  },
-  attribute: [
 
-  ]
 })
 
 const technique = graph.compile();

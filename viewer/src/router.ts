@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Viewer from './views/viewer.vue'
+import ShaderEditor from './views/shader-editor.vue'
 
 Vue.use(Router)
 
@@ -12,9 +13,9 @@ export default new Router({
       component: Viewer
     },
     {
-      path: '/graph',
-      name: 'graph',
-      component: Viewer
+      path: '/shader',
+      name: 'shader-editor',
+      component: ShaderEditor
     },
     {
       path: '/about',
