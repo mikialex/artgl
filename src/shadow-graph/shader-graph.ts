@@ -4,27 +4,22 @@ import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
 import { InnerSupportUniform, InnerUniformMapDescriptor } from "../webgl/uniform/uniform";
 import { GLProgramConfig } from "../webgl/program";
 
-export interface ShaderGraphEffectDefine{
+export interface ShaderGraphDefineInput {
+  type: ShaderGraphNodeInputType,
+  value?: any
+}
+
+export interface ShaderGraphNodeDefine {
   output: string,
   name: string,
   type: string,
-  input: {
-    // diffuse: {
-    //   type: ShaderGraphNodeInputType.shaderFunctionNode,
-    // },
-    // IBL: {
-    //   type: ShaderGraphNodeInputType.shaderFunctionNode,
-    // },
-  }
+  input: { [index: string]: ShaderGraphDefineInput }
 }
 
-export interface ShaderGraphTransformDefine{
-
-}
 
 export interface ShaderGraphDefine {
-  effect: ShaderGraphEffectDefine,
-  transform: ShaderGraphTransformDefine,
+  effect: ShaderGraphNodeDefine[],
+  transform: ShaderGraphNodeDefine[],
 
 }
 
@@ -67,7 +62,7 @@ export class ShaderGraph {
     };
   }
 
-  collectAttributeDepend(): AttributeDescriptor[]{
+  collectAttributeDepend(): AttributeDescriptor[] {
     return [
       { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
       { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal, stride: 3 },
@@ -97,7 +92,7 @@ export class ShaderGraph {
 
 const graph = new ShaderGraph();
 
-export enum ShaderGraphNodeInputType{
+export enum ShaderGraphNodeInputType {
   innerUniform,
   textureUniform,
   shaderFunctionNode,
@@ -149,15 +144,16 @@ graph.setGraph({
   // like frag, we export the graph root as gl_Position
   transform: [
     {
+      name: "root",
       output: "gl_Position",
       type: "VPtransfrom",
       input: {
         VPMatrix: {
           type: ShaderGraphNodeInputType.innerUniform,
-          innerValue: InnerSupportUniform.VPMatrix
+          value: InnerSupportUniform.VPMatrix
         },
         position: {
-          type:ShaderGraphNodeInputType.Attribute
+          type: ShaderGraphNodeInputType.Attribute
         }
       }
     },
