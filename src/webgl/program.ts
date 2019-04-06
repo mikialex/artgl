@@ -120,12 +120,14 @@ export class GLProgram {
   }
 
   private compileShaders(conf: GLProgramConfig) {
+    let vertexShaderString = conf.vertexShaderString;
+    let fragmentShaderString = conf.fragmentShaderString;
     if (conf.autoInjectHeader) {
-      conf.vertexShaderString = injectVertexShaderHeaders(conf, conf.vertexShaderString);
-      conf.fragmentShaderString = injectFragmentShaderHeaders(conf, conf.fragmentShaderString);
+      vertexShaderString = injectVertexShaderHeaders(conf, conf.vertexShaderString);
+      fragmentShaderString = injectFragmentShaderHeaders(conf, conf.fragmentShaderString);
     }
-    this.vertexShader.compileShader(conf.vertexShaderString);
-    this.fragmentShader.compileShader(conf.fragmentShaderString);
+    this.vertexShader.compileShader(vertexShaderString);
+    this.fragmentShader.compileShader(fragmentShaderString);
   }
 
   private createProgram(vertexShader: GLShader, fragmentShader: GLShader) {

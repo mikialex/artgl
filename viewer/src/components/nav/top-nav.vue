@@ -1,11 +1,11 @@
 <template>
   <div class="top-nav">
-    <img src="../../assets/art.svg" alt="">
+    <img src="../../assets/art.svg" alt="" >
     <div class="current-project">
       <!-- <div>
         demoscene.gltf 
       </div> -->
-      <router-link active-class="current" to="/">Viewer</router-link>
+      <router-link active-class="current" to="/viewer">Viewer</router-link>
       <router-link active-class="current" to="/shader">Shader Graph</router-link>
       <!-- <router-link to="/about">RenderGraph</router-link> -->
     </div>

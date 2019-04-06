@@ -4,22 +4,54 @@ import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
 import { InnerSupportUniform, InnerUniformMapDescriptor } from "../webgl/uniform/uniform";
 import { GLProgramConfig } from "../webgl/program";
 
+export interface ShaderGraphEffectDefine{
+  output: string,
+  name: string,
+  type: string,
+  input: {
+    // diffuse: {
+    //   type: ShaderGraphNodeInputType.shaderFunctionNode,
+    // },
+    // IBL: {
+    //   type: ShaderGraphNodeInputType.shaderFunctionNode,
+    // },
+  }
+}
+
+export interface ShaderGraphTransformDefine{
+
+}
+
 export interface ShaderGraphDefine {
-  effect,
-  transform,
+  effect: ShaderGraphEffectDefine,
+  transform: ShaderGraphTransformDefine,
 
 }
 
 
 export class ShaderGraph {
 
+  define: ShaderGraphDefine;
   graph: ShaderFunctionNode[] = [];
 
   // map shaderNodes define name to 
-  passNodes: Map<string, ShaderFunctionNode> = new Map();
+  functionNodes: Map<string, ShaderFunctionNode> = new Map();
 
   setGraph(define: ShaderGraphDefine): void {
+    this.reset();
+    this.define = define;
+  }
 
+  constructVertexGraph() {
+    // this.define.transform.
+  }
+
+  constructFragmentGraph() {
+
+  }
+
+  reset() {
+    this.functionNodes.clear();
   }
 
   compile(): GLProgramConfig {
@@ -80,6 +112,7 @@ graph.setGraph({
   effect: [
     {
       output: "gl_FragColor",
+      name: "result",
       type: "composeAdd",
       input: {
         diffuse: {
@@ -92,16 +125,18 @@ graph.setGraph({
     },
     {
       output: "diffuse",
-      type: "diffuse",
+      name: "diffuse",
+      type: "diffuse_lookup",
       input: {
-        envTex: {
+        diffTex: {
           type: ShaderGraphNodeInputType.textureUniform,
         }
       }
     },
     {
       output: "IBL",
-      type: "envTex",
+      name: "IBL",
+      type: "envTex_cal",
       input: {
         envTex: {
           type: ShaderGraphNodeInputType.textureUniform,
@@ -131,4 +166,4 @@ graph.setGraph({
 
 })
 
-const technique = graph.compile();
+const techniqueConf = graph.compile();
