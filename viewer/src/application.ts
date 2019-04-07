@@ -13,6 +13,7 @@ import hierachyBallBuilder from './scene/hierachy-balls';
 import { createConf } from './conf';
 import { Observable } from '../../src/core/observable';
 import { RenderConfig } from './components/conf/interface';
+import { Camera } from '../../src/core/camera';
 
 export const STATICSERVER = "http://localhost:3000/"
 
@@ -25,6 +26,8 @@ export class Application {
   active: boolean = false;
   interactor: Interactor;
   orbitControler: OrbitController;
+
+  lightCamera: Camera;
 
   taaTech: TAATechnique;
   enableTAA = true;
@@ -91,6 +94,10 @@ export class Application {
           name: 'SSAOHistoryB',
           from: () => this.isEvenTick ? 'SSAO' : null,
         },
+        // {
+        //   name: 'LightDepthMapResult',
+        //   from: () => 'LightDepthMap',
+        // }
       ],
       passes: [
         { // general scene origin
@@ -102,6 +109,15 @@ export class Application {
           technique: 'depthTech',
           source: ['AllScreen'],
         },
+        // { // general scene origin
+        //   name: "LightDepthMap",
+        //   source: ['AllScreen'],
+        //   beforePassExecute: () => {
+        //     // random sample lightcamera
+        //   },
+        //   technique: 'depthTech',
+        //   overideCamera: this.lightCamera,
+        // },
         { // mix newrender and old samples
           name: "TAA",
           inputs: () => {
@@ -208,7 +224,7 @@ export class Application {
     this.orbitControler.update();
 
     this.engine.connectCamera();
-    if (this.engine.isCameraChanged) {
+    if (this.engine.isCameraChanged || this.scene.isFrameChange) {
       this.sampleCount = 0;
     } else {
       if (this.enableTAA) {

@@ -1,20 +1,20 @@
-import { Vector3, Matrix4, MathUtil} from "../math/index";
+import { Vector3, Matrix4, MathUtil } from "../math/index";
 import { Camera } from "../core/camera";
 
 const tempMatrix = new Matrix4();
 
-export class PerspectiveCamera extends Camera{
+export class PerspectiveCamera extends Camera {
   constructor(near?: number, far?: number,
-    fov?: number, aspect?: number, zoom?:number) {
+    fov?: number, aspect?: number, zoom?: number) {
     super();
     this._fov = fov !== undefined ? fov : 50;
     this._zoom = 1;
-  
+
     this._near = near !== undefined ? near : 0.1;
     this._far = far !== undefined ? far : 2000;
-  
+
     this._aspect = aspect !== undefined ? aspect : 1;
-  
+
     this.updateProjectionMatrix();
   }
 
@@ -36,7 +36,7 @@ export class PerspectiveCamera extends Camera{
   set zoom(value) { this._zoom = value; this.projectionMatrixNeedUpdate = true };
 
   up = new Vector3(0, 1, 0);
-  
+
   get width() {
     return this._aspect * this.height;
   }
@@ -44,7 +44,7 @@ export class PerspectiveCamera extends Camera{
     return 2 * this._near * Math.tan(MathUtil.DEG2RAD * 0.5 * this._fov) / this._zoom;
   }
 
-  updateProjectionMatrix () {
+  updateProjectionMatrix() {
     const top = this._near * Math.tan(MathUtil.DEG2RAD * 0.5 * this._fov) / this._zoom;
     const height = 2 * top;
     const width = this._aspect * height;
@@ -59,5 +59,5 @@ export class PerspectiveCamera extends Camera{
   }
 
 
-  
+
 }

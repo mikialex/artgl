@@ -4,6 +4,8 @@
   :boardInfo="boardInfo"
   @updateviewport = "reEmit"
   >
+  <button @click="actualSize">actual size</button>
+  <button @click="defaultSize">default size</button>
   </NodeWrap>
 </template>
 
@@ -16,12 +18,20 @@ import NodeWrap from '../node-view.vue';
     NodeWrap
   }
 })
-export default class PassNodeView extends Vue {
+export default class RenderTargetNodeView extends Vue {
 @Prop() view;
 @Prop() boardInfo;
 
 reEmit(node){
   this.$emit("updateviewport", node)
+}
+
+actualSize(){
+  this.$emit("actualSize", this.view)
+}
+
+defaultSize(){
+  this.$emit("defaultSize", this.view)
 }
 
 }

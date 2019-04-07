@@ -41,7 +41,13 @@ export class Material{
 }
 
 function generateTextureToPureColor(color: Vector3): Texture {
-  const texture = new Texture();
+  const texture = new Texture(); 
+  const R = Math.floor(color.x * 256);
+  const G = Math.floor(color.y * 256);
+  const B = Math.floor(color.z * 256);
+  texture.textureData = new Uint8ClampedArray([
+    R, G, B, R, G, B, R, G, B, R, G, B, 
+  ]);
   return texture;
 }
 

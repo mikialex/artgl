@@ -93,6 +93,25 @@ export class Matrix4
     return this;
   }
 
+  makeOrthographic(left: number, right: number, top: number,
+    bottom: number, near: number, far: number) {
+    var te = this.elements;
+    var w = 1.0 / (right - left);
+    var h = 1.0 / (top - bottom);
+    var p = 1.0 / (far - near);
+
+    var x = (right + left) * w;
+    var y = (top + bottom) * h;
+    var z = (far + near) * p;
+
+    te[0] = 2 * w; te[4] = 0; te[8] = 0; te[12] = - x;
+    te[1] = 0; te[5] = 2 * h; te[9] = 0; te[13] = - y;
+    te[2] = 0; te[6] = 0; te[10] = - 2 * p; te[14] = - z;
+    te[3] = 0; te[7] = 0; te[11] = 0; te[15] = 1;
+
+    return this;
+  }
+
   multiplyMatrices(a: Matrix4, b: Matrix4) {
 
     var ae = a.elements;

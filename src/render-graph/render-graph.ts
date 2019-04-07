@@ -22,6 +22,21 @@ export class RenderGraph {
   renderTargetNodes: Map<string, RenderTargetNode> = new Map();
   passNodes: Map<string, PassGraphNode> = new Map();
 
+  getNodeByID(id: string) {
+    let n;
+    this.renderTargetNodes.forEach(node => {
+      if (node.uuid === id) {
+        n = node;
+      }
+    })
+    this.passNodes.forEach(node => {
+      if (node.uuid === id) {
+        n = node;
+      }
+    })
+    return n;
+  }
+
   render() {
     this.composer.render();
   }
