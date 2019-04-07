@@ -3,7 +3,7 @@
     <div class="editor">
       <h1>editor</h1>
       <div>
-
+        <GraphViewer :graphview="graphView"/>
       </div>
     </div>
 
@@ -26,10 +26,11 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-
+import GraphViewer from '../components/graph-viewer/graph-viewer.vue';
 
 @Component({
   components:{
+    GraphViewer
   }
 })
 export default class ShaderEditor extends Vue {

@@ -4,8 +4,7 @@ import { DAGNode } from '../../../src/render-graph/dag/dag-node';
 import { RenderTargetNode } from '../../../src/render-graph/dag/render-target-node';
 
 export class GraphView {
-  passNodes: GraphNodeView[] = [];
-  targetNodes: GraphNodeView[] = [];
+  nodes: GraphNodeView[] = [];
   nodeMap: Map<string, GraphNodeView> = new Map();
   rootNode: GraphNodeView
 
@@ -15,20 +14,15 @@ export class GraphView {
     graph.passNodes.forEach(node => {
       const nodeView = GraphNodeView.create(node)
       view.nodeMap.set(node.uuid, nodeView)
-      view.passNodes.push(nodeView);
+      view.nodes.push(nodeView);
     })
     graph.renderTargetNodes.forEach(node => {
       const nodeView = GraphNodeView.create(node)
       view.nodeMap.set(node.uuid, nodeView)
-      view.targetNodes.push(nodeView);
+      view.nodes.push(nodeView);
     })
 
-    view.passNodes.forEach(node => {
-      node.inputsID.forEach(id => {
-        node.inputs.push(view.nodeMap.get(id));
-      })
-    })
-    view.targetNodes.forEach(node => {
+    view.nodes.forEach(node => {
       node.inputsID.forEach(id => {
         node.inputs.push(view.nodeMap.get(id));
       })
@@ -40,9 +34,11 @@ export class GraphView {
   }
 
   layout() {
-    this.targetNodes.forEach(node => {
-      node.width = GraphView.targetNodeDefaultSize;
-      node.height = GraphView.targetNodeDefaultSize;
+    this.nodes.forEach(node => {
+      if (node.type === GraphNodeViewType.targetNode) {
+        node.width = GraphView.targetNodeDefaultSize;
+        node.height = GraphView.targetNodeDefaultSize;
+      }
     })
     genGraphLayout(this.rootNode)
   }
@@ -81,6 +77,11 @@ function genGraphLayout(rootNode: GraphNodeView) {
   })
 }
 
+export enum GraphNodeViewType{
+  passNode,
+  targetNode,
+}
+
 export class GraphNodeView {
   name: string;
   uuid: string;
@@ -90,6 +91,7 @@ export class GraphNodeView {
   positionY: number = 0;
   inputsID: string[] = [];
   inputs: GraphNodeView[] = [];
+  type: GraphNodeViewType;
 
   static create(node: DAGNode) {
     const view = new GraphNodeView();
@@ -102,8 +104,10 @@ export class GraphNodeView {
     if (node instanceof PassGraphNode) {
       view.name = node.name;
       view.height = 20;
+      view.type = GraphNodeViewType.passNode;
     } else if (node instanceof RenderTargetNode) {
       view.name = node.name;
+      view.type = GraphNodeViewType.targetNode;
     }
     return view;
   }

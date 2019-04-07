@@ -6,23 +6,27 @@
           transform
         }"
     >
-      <PassNode
-        v-for="node in graphview.passNodes"
-        :key="node.uuid"
-        :view="node"
-        :boardInfo="board"
-         @updateviewport = "updateViewport"
-      />
 
-      <RenderTargetNode
-        v-for="node in graphview.targetNodes"
-        :key="node.uuid"
-        :view="node"
-        :boardInfo="board"
-        @updateviewport = "updateViewport"
-        @actualSize = "actualSize"
-        @defaultSize = "defaultSize"
-      />
+      <div v-for="node in graphview.nodes"
+        :key="node.uuid">
+
+        <PassNode
+          v-if="node.type === passNodeType"
+          :view="node"
+          :boardInfo="board"
+          @updateviewport = "updateViewport"
+        />
+
+        <RenderTargetNode
+          v-if="node.type === targetNodType"
+          :view="node"
+          :boardInfo="board"
+          @updateviewport = "updateViewport"
+          @actualSize = "actualSize"
+          @defaultSize = "defaultSize"
+        />
+      </div>
+
     </div>
 
       <svg class="connection"
@@ -54,7 +58,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { GraphView, GraphNodeView } from "../../model/graph-view";
+import { GraphView, GraphNodeView, GraphNodeViewType } from "../../model/graph-view";
 import PassNode from "./node/pass-node-view.vue";
 import RenderTargetNode from "./node/render-target-node-view.vue";
 import { Vector4 } from "../../../../src/math/vector4";
@@ -82,6 +86,14 @@ export default class GraphViewer extends Vue {
 
   get transform(){
     return `translate(${this.board.transformX}px, ${this.board.transformY}px)`
+  }
+
+  get passNodeType(){
+    return GraphNodeViewType.passNode
+  }
+
+  get targetNodType(){
+    return GraphNodeViewType.targetNode
   }
 
   showMove = false;
@@ -136,10 +148,7 @@ export default class GraphViewer extends Vue {
   }
 
   updateAllViewports(){
-    this.graphview.targetNodes.forEach(node =>{
-      this.updateViewport(node)
-    })
-    this.graphview.passNodes.forEach(node =>{
+    this.graphview.nodes.forEach(node =>{
       this.updateViewport(node)
     })
   }
@@ -168,10 +177,7 @@ export default class GraphViewer extends Vue {
 
   get lines() {
     let lines = [];
-    this.graphview.passNodes.forEach(node => {
-      lines = lines.concat(node.getConnectionLines(this.graphview, this.board));
-    });
-    this.graphview.targetNodes.forEach(node => {
+    this.graphview.nodes.forEach(node => {
       lines = lines.concat(node.getConnectionLines(this.graphview, this.board));
     });
     return lines;
