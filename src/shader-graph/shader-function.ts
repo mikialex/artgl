@@ -51,6 +51,8 @@ export class ShaderFunction{
  */
 export class ShaderFunctionNode extends DAGNode{
 
+  name: string;
+
   // create a fragmentshader from this node
   makeFragmentShader() {
     

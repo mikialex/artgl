@@ -17,7 +17,7 @@
         </pre>
       </div>
       <div class="canvas-wrap" v-else>
-        <canvas></canvas>
+        <canvas id="shader-editor-canvas"></canvas>
       </div>
 
     </div>
@@ -27,6 +27,8 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import GraphViewer from '../components/graph-viewer/graph-viewer.vue';
+import { GraphView } from '../model/graph-view';
+import {ShaderApp} from '../shader-application';
 
 @Component({
   components:{
@@ -35,6 +37,13 @@ import GraphViewer from '../components/graph-viewer/graph-viewer.vue';
 })
 export default class ShaderEditor extends Vue {
   showCode:boolean = false;
+  graphView: GraphView;
+
+  mounted(){
+    ShaderApp.init(this.$el.querySelector("#shader-editor-canvas"));
+    this.graphView = GraphView.createFromShaderGraph(ShaderApp.graph);
+  }
+
 }
 </script>
 

@@ -3,6 +3,9 @@ import { PassGraphNode } from '../../../src/render-graph/dag/pass-graph-node';
 import { DAGNode } from '../../../src/render-graph/dag/dag-node';
 import { RenderTargetNode } from '../../../src/render-graph/dag/render-target-node';
 
+import { ShaderGraph } from '../../../src/shader-graph/shader-graph';
+import { ShaderFunctionNode } from '../../../src/shader-graph/shader-function';
+
 export class GraphView {
   nodes: GraphNodeView[] = [];
   nodeMap: Map<string, GraphNodeView> = new Map();
@@ -29,6 +32,18 @@ export class GraphView {
     })
     view.rootNode = view.nodeMap.get(graph.getRootScreenTargetNode().uuid)
 
+    view.layout();
+    return view;
+  }
+
+  static createFromShaderGraph(graph: ShaderGraph) {
+    const view = new GraphView();
+    graph.functionNodes.forEach(node => {
+      const nodeView = GraphNodeView.create(node)
+      view.nodeMap.set(node.uuid, nodeView)
+      view.nodes.push(nodeView);
+    })
+    
     view.layout();
     return view;
   }
@@ -80,6 +95,7 @@ function genGraphLayout(rootNode: GraphNodeView) {
 export enum GraphNodeViewType{
   passNode,
   targetNode,
+  shaderFuncNode
 }
 
 export class GraphNodeView {
@@ -108,6 +124,9 @@ export class GraphNodeView {
     } else if (node instanceof RenderTargetNode) {
       view.name = node.name;
       view.type = GraphNodeViewType.targetNode;
+    } else if (node instanceof ShaderFunctionNode) {
+      view.name = 'a shader funciton node';
+      view.type = GraphNodeViewType.shaderFuncNode;
     }
     return view;
   }

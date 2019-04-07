@@ -3,6 +3,7 @@ import { GLDataType } from "../webgl/shader-util";
 import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
 import { InnerSupportUniform, InnerUniformMapDescriptor } from "../webgl/uniform/uniform";
 import { GLProgramConfig } from "../webgl/program";
+import { findFirst } from "../util/array";
 
 export interface ShaderGraphDefineInput {
   type: ShaderGraphNodeInputType,
@@ -19,7 +20,7 @@ export interface ShaderGraphNodeDefine {
 
 export interface ShaderGraphDefine {
   effect: ShaderGraphNodeDefine[],
-  transform: ShaderGraphNodeDefine[],
+  transform?: ShaderGraphNodeDefine[],
 
 }
 
@@ -27,10 +28,10 @@ export interface ShaderGraphDefine {
 export class ShaderGraph {
 
   define: ShaderGraphDefine;
-  graph: ShaderFunctionNode[] = [];
+  functionNodes: ShaderFunctionNode[] = [];
 
   // map shaderNodes define name to 
-  functionNodes: Map<string, ShaderFunctionNode> = new Map();
+  functionNodesMap: Map<string, ShaderFunctionNode> = new Map();
 
   setGraph(define: ShaderGraphDefine): void {
     this.reset();
@@ -46,7 +47,7 @@ export class ShaderGraph {
   }
 
   reset() {
-    this.functionNodes.clear();
+    this.functionNodesMap.clear();
   }
 
   compile(): GLProgramConfig {
@@ -87,6 +88,16 @@ export class ShaderGraph {
 
   registShaderFunction(shaderFn: ShaderFunction) {
 
+  }
+
+  getEffectRoot() {
+    const root = findFirst(this.functionNodes, node => {
+      return node.name === "gl_FragColor"
+    })
+    if (!root) {
+      throw "cant find root of effect"
+    }
+    return root;
   }
 }
 
