@@ -1,12 +1,18 @@
 import { ShaderGraph, ShaderGraphNodeInputType } from '../../src/shader-graph/shader-graph';
 import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
+import { ARTEngine } from '../../src/artgl';
 
 export class ShaderApplication {
 
   canvas: HTMLCanvasElement;
   graph: ShaderGraph = new ShaderGraph();
 
+  engine: ARTEngine;
+
+
   init(canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
+    this.engine = new ARTEngine(canvas);
     this.graph.setGraph({
 
       // decalare your fragment shader graph
@@ -74,7 +80,8 @@ export class ShaderApplication {
   }
 
   uninit() {
-    
+    this.canvas = null;
+    this.engine = null;
   }
 
 

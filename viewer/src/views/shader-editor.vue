@@ -1,10 +1,7 @@
 <template>
   <div class="shader-graph">
     <div class="editor">
-      <h1>editor</h1>
-      <div>
-        <GraphViewer v-if="graphView" :graphview="graphView"/>
-      </div>
+      <GraphViewer v-if="graphView" :graphview="graphView"/>
     </div>
 
     <div class="viewer">
@@ -62,6 +59,7 @@ export default class ShaderEditor extends Vue {
   width: 60%;
   height:100%;
   border: 1px solid #ddd;
+  position: relative;
 }
 
 .viewer {

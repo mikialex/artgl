@@ -25,6 +25,13 @@
           @actualSize = "actualSize"
           @defaultSize = "defaultSize"
         />
+
+        <ShaderFunctionNodeView
+          v-if="node.type === shaderFunctionNodeType"
+          :view="node"
+          :boardInfo="board"
+          @updateviewport = "updateViewport"
+        />
       </div>
 
     </div>
@@ -64,12 +71,14 @@ import RenderTargetNode from "./node/render-target-node-view.vue";
 import { Vector4 } from "../../../../src/math/vector4";
 import NodeWrap from "./node-view.vue";
 import { GLApp } from "../../application";
+import ShaderFunctionNodeView from "./node/shader-function-node-view.vue";
 
 @Component({
   components: {
     PassNode,
     NodeWrap,
-    RenderTargetNode
+    RenderTargetNode,
+    ShaderFunctionNodeView
   }
 })
 export default class GraphViewer extends Vue {
@@ -94,6 +103,10 @@ export default class GraphViewer extends Vue {
 
   get targetNodeType(){
     return GraphNodeViewType.targetNode
+  }
+
+  get shaderFunctionNodeType(){
+    return GraphNodeViewType.shaderFuncNode
   }
 
   showMove = false;
