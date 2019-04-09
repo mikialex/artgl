@@ -197,9 +197,12 @@ export class Application {
   }
 
   unintialize() {
-    this.active = false;
     window.cancelAnimationFrame(this.tickId);
     window.removeEventListener('resize', this.onContainerResize);
+    this.active = false;
+    this.engine = null;
+    this.graph = null;
+    this.el = null;
   }
 
   private onContainerResize = () => {

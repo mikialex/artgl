@@ -4,13 +4,13 @@ import { GLProgramManager } from "./program-manager";
 import { GLAttributeBufferDataManager } from "./attribute-buffer-manager";
 import { GLState } from "./states/gl-state";
 import { DrawMode } from "./const";
-import { Nullable } from "../type";
+import { Nullable, GLRealeaseable } from "../type";
 import { GLTextureManager } from "./texture-manager";
 import { GLFrameBufferManager } from "./framebuffer-manager";
 import { GLFramebuffer } from "./gl-framebuffer";
 import { GLStat } from "./gl-stat";
 
-export class GLRenderer {
+export class GLRenderer implements GLRealeaseable{
   constructor(el?: HTMLCanvasElement, options?: any) {
     if (el === undefined) {
       el = document.createElement('canvas');
@@ -27,7 +27,6 @@ export class GLRenderer {
     this.glInfo = new GLInfo(this);
     this.frambufferManager = new GLFrameBufferManager(this);
     this.glInfo.createAllExtension();
-    this.devicePixelRatio = window.devicePixelRatio;
     this.state = new GLState(this);
     this.textureManger.init();
     this.setSize(this.el.offsetWidth, this.el.offsetHeight);
@@ -141,9 +140,11 @@ export class GLRenderer {
     this.setRenderTarget(null);
   }
 
-  dispose() {
-    this.attributeBufferManager.dispose();
-    this.programManager.dispose();
+  releaseGL() {
+    this.attributeBufferManager.releaseGL();
+    this.programManager.releaseGL();
+    this.textureManger.releaseGL();
+    this.frambufferManager.releaseGL();
   }
-  
+
 }

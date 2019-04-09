@@ -3,7 +3,7 @@
     <div class="editor">
       <h1>editor</h1>
       <div>
-        <GraphViewer :graphview="graphView"/>
+        <!-- <GraphViewer :graphview="graphView"/> -->
       </div>
     </div>
 
@@ -40,8 +40,8 @@ export default class ShaderEditor extends Vue {
   graphView: GraphView;
 
   mounted(){
-    ShaderApp.init(this.$el.querySelector("#shader-editor-canvas"));
-    this.graphView = GraphView.createFromShaderGraph(ShaderApp.graph);
+    // ShaderApp.init(this.$el.querySelector("#shader-editor-canvas"));
+    // this.graphView = GraphView.createFromShaderGraph(ShaderApp.graph);
   }
 
 }

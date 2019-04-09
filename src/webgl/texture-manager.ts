@@ -2,6 +2,7 @@ import { GLRenderer } from "./gl-renderer";
 import { generateUUID } from "../math/uuid";
 import { TextureFilter, TextureWrap } from "./const";
 import { Texture } from "../core/texture";
+import { GLRealeaseable } from '../type';
 
 enum TextureFormat {
   RGBA,
@@ -37,12 +38,12 @@ interface WebGLTextureWithVersionIDWrap{
  * @export
  * @class GLTextureManager
  */
-export class GLTextureManager{
+export class GLTextureManager implements GLRealeaseable{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
   }
   readonly renderer: GLRenderer;
-  private textures: { [index: string]: WebGLTexture } = {};
+  private textures: Map<string, WebGLTexture>  = new Map();
   // private textures: Map<Texture, WebGLTextureWithVersionIDWrap> = new Map();
 
   init() {
@@ -51,13 +52,13 @@ export class GLTextureManager{
   }
 
   getGLTexture(storeId: string) {
-    return this.textures[storeId];
+    return this.textures.get(storeId);
   }
 
   deleteGLTexture(storeId: string) {
     const texture = this.getGLTexture(storeId);
     this.renderer.gl.deleteTexture(texture);
-    this.textures[storeId] = undefined;
+    this.textures.delete(storeId);
   }
 
   createTextureFromImageElement(image: HTMLImageElement, config?: TextureDescriptor): string {
@@ -69,7 +70,7 @@ export class GLTextureManager{
   
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     const id = generateUUID();
-    this.textures[id] = texture;
+    this.textures.set(id, texture);
     return id;
   }
 
@@ -83,7 +84,7 @@ export class GLTextureManager{
     }
     this.fillRenderTarget(texture, width, height);
     const id = generateUUID();
-    this.textures[id] = texture;
+    this.textures.set(id, texture);
     return id;
   }
   // updateRenderTargetSize
@@ -120,5 +121,9 @@ export class GLTextureManager{
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, config.sWrap);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, config.tWrap);
     return texture;
+  }
+
+  releaseGL() {
+    
   }
 }
