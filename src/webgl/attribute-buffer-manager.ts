@@ -1,6 +1,7 @@
 import { GLRenderer } from "./gl-renderer";
+import { GLRealeaseable } from '../type';
 
-export class GLAttributeBufferDataManager {
+export class GLAttributeBufferDataManager implements GLRealeaseable {
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
   }
@@ -46,8 +47,8 @@ export class GLAttributeBufferDataManager {
     this.createBuffer(data, useForIndex);
   }
 
-  dispose() {
-    this.buffers = null;
+  releaseGL() {
+    this.buffers = new WeakMap();
   }
 
 }

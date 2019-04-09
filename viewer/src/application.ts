@@ -197,9 +197,12 @@ export class Application {
   }
 
   unintialize() {
-    this.active = false;
     window.cancelAnimationFrame(this.tickId);
     window.removeEventListener('resize', this.onContainerResize);
+    this.active = false;
+    this.engine = null;
+    this.graph = null;
+    this.el = null;
   }
 
   private onContainerResize = () => {
@@ -264,7 +267,7 @@ export class Application {
 
   createScene(scene: Scene): Scene {
     hierachyBallBuilder(scene.root);
-    this.loadOBJFromURL();
+    // this.loadOBJFromURL();
     return scene;
   }
 

@@ -1,7 +1,8 @@
 import { GLFramebuffer } from "./gl-framebuffer";
 import { GLRenderer } from "./gl-renderer";
+import { GLRealeaseable } from '../type';
 
-export class GLFrameBufferManager{
+export class GLFrameBufferManager implements GLRealeaseable{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
     this.gl = renderer.gl;
@@ -38,5 +39,9 @@ export class GLFrameBufferManager{
       throw `cant find frambuffer ${framebufferName}`
     }
     return frambuffer.textureAttachedSlot[0].gltexture;
+  }
+
+  releaseGL() {
+    
   }
 }

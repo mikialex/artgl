@@ -112,7 +112,6 @@ export default class NodeUIWrap extends Vue {
 <style scoped lang="scss">
 .node-wrap {
   pointer-events: auto;
-  width: 100px;
   min-height: 50px;
   border: 1px solid #999;
   border-radius: 3px;

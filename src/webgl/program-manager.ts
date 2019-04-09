@@ -1,7 +1,8 @@
 import { GLRenderer } from "./gl-renderer";
 import { GLProgram } from "./program";
+import { GLRealeaseable } from '../type';
 
-export class GLProgramManager{
+export class GLProgramManager implements GLRealeaseable {
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
   }
@@ -20,10 +21,11 @@ export class GLProgramManager{
     return this.programs.size;
   }
 
-  dispose() {
+  releaseGL() {
     this.programs.forEach(program => {
       program.dispose();
     })
+    this.programs = new Map();
   }
 
 }

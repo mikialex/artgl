@@ -12,7 +12,7 @@ import { Texture } from "../core/texture";
 import { Material } from "../core/material";
 import { GLTextureUniform } from "../webgl/uniform/uniform-texture";
 import { PerspectiveCamera } from "../camera/perspective-camera";
-import { Nullable } from "../type";
+import { Nullable, GLRealeaseable } from "../type";
 import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
 import { UniformProxy } from "./uniform-proxy";
 import { Observable } from "../core/observable";
@@ -34,7 +34,7 @@ export interface Size{
 const copyTechnique = new CopyTechnique();
 const quad = new QuadSource();
 
-export class ARTEngine {
+export class ARTEngine implements GLRealeaseable{
   constructor(el?: HTMLCanvasElement, options?: any) {
     this.renderer = new GLRenderer(el, options);
     // if we have a element param, use it as the default camera's param for convienience
@@ -323,10 +323,13 @@ export class ARTEngine {
     downloadCanvasPNGImage(this.renderer.el, 'artgl-renderscreenshot');
   }
 
+  releaseGL() {
+    this.renderer.releaseGL();
+  }
 
   dispose() {
     this.resizeObservable.clear();
-    this.renderer.dispose();
+    this.releaseGL();
   }
 
 

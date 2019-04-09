@@ -17,6 +17,7 @@ export interface GLProgramConfig {
   attributes: AttributeDescriptor[];
   uniforms?: UniformDescriptor[];
   uniformsIncludes?: InnerUniformMapDescriptor[];
+  _hasUniformIncludesExpand?: boolean;
   varyings?: VaryingDescriptor[];
   textures?: TextureDescriptor[];
   vertexShaderString: string;
@@ -32,16 +33,17 @@ function fullfillProgramConfig(config: GLProgramConfig){
   if (config.uniforms === undefined) {
     config.uniforms = [];
   }
-  if (config.uniformsIncludes !== undefined) {
+  if (config.uniformsIncludes !== undefined && config._hasUniformIncludesExpand !== true) {
     config.uniformsIncludes.forEach(ui => {
       config.uniforms.push(getInnerUniformDescriptor(ui));
     })
+    config._hasUniformIncludesExpand = true;
   }
   return config;
 }
 
 
-export class GLProgram {
+export class GLProgram{
   constructor(renderer: GLRenderer, config: GLProgramConfig) {
     fullfillProgramConfig(config);
     this.renderer = renderer;
@@ -120,12 +122,14 @@ export class GLProgram {
   }
 
   private compileShaders(conf: GLProgramConfig) {
+    let vertexShaderString = conf.vertexShaderString;
+    let fragmentShaderString = conf.fragmentShaderString;
     if (conf.autoInjectHeader) {
-      conf.vertexShaderString = injectVertexShaderHeaders(conf, conf.vertexShaderString);
-      conf.fragmentShaderString = injectFragmentShaderHeaders(conf, conf.fragmentShaderString);
+      vertexShaderString = injectVertexShaderHeaders(conf, conf.vertexShaderString);
+      fragmentShaderString = injectFragmentShaderHeaders(conf, conf.fragmentShaderString);
     }
-    this.vertexShader.compileShader(conf.vertexShaderString);
-    this.fragmentShader.compileShader(conf.fragmentShaderString);
+    this.vertexShader.compileShader(vertexShaderString);
+    this.fragmentShader.compileShader(fragmentShaderString);
   }
 
   private createProgram(vertexShader: GLShader, fragmentShader: GLShader) {

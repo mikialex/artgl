@@ -50,14 +50,14 @@ export function createUniform(program: GLProgram, descriptor: UniformDescriptor)
 }
 
 export function getInnerUniformDescriptor(des: InnerUniformMapDescriptor): UniformDescriptor {
-  const temdescritor = InnerUniformMap.get(des.mapInner);
-  const descritor = {
+  const temdescriptor = InnerUniformMap.get(des.mapInner);
+  const descriptor = {
     name: des.name,
-    type: temdescritor.type,
-    default: temdescritor.default,
+    type: temdescriptor.type,
+    default: temdescriptor.default,
     _innerGlobalUniform: des.mapInner
   }
-  return descritor;
+  return descriptor;
 }
 
 export class GLUniform{
