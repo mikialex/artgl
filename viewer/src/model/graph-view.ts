@@ -31,7 +31,9 @@ export class GraphView {
       })
     })
     view.rootNode = view.nodeMap.get(graph.getRootScreenTargetNode().uuid)
-
+    if (!view.rootNode) {
+      throw "cant find root";
+    }
     view.layout();
     return view;
   }
@@ -43,6 +45,7 @@ export class GraphView {
       view.nodeMap.set(node.uuid, nodeView)
       view.nodes.push(nodeView);
     })
+    view.rootNode = view.nodeMap.get(graph.getEffectRoot().uuid)
     
     view.layout();
     return view;

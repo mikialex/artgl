@@ -18,7 +18,7 @@
         />
 
         <RenderTargetNode
-          v-if="node.type === targetNodType"
+          v-if="node.type === targetNodeType"
           :view="node"
           :boardInfo="board"
           @updateviewport = "updateViewport"
@@ -92,7 +92,7 @@ export default class GraphViewer extends Vue {
     return GraphNodeViewType.passNode
   }
 
-  get targetNodType(){
+  get targetNodeType(){
     return GraphNodeViewType.targetNode
   }
 
@@ -144,7 +144,9 @@ export default class GraphViewer extends Vue {
       node.height
     );
     viewport.multiplyScalar(window.devicePixelRatio);
-    GLApp.graph.updateRenderTargetDebugView(node.uuid, viewport);
+    if(GLApp.graph){ // TODO
+      GLApp.graph.updateRenderTargetDebugView(node.uuid, viewport);
+    }
   }
 
   updateAllViewports(){

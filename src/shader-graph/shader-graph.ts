@@ -4,6 +4,7 @@ import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
 import { InnerSupportUniform, InnerUniformMapDescriptor } from "../webgl/uniform/uniform";
 import { GLProgramConfig } from "../webgl/program";
 import { findFirst } from "../util/array";
+import { BuildInShaderFuntions } from "./built-in/index";
 
 export interface ShaderGraphDefineInput {
   type: ShaderGraphNodeInputType,
@@ -25,9 +26,19 @@ export interface ShaderGraphDefine {
 }
 
 
+
 export class ShaderGraph {
 
+  constructor() {
+    BuildInShaderFuntions.forEach(fun => {
+      this.registShaderFunction(fun);
+    })
+  }
+
   define: ShaderGraphDefine;
+
+  functionNodeFactories: Map<string, ShaderFunction> = new Map();
+
   functionNodes: ShaderFunctionNode[] = [];
 
   // map shaderNodes define name to 
@@ -36,6 +47,8 @@ export class ShaderGraph {
   setGraph(define: ShaderGraphDefine): void {
     this.reset();
     this.define = define;
+    this.constructVertexGraph();
+    this.constructFragmentGraph();
   }
 
   constructVertexGraph() {
@@ -43,7 +56,28 @@ export class ShaderGraph {
   }
 
   constructFragmentGraph() {
-
+    this.define.effect.forEach(nodeDefine => {
+      const factory = this.functionNodeFactories.get(nodeDefine.type);
+      if (!factory) {
+        throw "cant find node type: " + nodeDefine.type
+      }
+      const node = factory.createNode(nodeDefine);
+      this.functionNodes.push(node);
+      this.functionNodesMap.set(nodeDefine.name, node);
+    })
+    this.functionNodes.forEach(node => {
+      Object.keys(node.define.input).forEach(key => {
+        const value = node.define.input[key];
+        if (value.type === ShaderGraphNodeInputType.shaderFunctionNode) {
+          const fromNode = this.functionNodesMap.get(key);
+          if (!fromNode) {
+            throw "cant find from node"
+          }
+          fromNode.connectTo(node);
+        }
+      })
+      
+    });
   }
 
   reset() {
@@ -87,90 +121,20 @@ export class ShaderGraph {
   }
 
   registShaderFunction(shaderFn: ShaderFunction) {
-
+    this.functionNodeFactories.set(shaderFn.define.name, shaderFn);
   }
 
   getEffectRoot() {
-    const root = findFirst(this.functionNodes, node => {
-      return node.name === "gl_FragColor"
+    return findFirst(this.functionNodes, node => {
+      return node.define.output === "gl_FragColor"
     })
-    if (!root) {
-      throw "cant find root of effect"
-    }
-    return root;
   }
 }
 
-const graph = new ShaderGraph();
-
 export enum ShaderGraphNodeInputType {
   innerUniform,
+  floatUnifrom,
   textureUniform,
   shaderFunctionNode,
   Attribute
 }
-
-graph.setGraph({
-
-  // decalare your fragment shader graph
-  // fragment shader graph should have a root node
-  // which output is gl_FragColor as the screen fragment output
-  effect: [
-    {
-      output: "gl_FragColor",
-      name: "result",
-      type: "composeAdd",
-      input: {
-        diffuse: {
-          type: ShaderGraphNodeInputType.shaderFunctionNode,
-        },
-        IBL: {
-          type: ShaderGraphNodeInputType.shaderFunctionNode,
-        },
-      }
-    },
-    {
-      output: "diffuse",
-      name: "diffuse",
-      type: "diffuse_lookup",
-      input: {
-        diffTex: {
-          type: ShaderGraphNodeInputType.textureUniform,
-        }
-      }
-    },
-    {
-      output: "IBL",
-      name: "IBL",
-      type: "envTex_cal",
-      input: {
-        envTex: {
-          type: ShaderGraphNodeInputType.textureUniform,
-        }
-      }
-    },
-  ],
-
-  // declare your vertex shader graph
-  // like frag, we export the graph root as gl_Position
-  transform: [
-    {
-      name: "root",
-      output: "gl_Position",
-      type: "VPtransfrom",
-      input: {
-        VPMatrix: {
-          type: ShaderGraphNodeInputType.innerUniform,
-          value: InnerSupportUniform.VPMatrix
-        },
-        position: {
-          type: ShaderGraphNodeInputType.Attribute
-        }
-      }
-    },
-  ],
-
-
-})
-
-const techniqueConf = graph.compile();
