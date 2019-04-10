@@ -6,6 +6,17 @@ import { GLProgramConfig } from "../webgl/program";
 import { findFirst } from "../util/array";
 import { BuildInShaderFuntions } from "./built-in/index";
 
+export enum ShaderGraphNodeInputType {
+  innerUniform,
+  commenUnifrom,
+  textureUniform,
+
+  shaderFunctionNode,
+  attribute,
+  varying,
+}
+
+
 export interface ShaderGraphDefineInput {
   type: ShaderGraphNodeInputType,
   value?: any
@@ -82,6 +93,7 @@ export class ShaderGraph {
 
   reset() {
     this.functionNodesMap.clear();
+    this.functionNodes = [];
   }
 
   compile(): GLProgramConfig {
@@ -98,6 +110,13 @@ export class ShaderGraph {
   }
 
   collectAttributeDepend(): AttributeDescriptor[] {
+    const attributeList = [];
+    this.functionNodes.forEach(node => {
+      // node.define.input.forEach(input => {
+        
+      // })
+    })
+    return attributeList;
     return [
       { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
       { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal, stride: 3 },
@@ -131,10 +150,3 @@ export class ShaderGraph {
   }
 }
 
-export enum ShaderGraphNodeInputType {
-  innerUniform,
-  floatUnifrom,
-  textureUniform,
-  shaderFunctionNode,
-  Attribute
-}
