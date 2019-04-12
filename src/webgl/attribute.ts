@@ -5,7 +5,8 @@ export const enum AttributeUsage {
   position,
   normal,
   color,
-  uv
+  uv,
+  unset
 }
 
 export interface AttributeDescriptor {

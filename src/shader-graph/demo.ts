@@ -58,7 +58,7 @@ graph.setGraph({
           value: InnerSupportUniform.VPMatrix
         },
         position: {
-          type: ShaderGraphNodeInputType.Attribute
+          type: ShaderGraphNodeInputType.attribute
         }
       }
     },

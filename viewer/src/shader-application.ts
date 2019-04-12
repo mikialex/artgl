@@ -1,6 +1,7 @@
 import { ShaderGraph, ShaderGraphNodeInputType } from '../../src/shader-graph/shader-graph';
 import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
 import { ARTEngine } from '../../src/artgl';
+import { GLDataType } from '../../src/webgl/shader-util';
 
 export class ShaderApplication {
 
@@ -25,11 +26,13 @@ export class ShaderApplication {
           type: "composeAddVec4",
           input: {
             diffuse: {
-              type: ShaderGraphNodeInputType.floatUnifrom
+              type: ShaderGraphNodeInputType.commenUnifrom,
+              dataType: GLDataType.float
               // type: ShaderGraphNodeInputType.shaderFunctionNode,
             },
             IBL: {
-              type: ShaderGraphNodeInputType.floatUnifrom
+              type: ShaderGraphNodeInputType.commenUnifrom,
+              dataType: GLDataType.float
               // type: ShaderGraphNodeInputType.shaderFunctionNode,
             },
           }
@@ -66,10 +69,12 @@ export class ShaderApplication {
           input: {
             VPMatrix: {
               type: ShaderGraphNodeInputType.innerUniform,
+              dataType: GLDataType.floatVec3,
               value: InnerSupportUniform.VPMatrix
             },
             position: {
-              type: ShaderGraphNodeInputType.Attribute
+              type: ShaderGraphNodeInputType.attribute,
+              dataType: GLDataType.floatVec3
             }
           }
         },

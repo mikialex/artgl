@@ -19,6 +19,7 @@ export enum ShaderGraphNodeInputType {
 
 export interface ShaderGraphDefineInput {
   type: ShaderGraphNodeInputType,
+  dataType: GLDataType,
   value?: any
 }
 
@@ -112,9 +113,16 @@ export class ShaderGraph {
   collectAttributeDepend(): AttributeDescriptor[] {
     const attributeList = [];
     this.functionNodes.forEach(node => {
-      // node.define.input.forEach(input => {
-        
-      // })
+      Object.keys(node.define.input).forEach(key => {
+        const input = node.define.input[key];
+        if (input.type === ShaderGraphNodeInputType.attribute) {
+          attributeList.push({
+            name: key,
+            type: input.dataType,
+            
+          })
+        }
+      })
     })
     return attributeList;
     return [
