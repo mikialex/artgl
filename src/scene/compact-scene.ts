@@ -23,6 +23,8 @@ const worldTransformArrayStride = 12;
 const worldAABBArrayStride = 6;
 const worldBSphereArrayStride = 4;
 
+const nodeIndexStride = 4;
+
 class CompactScene{
   static defaultCompactSceneCapacity = 1000;
   constructor() {
@@ -96,18 +98,60 @@ class CompactSceneNode{
 
   setIndex(id:number) {
     this.nodeId = id;
+
+    this.positionXIndex = this.nodeId * localPositionArrayStride;
+    this.positionYIndex = this.nodeId * localPositionArrayStride + 1;
+    this.positionZIndex = this.nodeId * localPositionArrayStride + 2;
+
+    this.parentIdIndex = this.nodeId * nodeIndexStride
+    this.firstIdIndex = this.nodeId * nodeIndexStride + 1;
+    this.preBrotherIdIndex = this.nodeId * nodeIndexStride + 2;
+    this.nextBrotherIdIndex = this.nodeId * nodeIndexStride + 3;
   }
 
   scene: CompactScene;
+
+  // cache for optimize 
   positionXIndex: number;
   positionYIndex: number;
   positionZIndex: number;
 
+  parentIdIndex: number;
+  firstIdIndex: number;
+  preBrotherIdIndex: number;
+  nextBrotherIdIndex: number;
+
   nodeId: number = null;
-  parentId: number = null;
-  firstChildId: number = null;
-  preBrotherId: number = null;
-  nextBrotherId: number = null;
+  
+  set parentId(id:number) {
+    this.scene.nodesIndexs[this.parentIdIndex] = id;
+  }
+  get parentId() {
+    return this.scene.nodesIndexs[this.parentIdIndex];
+  }
+
+  set firstChildId(id:number) {
+    this.scene.nodesIndexs[this.firstIdIndex] = id;
+  }
+  get firstChildId() {
+    return this.scene.nodesIndexs[this.firstIdIndex];
+  }
+
+  set preBrotherId(id:number) {
+    this.scene.nodesIndexs[this.preBrotherIdIndex] = id;
+  }
+  get preBrotherId() {
+    return this.scene.nodesIndexs[this.preBrotherIdIndex];
+  }
+
+  set nextBrotherId(id:number) {
+    this.scene.nodesIndexs[this.nextBrotherIdIndex] = id;
+  }
+  get nextBrotherId() {
+    return this.scene.nodesIndexs[this.nextBrotherIdIndex];
+  }
+
+  hasAttached = false;
 
   indexedchildren: number[];
 
@@ -119,8 +163,19 @@ class CompactSceneNode{
     
   }
 
-  add() {
+  traverse(visitor: Function) {
     
+  }
+
+  add(node: CompactSceneNode) {
+    if (node.hasAttached) {
+      throw "node should remove from scene before add to other"
+    }
+    if (node !== this) {
+      node.parentId = this.nodeId;
+    } else {
+      throw "cant add self"
+    }
   }
 
   remove() {
