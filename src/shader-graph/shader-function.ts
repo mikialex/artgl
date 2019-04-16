@@ -37,6 +37,7 @@ export class ShaderFunction{
 
   createNode(define: ShaderGraphNodeDefine): ShaderFunctionNode {
     const node = new ShaderFunctionNode(define);
+    node.factory = this;
     return node;
   }
 
@@ -59,6 +60,7 @@ export class ShaderFunctionNode extends DAGNode{
 
   name: string;
   define: ShaderGraphNodeDefine;
+  factory: ShaderFunction
 
   // create a fragmentshader from this node
   makeFragmentShader() {

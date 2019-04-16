@@ -2,6 +2,7 @@ import { ShaderGraph, ShaderGraphNodeInputType } from '../../src/shader-graph/sh
 import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
 import { ARTEngine } from '../../src/artgl';
 import { GLDataType } from '../../src/webgl/shader-util';
+import { ShaderFunction } from '../../src/shader-graph/shader-function';
 
 export class ShaderApplication {
 
@@ -14,6 +15,22 @@ export class ShaderApplication {
   init(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.engine = new ARTEngine(canvas);
+
+    this.graph.registShaderFunction(new ShaderFunction({
+      name: 'diffuse',
+      source: `
+      return vec4(diffuseColor);
+        `,
+      inputs: [
+        {
+          name: "diffuseColor",
+          type: GLDataType.floatVec3
+        }
+      ],
+      returnType: GLDataType.floatVec4
+    }))
+
+
     this.graph.setGraph({
 
       // decalare your fragment shader graph
@@ -26,7 +43,7 @@ export class ShaderApplication {
           type: "composeAddVec4",
           input: {
             diffuse: {
-              type: ShaderGraphNodeInputType.commenUniform,
+              type: ShaderGraphNodeInputType.shaderFunctionNode,
               dataType: GLDataType.float // TODO inner uniform may not need datatype define
               // type: ShaderGraphNodeInputType.shaderFunctionNode,
             },
@@ -37,16 +54,17 @@ export class ShaderApplication {
             },
           }
         },
-        // {
-        //   output: "diffuse",
-        //   name: "diffuse",
-        //   type: "diffuse_lookup",
-        //   input: {
-        //     diffTex: {
-        //       type: ShaderGraphNodeInputType.textureUniform,
-        //     }
-        //   }
-        // },
+        {
+          output: "result",
+          name: "diffuse",
+          type: "diffuse",
+          input: {
+            diffuseColor: {
+              type: ShaderGraphNodeInputType.commenUniform,
+              dataType: GLDataType.floatVec3
+            }
+          }
+        },
         // {
         //   output: "IBL",
         //   name: "IBL",

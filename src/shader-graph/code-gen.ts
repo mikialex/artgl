@@ -1,5 +1,6 @@
 import { ShaderGraph } from "./shader-graph";
-import { ShaderFunctionNode } from "./shader-function";
+import { ShaderFunctionNode, ShaderFunction } from "./shader-function";
+import { getShaderTypeStringFromGLDataType } from "../webgl/shader-util";
 
 export function genFragmentShader(graph: ShaderGraph): string {
   let result = "";
@@ -20,4 +21,35 @@ interface varRecord {
 
 function createVarRecord(varRecordList: varRecord[]) {
   
+}
+
+function genTempVarExpFromShaderFunction(
+  node: ShaderFunctionNode,
+  tempVarName: string,
+): string {
+  const functionDefine = node.factory.define;
+  const varType = getShaderTypeStringFromGLDataType(functionDefine.returnType);
+  let functionInputs = "";
+  functionDefine.inputs.forEach(inputDefine => {
+    // const paramType = getShaderTypeStringFromGLDataType(functionDefine.returnType);
+    // const paramStr = `${paramType} ${inputDefine.name}`
+    // functionInputs += paramStr
+  })
+  const result = `${varType} ${tempVarName} = ${functionDefine.name}(${functionInputs});`
+  return result;
+}
+
+function genShaderFunctionDeclare(shaderFunction: ShaderFunction): string {
+  const functionDefine = shaderFunction.define;
+  const varType = getShaderTypeStringFromGLDataType(functionDefine.returnType);
+  let functionInputs = "";
+  functionDefine.inputs.forEach(inputDefine => {
+    const paramType = getShaderTypeStringFromGLDataType(functionDefine.returnType);
+    const paramStr = `${paramType} ${inputDefine.name}`
+    functionInputs += paramStr
+  })
+  const result = `${varType} ${functionDefine.name}(${functionInputs}){
+    ${functionDefine.source}
+  }`
+  return result;
 }

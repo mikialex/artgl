@@ -52,7 +52,7 @@ Object.keys(shaderAttributStringInfo).forEach(key => {
     { name: key, stride: shaderAttributStringInfo[key].stride , default: shaderAttributStringInfo[key].default}
 })
 
-function GLDataType2ShaderString(type: GLDataType) {
+export function getShaderTypeStringFromGLDataType(type: GLDataType) {
   return reverseShaderStringMap[type];
 }
 
@@ -120,7 +120,7 @@ function generateUniformString(config: GLProgramConfig): string {
 
     for (const key in config.uniforms) {
       const uni = config.uniforms[key];
-      const type = GLDataType2ShaderString(uni.type);
+      const type = getShaderTypeStringFromGLDataType(uni.type);
       text = text + 'uniform ' + type + ' ' + uni.name + ';\n';
     }
   }
@@ -131,7 +131,7 @@ function generateVaryingString(config: GLProgramConfig): string {
   let text = '';
   if (config.varyings !== undefined) {
     config.varyings.forEach(vary => {
-      const type = GLDataType2ShaderString(vary.type);
+      const type = getShaderTypeStringFromGLDataType(vary.type);
       text = text + 'varying ' + type + ' ' + vary.name + ';\n';
     })
   }
