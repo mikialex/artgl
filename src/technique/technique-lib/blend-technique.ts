@@ -28,8 +28,8 @@ export class BlendTechnique extends Technique {
     const config: TechniqueConfig = {
       programConfig: {
         attributes: [
-          { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
-          { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
+          { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position},
+          { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv },
         ],
         uniforms:[
           {name: 'u_tssaoComposeRate',  default: 1.0, type: GLDataType.float},

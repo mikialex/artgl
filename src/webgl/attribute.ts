@@ -1,4 +1,4 @@
-import { GLDataType } from "./shader-util";
+import { GLDataType, getGLDataTypeStride } from "./shader-util";
 import { GLProgram } from "./program";
 
 export const enum AttributeUsage {
@@ -12,7 +12,6 @@ export const enum AttributeUsage {
 export interface AttributeDescriptor {
   name: string,
   type: GLDataType,
-  stride: number,
   usage: AttributeUsage
 }
 
@@ -42,7 +41,7 @@ export class GLAttribute {
     }
     const gl = this.gl;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.vertexAttribPointer(this.location, this.descriptor.stride, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(this.location, getGLDataTypeStride(this.descriptor.type), gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(this.location);
   }
 

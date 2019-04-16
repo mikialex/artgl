@@ -25,8 +25,8 @@ export class NormalTechnique extends Technique{
     const config = {
       programConfig:{
         attributes: [
-          { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
-          { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal, stride: 3 },
+          { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position},
+          { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal },
           // { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
         ],
         uniformsIncludes: [

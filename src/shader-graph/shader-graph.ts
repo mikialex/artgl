@@ -20,6 +20,7 @@ export enum ShaderGraphNodeInputType {
 export interface ShaderGraphDefineInput {
   type: ShaderGraphNodeInputType,
   dataType: GLDataType,
+  typeInfo?: any,
   value?: any
 }
 
@@ -116,20 +117,19 @@ export class ShaderGraph {
       Object.keys(node.define.input).forEach(key => {
         const input = node.define.input[key];
         if (input.type === ShaderGraphNodeInputType.attribute) {
+          let attusage = AttributeUsage.unset;
+          if (input.typeInfo && input.typeInfo.usage) {
+            attusage = input.typeInfo.usage
+          }
           attributeList.push({
             name: key,
             type: input.dataType,
-            
+            usage: attusage
           })
         }
       })
     })
     return attributeList;
-    return [
-      { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
-      { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal, stride: 3 },
-      // { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
-    ]
   }
 
   collectInnerUniformDepend(): InnerUniformMapDescriptor[] {

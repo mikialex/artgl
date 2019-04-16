@@ -39,7 +39,7 @@ export class DepthTechnique extends Technique {
     const config = {
       programConfig: {
         attributes: [
-          { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
+          { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position },
         ],
         uniformsIncludes: [
           { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix,},

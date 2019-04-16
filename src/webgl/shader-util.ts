@@ -54,7 +54,7 @@ function GLDataType2ShaderString(type: GLDataType) {
   return reverseShaderStringMap[type];
 }
 
-function getAttributeStride(type: GLDataType) {
+export function getGLDataTypeStride(type: GLDataType) {
   return reverseShaderAttributStringInfo[type].stride;
 }
 
@@ -95,7 +95,6 @@ function generateAttributeString(config: GLProgramConfig): string {
   let text = '';
   if (config.attributes !== undefined) {
     config.attributes.forEach(att => {
-      att.stride = getAttributeStride(att.type);
       const type = AttrivbuteGLDataType2ShaderString(att.type);
       text = text + 'attribute ' + type + ' ' + att.name + ';\n';
     })
