@@ -36,7 +36,7 @@ InnerUniformMap.set(InnerSupportUniform.LastVPMatrix, {
 export interface UniformDescriptor {
   name: string,
   type: GLDataType,
-  default: any,
+  default?: any,
   flattener?: flattenerType
   setter?: setterType,
   copyer?: copyerType,
@@ -54,7 +54,7 @@ export function getInnerUniformDescriptor(des: InnerUniformMapDescriptor): Unifo
   const descriptor = {
     name: des.name,
     type: temdescriptor.type,
-    default: temdescriptor.default,
+    default: temdescriptor.default, // TODO default seems not useful
     _innerGlobalUniform: des.mapInner
   }
   return descriptor;

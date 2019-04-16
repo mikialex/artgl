@@ -1,14 +1,13 @@
 import { ShaderFunction, ShaderFunctionNode } from "./shader-function";
-import { GLDataType } from "../webgl/shader-util";
+import { GLDataType, getGLDataTypeDefaultDefaultValue } from "../webgl/shader-util";
 import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
-import { InnerSupportUniform, InnerUniformMapDescriptor } from "../webgl/uniform/uniform";
-import { GLProgramConfig } from "../webgl/program";
+import { InnerSupportUniform, InnerUniformMapDescriptor, UniformDescriptor } from "../webgl/uniform/uniform";
+import { GLProgramConfig, VaryingDescriptor } from "../webgl/program";
 import { findFirst } from "../util/array";
 import { BuildInShaderFuntions } from "./built-in/index";
 
 export enum ShaderGraphNodeInputType {
-  innerUniform,
-  commenUnifrom,
+  commenUniform,
   textureUniform,
 
   shaderFunctionNode,
@@ -21,6 +20,7 @@ export interface ShaderGraphDefineInput {
   type: ShaderGraphNodeInputType,
   dataType: GLDataType,
   typeInfo?: any,
+  isInnerValue?: boolean,
   value?: any
 }
 
@@ -101,42 +101,83 @@ export class ShaderGraph {
   compile(): GLProgramConfig {
     return {
       attributes: this.collectAttributeDepend(),
+      uniforms: this.collectUniformDepend(),
       uniformsIncludes: this.collectInnerUniformDepend(),
-      varyings: [
-        { name: 'color', type: GLDataType.floatVec3 }
-      ],
+      varyings: this.collectVaryDepend(),
       vertexShaderString: this.compileVertexSource(),
       fragmentShaderString: this.compileFragSource(),
       autoInjectHeader: true,
     };
   }
 
-  collectAttributeDepend(): AttributeDescriptor[] {
-    const attributeList = [];
+  private visiteAllNodesInput(visitor: (
+    node: ShaderFunctionNode,
+    input: ShaderGraphDefineInput,
+    inputKey: string) => any) {
     this.functionNodes.forEach(node => {
       Object.keys(node.define.input).forEach(key => {
         const input = node.define.input[key];
-        if (input.type === ShaderGraphNodeInputType.attribute) {
-          let attusage = AttributeUsage.unset;
-          if (input.typeInfo && input.typeInfo.usage) {
-            attusage = input.typeInfo.usage
-          }
-          attributeList.push({
-            name: key,
-            type: input.dataType,
-            usage: attusage
-          })
-        }
+        visitor(node, input, key)
       })
+    })
+  }
+
+  collectVaryDepend(): VaryingDescriptor[] {
+    const varyingList: VaryingDescriptor[] = [];
+    this.visiteAllNodesInput((_node, input, key) => {
+      if (input.type === ShaderGraphNodeInputType.varying) {
+        varyingList.push({
+          name: key,
+          type: input.dataType,
+        })
+      }
+    })
+    return varyingList;
+  }
+
+  collectAttributeDepend(): AttributeDescriptor[] {
+    const attributeList: AttributeDescriptor[] = [];
+    this.visiteAllNodesInput((_node, input, key) => {
+      if (input.type === ShaderGraphNodeInputType.attribute) {
+        let attusage = AttributeUsage.unset;
+        if (input.typeInfo && input.typeInfo.usage) {
+          attusage = input.typeInfo.usage
+        }
+        attributeList.push({
+          name: key,
+          type: input.dataType,
+          usage: attusage
+        })
+      }
     })
     return attributeList;
   }
 
+  collectUniformDepend(): UniformDescriptor[] {
+    const uniformList: UniformDescriptor[] = [];
+    this.visiteAllNodesInput((_node, input, key) => {
+      if (input.type === ShaderGraphNodeInputType.varying) {
+        uniformList.push({
+          name: key,
+          type: input.dataType,
+        })
+      }
+    })
+    return uniformList;
+  }
+
   collectInnerUniformDepend(): InnerUniformMapDescriptor[] {
-    return [
-      { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix, },
-      { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix, }
-    ]
+    const innerUniformList: InnerUniformMapDescriptor[] = [];
+    this.visiteAllNodesInput((_node, input, key) => {
+      if (input.type === ShaderGraphNodeInputType.commenUniform
+      && input.isInnerValue) {
+        innerUniformList.push({
+          name: key,
+          mapInner: input.value,
+        })
+      }
+    })
+    return innerUniformList;
   }
 
   compileVertexSource(): string {

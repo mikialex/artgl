@@ -26,12 +26,12 @@ export class ShaderApplication {
           type: "composeAddVec4",
           input: {
             diffuse: {
-              type: ShaderGraphNodeInputType.commenUnifrom,
-              dataType: GLDataType.float
+              type: ShaderGraphNodeInputType.commenUniform,
+              dataType: GLDataType.float // TODO inner uniform may not need datatype define
               // type: ShaderGraphNodeInputType.shaderFunctionNode,
             },
             IBL: {
-              type: ShaderGraphNodeInputType.commenUnifrom,
+              type: ShaderGraphNodeInputType.commenUniform,
               dataType: GLDataType.float
               // type: ShaderGraphNodeInputType.shaderFunctionNode,
             },
@@ -68,8 +68,9 @@ export class ShaderApplication {
           type: "VPtransfrom",
           input: {
             VPMatrix: {
-              type: ShaderGraphNodeInputType.innerUniform,
+              type: ShaderGraphNodeInputType.commenUniform,
               dataType: GLDataType.floatVec3,
+              isInnerValue: true,
               value: InnerSupportUniform.VPMatrix
             },
             position: {

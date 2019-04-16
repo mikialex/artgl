@@ -1,5 +1,7 @@
 import { GLProgramConfig } from "./program";
 import { Matrix4, Vector3 } from "../math/index";
+import { Vector2 } from "../math/vector2";
+import { Vector4 } from "../math/vector4";
 
 export type GLData = number | Matrix4;
 
@@ -38,16 +40,16 @@ Object.keys(shaderStringMap).forEach(key => {
   reverseShaderStringMap[shaderStringMap[key]] = key
 })
 
-const shaderAttributStringInfo: { [index: string]: { type: GLDataType, stride: number} } = {
-  'float': { type: GLDataType.float, stride: 1 },
-  'vec2': { type: GLDataType.floatVec2, stride: 2 },
-  'vec3': { type: GLDataType.floatVec3, stride: 3 },
-  'vec4': { type: GLDataType.floatVec4, stride: 4 },
+const shaderAttributStringInfo: { [index: string]: { type: GLDataType, stride: number, default: any} } = {
+  'float': { type: GLDataType.float, stride: 1, default: 0 },
+  'vec2': { type: GLDataType.floatVec2, stride: 2, default: new Vector2() },
+  'vec3': { type: GLDataType.floatVec3, stride: 3, default: new Vector3() },
+  'vec4': { type: GLDataType.floatVec4, stride: 4, default: new Vector4() },
 }
-let reverseShaderAttributStringInfo: { [index: number]: { name: string, stride: number } } = {};
+let reverseShaderAttributStringInfo: { [index: number]: { name: string, stride: number , default: any} } = {};
 Object.keys(shaderAttributStringInfo).forEach(key => {
   reverseShaderAttributStringInfo[shaderAttributStringInfo[key].type] =
-    { name: key, stride: shaderAttributStringInfo[key].stride }
+    { name: key, stride: shaderAttributStringInfo[key].stride , default: shaderAttributStringInfo[key].default}
 })
 
 function GLDataType2ShaderString(type: GLDataType) {
@@ -56,6 +58,16 @@ function GLDataType2ShaderString(type: GLDataType) {
 
 export function getGLDataTypeStride(type: GLDataType) {
   return reverseShaderAttributStringInfo[type].stride;
+}
+
+export function getGLDataTypeDefaultDefaultValue(type: GLDataType) {
+  const value = reverseShaderAttributStringInfo[type].default;
+  try {
+    const clonedValue = value.clone();
+    return clonedValue;
+  } catch (error) {
+    return value
+  }
 }
 
 function AttrivbuteGLDataType2ShaderString(type: GLDataType) {
