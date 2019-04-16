@@ -7,10 +7,10 @@
     <div class="viewer">
       <h1>viewer</h1>
       <button v-if="showCode" @click="showCode = false">canvas</button>
-      <button v-else  @click="showCode = true">codegen result</button>
+      <button v-else  @click="codeGen">codegen result</button>
       <div v-if="showCode">
         <pre>
-          sdfj skdfj
+          {{codeGenResult}}
         </pre>
       </div>
       <div class="canvas-wrap" v-else>
@@ -35,11 +35,18 @@ import {ShaderApp} from '../shader-application';
 export default class ShaderEditor extends Vue {
   showCode:boolean = false;
   graphView: GraphView = null;
+  codeGenResult: string = "";
 
   mounted(){
     ShaderApp.init(this.$el.querySelector("#shader-editor-canvas"));
     this.graphView = GraphView.createFromShaderGraph(ShaderApp.graph);
     console.log(this.graphView)
+  }
+
+  codeGen(){
+    this.showCode = true;
+    const result = ShaderApp.graph.compile();
+    this.codeGenResult = result.fragmentShaderString;
   }
 
 }

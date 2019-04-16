@@ -5,6 +5,7 @@ import { InnerSupportUniform, InnerUniformMapDescriptor, UniformDescriptor } fro
 import { GLProgramConfig, VaryingDescriptor } from "../webgl/program";
 import { findFirst } from "../util/array";
 import { BuildInShaderFuntions } from "./built-in/index";
+import { genFragmentShader } from "./code-gen";
 
 export enum ShaderGraphNodeInputType {
   commenUniform,
@@ -185,7 +186,7 @@ export class ShaderGraph {
   }
 
   compileFragSource(): string {
-    return ""
+    return genFragmentShader(this);
   }
 
   registShaderFunction(shaderFn: ShaderFunction) {

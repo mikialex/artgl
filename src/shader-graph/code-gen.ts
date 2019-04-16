@@ -9,7 +9,17 @@ export function genFragmentShader(graph: ShaderGraph): string {
 }
 
 function genShaderFunctionDepend(graph: ShaderGraph): string {
-  return ""
+  let functionsStr = "";
+  const dependFunctions = {};
+  graph.functionNodes.forEach(node => {
+    if (dependFunctions[node.factory.define.name] === undefined) {
+      dependFunctions[node.factory.define.name] = node.factory;
+    }
+  })
+  Object.keys(dependFunctions).forEach(key => {
+    functionsStr += genShaderFunctionDeclare(dependFunctions[key])
+  })
+  return functionsStr
 }
 
 // temp1 = asd(12 + d);
@@ -50,6 +60,7 @@ function genShaderFunctionDeclare(shaderFunction: ShaderFunction): string {
   })
   const result = `${varType} ${functionDefine.name}(${functionInputs}){
     ${functionDefine.source}
-  }`
+  }
+  `
   return result;
 }
