@@ -101,6 +101,10 @@ export enum GraphNodeViewType{
   shaderFuncNode
 }
 
+interface GraphNodeInputDefineView{
+  name: string
+}
+
 export class GraphNodeView {
   name: string;
   uuid: string;
@@ -110,6 +114,8 @@ export class GraphNodeView {
   positionY: number = 0;
   inputsID: string[] = [];
   inputs: GraphNodeView[] = [];
+
+  inputDefine: GraphNodeInputDefineView[] = [];
   type: GraphNodeViewType;
 
   static create(node: DAGNode) {
@@ -122,20 +128,32 @@ export class GraphNodeView {
 
     if (node instanceof PassGraphNode) {
       view.name = node.name;
-      view.height = 20;
+      if (node.define.inputs !== undefined) {
+        view.inputDefine = Object.keys(node.define.inputs()).map(key => {
+          return {
+            name: key
+          }
+        })
+      }
+      view.height = 20 + view.inputDefine.length * 20;
       view.type = GraphNodeViewType.passNode;
     } else if (node instanceof RenderTargetNode) {
       view.name = node.name;
       view.type = GraphNodeViewType.targetNode;
     } else if (node instanceof ShaderFunctionNode) {
-      view.name = 'a shader funciton node';
+      view.name = node.factory.define.name;
       view.type = GraphNodeViewType.shaderFuncNode;
+      view.inputDefine = Object.keys(node.define.input).map(key => {
+        return {
+          name: key
+        }
+      })
     }
     return view;
   }
 
   getConnectionLines(graph: GraphView, boardInfo) {
-    return this.inputsID.map(id => {
+    return this.inputsID.map((id, index) => {
       const inputNode = graph.nodeMap.get(id);
       return {
         id: this.uuid + inputNode.uuid,
@@ -143,7 +161,7 @@ export class GraphNodeView {
           inputNode.positionX + inputNode.width + boardInfo.transformX,
           inputNode.positionY + inputNode.height / 2 + boardInfo.transformY,
           this.positionX + boardInfo.transformX,
-          this.positionY + this.height / 2 + boardInfo.transformY
+          this.positionY + boardInfo.transformY + index * 20 + 20
         )
       }
     })

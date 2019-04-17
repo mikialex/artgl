@@ -37,11 +37,9 @@ interface varRecord {
 
 function genTempVarExpFromShaderFunction(
   node: ShaderFunctionNode,
-  tempVarName: string,
   ctx: varRecord[]
 ): string {
   const functionDefine = node.factory.define;
-  const varType = getShaderTypeStringFromGLDataType(functionDefine.returnType);
 
   function getParamKeyFromVarList(ctx: varRecord[], node: ShaderFunctionNode): string {
     const record = findFirst(ctx, varRc => {
@@ -64,7 +62,7 @@ function genTempVarExpFromShaderFunction(
     }
 
   })
-  const result = `${varType} ${tempVarName} = ${functionDefine.name}(${functionInputs});`
+  const result = `${functionDefine.name}(${functionInputs});`
   return result;
 }
 
@@ -78,15 +76,18 @@ function codeGenGraph(graph: ShaderGraph): string {
     varList.push({
       refedNode: nodeToGen, 
       varKey: varName,
-      expression: genTempVarExpFromShaderFunction(
-        nodeToGen,  varName, varList
-      ),
+      expression: genTempVarExpFromShaderFunction(nodeToGen, varList),
     })
   })
   builder.writeLine("void main(){")
   builder.addIndent()
-  varList.forEach(varRc => {
-    builder.writeLine(varRc.expression)
+  varList.forEach((varRc, index) => {
+    if (index !== varList.length - 1) {
+      const varType = getShaderTypeStringFromGLDataType(varRc.refedNode.factory.define.returnType);
+      builder.writeLine(`${varType} ${varRc.varKey} = ${varRc.expression});`)
+    } else {
+      builder.writeLine(`gl_FragColor = ${varRc.expression});`)
+    }
   })
   builder.reduceIndent()
   builder.writeLine("}")

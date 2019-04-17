@@ -41,6 +41,13 @@
         {{input.name}}
       </div>
     </div>-->
+
+    <div class="input-info">
+      <div v-for="nodeinputDefine in node.inputDefine" :key="nodeinputDefine.name">
+        {{nodeinputDefine.name}}
+      </div>
+    </div>
+
     <slot></slot>
   </div>
 </template>

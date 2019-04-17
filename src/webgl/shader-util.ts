@@ -87,9 +87,9 @@ export function injectVertexShaderHeaders(config: GLProgramConfig, shaderText: s
 export function injectFragmentShaderHeaders(config: GLProgramConfig, shaderText: string) {
   let injectText = '';
   injectText += 'precision highp float;\n';
-  injectText = injectText + generateUniformString(config);
-  injectText = injectText + generateVaryingString(config);
-  injectText = injectText + generateTextureString(config);
+  injectText += generateUniformString(config);
+  injectText += generateVaryingString(config);
+  injectText += generateTextureString(config);
   return injectText + shaderText;
 }
 

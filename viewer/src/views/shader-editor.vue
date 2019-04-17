@@ -8,10 +8,8 @@
       <h1>viewer</h1>
       <button v-if="showCode" @click="showCode = false">canvas</button>
       <button v-else  @click="codeGen">codegen result</button>
-      <div v-if="showCode">
-        <pre>
-          {{codeGenResult}}
-        </pre>
+      <div v-if="showCode" class="code-result">
+        <pre>{{codeGenResult}}</pre>
       </div>
       <div class="canvas-wrap" v-else>
         <canvas id="shader-editor-canvas"></canvas>
@@ -26,6 +24,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import GraphViewer from '../components/graph-viewer/graph-viewer.vue';
 import { GraphView } from '../model/graph-view';
 import {ShaderApp} from '../shader-application';
+import { injectFragmentShaderHeaders } from '../../../src/webgl/shader-util';
 
 @Component({
   components:{
@@ -46,7 +45,7 @@ export default class ShaderEditor extends Vue {
   codeGen(){
     this.showCode = true;
     const result = ShaderApp.graph.compile();
-    this.codeGenResult = result.fragmentShaderString;
+    this.codeGenResult = injectFragmentShaderHeaders(result, result.fragmentShaderString);
   }
 
 }
@@ -82,5 +81,9 @@ export default class ShaderEditor extends Vue {
 h1 {
   margin: 0px;
   font-size: 20px;
+}
+
+.code-result{
+  overflow: scroll;
 }
 </style>
