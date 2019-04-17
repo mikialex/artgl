@@ -2,6 +2,9 @@ import { ShaderGraph } from "./shader-graph";
 import { ShaderFunctionNode, ShaderFunction } from "./shader-function";
 import { getShaderTypeStringFromGLDataType } from "../webgl/shader-util";
 import { findFirst } from "../util/array";
+import { CodeBuilder } from "./util/code-builder";
+
+const builder = new CodeBuilder()
 
 export function genFragmentShader(graph: ShaderGraph): string {
   let result = "";
@@ -67,6 +70,7 @@ function genTempVarExpFromShaderFunction(
 
 
 function codeGenGraph(graph: ShaderGraph): string {
+  builder.reset();
   const nodeDependList = graph.getEffectRoot().generateDependencyOrderList() as ShaderFunctionNode[];
   const varList: varRecord[] = [];
   nodeDependList.forEach(nodeToGen => {
@@ -79,14 +83,18 @@ function codeGenGraph(graph: ShaderGraph): string {
       ),
     })
   })
-  let result = "";
+  builder.writeLine("void main(){")
+  builder.addIndent()
   varList.forEach(varRc => {
-    result += `${varRc.varKey} = ${varRc.expression}\n`
+    builder.writeLine(varRc.expression)
   })
-  return result;
+  builder.reduceIndent()
+  builder.writeLine("}")
+  return builder.output();
 }
 
 function genShaderFunctionDeclare(shaderFunction: ShaderFunction): string {
+  builder.reset();
   const functionDefine = shaderFunction.define;
   const varType = getShaderTypeStringFromGLDataType(functionDefine.returnType);
   let functionInputs = "";
@@ -98,10 +106,11 @@ function genShaderFunctionDeclare(shaderFunction: ShaderFunction): string {
       functionInputs += ", "
     }
   })
-  const result =
-`${varType} ${functionDefine.name}(${functionInputs}){
-  ${functionDefine.source}
-}
-`
-  return result;
+
+  builder.writeLine(`${varType} ${functionDefine.name}(${functionInputs}){`)
+  builder.addIndent()
+  builder.writeBlock(functionDefine.source)
+  builder.reduceIndent()
+  builder.writeLine("}")
+  return builder.output();
 }
