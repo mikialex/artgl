@@ -45,5 +45,13 @@ export class GLShader {
 }
 
 function logDebugShaderSource(source: string) {
-  console.log(source);
+  console.log(addLineNumbers(source));
+}
+
+function addLineNumbers(string) {
+  var lines = string.split('\n');
+  for (var i = 0; i < lines.length; i++) {
+    lines[i] = (i + 1) + ': ' + lines[i];
+  }
+  return lines.join('\n');
 }

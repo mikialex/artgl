@@ -6,6 +6,14 @@ export class DAGNode {
   protected fromNode: DAGNode[] = [];
   protected fullfillList: boolean[] = [];
 
+  public getFromNodeByIndex(index:number) {
+    return this.fromNode[index]
+  }
+
+  public getToNodeByIndex(index:number) {
+    return this.toNode[index]
+  }
+
   public forFromNode(visitor: (node: DAGNode)=>any) {
     this.fromNode.forEach(visitor);
   }
