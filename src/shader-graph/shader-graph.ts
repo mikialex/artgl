@@ -79,7 +79,7 @@ export class ShaderGraph {
       this.functionNodesMap.set(nodeDefine.name, node);
     })
     this.functionNodes.forEach(node => {
-      Object.keys(node.define.input).forEach(key => {
+      Object.keys(node.define.input).forEach((key, index) => {
         const value = node.define.input[key];
         if (value.type === ShaderGraphNodeInputType.shaderFunctionNode) {
           const fromNode = this.functionNodesMap.get(key);
@@ -91,6 +91,10 @@ export class ShaderGraph {
       })
       
     });
+  }
+
+  private checkDataTypeIsMatch(node: ShaderFunctionNode, nodeInput:ShaderFunctionNode, inputIndex: number) {
+    return node.factory.define.inputs[inputIndex].type === nodeInput.factory.define.returnType
   }
 
   reset() {
