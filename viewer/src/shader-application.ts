@@ -44,12 +44,10 @@ export class ShaderApplication {
           input: {
             diffuse: {
               type: ShaderGraphNodeInputType.shaderFunctionNode,
-              dataType: GLDataType.float // TODO inner uniform may not need datatype define
               // type: ShaderGraphNodeInputType.shaderFunctionNode,
             },
             IBL: {
               type: ShaderGraphNodeInputType.commenUniform,
-              dataType: GLDataType.float
               // type: ShaderGraphNodeInputType.shaderFunctionNode,
             },
           }
@@ -61,7 +59,6 @@ export class ShaderApplication {
           input: {
             diffuseColor: {
               type: ShaderGraphNodeInputType.commenUniform,
-              dataType: GLDataType.floatVec3
             }
           }
         },
@@ -87,13 +84,11 @@ export class ShaderApplication {
           input: {
             VPMatrix: {
               type: ShaderGraphNodeInputType.commenUniform,
-              dataType: GLDataType.floatVec3,
               isInnerValue: true,
               value: InnerSupportUniform.VPMatrix
             },
             position: {
               type: ShaderGraphNodeInputType.attribute,
-              dataType: GLDataType.floatVec3
             }
           }
         },

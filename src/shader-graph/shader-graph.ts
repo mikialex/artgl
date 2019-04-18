@@ -1,4 +1,4 @@
-import { ShaderFunction, ShaderFunctionNode } from "./shader-function";
+import { ShaderFunction, ShaderFunctionNode, ShaderFunctionInput } from "./shader-function";
 import { GLDataType, getGLDataTypeDefaultDefaultValue } from "../webgl/shader-util";
 import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
 import { InnerSupportUniform, InnerUniformMapDescriptor, UniformDescriptor } from "../webgl/uniform/uniform";
@@ -19,7 +19,6 @@ export enum ShaderGraphNodeInputType {
 
 export interface ShaderGraphDefineInput {
   type: ShaderGraphNodeInputType,
-  dataType: GLDataType,
   typeInfo?: any,
   isInnerValue?: boolean,
   value?: any
@@ -114,22 +113,24 @@ export class ShaderGraph {
   private visiteAllNodesInput(visitor: (
     node: ShaderFunctionNode,
     input: ShaderGraphDefineInput,
+    inputDefine: ShaderFunctionInput,
     inputKey: string) => any) {
     this.functionNodes.forEach(node => {
-      Object.keys(node.define.input).forEach(key => {
+      Object.keys(node.define.input).forEach((key, index) => {
         const input = node.define.input[key];
-        visitor(node, input, key)
+        const inputDefine = node.factory.define.inputs[index];
+        visitor(node, input, inputDefine, key);
       })
     })
   }
 
   collectVaryDepend(): VaryingDescriptor[] {
     const varyingList: VaryingDescriptor[] = [];
-    this.visiteAllNodesInput((_node, input, key) => {
+    this.visiteAllNodesInput((node, input, inputDefine, key) => {
       if (input.type === ShaderGraphNodeInputType.varying) {
         varyingList.push({
           name: key,
-          type: input.dataType,
+          type: inputDefine.type
         })
       }
     })
@@ -138,7 +139,7 @@ export class ShaderGraph {
 
   collectAttributeDepend(): AttributeDescriptor[] {
     const attributeList: AttributeDescriptor[] = [];
-    this.visiteAllNodesInput((_node, input, key) => {
+    this.visiteAllNodesInput((_node, input, inputDefine, key) => {
       if (input.type === ShaderGraphNodeInputType.attribute) {
         let attusage = AttributeUsage.unset;
         if (input.typeInfo && input.typeInfo.usage) {
@@ -146,7 +147,7 @@ export class ShaderGraph {
         }
         attributeList.push({
           name: key,
-          type: input.dataType,
+          type: inputDefine.type,
           usage: attusage
         })
       }
@@ -156,11 +157,11 @@ export class ShaderGraph {
 
   collectUniformDepend(): UniformDescriptor[] {
     const uniformList: UniformDescriptor[] = [];
-    this.visiteAllNodesInput((_node, input, key) => {
+    this.visiteAllNodesInput((_node, input, inputDefine, key) => {
       if (input.type === ShaderGraphNodeInputType.varying) {
         uniformList.push({
           name: key,
-          type: input.dataType,
+          type: inputDefine.type,
         })
       }
     })
@@ -169,7 +170,7 @@ export class ShaderGraph {
 
   collectInnerUniformDepend(): InnerUniformMapDescriptor[] {
     const innerUniformList: InnerUniformMapDescriptor[] = [];
-    this.visiteAllNodesInput((_node, input, key) => {
+    this.visiteAllNodesInput((_node, input, _inputDefine, key) => {
       if (input.type === ShaderGraphNodeInputType.commenUniform
       && input.isInnerValue) {
         innerUniformList.push({
