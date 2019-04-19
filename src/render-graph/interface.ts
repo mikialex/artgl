@@ -2,7 +2,7 @@ import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
 export interface GraphDefine {
   passes: PassDefine[],
-  renderTargets: RenderTextureDefine[];
+  renderTargets: RenderTargetDefine[];
 }
 
 export interface PassInputMapInfo{
@@ -35,7 +35,7 @@ export enum DimensionType {
   fixed
 }
 
-export interface RenderTextureDefine {
+export interface RenderTargetDefine {
   name: string,
   from: () => Nullable<string>
   format?: {

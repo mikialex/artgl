@@ -71,7 +71,7 @@ export class RenderPass{
   private inputTarget: Map<string, string> = new Map();
   private outputTarget: GLFramebuffer
   setOutPutTarget(renderTargetNode: RenderTargetNode) {
-    if (renderTargetNode.name === 'screen') {
+    if (renderTargetNode.name === RenderGraph.screenRoot) {
       this.outputTarget = undefined;
       this.isOutputScreen = true;
     } else {

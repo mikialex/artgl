@@ -1,5 +1,5 @@
 import { EffectComposer } from "./effect-composer";
-import { PassDefine, GraphDefine, RenderTextureDefine } from "./interface";
+import { PassDefine, GraphDefine, RenderTargetDefine } from "./interface";
 import { PassGraphNode } from "./dag/pass-graph-node";
 import { RenderTargetNode } from "./dag/render-target-node";
 import { ARTEngine, RenderSource } from "../engine/render-engine";
@@ -9,6 +9,7 @@ import { Vector4 } from "../math/vector4";
 import { RenderPass } from "./pass";
 
 export class RenderGraph {
+  static screenRoot: string = 'artgl-rendergraph-screen-rt';
   constructor(engine: ARTEngine) {
     this.engine = engine;
     this.composer = new EffectComposer(this);
@@ -101,13 +102,13 @@ export class RenderGraph {
     return screenNode;
   }
 
-  private allocaterenderTargetNodes(textsDefine: RenderTextureDefine[]) {
+  private allocaterenderTargetNodes(textsDefine: RenderTargetDefine[]) {
     textsDefine.forEach(define => {
       if (this.renderTargetNodes.has(define.name)) {
         throw 'render graph build error, dupilcate texture key namefound '
       }
       const renderTargetNode = new RenderTargetNode(this, define);
-      if (define.name === 'screen') {
+      if (define.name === RenderGraph.screenRoot) {
         if (this.screenNode !== undefined) {
           throw "duplicate screen root node"
         }

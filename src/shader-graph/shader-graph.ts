@@ -25,7 +25,6 @@ export interface ShaderGraphDefineInput {
 }
 
 export interface ShaderGraphNodeDefine {
-  output: string,
   name: string,
   type: string,
   input: { [index: string]: ShaderGraphDefineInput }
@@ -34,7 +33,9 @@ export interface ShaderGraphNodeDefine {
 
 export interface ShaderGraphDefine {
   effect: ShaderGraphNodeDefine[],
+  effectRoot: string,
   transform?: ShaderGraphNodeDefine[],
+  transformRoot: string
 
 }
 
@@ -198,10 +199,8 @@ export class ShaderGraph {
     this.functionNodeFactories.set(shaderFn.define.name, shaderFn);
   }
 
-  getEffectRoot() {
-    return findFirst(this.functionNodes, node => {
-      return node.define.output === "gl_FragColor"
-    })
+  getEffectRoot(): ShaderFunctionNode {
+    return this.functionNodesMap.get(this.define.effectRoot);
   }
 }
 

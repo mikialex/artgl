@@ -38,22 +38,20 @@ export class ShaderApplication {
       // which output is gl_FragColor as the screen fragment output
       effect: [
         {
-          output: "gl_FragColor",
           name: "result",
           type: "composeAddVec4",
           input: {
-            diffuse: {
+            sourceA: {
               type: ShaderGraphNodeInputType.shaderFunctionNode,
-              // type: ShaderGraphNodeInputType.shaderFunctionNode,
+              value: "diffuse"
             },
-            IBL: {
-              type: ShaderGraphNodeInputType.commenUniform,
-              // type: ShaderGraphNodeInputType.shaderFunctionNode,
+            sourceB: {
+              type: ShaderGraphNodeInputType.shaderFunctionNode,
+              value: "IBL"
             },
           }
         },
         {
-          output: "result",
           name: "diffuse",
           type: "diffuse",
           input: {
@@ -62,24 +60,23 @@ export class ShaderApplication {
             }
           }
         },
-        // {
-        //   output: "IBL",
-        //   name: "IBL",
-        //   type: "envTex_cal",
-        //   input: {
-        //     envTex: {
-        //       type: ShaderGraphNodeInputType.textureUniform,
-        //     }
-        //   }
-        // },
+        {
+          name: "IBL",
+          type: "envTex_cal",
+          input: {
+            envTex: {
+              type: ShaderGraphNodeInputType.textureUniform,
+            }
+          }
+        },
       ],
+      effectRoot:"result",
     
       // declare your vertex shader graph
       // like frag, we export the graph root as gl_Position
       transform: [
         {
           name: "root",
-          output: "gl_Position",
           type: "VPtransfrom",
           input: {
             VPMatrix: {
@@ -93,6 +90,7 @@ export class ShaderApplication {
           }
         },
       ],
+      transformRoot:"result",
     
     
     })
