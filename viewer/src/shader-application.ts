@@ -1,13 +1,18 @@
 import { ShaderGraph, ShaderGraphNodeInputType } from '../../src/shader-graph/shader-graph';
 import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
-import { ARTEngine } from '../../src/artgl';
+import { ARTEngine, Technique } from '../../src/artgl';
 import { GLDataType } from '../../src/webgl/shader-util';
 import { ShaderFunction } from '../../src/shader-graph/shader-function';
+import { Scene } from '../../src/scene/scene';
+import ARTGL from '../../src/export';
 
 export class ShaderApplication {
 
   canvas: HTMLCanvasElement;
   graph: ShaderGraph = new ShaderGraph();
+  scene: Scene = new Scene();
+
+  technique: Technique;
 
   engine: ARTEngine;
 
@@ -62,9 +67,9 @@ export class ShaderApplication {
         },
         {
           name: "IBL",
-          type: "envTex_cal",
+          type: "diffuse",
           input: {
-            envTex: {
+            diffuseColor: {
               type: ShaderGraphNodeInputType.textureUniform,
             }
           }
@@ -94,6 +99,20 @@ export class ShaderApplication {
     
     
     })
+  }
+
+  loadScene() {
+    let testGeo = new ARTGL.SphereGeometry(1, 40, 40);
+    let testPlane = new ARTGL.PlaneGeometry(10, 10, 10, 10);
+    let testTec = new ARTGL.NormalTechnique();
+  }
+
+  start() {
+    
+  }
+
+  render() {
+    this.engine.render();
   }
 
   uninit() {

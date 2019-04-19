@@ -45,6 +45,13 @@ export class GraphView {
       view.nodeMap.set(node.uuid, nodeView)
       view.nodes.push(nodeView);
     })
+    
+    view.nodes.forEach(node => {
+      node.inputsID.forEach(id => {
+        node.inputs.push(view.nodeMap.get(id));
+      })
+    })
+
     view.rootNode = view.nodeMap.get(graph.getEffectRoot().uuid)
     
     view.layout();

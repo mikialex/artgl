@@ -81,12 +81,15 @@ export class ShaderGraph {
     })
     this.functionNodes.forEach(node => {
       Object.keys(node.define.input).forEach((key, index) => {
-        const value = node.define.input[key];
-        if (value.type === ShaderGraphNodeInputType.shaderFunctionNode) {
-          const fromNode = this.functionNodesMap.get(key);
+        const input = node.define.input[key];
+        if (input.type === ShaderGraphNodeInputType.shaderFunctionNode) {
+          const fromNode = this.functionNodesMap.get(input.value);
           if (!fromNode) {
-            throw "cant find from node"
+            console.warn(key);
+            console.warn(node);
+            throw "constructFragmentGraph failed: cant find from node"
           }
+          this.checkDataTypeIsMatch(node, fromNode, index);
           fromNode.connectTo(node);
         }
       })
@@ -95,7 +98,12 @@ export class ShaderGraph {
   }
 
   private checkDataTypeIsMatch(node: ShaderFunctionNode, nodeInput:ShaderFunctionNode, inputIndex: number) {
-    return node.factory.define.inputs[inputIndex].type === nodeInput.factory.define.returnType
+    const result = node.factory.define.inputs[inputIndex].type === nodeInput.factory.define.returnType;
+    if (!result) {
+      console.warn("node:", node);
+      console.warn("inputnode:", nodeInput);
+      throw "constructFragmentGraph failed: type missmatch"
+    }
   }
 
   reset() {
