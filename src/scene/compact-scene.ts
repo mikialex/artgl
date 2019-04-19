@@ -41,7 +41,6 @@ class CompactScene{
   sortKeyArray: Uint32Array;
 
   emptyArray: Uint8Array;
-
   emptyListArray: Uint16Array;
   emptyCount: number;
 

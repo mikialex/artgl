@@ -1,4 +1,5 @@
 mod utils;
+mod array_scene;
 
 use wasm_bindgen::prelude::*;
 
