@@ -13,7 +13,8 @@ pub struct ArrayScene{
   empty_list_array: Vec<u16>,
   empty_count: u16,
 
-  nodes_indexs: Vec<u16>,
+  // [parent, left brother, right brother, first child]
+  nodes_indexs: Vec<i16>,
 }
 
 const default_node_capacity: usize = 100000;
@@ -49,30 +50,37 @@ impl ArrayScene {
   }
 
   #[wasm_bindgen]
-  pub fn batch_renderlist(&self){
+  pub fn batch_renderlist(&mut self){
     self.update_hirerachy();
   }
 
-  fn traverse_from(&self, node_index: u16, 
-  visitor: &Fn(u16, &mut ArrayScene) -> () 
+  fn traverse_from(&mut self, index: i16, 
+  visitor: &Fn(i16, &mut ArrayScene) -> () 
   ){
-    
+    let mut travers_stack: Vec<i16> = Vec::with_capacity(100);
+    loop {
+      let first_child = self.nodes_indexs[(index as usize) + 3];
+      if first_child != -1 { // has more children
+        travers_stack.push(first_child);
+
+      }
+    }
   }
 
-  fn update_hirerachy(&self){
+  fn update_hirerachy(&mut self){
     self.traverse_from(0, &update_hirerachy_visitor)
   }
 
 }
 
-fn update_hirerachy_visitor(index: u16, scene: &mut ArrayScene){
+fn update_hirerachy_visitor(index: i16, scene: &mut ArrayScene){
   update_localmatrix(index);
   update_worldmatrix_by_parent(index);
 }
 
 use na::{Matrix4};
 
-fn update_worldmatrix_by_parent(index: u16){
+fn update_worldmatrix_by_parent(index: i16){
   let local = Matrix4::new(
     1.0, 1.0, 1.0, 1.0,
     1.0, 1.0, 1.0, 1.0,
@@ -82,6 +90,6 @@ fn update_worldmatrix_by_parent(index: u16){
   
 }
 
-fn update_localmatrix(index: u16){
+fn update_localmatrix(index: i16){
 
 }
