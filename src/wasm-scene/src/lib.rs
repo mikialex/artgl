@@ -2,6 +2,7 @@ mod utils;
 mod array_scene;
 
 use wasm_bindgen::prelude::*;
+extern crate nalgebra as na;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
