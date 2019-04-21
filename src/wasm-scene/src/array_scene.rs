@@ -28,21 +28,19 @@ const nodeIndexStride: usize = 4;
 impl ArrayScene {
   pub fn new() -> ArrayScene {
     ArrayScene {
-      localTransformArray: Vec::with_capacity(100);
-      localPositionArray: Vec<f32>;
-      worldTransformArray: Vec<f32>;
-      worldAABBArray: Vec<f32>;
-      worldBSphereArray: Vec<f32>;
+      localTransformArray: Vec::with_capacity(100),
+      localPositionArray: Vec::with_capacity(100),
+      worldTransformArray: Vec::with_capacity(100),
+      worldAABBArray: Vec::with_capacity(100),
+      worldBSphereArray: Vec::with_capacity(100),
 
-      emptyArray: Vec<u8>;
-      emptyListArray: Vec<u16>;
-      emptyCount: u16;
+      emptyArray: Vec::with_capacity(100),
+      emptyListArray: Vec::with_capacity(100),
+      emptyCount: 0,
 
-      nodesIndexs: Vec<u16>;
+      nodesIndexs: Vec::with_capacity(100),
     }
   }
-
-  
 
   #[wasm_bindgen]
   pub fn allocate(){
@@ -50,7 +48,29 @@ impl ArrayScene {
   }
 
   #[wasm_bindgen]
-  pub fn batch_renderlist(){
+  pub fn batch_renderlist(&self){
+    self.update_hirerachy();
+  }
+
+  fn traverse_from(&self, node_index: u16, 
+  visitor: &Fn(u16) -> () 
+  ){
+    
+  }
+
+  fn update_hirerachy(&self){
+    self.traverse_from(0, self.update_hirerachy_visitor)
+  }
+
+  fn update_hirerachy_visitor(){
+
+  }
+
+  fn update_worldmatrix_by_parent(node_index: u16){
+
+  }
+
+  fn update_localmatrix(node_index: u16){
 
   }
 }
