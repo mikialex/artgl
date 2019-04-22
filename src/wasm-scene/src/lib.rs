@@ -1,5 +1,6 @@
 mod utils;
 mod array_scene;
+mod math;
 
 use wasm_bindgen::prelude::*;
 extern crate nalgebra as na;

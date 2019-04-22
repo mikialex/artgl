@@ -1,4 +1,5 @@
 use wasm_bindgen::prelude::*;
+use crate::math::*;
 
 #[wasm_bindgen]
 pub struct ArrayScene{
@@ -17,30 +18,29 @@ pub struct ArrayScene{
   nodes_indexs: Vec<i16>,
 }
 
-const default_node_capacity: usize = 100000;
-const LOCAL_TRANSFORM_ARRAY_STRIDE: usize = 12;
-const LOCAL_POSITION_ARRAY_STRIDE: usize = 3;
+const DEFAULT_NODE_CAPACITY: usize = 100000;
+const TRANSFORM_ARRAY_STRIDE: usize = 16;
+const POSITION_ARRAY_STRIDE: usize = 3;
 const WORLD_AABB_ARRAY_STRIDE: usize = 12;
-const world_aabb_array_stride: usize = 6;
-const world_bsphere_array_stride: usize = 4;
-const node_index_stride: usize = 4;
+const WORLD_BSPHERE_ARRAY_STRIDE: usize = 4;
+const NODE_INDEX_STRIDE: usize = 4;
 
 
 #[wasm_bindgen]
 impl ArrayScene {
   pub fn new() -> ArrayScene {
     ArrayScene {
-      local_transform_array: Vec::with_capacity(100),
-      local_position_array: Vec::with_capacity(100),
-      world_transform_array: Vec::with_capacity(100),
-      world_aabb_array: Vec::with_capacity(100),
-      world_bsphere_array: Vec::with_capacity(100),
+      local_transform_array: Vec::with_capacity(DEFAULT_NODE_CAPACITY * TRANSFORM_ARRAY_STRIDE),
+      local_position_array: Vec::with_capacity(DEFAULT_NODE_CAPACITY * POSITION_ARRAY_STRIDE),
+      world_transform_array: Vec::with_capacity(DEFAULT_NODE_CAPACITY * TRANSFORM_ARRAY_STRIDE),
+      world_aabb_array: Vec::with_capacity(DEFAULT_NODE_CAPACITY * WORLD_AABB_ARRAY_STRIDE),
+      world_bsphere_array: Vec::with_capacity(DEFAULT_NODE_CAPACITY * WORLD_BSPHERE_ARRAY_STRIDE),
 
-      empty_array: Vec::with_capacity(100),
-      empty_list_array: Vec::with_capacity(100),
+      empty_array: Vec::with_capacity(DEFAULT_NODE_CAPACITY),
+      empty_list_array: Vec::with_capacity(DEFAULT_NODE_CAPACITY),
       empty_count: 0,
 
-      nodes_indexs: Vec::with_capacity(100),
+      nodes_indexs: Vec::with_capacity(DEFAULT_NODE_CAPACITY * NODE_INDEX_STRIDE),
     }
   }
 
@@ -58,11 +58,27 @@ impl ArrayScene {
   visitor: &Fn(i16, &mut ArrayScene) -> () 
   ){
     let mut travers_stack: Vec<i16> = Vec::with_capacity(100);
+    travers_stack.push(index);
     loop {
+      if travers_stack.len() == 0 {
+        break;
+      }
+
+      let node_to_visit = travers_stack.pop().unwrap();
+      visitor(node_to_visit, self);
+
       let first_child = self.nodes_indexs[(index as usize) + 3];
       if first_child != -1 { // has more children
         travers_stack.push(first_child);
-
+        let current_child = first_child;
+        loop {
+          let next_child = self.nodes_indexs[(current_child as usize) + 2];
+          if next_child != -1 {
+            travers_stack.push(next_child);
+          } else {
+            break
+          }
+        }
       }
     }
   }
@@ -74,22 +90,6 @@ impl ArrayScene {
 }
 
 fn update_hirerachy_visitor(index: i16, scene: &mut ArrayScene){
-  update_localmatrix(index);
-  update_worldmatrix_by_parent(index);
-}
-
-use na::{Matrix4};
-
-fn update_worldmatrix_by_parent(index: i16){
-  let local = Matrix4::new(
-    1.0, 1.0, 1.0, 1.0,
-    1.0, 1.0, 1.0, 1.0,
-    1.0, 1.0, 1.0, 1.0,
-    1.0, 1.0, 1.0, 1.0,
-  );
-  
-}
-
-fn update_localmatrix(index: i16){
-
+  // update_localmatrix(index, scene);
+  update_worldmatrix_by_parent(index, &mut scene.nodes_indexs);
 }
