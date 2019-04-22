@@ -67,6 +67,7 @@ impl ArrayScene {
       let node_to_visit = travers_stack.pop().unwrap();
       visitor(node_to_visit, self);
 
+      // add childs to stack
       let first_child = self.nodes_indexs[(index as usize) + 3];
       if first_child != -1 { // has more children
         travers_stack.push(first_child);
@@ -80,6 +81,7 @@ impl ArrayScene {
           }
         }
       }
+
     }
   }
 
