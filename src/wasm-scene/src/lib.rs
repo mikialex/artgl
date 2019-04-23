@@ -1,6 +1,6 @@
-mod utils;
 mod array_scene;
 mod math;
+mod utils;
 
 use wasm_bindgen::prelude::*;
 extern crate nalgebra as na;
@@ -12,17 +12,17 @@ extern crate nalgebra as na;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
-extern {
-    fn alert(s: &str);
-    
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
+extern "C" {
+  fn alert(s: &str);
 
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_f32(s: f32);
+  #[wasm_bindgen(js_namespace = console)]
+  fn log(s: &str);
+
+  #[wasm_bindgen(js_namespace = console, js_name = log)]
+  fn log_f32(s: f32);
 }
 
 #[wasm_bindgen]
 pub fn greet() {
-    alert("Hello, wasm-scene!");
+  alert("Hello, wasm-scene!");
 }

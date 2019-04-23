@@ -2,29 +2,10 @@ import { CompactSceneNode } from "./wasm-scene-node";
 import { ArrayScene } from "../pkg/wasm_scene";
 import * as wasmScene from "../pkg/wasm_scene_bg";
 
-function setBit() {
-
-}
-
-// MSB [ 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 ] LSB
-//       ^ ^       ^  ^                                   ^^                 ^
-//       | |       |  |                                   ||                 |- 3 bits - Shader System (Pass Immediate)
-//       | |       |  |                                   ||- 16 bits - Depth
-//       | |       |  |                                   |- 1 bit - Instance bit
-//       | |       |  |- 32 bits - User defined
-//       | |       |- 3 bits - Shader System (Pass Deferred)
-//       | - 7 bits - Layer System
-//       |- 2 bits - Unused
-// 
-
-
-// transform * 12, bboxminx, bboxminy, bboxminz, bboxmaxx, bboxmaxy, bboxmaxz, centerx, centery, centerz, bsphereR,
-// vertexcount, facecount
-
 export const transformArrayStride = 12;
 export const positionArrayStride = 3;
-export const worldAABBArrayStride = 6;
-export const worldBSphereArrayStride = 4;
+export const AABBArrayStride = 6;
+export const BSphereArrayStride = 4;
 
 export const nodeIndexStride = 4;
 
@@ -73,14 +54,9 @@ export class CompactScene {
     const wasmMemoryBuffer = wasmScene.memory.buffer;
 
     this.localPositionArray =
-    new Float32Array(wasmMemoryBuffer,
-      alloctionInfo.local_position_array_start,
-      newCapacity * positionArrayStride);
-    
-    // this.localTransformArray =
-    //   new Float32Array(wasmMemoryBuffer,
-    //     alloctionInfo.local_transform_array_start,
-    //     newCapacity * transformArrayStride);
+      new Float32Array(wasmMemoryBuffer,
+        alloctionInfo.local_position_array_start,
+        newCapacity * positionArrayStride);
 
     this.localTransformArray =
       new Float32Array(wasmMemoryBuffer,
@@ -91,12 +67,29 @@ export class CompactScene {
       new Float32Array(wasmMemoryBuffer,
         alloctionInfo.world_transform_array_start,
         newCapacity * transformArrayStride);
-    
+
+    this.localAABBArray =
+      new Float32Array(wasmMemoryBuffer,
+        alloctionInfo.local_aabb_array_start,
+        newCapacity * AABBArrayStride);
+    this.worldAABBArray =
+      new Float32Array(wasmMemoryBuffer,
+        alloctionInfo.world_aabb_array_start,
+        newCapacity * AABBArrayStride);
+
+    this.localBSphereArray =
+      new Float32Array(wasmMemoryBuffer,
+        alloctionInfo.local_bsphere_array_start,
+        newCapacity * BSphereArrayStride);
+    this.worldBSphereArray =
+      new Float32Array(wasmMemoryBuffer,
+        alloctionInfo.world_bsphere_array_start,
+        newCapacity * BSphereArrayStride);
+
     this.nodesIndexs =
       new Int16Array(wasmMemoryBuffer,
         alloctionInfo.nodes_indexs_start,
         newCapacity * nodeIndexStride);
-
 
   }
 
@@ -129,12 +122,12 @@ export class CompactScene {
     return node;
   }
 
-  private markNodeDeleteion(node: CompactSceneNode) {
+  private markNodeDeletion(node: CompactSceneNode) {
     this.emptyArray[node.nodeId] = 1;
   }
 
   deleteSceneNode(node: CompactSceneNode) {
-    this.markNodeDeleteion(node);
+    this.markNodeDeletion(node);
     this.nodeCount--;
   }
 
@@ -142,3 +135,23 @@ export class CompactScene {
 
   }
 }
+
+function setBit() {
+
+}
+
+// MSB [ 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 ] LSB
+//       ^ ^       ^  ^                                   ^^                 ^
+//       | |       |  |                                   ||                 |- 3 bits - Shader System (Pass Immediate)
+//       | |       |  |                                   ||- 16 bits - Depth
+//       | |       |  |                                   |- 1 bit - Instance bit
+//       | |       |  |- 32 bits - User defined
+//       | |       |- 3 bits - Shader System (Pass Deferred)
+//       | - 7 bits - Layer System
+//       |- 2 bits - Unused
+// 
+
+
+// transform * 12, bboxminx, bboxminy, bboxminz, bboxmaxx, bboxmaxy, bboxmaxz, centerx, centery, centerz, bsphereR,
+// vertexcount, facecount
+
