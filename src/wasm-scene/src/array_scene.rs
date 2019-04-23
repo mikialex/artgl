@@ -59,11 +59,8 @@ impl ArrayScene {
   ){
     let mut travers_stack: Vec<i16> = Vec::with_capacity(100);
     travers_stack.push(index);
-    loop {
-      if travers_stack.len() == 0 {
-        break;
-      }
-
+    while travers_stack.len() != 0 {
+      
       let node_to_visit = travers_stack.pop().unwrap();
       visitor(node_to_visit, self);
 
