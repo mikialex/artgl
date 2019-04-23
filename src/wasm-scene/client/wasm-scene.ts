@@ -1,4 +1,6 @@
 import { CompactSceneNode } from "./wasm-scene-node";
+import { ArrayScene } from "../pkg/wasm_scene";
+import * as wasmScene from "../pkg/wasm_scene_bg";
 
 function setBit() {
 
@@ -19,25 +21,38 @@ function setBit() {
 // transform * 12, bboxminx, bboxminy, bboxminz, bboxmaxx, bboxmaxy, bboxmaxz, centerx, centery, centerz, bsphereR,
 // vertexcount, facecount
 
-export const localTransformArrayStride = 12;
-export const localPositionArrayStride = 3;
-export const worldTransformArrayStride = 12;
+export const transformArrayStride = 12;
+export const positionArrayStride = 3;
 export const worldAABBArrayStride = 6;
 export const worldBSphereArrayStride = 4;
 
 export const nodeIndexStride = 4;
 
-export class CompactScene{
-  static defaultCompactSceneCapacity = 1000;
+export class CompactScene {
+  static defaultCompactSceneCapacity = 100;
   constructor() {
+    this.wasmScene = ArrayScene.new();
     this.checkIfNeedAndReAllocate(this.capacity);
   }
 
+  destroy() {
+    this.wasmScene.free();
+  }
+
+  wasmScene: ArrayScene;
+
   // each data is indexed for a sceneNode;
-  localTransformArray: Float32Array;
   localPositionArray: Float32Array;
+  localRotationArray: Float32Array;
+  localScaleArray: Float32Array;
+
+  localTransformArray: Float32Array;
   worldTransformArray: Float32Array;
+
+  localAABBArray: Float32Array;
   worldAABBArray: Float32Array;
+
+  localBSphereArray: Float32Array;
   worldBSphereArray: Float32Array;
 
   sortKeyArray: Uint32Array;
@@ -46,23 +61,52 @@ export class CompactScene{
   emptyListArray: Uint16Array;
   emptyCount: number;
 
-  nodesIndexs: Uint16Array;
-  nodes: CompactSceneNode[];
+  nodesIndexs: Int16Array;
+  nodes: CompactSceneNode[] = [];
 
   capacity: number = CompactScene.defaultCompactSceneCapacity;
   nodeCount: number = 0;
 
-  private checkIfNeedAndReAllocate(newCapacity:number) {
+  private checkIfNeedAndReAllocate(newCapacity: number) {
+    const alloctionInfo = this.wasmScene.allocate(newCapacity);
+    console.log("wasm reallocated:", alloctionInfo);
+    const wasmMemoryBuffer = wasmScene.memory.buffer;
+
+    this.localPositionArray =
+    new Float32Array(wasmMemoryBuffer,
+      alloctionInfo.local_position_array_start,
+      newCapacity * positionArrayStride);
     
+    // this.localTransformArray =
+    //   new Float32Array(wasmMemoryBuffer,
+    //     alloctionInfo.local_transform_array_start,
+    //     newCapacity * transformArrayStride);
+
+    this.localTransformArray =
+      new Float32Array(wasmMemoryBuffer,
+        alloctionInfo.local_transform_array_start,
+        newCapacity * transformArrayStride);
+
+    this.worldTransformArray =
+      new Float32Array(wasmMemoryBuffer,
+        alloctionInfo.world_transform_array_start,
+        newCapacity * transformArrayStride);
+    
+    this.nodesIndexs =
+      new Int16Array(wasmMemoryBuffer,
+        alloctionInfo.nodes_indexs_start,
+        newCapacity * nodeIndexStride);
+
+
   }
 
-  private findAvaliableNodeIndex(): number{
+  private findAvaliableNodeIndex(): number {
     if (this.nodeCount < this.capacity) {
       this.nodeCount++;
       return this.nodeCount;
     } else {
       if (this.emptyCount > 0) {
-        
+
       } else {
         this.checkIfNeedAndReAllocate(this.capacity * 1.8);
         return this.findAvaliableNodeIndex();
@@ -74,6 +118,13 @@ export class CompactScene{
     const node = new CompactSceneNode(this);
     const index = this.findAvaliableNodeIndex();
     node.setIndex(index);
+
+    node.nextBrotherId = -1;
+    node.preBrotherId = -1;
+    node.parentId = -1;
+    node.firstChildId = -1;
+
+    this.nodes[index] = node;
     this.nodeCount++;
     return node;
   }
@@ -86,8 +137,8 @@ export class CompactScene{
     this.markNodeDeleteion(node);
     this.nodeCount--;
   }
-  
+
   batchDrawcall() {
-    
+
   }
 }

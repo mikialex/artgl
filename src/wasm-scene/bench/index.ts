@@ -1,9 +1,20 @@
 import * as wasm from "../pkg/wasm_scene";
 
 import {memory} from '../pkg/wasm_scene_bg'
+import { CompactScene } from "../client/wasm-scene";
 
 console.log(wasm)
 console.log(memory)
+
+const scene = new CompactScene();
+console.log(scene)
+
+const node1 = scene.createSceneNode();
+
+console.log(node1)
+
+const node2 = scene.createSceneNode();
+console.log(node2)
 
 // wasm.greet("hello from js to wasm");
 

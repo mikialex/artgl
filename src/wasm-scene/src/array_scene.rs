@@ -2,6 +2,17 @@ use wasm_bindgen::prelude::*;
 use crate::math::*;
 
 #[wasm_bindgen]
+pub struct ArraySceneAllocationProtocal{
+  pub local_transform_array_start: *const f32,
+  pub local_position_array_start: *const f32,
+  pub world_transform_array_start: *const f32,
+  pub world_aabb_array_start: *const f32,
+  pub world_bsphere_array_start: *const f32,
+
+  pub nodes_indexs_start: *const i16,
+}
+
+#[wasm_bindgen]
 pub struct ArrayScene{
   local_transform_array: Vec<f32>,
   local_position_array: Vec<f32>,
@@ -18,7 +29,7 @@ pub struct ArrayScene{
   nodes_indexs: Vec<i16>,
 }
 
-pub const DEFAULT_NODE_CAPACITY: usize = 100000;
+pub const DEFAULT_NODE_CAPACITY: usize = 100;
 pub const TRANSFORM_ARRAY_STRIDE: usize = 16;
 pub const POSITION_ARRAY_STRIDE: usize = 3;
 pub const WORLD_AABB_ARRAY_STRIDE: usize = 12;
@@ -45,8 +56,28 @@ impl ArrayScene {
   }
 
   #[wasm_bindgen]
-  pub fn allocate(){
-    
+  pub fn allocate(&mut self, capacity: usize) -> ArraySceneAllocationProtocal{
+    // self.local_transform_array = Vec::with_capacity(capacity * TRANSFORM_ARRAY_STRIDE);
+    self.local_transform_array =  vec![0.0; capacity * TRANSFORM_ARRAY_STRIDE];
+    self.local_position_array =  vec![0.0; capacity * POSITION_ARRAY_STRIDE];
+    self.world_transform_array =  vec![0.0; capacity * TRANSFORM_ARRAY_STRIDE];
+    self.world_aabb_array =  vec![0.0; capacity * WORLD_AABB_ARRAY_STRIDE];
+    self.world_bsphere_array =  vec![0.0; capacity * WORLD_BSPHERE_ARRAY_STRIDE];
+
+    self.empty_array = vec![0; capacity];
+    self.empty_list_array = vec![0; capacity];
+
+    self.nodes_indexs = vec![0; capacity];
+
+    ArraySceneAllocationProtocal{
+      local_transform_array_start: self.local_transform_array.as_ptr(),
+        local_position_array_start: self.local_position_array.as_ptr(),
+        world_transform_array_start: self.world_transform_array.as_ptr(),
+        world_aabb_array_start: self.world_aabb_array.as_ptr(),
+        world_bsphere_array_start: self.world_bsphere_array.as_ptr(),
+
+        nodes_indexs_start: self.nodes_indexs.as_ptr(),
+    }
   }
 
   #[wasm_bindgen]

@@ -1,4 +1,4 @@
-import { CompactScene, localPositionArrayStride, nodeIndexStride } from "./wasm-scene";
+import { CompactScene, positionArrayStride, nodeIndexStride } from "./wasm-scene";
 
 type SceneNodeVisitor = (node: CompactSceneNode) => any;
 type SceneNodeVisitorEarlyExit = (node: CompactSceneNode) => boolean;
@@ -12,27 +12,27 @@ export class CompactSceneNode{
   setIndex(id:number) {
     this.nodeId = id;
 
-    this.positionXIndex = this.nodeId * localPositionArrayStride;
-    this.positionYIndex = this.nodeId * localPositionArrayStride + 1;
-    this.positionZIndex = this.nodeId * localPositionArrayStride + 2;
+    this._positionXIndex = this.nodeId * positionArrayStride;
+    this._positionYIndex = this.nodeId * positionArrayStride + 1;
+    this._positionZIndex = this.nodeId * positionArrayStride + 2;
 
-    this.parentIdIndex = this.nodeId * nodeIndexStride
-    this.firstIdIndex = this.nodeId * nodeIndexStride + 1;
-    this.preBrotherIdIndex = this.nodeId * nodeIndexStride + 2;
-    this.nextBrotherIdIndex = this.nodeId * nodeIndexStride + 3;
+    this._parentIdIndex = this.nodeId * nodeIndexStride
+    this._firstIdIndex = this.nodeId * nodeIndexStride + 1;
+    this._preBrotherIdIndex = this.nodeId * nodeIndexStride + 2;
+    this._nextBrotherIdIndex = this.nodeId * nodeIndexStride + 3;
   }
 
   scene: CompactScene;
 
   // cache for optimize 
-  positionXIndex: number;
-  positionYIndex: number;
-  positionZIndex: number;
+  _positionXIndex: number;
+  _positionYIndex: number;
+  _positionZIndex: number;
 
-  parentIdIndex: number;
-  firstIdIndex: number;
-  preBrotherIdIndex: number;
-  nextBrotherIdIndex: number;
+  _parentIdIndex: number;
+  _firstIdIndex: number;
+  _preBrotherIdIndex: number;
+  _nextBrotherIdIndex: number;
 
   nodeId: number = null;
 
@@ -115,55 +115,55 @@ export class CompactSceneNode{
   }
     
   set parentId(id:number) {
-    this.scene.nodesIndexs[this.parentIdIndex] = id;
+    this.scene.nodesIndexs[this._parentIdIndex] = id;
   }
   get parentId() {
-    return this.scene.nodesIndexs[this.parentIdIndex];
+    return this.scene.nodesIndexs[this._parentIdIndex];
   }
 
   set firstChildId(id:number) {
-    this.scene.nodesIndexs[this.firstIdIndex] = id;
+    this.scene.nodesIndexs[this._firstIdIndex] = id;
   }
   get firstChildId() {
-    return this.scene.nodesIndexs[this.firstIdIndex];
+    return this.scene.nodesIndexs[this._firstIdIndex];
   }
 
   set preBrotherId(id:number) {
-    this.scene.nodesIndexs[this.preBrotherIdIndex] = id;
+    this.scene.nodesIndexs[this._preBrotherIdIndex] = id;
   }
   get preBrotherId() {
-    return this.scene.nodesIndexs[this.preBrotherIdIndex];
+    return this.scene.nodesIndexs[this._preBrotherIdIndex];
   }
 
   set nextBrotherId(id:number) {
-    this.scene.nodesIndexs[this.nextBrotherIdIndex] = id;
+    this.scene.nodesIndexs[this._nextBrotherIdIndex] = id;
   }
   get nextBrotherId() {
-    return this.scene.nodesIndexs[this.nextBrotherIdIndex];
+    return this.scene.nodesIndexs[this._nextBrotherIdIndex];
   }
 
   set positionX(x: number) {
-    this.scene.localPositionArray[this.positionXIndex] = x;
+    this.scene.localPositionArray[this._positionXIndex] = x;
   }
 
   set positionY(y: number) {
-    this.scene.localPositionArray[this.positionYIndex] = y;
+    this.scene.localPositionArray[this._positionYIndex] = y;
   }
 
   set positionZ(z: number) {
-    this.scene.localPositionArray[this.positionZIndex] = z;
+    this.scene.localPositionArray[this._positionZIndex] = z;
   }
 
   get PositionX() {
-    return this.scene.localPositionArray[this.positionXIndex]
+    return this.scene.localPositionArray[this._positionXIndex]
   }
 
   get PositionY() {
-    return this.scene.localPositionArray[this.positionYIndex]
+    return this.scene.localPositionArray[this._positionYIndex]
   }
 
   get PositionZ() {
-    return this.scene.localPositionArray[this.positionZIndex]
+    return this.scene.localPositionArray[this._positionZIndex]
   }
 
 }
