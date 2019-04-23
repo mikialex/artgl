@@ -18,9 +18,12 @@ pub fn update_worldmatrix_by_parent(
   );
 }
 
-// pub fn update_localmatrix(
-//   index: i16,
-//   scene: &mut ArrayScene
-//  ){
+pub fn update_localmatrix(
+  index: i16,
+  local_position: &Vec<f32>,
+  local_rotation: &Vec<f32>,
+  local_scale: &Vec<f32>,
+  local_matrix: &mut Vec<f32>,
+ ){
 
-// }
+}

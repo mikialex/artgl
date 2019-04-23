@@ -4,6 +4,9 @@ import * as wasmScene from "../pkg/wasm_scene_bg";
 
 export const transformArrayStride = 12;
 export const positionArrayStride = 3;
+export const rotationArrayStride = 3;
+export const scaleArrayStride = 3;
+
 export const AABBArrayStride = 6;
 export const BSphereArrayStride = 4;
 
@@ -47,6 +50,9 @@ export class CompactScene {
 
   capacity: number = CompactScene.defaultCompactSceneCapacity;
   nodeCount: number = 0;
+  get rootNode() {
+    return this.nodes[0];
+  }
 
   private checkIfNeedAndReAllocate(newCapacity: number) {
     const alloctionInfo = this.wasmScene.allocate(newCapacity);
@@ -57,6 +63,18 @@ export class CompactScene {
       new Float32Array(wasmMemoryBuffer,
         alloctionInfo.local_position_array_start,
         newCapacity * positionArrayStride);
+
+
+    this.localRotationArray =
+      new Float32Array(wasmMemoryBuffer,
+        alloctionInfo.local_rotation_array_start,
+        newCapacity * rotationArrayStride);
+
+
+    this.localScaleArray =
+      new Float32Array(wasmMemoryBuffer,
+        alloctionInfo.local_scale_array_start,
+        newCapacity * scaleArrayStride);
 
     this.localTransformArray =
       new Float32Array(wasmMemoryBuffer,
@@ -95,8 +113,9 @@ export class CompactScene {
 
   private findAvaliableNodeIndex(): number {
     if (this.nodeCount < this.capacity) {
+      let ret = this.nodeCount;
       this.nodeCount++;
-      return this.nodeCount;
+      return ret;
     } else {
       if (this.emptyCount > 0) {
 
@@ -118,7 +137,6 @@ export class CompactScene {
     node.firstChildId = -1;
 
     this.nodes[index] = node;
-    this.nodeCount++;
     return node;
   }
 
