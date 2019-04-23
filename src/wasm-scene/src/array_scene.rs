@@ -18,12 +18,12 @@ pub struct ArrayScene{
   nodes_indexs: Vec<i16>,
 }
 
-const DEFAULT_NODE_CAPACITY: usize = 100000;
-const TRANSFORM_ARRAY_STRIDE: usize = 16;
-const POSITION_ARRAY_STRIDE: usize = 3;
-const WORLD_AABB_ARRAY_STRIDE: usize = 12;
-const WORLD_BSPHERE_ARRAY_STRIDE: usize = 4;
-const NODE_INDEX_STRIDE: usize = 4;
+pub const DEFAULT_NODE_CAPACITY: usize = 100000;
+pub const TRANSFORM_ARRAY_STRIDE: usize = 16;
+pub const POSITION_ARRAY_STRIDE: usize = 3;
+pub const WORLD_AABB_ARRAY_STRIDE: usize = 12;
+pub const WORLD_BSPHERE_ARRAY_STRIDE: usize = 4;
+pub const NODE_INDEX_STRIDE: usize = 4;
 
 
 #[wasm_bindgen]
@@ -89,6 +89,16 @@ impl ArrayScene {
 }
 
 fn update_hirerachy_visitor(index: i16, scene: &mut ArrayScene){
-  // update_localmatrix(index, scene);
-  update_worldmatrix_by_parent(index, &mut scene.nodes_indexs);
+  // update_localmatrix(
+  //   index, 
+  //   &scene.local_position_array,
+  //   &scene.local_rotation_array,
+  //   &scene.local_scale_array,
+  // );
+  update_worldmatrix_by_parent(
+    index, 
+    &scene.nodes_indexs,
+    &scene.local_transform_array,
+    &mut scene.world_transform_array,
+  );
 }
