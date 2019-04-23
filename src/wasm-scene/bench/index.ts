@@ -16,6 +16,12 @@ console.log(node1)
 const node2 = scene.createSceneNode();
 console.log(node2)
 
+node1.add(node2);
+
+scene.rootNode.add(node1);
+
+scene.batchDrawcall();
+
 // wasm.greet("hello from js to wasm");
 
 // const dataLength = 1000000;

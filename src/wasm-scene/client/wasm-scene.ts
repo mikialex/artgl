@@ -17,6 +17,8 @@ export class CompactScene {
   constructor() {
     this.wasmScene = ArrayScene.new();
     this.checkIfNeedAndReAllocate(this.capacity);
+    const root = this.createSceneNode();
+    root.hasAttached = true;
   }
 
   destroy() {
@@ -150,7 +152,7 @@ export class CompactScene {
   }
 
   batchDrawcall() {
-
+    this.wasmScene.batch_renderlist();
   }
 }
 

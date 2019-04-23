@@ -113,20 +113,24 @@ impl ArrayScene {
   fn traverse_from(&mut self, index: i16, visitor: &Fn(i16, &mut ArrayScene) -> ()) {
     let mut travers_stack: Vec<i16> = Vec::with_capacity(100);
     travers_stack.push(index);
-    while travers_stack.len() != 0 {
-      let node_to_visit = travers_stack.pop().unwrap();
+    let mut debug: i16 = 0;
+    while let Some(node_to_visit) = travers_stack.pop() {
+      debug += 1;
+      if(debug > 20){
+        panic!("ddd")
+      }
       visitor(node_to_visit, self);
 
       // add childs to stack
-      let first_child = self.nodes_indexs[(index as usize) + 3];
-      if first_child != -1 {
-        // has more children
+      let first_child = self.nodes_indexs[(node_to_visit as usize) * NODE_INDEX_STRIDE + 3];
+      if first_child != -1 { // has children
         travers_stack.push(first_child);
-        let current_child = first_child;
+        let mut current_child = first_child;
         loop {
-          let next_child = self.nodes_indexs[(current_child as usize) + 2];
+          let next_child = self.nodes_indexs[(current_child as usize) * NODE_INDEX_STRIDE + 2];
           if next_child != -1 {
             travers_stack.push(next_child);
+            current_child = next_child;
           } else {
             break;
           }
@@ -139,6 +143,8 @@ impl ArrayScene {
     self.traverse_from(0, &update_hirerachy_visitor)
   }
 }
+
+use crate::log_i16;
 
 fn update_hirerachy_visitor(index: i16, scene: &mut ArrayScene) {
   update_localmatrix(

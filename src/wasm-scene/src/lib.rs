@@ -16,10 +16,13 @@ extern "C" {
   fn alert(s: &str);
 
   #[wasm_bindgen(js_namespace = console)]
-  fn log(s: &str);
+  pub fn log(s: &str);
 
   #[wasm_bindgen(js_namespace = console, js_name = log)]
-  fn log_f32(s: f32);
+  pub fn log_f32(s: f32);
+
+  #[wasm_bindgen(js_namespace = console, js_name = log)]
+  pub fn log_i16(s: i16);
 }
 
 #[wasm_bindgen]

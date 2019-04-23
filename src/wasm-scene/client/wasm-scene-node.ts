@@ -17,9 +17,9 @@ export class CompactSceneNode{
     this._positionZIndex = this.nodeId * positionArrayStride + 2;
 
     this._parentIdIndex = this.nodeId * nodeIndexStride
-    this._firstIdIndex = this.nodeId * nodeIndexStride + 1;
-    this._preBrotherIdIndex = this.nodeId * nodeIndexStride + 2;
-    this._nextBrotherIdIndex = this.nodeId * nodeIndexStride + 3;
+    this._preBrotherIdIndex = this.nodeId * nodeIndexStride + 1;
+    this._nextBrotherIdIndex = this.nodeId * nodeIndexStride + 2;
+    this._firstIdIndex = this.nodeId * nodeIndexStride + 3;
   }
 
   scene: CompactScene;
@@ -59,7 +59,7 @@ export class CompactSceneNode{
   traverse(visitor: SceneNodeVisitor) {
     var tra = (node: CompactSceneNode) => {
       visitor(node);
-      this.foreachChildren(child => {
+      node.foreachChildren(child => {
         tra(child)
       })
     }
@@ -74,13 +74,17 @@ export class CompactSceneNode{
       throw "cant add self"
     }
     const oldFirstChild = this.scene.nodes[this.firstChildId];
-    oldFirstChild.preBrotherId = node.nodeId;
-    node.nextBrotherId = oldFirstChild.nodeId;
+    if (oldFirstChild !== undefined) {
+      oldFirstChild.preBrotherId = node.nodeId;
+      node.nextBrotherId = oldFirstChild.nodeId;
+    }
     node.parentId = this.nodeId;
     this.firstChildId = node.nodeId;
-    node.traverse(n => {
-      n.hasAttached = true;
-    })
+    if (this.hasAttached) {
+      node.traverse(n => {
+        n.hasAttached = true;
+      })
+    }
   }
 
   remove(nodeToRemove: CompactSceneNode) {
@@ -93,9 +97,11 @@ export class CompactSceneNode{
 
     nodeToRemove.preBrotherId = -1;
     nodeToRemove.nextBrotherId = -1;
-    nodeToRemove.traverse(node => {
-      node.hasAttached = false;
-    })
+    if (this.hasAttached) {
+      nodeToRemove.traverse(node => {
+        node.hasAttached = false;
+      })
+    }
   }
 
   findInChildren(node: CompactSceneNode): number {
