@@ -147,6 +147,7 @@ impl ArrayScene {
 use crate::log_i16;
 
 fn update_hirerachy_visitor(index: i16, scene: &mut ArrayScene) {
+  log_i16(index);
   update_localmatrix(
     index,
     &scene.local_position_array,

@@ -1,4 +1,4 @@
-import { CompactScene, positionArrayStride, nodeIndexStride } from "./wasm-scene";
+import { CompactScene, positionArrayStride, nodeIndexStride, rotationArrayStride, scaleArrayStride } from "./wasm-scene";
 
 type SceneNodeVisitor = (node: CompactSceneNode) => any;
 type SceneNodeVisitorEarlyExit = (node: CompactSceneNode) => boolean;
@@ -16,6 +16,14 @@ export class CompactSceneNode{
     this._positionYIndex = this.nodeId * positionArrayStride + 1;
     this._positionZIndex = this.nodeId * positionArrayStride + 2;
 
+    this._rotationXIndex = this.nodeId * rotationArrayStride;
+    this._rotationYIndex = this.nodeId * rotationArrayStride + 1;
+    this._rotationZIndex = this.nodeId * rotationArrayStride + 2;
+
+    this._scaleXIndex = this.nodeId * scaleArrayStride;
+    this._scaleYIndex = this.nodeId * scaleArrayStride + 1;
+    this._scaleZIndex = this.nodeId * scaleArrayStride + 2;
+
     this._parentIdIndex = this.nodeId * nodeIndexStride
     this._preBrotherIdIndex = this.nodeId * nodeIndexStride + 1;
     this._nextBrotherIdIndex = this.nodeId * nodeIndexStride + 2;
@@ -28,6 +36,12 @@ export class CompactSceneNode{
   _positionXIndex: number;
   _positionYIndex: number;
   _positionZIndex: number;
+  _rotationXIndex: number;
+  _rotationYIndex: number;
+  _rotationZIndex: number;
+  _scaleXIndex: number;
+  _scaleYIndex: number;
+  _scaleZIndex: number;
 
   _parentIdIndex: number;
   _firstIdIndex: number;
@@ -194,6 +208,31 @@ export class CompactSceneNode{
 
   get rotationZ() {
     return this.scene.localRotationArray[this._rotationZIndex]
+  }
+
+
+  set scaleX(x: number) {
+    this.scene.localScaleArray[this._scaleXIndex] = x;
+  }
+
+  set scaleY(y: number) {
+    this.scene.localScaleArray[this._scaleYIndex] = y;
+  }
+
+  set scaleZ(z: number) {
+    this.scene.localScaleArray[this._scaleZIndex] = z;
+  }
+
+  get scaleX() {
+    return this.scene.localScaleArray[this._scaleXIndex]
+  }
+
+  get scaleY() {
+    return this.scene.localScaleArray[this._scaleYIndex]
+  }
+
+  get scaleZ() {
+    return this.scene.localScaleArray[this._scaleZIndex]
   }
 
 }

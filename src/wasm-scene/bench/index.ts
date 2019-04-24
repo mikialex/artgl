@@ -5,18 +5,19 @@ import { CompactScene } from "../client/wasm-scene";
 import { CompactSceneNode } from "../client/wasm-scene-node";
 
 function buildScene(scene: CompactScene, childrenCount: number, depth: number) {
+  let count = 0;
   function addChildren(node: CompactSceneNode, d: number) {
-    console.log(d);
     if (d > 0) {
       for (let i = 0; i < childrenCount; i++) {
         const child = scene.createSceneNode();
+        count++;
         node.add(child);
         addChildren(child, d - 1);
       }
     }
   }
-  debugger;
   addChildren(scene.rootNode, depth);
+  console.log(`${count} has add to scene`)
 }
 
 console.log(wasm)
@@ -25,7 +26,7 @@ console.log(memory)
 const scene = new CompactScene();
 console.log(scene)
 
-buildScene(scene, 2, 2);
+buildScene(scene, 5, 2);
 
 scene.batchDrawcall();
 

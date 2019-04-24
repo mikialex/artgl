@@ -13,7 +13,7 @@ export const BSphereArrayStride = 4;
 export const nodeIndexStride = 4;
 
 export class CompactScene {
-  static defaultCompactSceneCapacity = 100;
+  static defaultCompactSceneCapacity = 1000;
   constructor() {
     this.wasmScene = ArrayScene.new();
     this.checkIfNeedAndReAllocate(this.capacity);
@@ -141,6 +141,12 @@ export class CompactScene {
     node.positionX = 0;
     node.positionY = 0;
     node.positionZ = 0;
+    node.rotationX = 0;
+    node.rotationY = 0;
+    node.rotationZ = 0;
+    node.scaleX = 1;
+    node.scaleY = 1;
+    node.scaleZ = 1;
 
     this.nodes[index] = node;
     return node;
