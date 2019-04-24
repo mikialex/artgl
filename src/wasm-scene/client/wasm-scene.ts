@@ -138,6 +138,10 @@ export class CompactScene {
     node.parentId = -1;
     node.firstChildId = -1;
 
+    node.positionX = 0;
+    node.positionY = 0;
+    node.positionZ = 0;
+
     this.nodes[index] = node;
     return node;
   }

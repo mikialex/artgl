@@ -160,16 +160,40 @@ export class CompactSceneNode{
     this.scene.localPositionArray[this._positionZIndex] = z;
   }
 
-  get PositionX() {
+  get positionX() {
     return this.scene.localPositionArray[this._positionXIndex]
   }
 
-  get PositionY() {
+  get positionY() {
     return this.scene.localPositionArray[this._positionYIndex]
   }
 
-  get PositionZ() {
+  get positionZ() {
     return this.scene.localPositionArray[this._positionZIndex]
+  }
+
+  set rotationX(x: number) {
+    this.scene.localRotationArray[this._rotationXIndex] = x;
+  }
+
+  set rotationY(y: number) {
+    this.scene.localRotationArray[this._rotationYIndex] = y;
+  }
+
+  set rotationZ(z: number) {
+    this.scene.localRotationArray[this._rotationZIndex] = z;
+  }
+
+  get rotationX() {
+    return this.scene.localRotationArray[this._rotationXIndex]
+  }
+
+  get rotationY() {
+    return this.scene.localRotationArray[this._rotationYIndex]
+  }
+
+  get rotationZ() {
+    return this.scene.localRotationArray[this._rotationZIndex]
   }
 
 }
