@@ -1,5 +1,6 @@
 use crate::math::*;
 use wasm_bindgen::prelude::*;
+use crate::utils::{set_panic_hook};
 
 #[wasm_bindgen]
 pub struct ArraySceneAllocationProtocal {
@@ -50,6 +51,8 @@ pub const NODE_INDEX_STRIDE: usize = 4;
 #[wasm_bindgen]
 impl ArrayScene {
   pub fn new() -> ArrayScene {
+    set_panic_hook();
+
     ArrayScene {
       local_transform_array: Vec::with_capacity(DEFAULT_NODE_CAPACITY * TRANSFORM_ARRAY_STRIDE),
       local_position_array: Vec::with_capacity(DEFAULT_NODE_CAPACITY * POSITION_ARRAY_STRIDE),
@@ -113,12 +116,7 @@ impl ArrayScene {
   fn traverse_from(&mut self, index: i16, visitor: &Fn(i16, &mut ArrayScene) -> ()) {
     let mut travers_stack: Vec<i16> = Vec::with_capacity(100);
     travers_stack.push(index);
-    let mut debug: i16 = 0;
     while let Some(node_to_visit) = travers_stack.pop() {
-      debug += 1;
-      if(debug > 20){
-        panic!("ddd")
-      }
       visitor(node_to_visit, self);
 
       // add childs to stack
