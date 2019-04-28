@@ -88,16 +88,16 @@ export class GLUniform{
   private gl: WebGLRenderingContext;
   program: GLProgram;
   descriptor: UniformDescriptor;
-  location: WebGLUniformLocation;
+  private location: WebGLUniformLocation;
   innerGlobal?: InnerSupportUniform; 
   value: any;
-  lastReceiveData: uniformUploadType;
-  receiveData: uniformUploadType;
+  private lastReceiveData: uniformUploadType;
+  private receiveData: uniformUploadType;
   private setter: setterType;
   private flattener: flattenerType
   private differ: differType;
   private copyer: copyerType;
-  isActive: boolean;
+  private isActive: boolean;
 
   set(value: any): void {
     if (!this.isActive) {
