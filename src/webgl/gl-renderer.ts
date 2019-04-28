@@ -66,6 +66,7 @@ export class GLRenderer implements GLRealeaseable{
   readonly state: GLState;
   readonly stat: GLStat = new GLStat();
   private activeProgram: Nullable<GLProgram> = null;
+  _programChangeId: number = 0;
 
   // resource managers
   readonly programManager = new GLProgramManager(this);
@@ -87,6 +88,7 @@ export class GLRenderer implements GLRealeaseable{
     if (this.activeProgram !== program) {
       this.stat.programSwitch++;
       this.activeProgram = program;
+      this._programChangeId++;
       this.gl.useProgram(program.getProgram());
     }
   }
