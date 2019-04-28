@@ -2,6 +2,7 @@ import { GLProgram } from "../program";
 import { findUniformSetter, findUniformFlattener, findUniformDiffer, findUniformCopyer } from "./uniform-util";
 import { GLDataType } from "../shader-util";
 import { Matrix4 } from "../../math/matrix4";
+import { GLRenderer } from "../gl-renderer";
 
 export type uniformUploadType = number | Float32Array | number[]
 export type flattenerType= (value: any, receiveData: uniformUploadType) => uniformUploadType;
@@ -86,6 +87,7 @@ export class GLUniform{
   }
   name: string;
   private gl: WebGLRenderingContext;
+  private programChangeId: number = -1;
   program: GLProgram;
   descriptor: UniformDescriptor;
   location: WebGLUniformLocation;
@@ -112,7 +114,13 @@ export class GLUniform{
       return;
     }
 
-    if (this.program.renderer.enableUniformDiff) {
+    let programRefreshed = false;
+    if (this.programChangeId !== this.program.renderer._programChangeId) {
+      programRefreshed = true;
+      this.programChangeId = this.program.renderer._programChangeId;
+    }
+
+    if (this.program.renderer.enableUniformDiff && !programRefreshed) {
       if (this.differ(this.receiveData, this.lastReceiveData)) {
         this.setter(this.gl, this.location, this.receiveData);
         this.program.renderer.stat.uniformUpload++;
