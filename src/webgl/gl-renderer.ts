@@ -9,6 +9,7 @@ import { GLTextureManager } from "./texture-manager";
 import { GLFrameBufferManager } from "./framebuffer-manager";
 import { GLFramebuffer } from "./gl-framebuffer";
 import { GLStat } from "./gl-stat";
+import { GLVAOManager } from "./vao";
 
 export class GLRenderer implements GLRealeaseable{
   constructor(el?: HTMLCanvasElement, options?: any) {
@@ -26,7 +27,7 @@ export class GLRenderer implements GLRealeaseable{
     this.el = el;
     this.glInfo = new GLInfo(this);
     this.frambufferManager = new GLFrameBufferManager(this);
-    this.glInfo.createAllExtension();
+    this.vaoManager = new GLVAOManager(this);
     this.state = new GLState(this);
     this.textureManger.init();
     this.setSize(this.el.offsetWidth, this.el.offsetHeight);
@@ -72,6 +73,7 @@ export class GLRenderer implements GLRealeaseable{
   readonly programManager = new GLProgramManager(this);
   readonly textureManger = new GLTextureManager(this);
   readonly attributeBufferManager = new GLAttributeBufferDataManager(this);
+  readonly vaoManager: GLVAOManager;
   readonly frambufferManager: GLFrameBufferManager;
 
   createProgram(conf: GLProgramConfig): GLProgram {
