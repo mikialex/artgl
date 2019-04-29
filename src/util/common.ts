@@ -6,3 +6,7 @@ export function defaultValue<T>(value: T, defaultValue: T) {
   }
   return value;
 }
+
+export function objKeyTo(obj: any): string[] {
+  return Object.keys(obj).filter(k => typeof obj[k as any] === "number");
+}
