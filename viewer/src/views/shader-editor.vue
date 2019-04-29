@@ -8,10 +8,12 @@
       <h1>viewer</h1>
       <button v-if="showCode" @click="showCode = false">canvas</button>
       <button v-else  @click="codeGen">codegen result</button>
-      <div v-if="showCode" class="code-result">
+      <div v-show="showCode" class="code-result">
         <pre>{{codeGenResult}}</pre>
       </div>
-      <div class="canvas-wrap" v-else>
+      <div class="canvas-wrap" v-show="!showCode" 
+      @mouseenter="start"
+      @mouseleave="end">
         <canvas id="shader-editor-canvas"></canvas>
       </div>
 
@@ -48,6 +50,14 @@ export default class ShaderEditor extends Vue {
     this.codeGenResult = injectFragmentShaderHeaders(result, result.fragmentShaderString);
   }
 
+  start(){
+    ShaderApp.start();
+  }
+
+  end(){
+    ShaderApp.canvasRun = false;
+  }
+
 }
 </script>
 
@@ -76,6 +86,10 @@ export default class ShaderEditor extends Vue {
   border: 1px solid #ddd;
   width: 100%;
   height: 100%;
+  > canvas{
+    width: 100%;
+    height: 100%;
+  }
 }
 
 h1 {

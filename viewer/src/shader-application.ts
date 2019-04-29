@@ -1,6 +1,6 @@
 import { ShaderGraph, ShaderGraphNodeInputType } from '../../src/shader-graph/shader-graph';
 import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
-import { ARTEngine, Technique } from '../../src/artgl';
+import { ARTEngine, Technique, Mesh, Interactor, OrbitController, PerspectiveCamera } from '../../src/artgl';
 import { GLDataType } from '../../src/webgl/shader-util';
 import { ShaderFunction } from '../../src/shader-graph/shader-function';
 import { Scene } from '../../src/scene/scene';
@@ -13,6 +13,8 @@ export class ShaderApplication {
   scene: Scene = new Scene();
 
   technique: Technique;
+  interactor: Interactor;
+  orbitControler: OrbitController;
 
   engine: ARTEngine;
 
@@ -20,6 +22,14 @@ export class ShaderApplication {
   init(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.engine = new ARTEngine(canvas);
+    this.engine.camera.transform.position.set(20, 10, 10)
+    this.interactor = new Interactor(canvas);
+    this.orbitControler = new OrbitController(this.engine.camera as PerspectiveCamera);
+    this.orbitControler.registerInteractor(this.interactor);
+    this.technique = new ARTGL.NormalTechnique();
+    this.loadScene();
+    this.tick();
+    this.start();
 
     this.graph.registShaderFunction(new ShaderFunction({
       name: 'diffuse',
@@ -99,25 +109,54 @@ export class ShaderApplication {
     
     
     })
+
+    window.addEventListener('resize', this.onContainerResize);
+    this.onContainerResize();
+  }
+
+  updateShader() {
+    const newConf = this.graph.compile();
+    this.technique = new Technique({
+      programConfig: newConf
+    });
   }
 
   loadScene() {
     let testGeo = new ARTGL.SphereGeometry(1, 40, 40);
-    let testPlane = new ARTGL.PlaneGeometry(10, 10, 10, 10);
-    let testTec = new ARTGL.NormalTechnique();
+    const mesh = new Mesh();
+    mesh.geometry = testGeo;
+    mesh.technique = this.technique;
+    this.scene.root.addChild(mesh);
   }
 
+  canvasRun: boolean = false;
   start() {
-    
+    this.canvasRun = true;
+  }
+
+  tick = () => {
+    if (this.canvasRun) {
+      this.render();
+    }
+    window.requestAnimationFrame(this.tick);
   }
 
   render() {
-    this.engine.render();
+    this.orbitControler.update();
+    this.engine.connectCamera();
+    this.engine.render(this.scene);
   }
 
   uninit() {
     this.canvas = null;
     this.engine = null;
+  }
+
+  private onContainerResize = () => {
+    const width = this.canvas.offsetWidth;
+    const height = this.canvas.offsetHeight;
+    this.engine.setSize(width, height);
+    (this.engine.camera as PerspectiveCamera).aspect = width / height;
   }
 
 
