@@ -1,7 +1,6 @@
 // https://github.com/pissang/claygl/blob/master/src/core/GLInfo.js
 
 import { GLRenderer } from "./gl-renderer";
-import { objKeyTo } from "../util/common";
 
 export enum GLExtList {
   OES_texture_float = "OES_texture_float",
@@ -25,8 +24,8 @@ export enum GLParamList {
   MAX_CUBE_MAP_TEXTURE_SIZE = "MAX_CUBE_MAP_TEXTURE_SIZE"
 }
 
-const EXTENSION_LIST = objKeyTo(GLExtList);
-const PARAMETER_NAMES = objKeyTo(GLParamList);
+const EXTENSION_LIST = Object.keys(GLExtList);
+const PARAMETER_NAMES = Object.keys(GLParamList);
 
 export class GLInfo{
   constructor(renderer: GLRenderer) {

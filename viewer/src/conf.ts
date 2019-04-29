@@ -52,6 +52,13 @@ export function createConf(app: Application): RenderConfig {
         name: 'engine',
         value: [
           {
+            name: 'preferUseVAO',
+            value: app.graph.engine.preferVAO,
+            onChange: (value: boolean) => {
+              app.graph.engine.preferVAO = value
+            },
+          },
+          {
             name: 'enableUniformDiffUpload',
             value: app.graph.engine.renderer.enableUniformDiff,
             onChange: (value: boolean) => {

@@ -27,6 +27,7 @@ export class GLRenderer implements GLRealeaseable{
     this.el = el;
     this.glInfo = new GLInfo(this);
     this.frambufferManager = new GLFrameBufferManager(this);
+    this.vaoManager = new GLVAOManager(this);
     this.state = new GLState(this);
     this.textureManger.init();
     this.setSize(this.el.offsetWidth, this.el.offsetHeight);
@@ -72,7 +73,7 @@ export class GLRenderer implements GLRealeaseable{
   readonly programManager = new GLProgramManager(this);
   readonly textureManger = new GLTextureManager(this);
   readonly attributeBufferManager = new GLAttributeBufferDataManager(this);
-  readonly vaoManager = new GLVAOManager(this);
+  readonly vaoManager: GLVAOManager;
   readonly frambufferManager: GLFrameBufferManager;
 
   createProgram(conf: GLProgramConfig): GLProgram {

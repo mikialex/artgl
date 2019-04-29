@@ -1,24 +1,14 @@
 import { GLRenderer } from "./gl-renderer";
 import { GLExtList } from "./gl-info";
 import { GLRealeaseable } from "../type";
-
-export class GLVAO{
-  gl: WebGLRenderingContext;
-  renderer: GLRenderer;
-  manager: GLVAOManager
-
-  constructor(renderer: GLRenderer, manager: GLVAOManager) {
-    this.renderer = renderer;
-    this.gl = renderer.gl;
-    this.manager = manager;
-  }
-}
+import { Geometry } from "../core/geometry";
 
 export class GLVAOManager implements GLRealeaseable{
   readonly gl: WebGLRenderingContext;
   readonly renderer: GLRenderer;
   readonly vaoExt: any;
   readonly isSupported: boolean;
+  private vaos: WeakMap<Geometry, any> = new WeakMap();
 
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
@@ -27,7 +17,31 @@ export class GLVAOManager implements GLRealeaseable{
     this.isSupported = this.vaoExt !== undefined;
   }
 
+  getVAO(geometry: Geometry) {
+    return this.vaos.get(geometry);
+  }
+
+  createVAO(geometry: Geometry) {
+    const vao = this.vaoExt.createVertexArrayOES(); 
+    this.vaoExt.bindVertexArrayOES(vao);
+    this.vaos.set(geometry, vao);
+    return {
+      vao, unbind: () => {
+        this.vaoExt.bindVertexArrayOES(null);
+      }
+    };
+  }
+
+  deleteVAO(geometry: Geometry) {
+    this.vaos.delete(geometry);
+  }
+
+  useVAO(vao: any) {
+    this.vaoExt.bindVertexArrayOES(vao);
+  }
+
   releaseGL(): void {
-    throw new Error("Method not implemented.");
+    this.vaoExt.bindVertexArrayOES(null);
+    this.vaos = new WeakMap();
   }
 }

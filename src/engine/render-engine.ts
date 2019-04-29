@@ -60,7 +60,6 @@ export class ARTEngine implements GLRealeaseable{
       if (!this.renderer.vaoManager.isSupported) {
         console.warn(`prefer vao is set to true, but your environvent cant support vao, vaoEnabled is false`)
       }
-      this.renderer.attributeBufferManager.releaseGL();
       this._vaoEnabled = true
     } else {
       this.renderer.vaoManager.releaseGL();
@@ -268,6 +267,18 @@ export class ARTEngine implements GLRealeaseable{
   }
 
   connectGeometry(geometry: Geometry, program: GLProgram) {
+    let vaoUnbindCallback;
+    if (this._vaoEnabled) {
+      const vaoManager = this.renderer.vaoManager;
+      const webglVAO = vaoManager.getVAO(geometry)
+      if (webglVAO === undefined && geometry.needUpdate) {
+        vaoManager.deleteVAO(geometry);
+        vaoUnbindCallback = vaoManager.createVAO(geometry);
+      } else {
+        vaoManager.useVAO(webglVAO)
+        return;
+      }
+    }
 
     program.forAttributes(att => {
       const bufferData = geometry.bufferDatas[att.name];
@@ -297,6 +308,13 @@ export class ARTEngine implements GLRealeaseable{
         glBuffer = this.createOrUpdateAttributeBuffer(geometryIndexBuffer, true);
       }
       program.useIndexBuffer(glBuffer);
+    }
+
+    if (this._vaoEnabled) {
+      if (vaoUnbindCallback) {
+        vaoUnbindCallback.unbind();
+        this.renderer.vaoManager.useVAO(vaoUnbindCallback.vao)
+      }
     }
   }
 
