@@ -73,6 +73,7 @@ export class GLProgram{
     });
   }
   id: string;
+  name: string = "any";
   readonly renderer: GLRenderer;
   getRenderer() { return this.renderer };
   private program: Nullable<WebGLProgram> = null;

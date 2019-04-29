@@ -1,5 +1,6 @@
 import { GLRenderer } from "./gl-renderer";
 import { GLExtList } from "./gl-info";
+import { GLRealeaseable } from "../type";
 
 export class GLVAO{
   gl: WebGLRenderingContext;
@@ -13,7 +14,7 @@ export class GLVAO{
   }
 }
 
-export class GLVAOManager{
+export class GLVAOManager implements GLRealeaseable{
   readonly gl: WebGLRenderingContext;
   readonly renderer: GLRenderer;
   readonly vaoExt: any;
@@ -24,5 +25,9 @@ export class GLVAOManager{
     this.gl = renderer.gl;
     this.vaoExt = renderer.glInfo.getExtension(GLExtList.OES_vertex_array_object);
     this.isSupported = this.vaoExt !== undefined;
+  }
+
+  releaseGL(): void {
+    throw new Error("Method not implemented.");
   }
 }

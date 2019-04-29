@@ -35,8 +35,8 @@ const copyTechnique = new CopyTechnique();
 const quad = new QuadSource();
 
 export class ARTEngine implements GLRealeaseable{
-  constructor(el?: HTMLCanvasElement, options?: any) {
-    this.renderer = new GLRenderer(el, options);
+  constructor(el?: HTMLCanvasElement, ctxOptions?: any) {
+    this.renderer = new GLRenderer(el, ctxOptions);
     // if we have a element param, use it as the default camera's param for convienience
     if (el !== undefined) {
       (this.camera as PerspectiveCamera).aspect = el.width / el.height;
@@ -45,9 +45,28 @@ export class ARTEngine implements GLRealeaseable{
     InnerUniformMap.forEach((des, key) => {
       this.globalUniforms.set(key, new UniformProxy(des.default))
     })
+    
+    this.preferVAO = true;
   }
 
   readonly renderer: GLRenderer;
+  _preferVAO: boolean;
+  _vaoEnabled: boolean;
+  get vaoEnabled(): boolean { return this._vaoEnabled };
+  get preferVAO(): boolean { return this._preferVAO };
+  set preferVAO(val: boolean) {
+    this._preferVAO = val;
+    if (val) {
+      if (!this.renderer.vaoManager.isSupported) {
+        console.warn(`prefer vao is set to true, but your environvent cant support vao, vaoEnabled is false`)
+      }
+      this.renderer.attributeBufferManager.releaseGL();
+      this._vaoEnabled = true
+    } else {
+      this.renderer.vaoManager.releaseGL();
+      this._vaoEnabled = false
+    }
+  }
 
   // resize
   readonly resizeObservable: Observable<Size> = new Observable<Size>();
@@ -252,9 +271,13 @@ export class ARTEngine implements GLRealeaseable{
 
     program.forAttributes(att => {
       const bufferData = geometry.bufferDatas[att.name];
+      if (bufferData === undefined) {
+        throw `program ${program.name} needs an attribute named ${att.name}, but cant find in geometry data`;
+      }
       let glBuffer = this.getGLAttributeBuffer(bufferData);
-      if (glBuffer === undefined) {
+      if (glBuffer === undefined && bufferData.shouldUpdate) {
         glBuffer = this.createOrUpdateAttributeBuffer(bufferData, false);
+        bufferData.shouldUpdate = false;
       }
       att.useBuffer(glBuffer);
     })

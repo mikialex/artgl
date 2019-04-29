@@ -29,7 +29,14 @@ export abstract class Geometry {
   readonly bufferDatas: { [index: string]: BufferData } = {};
   indexBuffer: BufferData;
   layout: GeometryDataLayout;
-  needUpdate: boolean = true;
+  get needUpdate(): boolean{
+    for (const key in this.bufferDatas) {
+      if (this.bufferDatas[key].shouldUpdate) {
+        return true
+      }
+    }
+    return false;
+  }
 
   _AABBBox: Box3 = new Box3();
   abstract updateAABBBox(): void;

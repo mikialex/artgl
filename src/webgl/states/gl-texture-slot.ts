@@ -1,5 +1,6 @@
 import { GLRenderer } from "../gl-renderer";
 import { GLTextureTypeRaw } from "../const";
+import { GLParamList } from "../gl-info";
 
 interface textureBindInfo {
   type: GLTextureTypeRaw,
@@ -16,7 +17,7 @@ export class GLTextureSlot{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
     this.gl = renderer.gl;
-    this.maxSupport = renderer.glInfo.maxTextures;
+    this.maxSupport = renderer.glInfo.getParameter(GLParamList.MAX_TEXTURE_SIZE);
     generateTextureSlotMap(this.maxSupport, this.gl);
   }
   readonly renderer;
