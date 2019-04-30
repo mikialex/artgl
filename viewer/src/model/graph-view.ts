@@ -4,7 +4,7 @@ import { DAGNode } from '../../../src/render-graph/dag/dag-node';
 import { RenderTargetNode } from '../../../src/render-graph/dag/render-target-node';
 
 import { ShaderGraph } from '../../../src/shader-graph/shader-graph';
-import { ShaderFunctionNode } from '../../../src/shader-graph/shader-function';
+import { ShaderFunctionNode } from '../../../src/shader-graph/shader-node';
 
 export class GraphView {
   nodes: GraphNodeView[] = [];

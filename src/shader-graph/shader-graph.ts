@@ -1,12 +1,15 @@
-import { ShaderFunction, ShaderFunctionNode, ShaderFunctionInput, ShaderInputNode, ShaderInputType } from "./shader-function";
-import { GLDataType, getGLDataTypeDefaultDefaultValue } from "../webgl/shader-util";
-import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
-import { InnerSupportUniform, InnerUniformMapDescriptor, UniformDescriptor } from "../webgl/uniform/uniform";
+import { ShaderFunction, ShaderFunctionInput } from "./shader-function";
+import { AttributeDescriptor } from "../webgl/attribute";
+import { InnerUniformMapDescriptor, UniformDescriptor } from "../webgl/uniform/uniform";
 import { GLProgramConfig, VaryingDescriptor } from "../webgl/program";
-import { findFirst } from "../util/array";
 import { BuildInShaderFuntions } from "./built-in/index";
 import { genShader } from "./code-gen";
 import { TextureDescriptor } from '../webgl/uniform/uniform-texture';
+import {
+  ShaderFunctionNode, ShaderInputNode,
+  ShaderInnerAttributeInputNode, ShaderInnerUniformInputNode,
+  ShaderCommonUniformInputNode, ShaderVaryInputNode
+} from "./shader-node";
 
 export enum ShaderGraphNodeInputType {
   commenUniform,
@@ -64,20 +67,29 @@ export class ShaderGraph {
 
   // map shaderNodes define name to 
   functionNodesMap: Map<string, ShaderFunctionNode> = new Map();
-  inputNodesMap: Map<string, ShaderFunctionNode> = new Map();
+  inputNodesMap: Map<string, ShaderInputNode> = new Map();
 
   setGraph(define: ShaderGraphDefine): void {
     this.reset();
     this.define = define;
+    this.createInputs();
     this.constructVertexGraph();
     this.constructFragmentGraph();
   }
 
-  constructVertexGraph() {
+  private createInputs() {
+    this.define.attributes.forEach(att => {
+      const node = new ShaderInnerAttributeInputNode(att);
+      this.inputNodes.push(node);
+      this.inputNodesMap.set(node.name, node);
+    })
+  }
+
+  private constructVertexGraph() {
     // this.define.transform.
   }
 
-  constructFragmentGraph() {
+  private constructFragmentGraph() {
     this.define.effect.forEach(nodeDefine => {
       const factory = this.functionNodeFactories.get(nodeDefine.type);
       if (!factory) {
@@ -133,7 +145,7 @@ export class ShaderGraph {
     };
   }
 
-  private visiteAllNodesInput(visitor: (
+  public visiteAllNodesInput(visitor: (
     node: ShaderFunctionNode,
     input: ShaderGraphDefineInput,
     inputDefine: ShaderFunctionInput,
@@ -148,40 +160,32 @@ export class ShaderGraph {
   }
 
   collectVaryDepend(): VaryingDescriptor[] {
-    const varyingList: VaryingDescriptor[] = [];
-    this.visiteAllNodesInput((node, input, inputDefine, key) => {
-      if (input.type === ShaderGraphNodeInputType.varying) {
-        varyingList.push({
-          name: key,
-          type: inputDefine.type
-        })
-      }
-    })
-    return varyingList;
+    return this.inputNodes
+      .filter(node => node instanceof ShaderVaryInputNode)
+      .map((node: ShaderVaryInputNode) => {
+        return {
+          name: node.name,
+          type: node.dataType,
+        }
+      });
   }
 
   collectAttributeDepend(): AttributeDescriptor[] {
-    const attributeList: AttributeDescriptor[] = [];
-    this.visiteAllNodesInput((_node, input, inputDefine, key) => {
-      if (input.type === ShaderGraphNodeInputType.attribute) {
-        let attusage = AttributeUsage.unset;
-        if (input.typeInfo && input.typeInfo.usage) {
-          attusage = input.typeInfo.usage
+    return this.inputNodes
+      .filter(node => node instanceof ShaderInnerAttributeInputNode)
+      .map((node: ShaderInnerAttributeInputNode) => {
+        return {
+          name: node.name,
+          usage: node.attributeUsage,
+          type: node.dataType,
         }
-        attributeList.push({
-          name: key,
-          type: inputDefine.type,
-          usage: attusage
-        })
-      }
-    })
-    return attributeList;
+      });
   }
 
   collectUniformDepend(): UniformDescriptor[] {
     return this.inputNodes
-      .filter(node => node.inputType === ShaderInputType.uniform)
-      .map(node => {
+      .filter(node => node instanceof ShaderCommonUniformInputNode)
+      .map((node: ShaderCommonUniformInputNode) => {
         return {
           name: node.name,
           type: node.dataType,
@@ -190,25 +194,14 @@ export class ShaderGraph {
   }
 
   collectInnerUniformDepend(): InnerUniformMapDescriptor[] {
-    // return this.inputNodes
-    //   .filter(node => node.inputType === ShaderInputType.uniform)
-    //   .map(node => {
-    //     return {
-    //       name: node.name,
-    //       mapInner: node.value,
-    //     }
-    //   });
-    const innerUniformList: InnerUniformMapDescriptor[] = [];
-    this.visiteAllNodesInput((_node, input, _inputDefine, key) => {
-      if (input.type === ShaderGraphNodeInputType.commenUniform
-      && input.isInnerValue) {
-        innerUniformList.push({
-          name: key,
-          mapInner: input.value,
-        })
-      }
-    })
-    return innerUniformList;
+    return this.inputNodes
+      .filter(node => node instanceof ShaderInnerUniformInputNode)
+      .map((node: ShaderInnerUniformInputNode) => {
+        return {
+          name: node.name,
+          mapInner: node.mapInner,
+        }
+      });
   }
 
   compileVertexSource(): string {

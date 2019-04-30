@@ -1,8 +1,9 @@
 import { ShaderGraph } from "./shader-graph";
-import { ShaderFunctionNode, ShaderFunction } from "./shader-function";
+import { ShaderFunction } from "./shader-function";
 import { getShaderTypeStringFromGLDataType } from "../webgl/shader-util";
 import { findFirst } from "../util/array";
 import { CodeBuilder } from "./util/code-builder";
+import { ShaderFunctionNode } from "./shader-node";
 
 const builder = new CodeBuilder()
 
