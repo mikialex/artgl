@@ -45,6 +45,11 @@ export class GraphView {
       view.nodeMap.set(node.uuid, nodeView)
       view.nodes.push(nodeView);
     })
+    graph.inputNodes.forEach(node => {
+      const nodeView = GraphNodeView.create(node)
+      view.nodeMap.set(node.uuid, nodeView)
+      view.nodes.push(nodeView);
+    })
     
     view.nodes.forEach(node => {
       node.inputsID.forEach(id => {

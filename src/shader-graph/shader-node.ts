@@ -1,12 +1,12 @@
 import { DAGNode } from "../render-graph/dag/dag-node";
 import { ShaderGraphNodeDefine } from "./shader-graph";
-import { ShaderFunction } from "./shader-function";
+import { ShaderFunction, ShaderFunctionDefine } from "./shader-function";
 import { GLDataType } from "../webgl/shader-util";
-import { InnerSupportUniform } from "../webgl/uniform/uniform";
+import { InnerSupportUniform, UniformDescriptor } from "../webgl/uniform/uniform";
 import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
 
 export class ShaderNode extends DAGNode{
-  constructor(public name: string) {
+  constructor(public name: string, public dataType: GLDataType) {
     super();
   }
 }
@@ -20,8 +20,8 @@ export class ShaderNode extends DAGNode{
  * @extends {DAGNode}
  */
 export class ShaderFunctionNode extends ShaderNode{
-  constructor(define: ShaderGraphNodeDefine) {
-    super(define.name);
+  constructor(define: ShaderGraphNodeDefine, functionDefine: ShaderFunctionDefine) {
+    super(define.name, functionDefine.returnType);
     this.define = define;
   }
 
@@ -40,12 +40,16 @@ export class ShaderFunctionNode extends ShaderNode{
 
 
 export class ShaderInputNode extends ShaderNode {
-  constructor(name: string, public dataType: GLDataType) {
-    super(name);
+  constructor(name: string, dataType: GLDataType) {
+    super(name, dataType);
   }
 }
 
-export class ShaderCommonUniformInputNode extends ShaderInputNode {}
+export class ShaderCommonUniformInputNode extends ShaderInputNode {
+  constructor(des: UniformDescriptor) {
+    super(des.name, des.type);
+  }
+}
 export class ShaderVaryInputNode extends ShaderInputNode {}
 
 export class ShaderInnerUniformInputNode extends ShaderInputNode {

@@ -8,7 +8,7 @@ import { TextureDescriptor } from '../webgl/uniform/uniform-texture';
 import {
   ShaderFunctionNode, ShaderInputNode,
   ShaderInnerAttributeInputNode, ShaderInnerUniformInputNode,
-  ShaderCommonUniformInputNode, ShaderVaryInputNode
+  ShaderCommonUniformInputNode, ShaderVaryInputNode, ShaderNode
 } from "./shader-node";
 
 export enum ShaderGraphNodeInputType {
@@ -83,6 +83,11 @@ export class ShaderGraph {
       this.inputNodes.push(node);
       this.inputNodesMap.set(node.name, node);
     })
+    this.define.uniforms.forEach(uni => {
+      const node = new ShaderCommonUniformInputNode(uni);
+      this.inputNodes.push(node);
+      this.inputNodesMap.set(node.name, node);
+    })
   }
 
   private constructVertexGraph() {
@@ -111,14 +116,24 @@ export class ShaderGraph {
           }
           this.checkDataTypeIsMatch(node, fromNode, index);
           fromNode.connectTo(node);
+        } else{
+          const fromNode = this.inputNodesMap.get(input.value);
+          if (!fromNode) {
+            console.warn(key);
+            console.warn(node);
+            throw "constructFragmentGraph failed: cant find from node"
+          }
+          this.checkDataTypeIsMatch(node, fromNode, index);
+          fromNode.connectTo(node);
+
         }
       })
       
     });
   }
 
-  private checkDataTypeIsMatch(node: ShaderFunctionNode, nodeInput:ShaderFunctionNode, inputIndex: number) {
-    const result = node.factory.define.inputs[inputIndex].type === nodeInput.factory.define.returnType;
+  private checkDataTypeIsMatch(node: ShaderFunctionNode, nodeInput:ShaderNode, inputIndex: number) {
+    const result = node.factory.define.inputs[inputIndex].type === nodeInput.dataType;
     if (!result) {
       console.warn("node:", node);
       console.warn("inputnode:", nodeInput);

@@ -36,7 +36,7 @@ export class ShaderFunction{
   define: ShaderFunctionDefine
 
   createNode(define: ShaderGraphNodeDefine): ShaderFunctionNode {
-    const node = new ShaderFunctionNode(define);
+    const node = new ShaderFunctionNode(define, this.define);
     node.factory = this;
     return node;
   }

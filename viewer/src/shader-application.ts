@@ -51,7 +51,8 @@ export class ShaderApplication {
 
     this.graph.setGraph({
       uniforms: [
-
+        { name: 'u_color1', type: GLDataType.floatVec3 },
+        { name: 'u_color2', type: GLDataType.floatVec3 },
       ],
 
       uniformsIncludes: [
@@ -97,7 +98,7 @@ export class ShaderApplication {
           input: {
             diffuseColor: {
               type: ShaderGraphNodeInputType.commenUniform,
-              value: "diffuse"
+              value: "u_color1"
             }
           }
         },
@@ -106,7 +107,8 @@ export class ShaderApplication {
           type: "diffuse",
           input: {
             diffuseColor: {
-              type: ShaderGraphNodeInputType.textureUniform,
+              type: ShaderGraphNodeInputType.commenUniform,
+              value: "u_color2"
             }
           }
         },
