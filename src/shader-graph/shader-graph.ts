@@ -3,7 +3,7 @@ import { AttributeDescriptor } from "../webgl/attribute";
 import { InnerUniformMapDescriptor, UniformDescriptor } from "../webgl/uniform/uniform";
 import { GLProgramConfig, VaryingDescriptor } from "../webgl/program";
 import { BuildInShaderFuntions } from "./built-in/index";
-import { genShader } from "./code-gen";
+import { genFragShader, genVertexShader } from "./code-gen";
 import { TextureDescriptor } from '../webgl/uniform/uniform-texture';
 import {
   ShaderFunctionNode, ShaderInputNode,
@@ -223,11 +223,11 @@ export class ShaderGraph {
   }
 
   compileVertexSource(): string {
-    return genShader(this, this.transformRoot);
+    return genVertexShader(this);
   }
 
   compileFragSource(): string {
-    return genShader(this, this.effectRoot);
+    return genFragShader(this);
   }
 
   registShaderFunction(shaderFn: ShaderFunction) {

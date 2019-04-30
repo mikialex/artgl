@@ -7,13 +7,23 @@ import { ShaderFunctionNode, ShaderNode } from "./shader-node";
 
 const builder = new CodeBuilder()
 
-export function genShader(graph: ShaderGraph, root: ShaderFunctionNode): string {
+export function genFragShader(graph: ShaderGraph): string {
   let result = "";
   result += genShaderFunctionDepend(graph)
   result += "\n"
-  result += codeGenGraph(graph, root)
+  result += codeGenGraph(graph.effectRoot, "gl_FragColor")
   return result;
 }
+
+
+export function genVertexShader(graph: ShaderGraph): string {
+  let result = "";
+  result += genShaderFunctionDepend(graph)
+  result += "\n"
+  result += codeGenGraph(graph.transformRoot, "gl_Position")
+  return result;
+}
+
 
 
 function genShaderFunctionDepend(graph: ShaderGraph): string {
@@ -73,7 +83,9 @@ function genTempVarExpFromShaderNode(
 }
 
 
-function codeGenGraph(graph: ShaderGraph, root: ShaderFunctionNode): string {
+function codeGenGraph(
+  root: ShaderFunctionNode,
+  rootOutputName: string): string {
   builder.reset();
   const nodeDependList = root.generateDependencyOrderList() as ShaderNode[];
   const varList: varRecord[] = [];
@@ -97,7 +109,7 @@ function codeGenGraph(graph: ShaderGraph, root: ShaderFunctionNode): string {
       }
       builder.writeLine(`${varType} ${varRc.varKey} = ${varRc.expression}`)
     } else {
-      builder.writeLine(`gl_FragColor = ${varRc.expression}`)
+      builder.writeLine(`${rootOutputName} = ${varRc.expression}`)
     }
   })
   builder.reduceIndent()
