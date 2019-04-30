@@ -1,6 +1,6 @@
 import { GLDataType } from "../webgl/shader-util";
-import { DAGNode } from "../render-graph/dag/dag-node";
 import { ShaderGraphNodeDefine } from "./shader-graph";
+import { ShaderFunctionNode } from "./shader-node";
 
 export interface ShaderFunctionInput{
   name: string
@@ -36,38 +36,9 @@ export class ShaderFunction{
   define: ShaderFunctionDefine
 
   createNode(define: ShaderGraphNodeDefine): ShaderFunctionNode {
-    const node = new ShaderFunctionNode(define);
+    const node = new ShaderFunctionNode(define, this.define);
     node.factory = this;
     return node;
   }
 
-}
-
-
-/**
- * A node instance of a shaderfunction
- * used in shadergraph for connection
- *
- * @export
- * @class ShaderFunctionNode
- * @extends {DAGNode}
- */
-export class ShaderFunctionNode extends DAGNode{
-  constructor(define: ShaderGraphNodeDefine) {
-    super();
-    this.define = define;
-  }
-
-  name: string;
-  define: ShaderGraphNodeDefine;
-  factory: ShaderFunction
-
-  // create a fragmentshader from this node
-  makeFragmentShader() {
-    
-  }
-
-  fillInput(key:string, input) {
-    
-  }
 }

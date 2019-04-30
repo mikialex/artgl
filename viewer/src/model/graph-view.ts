@@ -4,7 +4,7 @@ import { DAGNode } from '../../../src/render-graph/dag/dag-node';
 import { RenderTargetNode } from '../../../src/render-graph/dag/render-target-node';
 
 import { ShaderGraph } from '../../../src/shader-graph/shader-graph';
-import { ShaderFunctionNode } from '../../../src/shader-graph/shader-function';
+import { ShaderFunctionNode } from '../../../src/shader-graph/shader-node';
 
 export class GraphView {
   nodes: GraphNodeView[] = [];
@@ -45,7 +45,19 @@ export class GraphView {
       view.nodeMap.set(node.uuid, nodeView)
       view.nodes.push(nodeView);
     })
-    view.rootNode = view.nodeMap.get(graph.getEffectRoot().uuid)
+    graph.inputNodes.forEach(node => {
+      const nodeView = GraphNodeView.create(node)
+      view.nodeMap.set(node.uuid, nodeView)
+      view.nodes.push(nodeView);
+    })
+    
+    view.nodes.forEach(node => {
+      node.inputsID.forEach(id => {
+        node.inputs.push(view.nodeMap.get(id));
+      })
+    })
+
+    view.rootNode = view.nodeMap.get(graph.effectRoot.uuid)
     
     view.layout();
     return view;

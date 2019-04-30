@@ -1,6 +1,7 @@
 import { ShaderGraph, ShaderGraphNodeInputType } from "./shader-graph";
 import { InnerSupportUniform } from "../webgl/uniform/uniform";
 
+const technique = gammaCorrection(composeAdd(effect, light));
 
 const graph = new ShaderGraph();
 

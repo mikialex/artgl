@@ -67,7 +67,7 @@ export class Application {
     this.graph.setGraph({
       renderTargets: [
         {
-          name: 'screen',
+          name: RenderGraph.screenRoot,
           from: () => 'CopyToScreen',
         },
         {

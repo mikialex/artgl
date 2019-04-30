@@ -1,5 +1,5 @@
 import { DAGNode } from "./dag-node";
-import { RenderTextureDefine, DimensionType, PixelFormat } from "../interface";
+import { RenderTargetDefine, DimensionType, PixelFormat } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { GLFramebuffer } from "../../webgl/gl-framebuffer";
 import { PassGraphNode } from './pass-graph-node';
@@ -10,7 +10,7 @@ import { Nullable } from "../../type";
 import { Vector4 } from '../../math/vector4';
 
 export class RenderTargetNode extends DAGNode{
-  constructor(graph: RenderGraph, define: RenderTextureDefine) {
+  constructor(graph: RenderGraph, define: RenderTargetDefine) {
     super();
     this.name = define.name;
     this.define = define;
@@ -18,7 +18,7 @@ export class RenderTargetNode extends DAGNode{
 
     this.fromGetter = define.from;
 
-    if (define.name === 'screen') {
+    if (define.name === RenderGraph.screenRoot) {
       this.isScreenNode = true;
       return
     }
@@ -54,7 +54,7 @@ export class RenderTargetNode extends DAGNode{
   }
   readonly isScreenNode: boolean;
   readonly name: string;
-  readonly define: RenderTextureDefine;
+  readonly define: RenderTargetDefine;
   readonly graph: RenderGraph;
 
   debugViewPort: Vector4 = new Vector4(0, 0, 200, 200);

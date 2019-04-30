@@ -15,6 +15,9 @@ export { BufferData } from "./core/buffer-data";
 // render graph
 export { RenderGraph } from './render-graph/render-graph';
 
+// shader graph
+export { ShaderGraph } from './shader-graph/shader-graph';
+
 // geometry lib
 export { SphereGeometry } from "./geometry/geo-lib/sphere-geometry";
 export { PlaneGeometry } from "./geometry/geo-lib/plane-geometry";
