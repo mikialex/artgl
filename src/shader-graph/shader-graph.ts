@@ -7,12 +7,13 @@ import { genShader } from "./code-gen";
 import { TextureDescriptor } from '../webgl/uniform/uniform-texture';
 import {
   ShaderFunctionNode, ShaderInputNode,
-  ShaderInnerAttributeInputNode, ShaderInnerUniformInputNode,
+  ShaderAttributeInputNode, ShaderInnerUniformInputNode,
   ShaderCommonUniformInputNode, ShaderVaryInputNode, ShaderNode
 } from "./shader-node";
 
 export enum ShaderGraphNodeInputType {
   commenUniform,
+  innerUniform,
   textureUniform,
 
   shaderFunctionNode,
@@ -23,9 +24,7 @@ export enum ShaderGraphNodeInputType {
 
 export interface ShaderGraphDefineInput {
   type: ShaderGraphNodeInputType,
-  typeInfo?: any,
-  isInnerValue?: boolean,
-  value?: any
+  value: string
 }
 
 export interface ShaderGraphNodeDefine {
@@ -43,7 +42,7 @@ export interface ShaderGraphDefine {
   textures?: TextureDescriptor[];
   effect: ShaderGraphNodeDefine[],
   effectRoot: string,
-  transform?: ShaderGraphNodeDefine[],
+  transform: ShaderGraphNodeDefine[],
   transformRoot: string
 
 }
@@ -73,29 +72,31 @@ export class ShaderGraph {
     this.reset();
     this.define = define;
     this.createInputs();
-    this.constructVertexGraph();
-    this.constructFragmentGraph();
+    this.createFunctionNodes(this.define.transform)
+    this.createFunctionNodes(this.define.effect);
+    this.constructGraph();
   }
 
   private createInputs() {
     this.define.attributes.forEach(att => {
-      const node = new ShaderInnerAttributeInputNode(att);
+      const node = new ShaderAttributeInputNode(att);
       this.inputNodes.push(node);
       this.inputNodesMap.set(node.name, node);
-    })
+    });
     this.define.uniforms.forEach(uni => {
       const node = new ShaderCommonUniformInputNode(uni);
       this.inputNodes.push(node);
       this.inputNodesMap.set(node.name, node);
-    })
+    });
+    this.define.uniformsIncludes.forEach(uni => {
+      const node = new ShaderInnerUniformInputNode(uni);
+      this.inputNodes.push(node);
+      this.inputNodesMap.set(node.name, node);
+    });
   }
 
-  private constructVertexGraph() {
-    // this.define.transform.
-  }
-
-  private constructFragmentGraph() {
-    this.define.effect.forEach(nodeDefine => {
+  private createFunctionNodes(defines: ShaderGraphNodeDefine[]) {
+    defines.forEach(nodeDefine => {
       const factory = this.functionNodeFactories.get(nodeDefine.type);
       if (!factory) {
         throw "cant find node type: " + nodeDefine.type
@@ -104,6 +105,9 @@ export class ShaderGraph {
       this.functionNodes.push(node);
       this.functionNodesMap.set(nodeDefine.name, node);
     })
+  }
+
+  private constructGraph() {
     this.functionNodes.forEach(node => {
       Object.keys(node.define.input).forEach((key, index) => {
         const input = node.define.input[key];
@@ -112,27 +116,26 @@ export class ShaderGraph {
           if (!fromNode) {
             console.warn(key);
             console.warn(node);
-            throw "constructFragmentGraph failed: cant find from node"
+            throw "constructShaderGraph failed: cant find from node"
           }
           this.checkDataTypeIsMatch(node, fromNode, index);
           fromNode.connectTo(node);
-        } else{
+        } else {
           const fromNode = this.inputNodesMap.get(input.value);
           if (!fromNode) {
             console.warn(key);
             console.warn(node);
-            throw "constructFragmentGraph failed: cant find from node"
+            throw "constructShaderGraph failed: cant find from node"
           }
           this.checkDataTypeIsMatch(node, fromNode, index);
           fromNode.connectTo(node);
 
         }
       })
-      
     });
   }
 
-  private checkDataTypeIsMatch(node: ShaderFunctionNode, nodeInput:ShaderNode, inputIndex: number) {
+  private checkDataTypeIsMatch(node: ShaderFunctionNode, nodeInput: ShaderNode, inputIndex: number) {
     const result = node.factory.define.inputs[inputIndex].type === nodeInput.dataType;
     if (!result) {
       console.warn("node:", node);
@@ -187,8 +190,8 @@ export class ShaderGraph {
 
   collectAttributeDepend(): AttributeDescriptor[] {
     return this.inputNodes
-      .filter(node => node instanceof ShaderInnerAttributeInputNode)
-      .map((node: ShaderInnerAttributeInputNode) => {
+      .filter(node => node instanceof ShaderAttributeInputNode)
+      .map((node: ShaderAttributeInputNode) => {
         return {
           name: node.name,
           usage: node.attributeUsage,

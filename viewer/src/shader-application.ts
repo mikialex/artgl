@@ -37,7 +37,7 @@ export class ShaderApplication {
     this.graph.registShaderFunction(new ShaderFunction({
       name: 'diffuse',
       source: `
-      return vec4(diffuseColor);
+      return vec4(diffuseColor, 1.0);
         `,
       inputs: [
         {
@@ -79,7 +79,7 @@ export class ShaderApplication {
       // which output is gl_FragColor as the screen fragment output
       effect: [
         {
-          name: "result",
+          name: "effectOutput",
           type: "composeAddVec4",
           input: {
             sourceA: {
@@ -113,27 +113,31 @@ export class ShaderApplication {
           }
         },
       ],
-      effectRoot: "result",
+      effectRoot: "effectOutput",
 
       // declare your vertex shader graph
       // like frag, we export the graph root as gl_Position
       transform: [
         {
-          name: "root",
+          name: "transformOutput",
           type: "VPtransfrom",
           input: {
             VPMatrix: {
-              type: ShaderGraphNodeInputType.commenUniform,
-              isInnerValue: true,
-              value: InnerSupportUniform.VPMatrix
+              type: ShaderGraphNodeInputType.innerUniform,
+              value: "VPMatrix"
+            },
+            MMatrix: {
+              type: ShaderGraphNodeInputType.innerUniform,
+              value: "MMatrix"
             },
             position: {
               type: ShaderGraphNodeInputType.attribute,
+              value: "position"
             }
           }
         },
       ],
-      transformRoot: "result",
+      transformRoot: "transformOutput",
 
 
     })

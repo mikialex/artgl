@@ -32,7 +32,7 @@ function genShaderFunctionDepend(graph: ShaderGraph): string {
 
 // temp1 = asd(12 + d);
 interface varRecord {
-  refedNode: ShaderNode, 
+  refedNode: ShaderNode,
   varKey: string,
   expression: string,
 }
@@ -66,9 +66,9 @@ function genTempVarExpFromShaderNode(
 
     })
     const result = `${functionDefine.name}(${functionInputs});`
-    return result; 
+    return result;
   } else {
-    return node.name;
+    return node.name + ';';
   }
 }
 
@@ -80,7 +80,7 @@ function codeGenGraph(graph: ShaderGraph, root: ShaderFunctionNode): string {
   nodeDependList.forEach(nodeToGen => {
     const varName = 'var' + nodeToGen.uuid.slice(0, 4);
     varList.push({
-      refedNode: nodeToGen, 
+      refedNode: nodeToGen,
       varKey: varName,
       expression: genTempVarExpFromShaderNode(nodeToGen, varList),
     })
@@ -93,7 +93,7 @@ function codeGenGraph(graph: ShaderGraph, root: ShaderFunctionNode): string {
       if (varRc.refedNode instanceof ShaderFunctionNode) {
         varType = getShaderTypeStringFromGLDataType(varRc.refedNode.factory.define.returnType);
       } else {
-        varType = getShaderTypeStringFromGLDataType(varRc.refedNode.dataType); 
+        varType = getShaderTypeStringFromGLDataType(varRc.refedNode.dataType);
       }
       builder.writeLine(`${varType} ${varRc.varKey} = ${varRc.expression}`)
     } else {
@@ -111,7 +111,7 @@ function genShaderFunctionDeclare(shaderFunction: ShaderFunction): string {
   const varType = getShaderTypeStringFromGLDataType(functionDefine.returnType);
   let functionInputs = "";
   functionDefine.inputs.forEach((inputDefine, index) => {
-    const paramType = getShaderTypeStringFromGLDataType(functionDefine.returnType);
+    const paramType = getShaderTypeStringFromGLDataType(inputDefine.type);
     const paramStr = `${paramType} ${inputDefine.name}`
     functionInputs += paramStr
     if (index !== functionDefine.inputs.length - 1) {
