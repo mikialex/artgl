@@ -1,11 +1,12 @@
-import { ShaderFunction, ShaderFunctionNode, ShaderFunctionInput } from "./shader-function";
+import { ShaderFunction, ShaderFunctionNode, ShaderFunctionInput, ShaderInputNode, ShaderInputType } from "./shader-function";
 import { GLDataType, getGLDataTypeDefaultDefaultValue } from "../webgl/shader-util";
 import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
 import { InnerSupportUniform, InnerUniformMapDescriptor, UniformDescriptor } from "../webgl/uniform/uniform";
 import { GLProgramConfig, VaryingDescriptor } from "../webgl/program";
 import { findFirst } from "../util/array";
 import { BuildInShaderFuntions } from "./built-in/index";
-import { genFragmentShader } from "./code-gen";
+import { genShader } from "./code-gen";
+import { TextureDescriptor } from '../webgl/uniform/uniform-texture';
 
 export enum ShaderGraphNodeInputType {
   commenUniform,
@@ -32,6 +33,11 @@ export interface ShaderGraphNodeDefine {
 
 
 export interface ShaderGraphDefine {
+  attributes: AttributeDescriptor[];
+  uniforms?: UniformDescriptor[];
+  uniformsIncludes?: InnerUniformMapDescriptor[];
+  varyings?: VaryingDescriptor[];
+  textures?: TextureDescriptor[];
   effect: ShaderGraphNodeDefine[],
   effectRoot: string,
   transform?: ShaderGraphNodeDefine[],
@@ -54,9 +60,11 @@ export class ShaderGraph {
   functionNodeFactories: Map<string, ShaderFunction> = new Map();
 
   functionNodes: ShaderFunctionNode[] = [];
+  inputNodes: ShaderInputNode[] = [];
 
   // map shaderNodes define name to 
   functionNodesMap: Map<string, ShaderFunctionNode> = new Map();
+  inputNodesMap: Map<string, ShaderFunctionNode> = new Map();
 
   setGraph(define: ShaderGraphDefine): void {
     this.reset();
@@ -109,6 +117,8 @@ export class ShaderGraph {
   reset() {
     this.functionNodesMap.clear();
     this.functionNodes = [];
+    this.inputNodesMap.clear();
+    this.inputNodes = [];
   }
 
   compile(): GLProgramConfig {
@@ -169,19 +179,25 @@ export class ShaderGraph {
   }
 
   collectUniformDepend(): UniformDescriptor[] {
-    const uniformList: UniformDescriptor[] = [];
-    this.visiteAllNodesInput((_node, input, inputDefine, key) => {
-      if (input.type === ShaderGraphNodeInputType.varying) {
-        uniformList.push({
-          name: key,
-          type: inputDefine.type,
-        })
-      }
-    })
-    return uniformList;
+    return this.inputNodes
+      .filter(node => node.inputType === ShaderInputType.uniform)
+      .map(node => {
+        return {
+          name: node.name,
+          type: node.dataType,
+        }
+      });
   }
 
   collectInnerUniformDepend(): InnerUniformMapDescriptor[] {
+    // return this.inputNodes
+    //   .filter(node => node.inputType === ShaderInputType.uniform)
+    //   .map(node => {
+    //     return {
+    //       name: node.name,
+    //       mapInner: node.value,
+    //     }
+    //   });
     const innerUniformList: InnerUniformMapDescriptor[] = [];
     this.visiteAllNodesInput((_node, input, _inputDefine, key) => {
       if (input.type === ShaderGraphNodeInputType.commenUniform
@@ -196,19 +212,23 @@ export class ShaderGraph {
   }
 
   compileVertexSource(): string {
-    return ""
+    return genShader(this, this.transformRoot);
   }
 
   compileFragSource(): string {
-    return genFragmentShader(this);
+    return genShader(this, this.effectRoot);
   }
 
   registShaderFunction(shaderFn: ShaderFunction) {
     this.functionNodeFactories.set(shaderFn.define.name, shaderFn);
   }
 
-  getEffectRoot(): ShaderFunctionNode {
+  get effectRoot(): ShaderFunctionNode {
     return this.functionNodesMap.get(this.define.effectRoot);
+  }
+
+  get transformRoot(): ShaderFunctionNode {
+    return this.functionNodesMap.get(this.define.transformRoot);
   }
 }
 

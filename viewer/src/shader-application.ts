@@ -5,6 +5,8 @@ import { GLDataType } from '../../src/webgl/shader-util';
 import { ShaderFunction } from '../../src/shader-graph/shader-function';
 import { Scene } from '../../src/scene/scene';
 import ARTGL from '../../src/export';
+import { AttributeUsage } from '../../src/webgl/attribute';
+import { GLTextureType } from '../../src/webgl/uniform/uniform-texture';
 
 export class ShaderApplication {
 
@@ -13,6 +15,7 @@ export class ShaderApplication {
   scene: Scene = new Scene();
 
   technique: Technique;
+  mesh: Mesh;
   interactor: Interactor;
   orbitControler: OrbitController;
 
@@ -47,6 +50,28 @@ export class ShaderApplication {
 
 
     this.graph.setGraph({
+      uniforms: [
+
+      ],
+
+      uniformsIncludes: [
+        { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix, },
+        { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix, }
+      ],
+
+      textures: [
+        { name: 'copySource', type: GLTextureType.texture2D },
+      ],
+
+      varyings: [
+        { name: 'color', type: GLDataType.floatVec3 }
+      ],
+
+      attributes: [
+        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position },
+        { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal },
+      ],
+
 
       // decalare your fragment shader graph
       // fragment shader graph should have a root node
@@ -72,6 +97,7 @@ export class ShaderApplication {
           input: {
             diffuseColor: {
               type: ShaderGraphNodeInputType.commenUniform,
+              value: "diffuse"
             }
           }
         },
@@ -85,8 +111,8 @@ export class ShaderApplication {
           }
         },
       ],
-      effectRoot:"result",
-    
+      effectRoot: "result",
+
       // declare your vertex shader graph
       // like frag, we export the graph root as gl_Position
       transform: [
@@ -105,9 +131,9 @@ export class ShaderApplication {
           }
         },
       ],
-      transformRoot:"result",
-    
-    
+      transformRoot: "result",
+
+
     })
 
     window.addEventListener('resize', this.onContainerResize);
@@ -116,9 +142,11 @@ export class ShaderApplication {
 
   updateShader() {
     const newConf = this.graph.compile();
+    console.log(newConf)
     this.technique = new Technique({
       programConfig: newConf
     });
+    this.mesh.technique = this.technique;
   }
 
   loadScene() {
@@ -126,6 +154,7 @@ export class ShaderApplication {
     const mesh = new Mesh();
     mesh.geometry = testGeo;
     mesh.technique = this.technique;
+    this.mesh = mesh;
     this.scene.root.addChild(mesh);
   }
 

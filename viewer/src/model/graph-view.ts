@@ -52,7 +52,7 @@ export class GraphView {
       })
     })
 
-    view.rootNode = view.nodeMap.get(graph.getEffectRoot().uuid)
+    view.rootNode = view.nodeMap.get(graph.effectRoot.uuid)
     
     view.layout();
     return view;

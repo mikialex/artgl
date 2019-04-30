@@ -8,6 +8,7 @@
       <h1>viewer</h1>
       <button v-if="showCode" @click="showCode = false">canvas</button>
       <button v-else  @click="codeGen">codegen result</button>
+      <button @click="updateTechnique">updateTechnique</button>
       <div v-show="showCode" class="code-result">
         <pre>{{codeGenResult}}</pre>
       </div>
@@ -48,6 +49,10 @@ export default class ShaderEditor extends Vue {
     this.showCode = true;
     const result = ShaderApp.graph.compile();
     this.codeGenResult = injectFragmentShaderHeaders(result, result.fragmentShaderString);
+  }
+
+  updateTechnique(){
+    ShaderApp.updateShader();
   }
 
   start(){

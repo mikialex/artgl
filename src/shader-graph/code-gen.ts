@@ -6,13 +6,14 @@ import { CodeBuilder } from "./util/code-builder";
 
 const builder = new CodeBuilder()
 
-export function genFragmentShader(graph: ShaderGraph): string {
+export function genShader(graph: ShaderGraph, root: ShaderFunctionNode): string {
   let result = "";
   result += genShaderFunctionDepend(graph)
   result += "\n"
-  result += codeGenGraph(graph)
+  result += codeGenGraph(graph, root)
   return result;
 }
+
 
 function genShaderFunctionDepend(graph: ShaderGraph): string {
   let functionsStr = "\n";
@@ -67,12 +68,12 @@ function genTempVarExpFromShaderFunction(
 }
 
 
-function codeGenGraph(graph: ShaderGraph): string {
+function codeGenGraph(graph: ShaderGraph, root: ShaderFunctionNode): string {
   builder.reset();
-  const nodeDependList = graph.getEffectRoot().generateDependencyOrderList() as ShaderFunctionNode[];
+  const nodeDependList = root.generateDependencyOrderList() as ShaderFunctionNode[];
   const varList: varRecord[] = [];
   nodeDependList.forEach(nodeToGen => {
-    const varName = nodeToGen.uuid.slice(0, 4);
+    const varName = 'var' + nodeToGen.uuid.slice(0, 4);
     varList.push({
       refedNode: nodeToGen, 
       varKey: varName,
@@ -84,9 +85,9 @@ function codeGenGraph(graph: ShaderGraph): string {
   varList.forEach((varRc, index) => {
     if (index !== varList.length - 1) {
       const varType = getShaderTypeStringFromGLDataType(varRc.refedNode.factory.define.returnType);
-      builder.writeLine(`${varType} ${varRc.varKey} = ${varRc.expression});`)
+      builder.writeLine(`${varType} ${varRc.varKey} = ${varRc.expression}`)
     } else {
-      builder.writeLine(`gl_FragColor = ${varRc.expression});`)
+      builder.writeLine(`gl_FragColor = ${varRc.expression}`)
     }
   })
   builder.reduceIndent()
