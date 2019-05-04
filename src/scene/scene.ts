@@ -41,12 +41,19 @@ export class Scene implements RenderSource {
     this.onRemoveList.add(object);
     this.isFrameStructureChange = true;
   }
-  
-  getRenderList() {
+
+  updateSource() {
     if (this.isFrameStructureChange) {
       this.updateObjectList();
     }
-    return this.objectList;
+  }
+
+  resetSource() {
+    this.objectList.resetCursor();
+  }
+
+  nextRenderable() {
+    return this.objectList.next();
   }
 
   updateObjectList() { 

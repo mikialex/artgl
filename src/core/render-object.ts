@@ -59,7 +59,8 @@ export class RenderObject extends SceneNode{
   material: Material;
   geometry: Geometry;
   technique: Technique;
-  range: RenderRange
+  range: RenderRange;
 
-  renderOrder: number;
+  interactive: boolean = true;
+
 }

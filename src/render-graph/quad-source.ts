@@ -13,4 +13,16 @@ export class QuadSource implements RenderSource{
     return renderlist;
   }
 
+  resetSource() {
+    renderlist.resetCursor();
+  }
+
+  nextRenderable() {
+    return renderlist.next();
+  }
+
+  updateSource() {
+    
+  }
+
 }

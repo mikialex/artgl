@@ -1,5 +1,4 @@
 import { GLRenderer } from "../webgl/gl-renderer";
-import { RenderList } from "./render-list";
 import { RenderObject, RenderRange } from "../core/render-object";
 import { Camera } from "../core/camera";
 import { Matrix4 } from "../math/matrix4";
@@ -22,7 +21,9 @@ import { CopyTechnique } from '../technique/technique-lib/copy-technique';
 import { downloadCanvasPNGImage } from "../util/file-io";
 
 export interface RenderSource{
-  getRenderList(): RenderList;
+  resetSource(): void;
+  nextRenderable(): Nullable<RenderObject>;
+  updateSource();
 }
 
 export interface Size{
@@ -162,10 +163,15 @@ export class ARTEngine implements GLRealeaseable{
   //// render APIs
   // render renderList from given source
   render(source: RenderSource) {
-    const renderlist = source.getRenderList();
-    renderlist.forEach((obj) => {
-      this.renderObject(obj);
-    })
+    source.updateSource();
+    source.resetSource();
+    let nextSource: RenderObject;
+    do {
+      nextSource = source.nextRenderable();
+      if (nextSource !== null) {
+        this.renderObject(nextSource);
+      }
+    } while (nextSource !== null);
   }
 
   renderObjects(objects: RenderObject[]) {
