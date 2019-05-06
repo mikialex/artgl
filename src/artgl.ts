@@ -12,6 +12,10 @@ export { Material } from './core/material';
 export { Technique } from "./core/technique";
 export { BufferData } from "./core/buffer-data";
 
+// scene
+export { Scene } from "./scene/scene";
+export { SceneNode } from "./scene/scene-node";
+
 // render graph
 export { RenderGraph } from './render-graph/render-graph';
 
