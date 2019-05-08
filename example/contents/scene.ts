@@ -1,5 +1,11 @@
 import * as ARTGL from '../../src/artgl'
 
+//##
+// 
+//
+//##
+
+//##>
 let canv = document.querySelector('canvas');
 
 const engine = new ARTGL.ARTEngine();
@@ -13,3 +19,4 @@ let testMesh = new ARTGL.Mesh();
 scene.root.addChild(testMesh);
 
 engine.render(scene);
+//##<
