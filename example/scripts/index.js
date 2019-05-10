@@ -1,12 +1,13 @@
 const md = require('./gen-md');
 const fs = require('fs');
 const path = require('path');
+const utils = require('./utils');
 
 function genMarkdowns(contentFoldPath, distFoldPath) {
   const fileList = fs.readdirSync(contentFoldPath);
   fileList.forEach(fileName => {
     const filePath = contentFoldPath + '/' + fileName;
-    const distPath = distFoldPath + '/' + fileName;
+    const distPath = distFoldPath + '/' + utils.splitFileName(fileName) + '.md';
     if (fs.statSync(filePath).isFile()) {
       md.generateMD(filePath, distPath)
     }

@@ -17,10 +17,7 @@ function generateMD(inputFilePath, distPath) {
       mdStr += result;
     }
   }
-  console.log(mdStr)
-  
-
-
+  fs.writeFileSync(distPath, mdStr)
 }
 
 function isMDSegmentStart(line) {
@@ -40,7 +37,7 @@ function readMDSegment(sourcefileContent, index) {
     const line = sourcefileContent[i]
     if (isMDSegmentEnd(line)) {
       return {
-        move, result:MDSegment
+        move, result:MDSegment + "\n"
       }
     }
     if (line.slice(0, 2) == "//") {
@@ -72,7 +69,7 @@ function readMDCodeSegment(sourcefileContent, index) {
     if (isMDCodeSegmentEnd(line)) {
       return {
         move,
-        result: MDSegment
+        result: "``` ts \n" + MDSegment + "``` \n\n"
       }
     } else {
       MDSegment += line
