@@ -1,4 +1,6 @@
-require('./gen-md').genMarkdowns;
+const md = require('./gen-md');
+const fs = require('fs');
+const path = require('path');
 
 function genMarkdowns(contentFoldPath, distFoldPath) {
   const fileList = fs.readdirSync(contentFoldPath);
@@ -6,13 +8,17 @@ function genMarkdowns(contentFoldPath, distFoldPath) {
     const filePath = contentFoldPath + '/' + fileName;
     const distPath = distFoldPath + '/' + fileName;
     if (fs.statSync(filePath).isFile()) {
-      genMarkdowns(filePath, distPath)
+      md.generateMD(filePath, distPath)
     }
   })
 }
 
+
+
 function build() {
-  // genMarkdowns();
+  const inputFolderPath = path.resolve(__dirname, '../contents');
+  const distFolderPath = path.resolve(__dirname, '../build');
+  genMarkdowns(inputFolderPath, distFolderPath);
 }
 
 build();

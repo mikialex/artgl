@@ -6,17 +6,18 @@ function generateMD(inputFilePath, distPath) {
 
   for (let i = 0; i < sourcefileContent.length; i++) {
     const line = sourcefileContent[i]
-    if (line.slice(0, 4) === '//== ') {
+    if (line.slice(0, 5) === '//== ') {
       const { result, move } = readMDSegment(content, i);
       i += move;
       mdStr += result;
-    } else if (line.slice(0, 4) === '//==> ') {
+    } else if (line.slice(0, 6) === '//==> ') {
       const { result, move } = readMDCodeSegment(content, i);
       i += move;
       mdStr += result;
     }
-    
   }
+  console.log(mdStr)
+  
 
 
 }
