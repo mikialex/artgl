@@ -9,7 +9,7 @@ export class PlaneGeometry extends Geometry {
     super();
 
     this.width = width !== undefined ? width : 1;
-    this.height = width !== undefined ? height : 1;
+    this.height = height !== undefined ? height : 1;
     this.widthSegments = widthSegments !== undefined ? widthSegments : 1;
     this.heightSegments = heightSegments !== undefined ? heightSegments : 1;
 

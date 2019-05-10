@@ -3,8 +3,9 @@ import { PassDefine, PassInputMapInfo } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { RenderPass } from "../pass";
 import { RenderTargetNode } from './render-target-node';
+import { Nullable } from "../../type";
 
-export class PassGraphNode extends DAGNode{
+export class PassGraphNode extends DAGNode {
   constructor(graph: RenderGraph, define: PassDefine) {
     super();
     this.graph = graph;
@@ -20,7 +21,7 @@ export class PassGraphNode extends DAGNode{
 
   }
   readonly graph: RenderGraph;
-  private inputsGetter: () => PassInputMapInfo
+  private inputsGetter: Nullable<() => PassInputMapInfo> = null
   inputs: PassInputMapInfo = {}
   readonly name: string;
   readonly define: PassDefine;
@@ -36,7 +37,7 @@ export class PassGraphNode extends DAGNode{
       renderTargetNode.deConnectTo(this);
     })
     // reeval getter
-    if (this.inputsGetter !== undefined) {
+    if (this.inputsGetter !== null) {
       this.inputs = this.inputsGetter();
     }
     // connect new depends node
@@ -60,7 +61,7 @@ export class PassGraphNode extends DAGNode{
             if (hasFoundTarget) {
               throw 'output recive multiple active pass'
             }
-            hasFoundTarget === true
+            hasFoundTarget = true
             this.pass.setOutPutTarget(node);
           }
         }
@@ -69,5 +70,5 @@ export class PassGraphNode extends DAGNode{
   }
 
   pass: RenderPass;
-  
+
 }

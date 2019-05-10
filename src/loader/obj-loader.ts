@@ -35,7 +35,7 @@ export class OBJLoader extends GeometryLoader{
   private facePattern4 = /f\s+((([\d]{1,}\/\/[\d]{1,}[\s]?){3,})+)/;
 
   private collectTriangle(faces: string[]): string[] {
-    const triangles = [];
+    const triangles: string[] = [];
     this.getTriangles(faces, 1, triangles);
     return triangles;
   }
@@ -212,7 +212,7 @@ export class OBJLoader extends GeometryLoader{
     const lines = objStr.split('\n');
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
-      let result: string[];
+      let result: string[] | null;
 
       //Comment or newLine
       if (line.length === 0 || line.charAt(0) === '#') {
@@ -281,14 +281,14 @@ export class OBJLoader extends GeometryLoader{
 
     }
     const geometry = new StandradGeometry();
-    const position = [];
+    const position: number[] = [];
     this.wrappedPositionForArtgl.forEach(po => {
       position.push(po.x);
       position.push(po.y);
       position.push(po.z);
     })
 
-    const normal = [];
+    const normal: number[] = [];
     this.wrappedNormalsForArtgl.forEach(po => {
       normal.push(po.x);
       normal.push(po.y);

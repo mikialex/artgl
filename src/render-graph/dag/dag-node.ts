@@ -60,7 +60,7 @@ export class DAGNode {
       node.fullfillList = node.fromNode.map(n => false);
     })
     let preventEndlessCounter = 1;
-    const result = [];
+    const result: DAGNode[] = [];
     function resolveNext(node: DAGNode) {
       result.push(node);
       node.toNode.forEach(n => {
@@ -105,7 +105,7 @@ export class DAGNode {
   }
 
   generateAllDependencyList(): DAGNode[] {
-    const result = [];
+    const result: DAGNode[] = [];
     this.travserseDFS((n) => {
       result.push(n);
     })

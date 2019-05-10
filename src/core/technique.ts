@@ -37,7 +37,7 @@ export class Technique{
   }
 
   config: TechniqueConfig;
-  name: string;
+  name: string = "noname technique";
   uuid: string = generateUUID();
   _techniqueId: string;
 

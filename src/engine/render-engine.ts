@@ -23,7 +23,7 @@ import { downloadCanvasPNGImage } from "../util/file-io";
 export interface RenderSource{
   resetSource(): void;
   nextRenderable(): Nullable<RenderObject>;
-  updateSource();
+  updateSource(): void;
 }
 
 export interface Size{
@@ -51,8 +51,8 @@ export class ARTEngine implements GLRealeaseable{
   }
 
   readonly renderer: GLRenderer;
-  _preferVAO: boolean;
-  _vaoEnabled: boolean;
+  _preferVAO: boolean = true;
+  _vaoEnabled: boolean = false;
   get vaoEnabled(): boolean { return this._vaoEnabled };
   get preferVAO(): boolean { return this._preferVAO };
   set preferVAO(val: boolean) {
@@ -114,11 +114,11 @@ export class ARTEngine implements GLRealeaseable{
     this.jitterPMatrix.elements[8] += ((2 * Math.random() - 1) / this.renderer.width);
     this.jitterPMatrix.elements[9] += ((2 * Math.random() - 1) / this.renderer.height);
     this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.cameraMatrixRerverse);
-    this.globalUniforms.get(InnerSupportUniform.VPMatrix).setValue(this.jitterVPMatrix);
+    this.getGlobalUniform(InnerSupportUniform.VPMatrix).setValue(this.jitterVPMatrix);
   }
 
   unjit() {
-    this.globalUniforms.get(InnerSupportUniform.VPMatrix).setValue(this.VPMatrix);
+    this.getGlobalUniform(InnerSupportUniform.VPMatrix).setValue(this.VPMatrix);
   }
 
   /**
@@ -143,11 +143,11 @@ export class ARTEngine implements GLRealeaseable{
     }
 
     this.LastVPMatrix.copy(this.VPMatrix);
-    this.globalUniforms.get(InnerSupportUniform.LastVPMatrix).setValue(this.LastVPMatrix);
+    this.getGlobalUniform(InnerSupportUniform.LastVPMatrix).setValue(this.LastVPMatrix);
 
     if (needUpdateVP) {
       this.VPMatrix.multiplyMatrices(this.ProjectionMatirx, this.cameraMatrixRerverse);
-      this.globalUniforms.get(InnerSupportUniform.VPMatrix).setValue(this.VPMatrix);
+      this.getGlobalUniform(InnerSupportUniform.VPMatrix).setValue(this.VPMatrix);
       needUpdateVP = false;
       this.isCameraChanged = true;
     } else {
@@ -165,7 +165,7 @@ export class ARTEngine implements GLRealeaseable{
   render(source: RenderSource) {
     source.updateSource();
     source.resetSource();
-    let nextSource: RenderObject;
+    let nextSource: RenderObject | null;
     do {
       nextSource = source.nextRenderable();
       if (nextSource !== null) {
@@ -218,7 +218,10 @@ export class ARTEngine implements GLRealeaseable{
 
 
   //// low level resouce binding
-  globalUniforms: Map<InnerSupportUniform, UniformProxy> = new Map();
+  private globalUniforms: Map<InnerSupportUniform, UniformProxy> = new Map();
+  getGlobalUniform(uniform: InnerSupportUniform): UniformProxy {
+    return this.globalUniforms.get(uniform) as UniformProxy 
+  }
   connectTechnique(object: RenderObject): GLProgram {
     let technique: Technique;
     if (this.overrideTechnique !== null) {
@@ -228,7 +231,7 @@ export class ARTEngine implements GLRealeaseable{
     }
     const program = technique.getProgram(this);
     this.renderer.useProgram(program);
-    this.globalUniforms.get(InnerSupportUniform.MMatrix).setValue(object.worldMatrix);
+    this.getGlobalUniform(InnerSupportUniform.MMatrix).setValue(object.worldMatrix);
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
     technique.uniforms.forEach((uni, key) => {
       // if (uni._needUpdate) {

@@ -107,7 +107,7 @@ export class Interactor{
       callback.callback(...param);
     });
   }
-  private removeControler(controler, callBackList) {
+  private removeControler(controler : Controler, callBackList) {
     callBackList = callBackList.filter(callback => { return callback.controler === controler });
   }
 

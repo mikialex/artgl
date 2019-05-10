@@ -8,6 +8,7 @@ import { Vector4 } from "../math/vector4";
 import { PassGraphNode } from "./dag/pass-graph-node";
 import { CopyTechnique } from "../technique/technique-lib/copy-technique";
 import { QuadSource } from "./quad-source";
+import { Nullable } from "../type";
 
 export class RenderPass{
   constructor(graph: RenderGraph, define: PassDefine) {
@@ -65,7 +66,7 @@ export class RenderPass{
   
 
   private sourceUse: RenderSource[] = [];
-  private overrideTechnique: Technique;
+  private overrideTechnique: Nullable<Technique> = null;
 
   // key: uniformName ;   value: inputFrambufferName
   private inputTarget: Map<string, string> = new Map();
@@ -122,10 +123,10 @@ export class RenderPass{
     this.checkIsValid();
   
     // input binding 
-    if (this.overrideTechnique !== undefined) {
+    if (this.overrideTechnique !== null) {
       engine.overrideTechnique = this.overrideTechnique;
       this.inputTarget.forEach((inputFrambufferName, uniformName) => {
-        engine.overrideTechnique.getProgram(engine).defineFrameBufferTextureDep(
+        (engine.overrideTechnique as Technique).getProgram(engine).defineFrameBufferTextureDep(
           inputFrambufferName, uniformName
         );
       })

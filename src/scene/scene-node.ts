@@ -84,7 +84,7 @@ export class SceneNode {
   }
 
   traversePair(fn: (sceneNodeParent: Nullable<SceneNode>, sceneNode: SceneNode) => any): any {
-    function visit(nodeParent: SceneNode, node: SceneNode) {
+    function visit(nodeParent: Nullable<SceneNode>, node: SceneNode) {
       const result = fn(nodeParent, node);
       for (let i = 0; i < node.children.length; i++) {
         visit(node, node.children[i]);
@@ -96,11 +96,14 @@ export class SceneNode {
 
   map(fn: (sceneNode: SceneNode) => TreeNode) {
     const nodes: Map<SceneNode, TreeNode> = new Map();
-    const rootNode = this.traversePair((nodeParent: SceneNode, node: SceneNode) => {
+    const rootNode = this.traversePair((nodeParent: Nullable<SceneNode>, node: SceneNode) => {
       const mapNode = fn(node);
       nodes.set(node, mapNode);
       if (node.parent !== null && nodes.has(node.parent)) {
         const mapParentNode = nodes.get(node.parent);
+        if (mapParentNode === undefined) {
+          throw 'tree map error: cant find mapped parent'
+        }
         mapParentNode.children.push(mapNode);
       }
       return mapNode;
@@ -108,8 +111,8 @@ export class SceneNode {
     return rootNode;
   }
 
-  findSubNode(id: string) {
-    let result: SceneNode;
+  findSubNode(id: string): Nullable<SceneNode> {
+    let result: Nullable<SceneNode> = null;
     this.traverse(node => {
       if (node.uuid === id) {
         result = node;

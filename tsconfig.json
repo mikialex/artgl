@@ -7,7 +7,7 @@
     "jsx": "react",
     "declaration": true,
     "experimentalDecorators": true,
-    // "strict": true,
+    "strict": true,
     "lib": [
       "es6",
       "dom"

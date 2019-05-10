@@ -25,13 +25,12 @@ markdown 代码块：
 ``` ts
 
 //==>
+
 let canv = document.querySelector('canvas');
 
-const engine = new ARTGL.ARTEngine();
+const engine = new ARTGL.ARTEngine(canv);
 
 const scene = new ARTGL.Scene();
-
-const camera = new ARTGL.PerspectiveCamera();
 
 let testMesh = new ARTGL.Mesh();
 

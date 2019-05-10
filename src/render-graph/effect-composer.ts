@@ -13,11 +13,9 @@ export class EffectComposer{
   private graph: RenderGraph;
   private engine: ARTEngine;
   private passes: RenderPass[] = [];
-  private nodeQueue: DAGNode[];
 
   updatePasses(nodeQueue: DAGNode[]) {
     this.clearPasses();
-    this.nodeQueue = nodeQueue;
     nodeQueue.forEach(node => {
       if (node instanceof PassGraphNode) {
         node.updatePass(nodeQueue);

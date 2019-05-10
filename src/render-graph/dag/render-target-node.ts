@@ -18,8 +18,8 @@ export class RenderTargetNode extends DAGNode{
 
     this.fromGetter = define.from;
 
-    if (define.name === RenderGraph.screenRoot) {
-      this.isScreenNode = true;
+    this.isScreenNode = define.name === RenderGraph.screenRoot;
+    if (this.isScreenNode) {
       return
     }
 
@@ -37,7 +37,7 @@ export class RenderTargetNode extends DAGNode{
     if (define.format.dimensionType === DimensionType.fixed) {
       width = define.format.width !== undefined ? define.format.width : graph.engine.renderer.width;
       height = define.format.height !== undefined ? define.format.height : graph.engine.renderer.height;
-    } else if (define.format.dimensionType === DimensionType.bindRenderSize) {
+    } else { //  === DimensionType.bindRenderSize
       this.autoWidthRatio = define.format.width !== undefined ? MathUtil.clamp(define.format.width, 0, 1) : 1;
       this.autoHeightRatio = define.format.height !== undefined ? MathUtil.clamp(define.format.height, 0, 1) : 1;
       width = this.autoWidth;
