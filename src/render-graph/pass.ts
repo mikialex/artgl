@@ -5,9 +5,6 @@ import { RenderGraph } from "./render-graph";
 import { PassDefine, PassInputMapInfo } from "./interface";
 import { RenderTargetNode } from "./dag/render-target-node";
 import { Vector4 } from "../math/vector4";
-import { PassGraphNode } from "./dag/pass-graph-node";
-import { CopyTechnique } from "../technique/technique-lib/copy-technique";
-import { QuadSource } from "./quad-source";
 import { Nullable } from "../type";
 
 export class RenderPass{
@@ -61,8 +58,8 @@ export class RenderPass{
   private enableDepthClear: boolean = true;
   private enableColorClear: boolean = true;
 
-  private afterPassExecute: () => any;
-  private beforePassExecute: () => any;
+  private afterPassExecute?: () => any;
+  private beforePassExecute?: () => any;
   
 
   private sourceUse: RenderSource[] = [];
@@ -91,7 +88,7 @@ export class RenderPass{
     })
   }
 
-  renderDebugFramebuffer(engine, framebuffer: GLFramebuffer) {
+  renderDebugFramebuffer(engine: ARTEngine, framebuffer: GLFramebuffer) {
     engine.renderer.setRenderTargetScreen();
   }
 

@@ -8,8 +8,8 @@ import { ARTEngine } from "../engine/render-engine";
  */
 export class Texture {
 
-  image: HTMLImageElement;
-  textureData: Uint8ClampedArray;
+  image?: HTMLImageElement;
+  textureData?: Uint8ClampedArray;
   gltextureId: string;
   updateVersionId: number = 0;
 
@@ -18,7 +18,6 @@ export class Texture {
   }
 
   getGLTexture(engine: ARTEngine): WebGLTexture {
-
     return engine.getGLTexture(this);
   }
 

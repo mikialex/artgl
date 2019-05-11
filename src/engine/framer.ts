@@ -1,11 +1,18 @@
 import { Nullable } from "../type";
 
+
+/**
+ * Framer is for render schedules
+ *
+ * @export
+ * @class Framer
+ */
 export class Framer{
   constructor() {
     
   }
 
-  //// frame controls
+  // frame controls
   private userRenderFrame: Nullable<FrameRequestCallback> = null;
   private renderFrame: FrameRequestCallback = (time) => {
     this.frameStart();

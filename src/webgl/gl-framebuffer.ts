@@ -60,7 +60,7 @@ export class GLFramebuffer{
     this.renderer = renderer;
     this.gl = renderer.gl;
     loadGLAttachmentPoints(this.gl);
-    this.wegbglFrameBuffer = this.gl.createFramebuffer();
+    this.wegbglFrameBuffer = this.createGLFramebuffer();
     this.width = width;
     this.height = height;
   }
@@ -77,7 +77,23 @@ export class GLFramebuffer{
 
   textureAttachedSlot: GLFrameAttachedTexture[] = [];
 
-  debuggingViewport: Vector4 = new Vector4(0,0,200,200);
+  debuggingViewport: Vector4 = new Vector4(0, 0, 200, 200);
+  
+  createGLFramebuffer() {
+    const buffer = this.gl.createFramebuffer();
+    if (buffer === null) {
+      throw 'webgl framgbuffer create failed'
+    }
+    return buffer;
+  }
+
+  createGLRenderbuffer() {
+    const buffer = this.gl.createRenderbuffer();
+    if (buffer === null) {
+      throw 'webgl renderbuffer create failed'
+    }
+    return buffer;
+  }
 
   resize(width:number, height:number) {
     if (this.width !== width || this.height !== height) {
@@ -85,7 +101,7 @@ export class GLFramebuffer{
       this.height = height;
 
       this.gl.deleteFramebuffer(this.wegbglFrameBuffer);
-      this.wegbglFrameBuffer = this.gl.createFramebuffer();
+      this.wegbglFrameBuffer = this.createGLFramebuffer();
       
       this.textureAttachedSlot.forEach(text => {
         if (text) {
@@ -110,7 +126,7 @@ export class GLFramebuffer{
 
   createAttachDepthBuffer() {
     const gl = this.gl;
-    const depthBuffer = gl.createRenderbuffer();
+    const depthBuffer = this.createGLRenderbuffer();
     this.webglDepthBuffer = depthBuffer;
 
     gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
@@ -141,6 +157,6 @@ export class GLFramebuffer{
     })
     this.disposeAttachedDepthBuffer();
     this.gl.deleteFramebuffer(this.wegbglFrameBuffer);
-    this.wegbglFrameBuffer = undefined;
+    this.wegbglFrameBuffer = null;
   }
 }

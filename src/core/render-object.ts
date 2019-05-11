@@ -32,12 +32,12 @@ export class RenderRange{
 
 
 /**
- * render drawcall decription,  
- * which is decribe all drawable things
+ * Class for render drawcall description,  which is describe all drawable things
  * a drawable thing should have a geomemtry to define what to draw
  * and a technique to defined how to draw
  * and many other draw config such as blending depth behaviour
- * engine will understand these infomantion and organize things properly
+ * engine will read these infomantion and organize things properly
+ * 
  * @export
  * @class RenderObject
  * @extends {SceneNode}
@@ -56,10 +56,10 @@ export class RenderObject extends SceneNode{
     this.range = range;
   }
 
-  material: Material;
-  geometry: Geometry;
-  technique: Technique;
-  range: RenderRange;
+  material?: Material;
+  geometry?: Geometry;
+  technique?: Technique;
+  range?: RenderRange;
 
   interactive: boolean = true;
 

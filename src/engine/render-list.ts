@@ -2,18 +2,22 @@ import { RenderObject } from "../core/render-object";
 import { Nullable } from "../type";
 
 export class RenderList {
-  constructor() {
-    
-  }
 
-  list: Nullable<RenderObject>[] = [];
-  addRenderItem(object: RenderObject) {
-    this.list.push(object);
+  private list: Nullable<RenderObject>[] = [];
+  private realLength: number = 0;
+
+  public addRenderItem(object: RenderObject) {
+    if (this.realLength < this.list.length) {
+      this.list[this.realLength] = object;
+    } else {
+      this.list.push(object);
+    }
+    this.realLength++;
   }
 
   forEach(visitor: (object: RenderObject) => any) {
-    for (let i = 0; i < this.list.length; i++) {
-      visitor(this.list[i]);
+    for (let i = 0; i < this.realLength; i++) {
+      visitor(this.list[i] as RenderObject);
     }
   }
 
@@ -28,12 +32,15 @@ export class RenderList {
   }
 
   reset() {
-    // TODO optimize here
-    this.list = [];
+    this.realLength = 0;
   }
 
   resetCursor() {
     this.renderListCursor = 0;
+  }
+
+  clear() {
+    this.list = [];
   }
 
   sort(){

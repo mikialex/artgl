@@ -19,10 +19,10 @@ export const enum ChannelType{
 export class Material{
 
   uuid = generateUUID();
-  private channel: Map<ChannelType, Texture> = new Map();
+  private channels: Map<ChannelType, Texture> = new Map();
 
   setChannelColor(channel: ChannelType, color: Vector3) {
-    let channelTexture = this.channel.get(channel);
+    let channelTexture = this.channels.get(channel);
     if (channelTexture === undefined) {
       channelTexture = generateTextureToPureColor(color);
     } else {
@@ -31,11 +31,11 @@ export class Material{
   }
 
   setChannelTexture(channel: ChannelType, texture: Texture) {
-    this.channel[channel] = texture;
+    this.channels.set(channel, texture);
   }
 
   getChannelTexture(type: ChannelType) {
-    return this.channel.get(type);
+    return this.channels.get(type);
   }
 
 }

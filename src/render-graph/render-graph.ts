@@ -38,24 +38,45 @@ export class RenderGraph {
     return n;
   }
 
-  render() {
+  /**
+   * Render a frame by this graph
+   *
+   * @memberof RenderGraph
+   */
+  public render() {
     this.composer.render();
   }
 
-  reset() {
+  /**
+   * Clear the graph pass info as needed
+   *
+   * @memberof RenderGraph
+   */
+  public reset() {
     this.renderTargetNodes.clear();
     this.passNodes.clear();
     this.composer.clearPasses();
   }
 
-  public setGraph(graphDefine: GraphDefine) {
+  /**
+   * Setup a new Graph configuration
+   *
+   * @param {GraphDefine} graphDefine
+   * @memberof RenderGraph
+   */
+  public setGraph(graphDefine: GraphDefine): void {
     this.reset();
     this.allocaterenderTargetNodes(graphDefine.renderTargets);
     this.constructPassGraph(graphDefine.passes);
     this.update();
   }
 
-  public update() {
+  /**
+   * Update the pass queue from current graph configure
+   *
+   * @memberof RenderGraph
+   */
+  update() {
     this.updateNodesConnection();
     this.updateComposer();
   }

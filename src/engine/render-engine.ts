@@ -19,6 +19,7 @@ import { GLFramebuffer } from '../webgl/gl-framebuffer';
 import { QuadSource } from '../render-graph/quad-source';
 import { CopyTechnique } from '../technique/technique-lib/copy-technique';
 import { downloadCanvasPNGImage } from "../util/file-io";
+import { NormalTechnique } from "../technique/technique-lib/normal-technique";
 
 export interface RenderSource{
   resetSource(): void;
@@ -86,7 +87,8 @@ export class ARTEngine implements GLRealeaseable{
   }
 
 
-  overrideTechnique: Nullable<Technique> = null;
+  public overrideTechnique: Nullable<Technique> = null;
+  public defaultTechnique: Technique = new NormalTechnique();
 
   ////
 
@@ -218,16 +220,29 @@ export class ARTEngine implements GLRealeaseable{
 
 
   //// low level resouce binding
+
+  /**
+   *
+   * GlobalUniforms is store useful inner support unifroms
+   * Engine will update these values and auto bind them to
+   * program that you will draw as needed
+   *
+   * @private
+   * @type {Map<InnerSupportUniform, UniformProxy>}
+   * @memberof ARTEngine
+   */
   private globalUniforms: Map<InnerSupportUniform, UniformProxy> = new Map();
   getGlobalUniform(uniform: InnerSupportUniform): UniformProxy {
     return this.globalUniforms.get(uniform) as UniformProxy 
   }
-  connectTechnique(object: RenderObject): GLProgram {
+  private connectTechnique(object: RenderObject): GLProgram {
     let technique: Technique;
     if (this.overrideTechnique !== null) {
       technique = this.overrideTechnique;
-    } else {
+    } else if (object.technique !== undefined) {
       technique = object.technique;
+    } else {
+      technique = this.defaultTechnique;
     }
     const program = technique.getProgram(this);
     this.renderer.useProgram(program);
@@ -242,7 +257,7 @@ export class ARTEngine implements GLRealeaseable{
     return program;
   }
 
-  connectMaterial(material: Material, program: GLProgram) {
+  private connectMaterial(material: Material, program: GLProgram) {
 
     program.forTextures((tex: GLTextureUniform) => {
       let webgltexture: WebGLTexture;
@@ -275,7 +290,7 @@ export class ARTEngine implements GLRealeaseable{
     })
   }
 
-  connectGeometry(geometry: Geometry, program: GLProgram) {
+  private connectGeometry(geometry: Geometry, program: GLProgram) {
     let vaoUnbindCallback;
     if (this._vaoEnabled) {
       const vaoManager = this.renderer.vaoManager;
@@ -327,7 +342,7 @@ export class ARTEngine implements GLRealeaseable{
     }
   }
 
-  connectRange(range: RenderRange, program: GLProgram, geometry: Geometry) {
+  private connectRange(range: RenderRange, program: GLProgram, geometry: Geometry) {
     let start = 0;
     let count = 0;
     if (range === undefined) {

@@ -1,8 +1,8 @@
 import { Geometry } from "./geometry";
 
 export abstract class Loader {
-  name: string;
-  fileSuffixReg: RegExp;
+  name: string = "unnamed loader";
+  fileSuffixReg?: RegExp;
   abstract parse(input: string | ArrayBuffer): any;
 }
 
