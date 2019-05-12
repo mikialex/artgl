@@ -1,13 +1,12 @@
-import { GLRenderer, ARTEngine, PerspectiveCamera, TestTechnique, Mesh, Interactor, OrbitController, SphereGeometry, Material } from "../artgl";
+import { ARTEngine, PerspectiveCamera, TestTechnique, Mesh, Interactor, OrbitController, Material } from "../../src/artgl";
 
-import { loadObjFile } from "../loader/obj-loader";
+import { loadObjFile } from "../../src/loader/obj-loader";
 
 let mesh: Mesh;
 
 async function loadObj() {
   const geometry = await loadObjFile();
   const testTech = new TestTechnique();
-  const material = new Material();
   mesh = new Mesh();
   mesh.geometry = geometry;
   mesh.technique = testTech;
@@ -16,8 +15,6 @@ async function loadObj() {
 export default function() {
   (window as any).load = loadObj;
   let canv = document.querySelector('canvas') as HTMLCanvasElement; 
-  const width = canv.clientWidth;
-  const height = canv.clientHeight;
   const engine = new ARTEngine(canv);
 
   const myInteractor = new Interactor(canv);

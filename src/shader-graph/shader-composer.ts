@@ -2,13 +2,13 @@ import { Technique } from "../core/technique";
 import { ShaderFunction } from "./shader-function";
 import { GLDataType } from "../webgl/shader-util";
 
-export function createEffectComposer(shaderfunction: ShaderFunction)
-  : (params: any) => Technique {
+// export function createEffectComposer(shaderfunction: ShaderFunction)
+//   : (params: any) => Technique {
   
-  return (params) => {
-    return new Technique();
-  }
-}
+//   return (params) => {
+//     return new Technique();
+//   }
+// }
 
 const gamma = new ShaderFunction({
   name: 'gammaCorrection',
@@ -38,6 +38,6 @@ const add = new ShaderFunction({
 })
 
 
-const gammaCorrection = createEffectComposer(gamma);
-const composeAdd = createEffectComposer(add);
-const technique = gammaCorrection(composeAdd(effect, light));
+// const gammaCorrection = createEffectComposer(gamma);
+// const composeAdd = createEffectComposer(add);
+// const technique = gammaCorrection(composeAdd(effect, light));

@@ -1,5 +1,5 @@
 import { SceneNode } from "../scene/scene-node";
-import { Vector3 } from '../math';
+import { Vector3 } from '../math/vector3';
 import { ShaderFunction } from '../shader-graph/shader-function';
 import { GLDataType } from '../webgl/shader-util';
 

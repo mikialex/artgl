@@ -2,5 +2,6 @@ node_modules
 dist
 package
 static
+typedocs
 
 yarn.lock

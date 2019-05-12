@@ -8,7 +8,7 @@ export { ARTEngine } from "./engine/render-engine";
 export { RenderObject } from "./core/render-object";
 export { Mesh } from "./object/mesh";
 export { Geometry } from "./core/geometry";
-export { Material } from './core/material';
+export { Material, ChannelType } from './core/material';
 export { Technique } from "./core/technique";
 export { BufferData } from "./core/buffer-data";
 

@@ -1,7 +1,7 @@
-import ARTGL from '../export';
-import { loadImageFromURL } from '../util/file-io';
-import { Texture } from '../core/texture';
-import { PerspectiveCamera } from '../camera/perspective-camera';
+import ARTGL from '../../src/export';
+import { loadImageFromURL } from '../../src/util/file-io';
+import { Texture } from '../../src/core/texture';
+import { PerspectiveCamera } from '../../src/camera/perspective-camera';
 
 export default async function() {
   let canv = document.querySelector('canvas') as HTMLCanvasElement;
@@ -14,7 +14,7 @@ export default async function() {
   let testTech = new ARTGL.TestTechnique();
   let testSpere = new ARTGL.Mesh();
   let testMat = new ARTGL.Material();
-  testMat.setChannel('texture', texture);
+  testMat.setChannelTexture(ARTGL.ChannelType.diffuse, texture);
   testSpere.geometry = testGeoSphere;
   testSpere.technique = testTech;
   testSpere.material = testMat;
