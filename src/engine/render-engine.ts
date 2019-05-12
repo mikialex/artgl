@@ -260,7 +260,7 @@ export class ARTEngine implements GLRealeaseable{
   private connectMaterial(material: Material, program: GLProgram) {
 
     program.forTextures((tex: GLTextureUniform) => {
-      let webgltexture: WebGLTexture;
+      let webgltexture: WebGLTexture | undefined;
 
       // aquire texuture from material or framebuffers
       if (material !== undefined) {

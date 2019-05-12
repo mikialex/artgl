@@ -34,8 +34,12 @@ export class Material{
     this.channels.set(channel, texture);
   }
 
-  getChannelTexture(type: ChannelType) {
-    return this.channels.get(type);
+  getChannelTexture(type: ChannelType): Texture {
+    const texture = this.channels.get(type);
+    if (texture === undefined) {
+      throw 'cant get channel texture'
+    }
+    return texture;
   }
 
 }

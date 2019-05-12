@@ -48,8 +48,8 @@ function logDebugShaderSource(source: string) {
   console.log(addLineNumbers(source));
 }
 
-function addLineNumbers(string) {
-  var lines = string.split('\n');
+function addLineNumbers(str: string) {
+  var lines = str.split('\n');
   for (var i = 0; i < lines.length; i++) {
     lines[i] = (i + 1) + ': ' + lines[i];
   }

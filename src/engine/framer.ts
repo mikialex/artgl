@@ -14,29 +14,34 @@ export class Framer{
 
   // frame controls
   private userRenderFrame: Nullable<FrameRequestCallback> = null;
+  setFrame(frame: FrameRequestCallback) {
+    this.renderFrame = frame;
+  }
+
   private renderFrame: FrameRequestCallback = (time) => {
     this.frameStart();
-    this.userRenderFrame(time);
+    if (this.userRenderFrame !== null) {
+      this.userRenderFrame(time);
+    }
     this.frameEnd();
     if (this.isAutoRenderActive) {
       window.requestAnimationFrame(this.renderFrame);
     }
   }
+  
   isAutoRenderActive = false;
-  setFrame(frame: FrameRequestCallback) {
-    this.renderFrame = frame;
-  }
+  tickId?: number;
 
   run() {
-    if (!this.userRenderFrame) {
-      throw 'frame function is not set';
-    }
     this.isAutoRenderActive = true;
-    window.requestAnimationFrame(this.renderFrame);
+    this.tickId = window.requestAnimationFrame(this.renderFrame);
   }
 
   stop() {
     this.isAutoRenderActive = false;
+    if (this.tickId !== undefined) {
+      window.cancelAnimationFrame(this.tickId);
+    }
   }
 
   private frameStart() {

@@ -1,6 +1,10 @@
 import { Controler } from "./controler";
 import { Vector2 } from "../math/vector2";
 
+interface ControlerCallback {
+  controler: Controler,
+  callback: Function
+}
 
 const prev = new Vector2();
 const mousePosition = new Vector2();
@@ -15,7 +19,7 @@ export class Interactor{
   }
 
   enabled: boolean = true;
-  mouseButton: number;
+  mouseButton: number = -1; // -1 is default state for no button pressed 
   inputElement: HTMLElement;
 
   controlers: Controler[] = [];
@@ -26,7 +30,7 @@ export class Interactor{
     el.addEventListener('mousemove', this.onMouseMove, false);
     el.addEventListener('mousedown', this.onMouseDown, false);
     el.addEventListener('mouseup', this.onMouseUp, false);
-    el.addEventListener('mousewheel', this.onMouseWheel, false);
+    el.addEventListener('wheel', this.onMouseWheel, false);
     // el.addEventListener('keydown', this.eventLoop, false);
     // el.addEventListener('keyup', this.cancelLoop, false);
     el.addEventListener('contextmenu', this.preventContentMenu, false);
@@ -37,7 +41,7 @@ export class Interactor{
     el.removeEventListener('mousemove', this.onMouseMove);
     el.removeEventListener('mousedown', this.onMouseDown);
     el.removeEventListener('mouseup', this.onMouseUp);
-    el.removeEventListener('mousewheel', this.onMouseWheel);
+    el.removeEventListener('wheel', this.onMouseWheel);
     // el.removeEventListener('keydown', this.eventLoop);
     // el.removeEventListener('keyup', this.cancelLoop);
     el.removeEventListener('contextmenu', this.preventContentMenu, false);
@@ -80,7 +84,7 @@ export class Interactor{
     this.mouseButton = -1;
   }
 
-  private onMouseWheel = (event: MouseWheelEvent) => {
+  private onMouseWheel = (event: WheelEvent) => {
     if (!this.enabled) {
       return;
     }
@@ -96,18 +100,18 @@ export class Interactor{
     this.groupEmit(this.mouseWheelCallBacks, delta);
   }
 
-  private leftMouseMoveCallBacks = [];
-  private rightMouseMoveCallBacks = [];
-  private mouseWheelCallBacks = [];
-  private mouseDownCallBacks = [];
-  private mouseUpCallBacks = [];
+  private leftMouseMoveCallBacks: ControlerCallback[] = [];
+  private rightMouseMoveCallBacks: ControlerCallback[] = [];
+  private mouseWheelCallBacks: ControlerCallback[] = [];
+  private mouseDownCallBacks: ControlerCallback[] = [];
+  private mouseUpCallBacks: ControlerCallback[] = [];
 
-  private groupEmit(callBackList, ...param) {
+  private groupEmit(callBackList: ControlerCallback[], ...param: any) {
     callBackList.forEach(callback => {
       callback.callback(...param);
     });
   }
-  private removeControler(controler : Controler, callBackList) {
+  private removeControler(controler: Controler, callBackList: ControlerCallback[]) {
     callBackList = callBackList.filter(callback => { return callback.controler === controler });
   }
 
@@ -132,11 +136,11 @@ export class Interactor{
   }
 
   public unbindControlerAllListener(controler: Controler) {
-    this.removeControler(this.mouseUpCallBacks, controler);
-    this.removeControler(this.rightMouseMoveCallBacks, controler);
-    this.removeControler(this.mouseWheelCallBacks, controler);
-    this.removeControler(this.mouseDownCallBacks, controler);
-    this.removeControler(this.mouseUpCallBacks, controler);
+    this.removeControler(controler, this.mouseUpCallBacks);
+    this.removeControler(controler, this.rightMouseMoveCallBacks);
+    this.removeControler(controler, this.mouseWheelCallBacks);
+    this.removeControler(controler, this.mouseDownCallBacks);
+    this.removeControler(controler, this.mouseUpCallBacks);
   }
 
   dispose() {

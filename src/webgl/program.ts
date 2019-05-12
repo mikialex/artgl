@@ -2,7 +2,7 @@ import { GLRenderer } from "./gl-renderer";
 import { GLShader, ShaderType } from "./shader";
 import { generateUUID } from "../math/uuid";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
-import { GLUniform, UniformDescriptor, getInnerUniformDescriptor, InnerUniformMapDescriptor } from "./uniform/uniform";
+import { GLUniform, UniformDescriptor, getInnerUniformDescriptor, InnerUniformMapDescriptor, InnerSupportUniform } from "./uniform/uniform";
 import { AttributeDescriptor, GLAttribute, AttributeUsage } from "./attribute";
 import { Nullable } from "../type";
 import { GLTextureUniform, TextureDescriptor } from "./uniform/uniform-texture";
@@ -35,7 +35,7 @@ function fullfillProgramConfig(config: GLProgramConfig){
   }
   if (config.uniformsIncludes !== undefined && config._hasUniformIncludesExpand !== true) {
     config.uniformsIncludes.forEach(ui => {
-      config.uniforms.push(getInnerUniformDescriptor(ui));
+      (config.uniforms as UniformDescriptor[]).push(getInnerUniformDescriptor(ui));
     })
     config._hasUniformIncludesExpand = true;
   }
@@ -63,7 +63,9 @@ export class GLProgram{
     }
 
     this.config = config;
-    this.useIndexDraw = config.useIndex;
+    if (config.useIndex !== undefined) {
+      this.useIndexDraw = config.useIndex;
+    }
     renderer.programManager.addNewProgram(this);
 
     config.attributes.forEach(att => {
@@ -194,7 +196,7 @@ export class GLProgram{
 
   updateInnerGlobalUniforms(engine: ARTEngine) {
     this.globalUniforms.forEach(uni => {
-      uni.set(engine.globalUniforms.get(uni.innerGlobal).value)
+      uni.set(engine.getGlobalUniform(uni.innerGlobal as InnerSupportUniform).value)
     })
   }
 
