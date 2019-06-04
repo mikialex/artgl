@@ -28,10 +28,3 @@ Performance matters.
 
 ....
 
-
-
-posts (zh/cn)：
-
-[关于ARTGL](./design/about.md)
-
-[概念模型](./design/concept.md)

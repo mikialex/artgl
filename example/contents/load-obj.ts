@@ -1,4 +1,4 @@
-import { ARTEngine, PerspectiveCamera, TestTechnique, Mesh, Interactor, OrbitController, Material } from "../../src/artgl";
+import { ARTEngine, PerspectiveCamera, TestTechnique, Mesh, Interactor, OrbitController } from "../../src/artgl";
 
 import { loadObjFile } from "../../src/loader/obj-loader";
 
