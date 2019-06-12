@@ -1,10 +1,10 @@
-import { Geometry } from "../core/geometry";
 import { RenderObject } from "../core/render-object";
-import { Technique } from "../core/technique";
-import { Material } from "../core/material";
+import { DrawMode } from "../webgl/const";
 
 export class Points extends RenderObject{
-  constructor(geometry: Geometry, material: Material, technique: Technique) {
+  constructor() {
     super();
+    this.drawType = DrawMode.POINTS
   }
+
 }

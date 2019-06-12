@@ -3,6 +3,7 @@ import { Technique } from "./technique";
 import { SceneNode } from "../scene/scene-node";
 import { Material } from "./material";
 import { Nullable } from "../type";
+import { DrawMode } from "../webgl/const";
 
 export class RenderRange{
   constructor(start?:number, count?:number) {
@@ -60,6 +61,8 @@ export class RenderObject extends SceneNode{
   geometry?: Geometry;
   technique?: Technique;
   range?: RenderRange;
+
+  drawType: DrawMode = DrawMode.TRIANGLES;
 
   interactive: boolean = true;
 

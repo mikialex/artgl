@@ -4,6 +4,11 @@ import { Box3 } from "../math/entity/box3";
 import { Sphere } from "../math/entity/sphere";
 import { generateUUID } from '../math/uuid';
 
+/**
+ * Define a attribute usage detail
+ *
+ * @interface LayoutInfo
+ */
 interface LayoutInfo{
   usage: AttributeUsage,
   stride: number,

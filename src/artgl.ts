@@ -7,6 +7,8 @@ export { GLProgram } from "./webgl/program";
 export { ARTEngine } from "./engine/render-engine";
 export { RenderObject } from "./core/render-object";
 export { Mesh } from "./object/mesh";
+export { Line } from "./object/line";
+export { Points } from "./object/points";
 export { Geometry } from "./core/geometry";
 export { Material, ChannelType } from './core/material';
 export { Technique } from "./core/technique";
