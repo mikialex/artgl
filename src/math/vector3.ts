@@ -125,6 +125,13 @@ export class Vector3
     return this.crossVectors(this, v);
   }
 
+  public addVectors ( a: Vector3, b : Vector3): Vector3 {
+		this.x = a.x + b.x;
+		this.y = a.y + b.y;
+		this.z = a.z + b.z;
+		return this;
+	}
+
   public setFromQuaternion(q: Quaternion): Vector3 {
     const x = this.x, y = this.y, z = this.z;
     const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
@@ -163,6 +170,15 @@ export class Vector3
     this.z = (e[2] * x + e[6] * y + e[10] * z + e[14]) * w;
 
     return this;
+  }
+
+  distanceTo(v: Vector3) {
+    return Math.sqrt(this.distanceToSquared(v));
+  }
+
+  distanceToSquared(v: Vector3) {
+    var dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
+    return dx * dx + dy * dy + dz * dz;
   }
 
   public getBuffer() {

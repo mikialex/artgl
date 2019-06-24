@@ -2,12 +2,14 @@ import { Geometry } from "./geometry";
 import { Technique } from "./technique";
 import { SceneNode } from "../scene/scene-node";
 import { Material } from "./material";
-import { Nullable } from "../type";
 import { DrawMode } from "../webgl/const";
 import { DrawState } from "./draw-state";
+import { Face3 } from "../math/entity/face3";
+import { Line3 } from "../math/entity/line3";
+import { Vector3 } from "../artgl";
 
-export class RenderRange{
-  constructor(start?:number, count?:number) {
+export class RenderRange {
+  constructor(start?: number, count?: number) {
     if (start !== undefined) {
       this.start = start;
     }
@@ -16,7 +18,7 @@ export class RenderRange{
     }
   }
 
-  setRange(start:number, count:number): void {
+  setRange(start: number, count: number): void {
     this.start = start;
     this.count = count;
   }
@@ -32,19 +34,27 @@ export class RenderRange{
 
 }
 
+const enum PrimitiveType {
+  triangle,
+  point,
+  linesegment,
+}
+
+export type RenderablePrimitive = Line3 | Vector3 | Face3
+export type PrimitiveVisitor = (prim: RenderablePrimitive) => any
 
 /**
  * Class for render drawcall description,  which is describe all drawable things
  * a drawable thing should have a geomemtry to define what to draw
  * and a technique to defined how to draw
- * and many other draw config such as blending depth behaviour
+ * and many other draw config such as blending depth behaviour defined in state object
  * engine will read these infomantion and organize things properly
  * 
  * @export
  * @class RenderObject
  * @extends {SceneNode}
  */
-export class RenderObject extends SceneNode{
+export class RenderObject extends SceneNode {
 
   material?: Material;
   geometry?: Geometry;
@@ -52,6 +62,11 @@ export class RenderObject extends SceneNode{
   range?: RenderRange;
   state?: DrawState;
 
+  // sometimes something draw as mesh(tri), but act like line, like fatline 
+  // so, drawType and primitiveType is different things 
   drawType: DrawMode = DrawMode.TRIANGLES;
+  primitiveType: PrimitiveType = PrimitiveType.triangle;
+
+  foreachPrimitive(_visitor: PrimitiveVisitor) { throw "not implement" }
 
 }

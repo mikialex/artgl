@@ -1,4 +1,4 @@
-import { RenderObject } from "../core/render-object";
+import { RenderObject, PrimitiveVisitor } from "../core/render-object";
 import { DrawMode } from "../webgl/const";
 export class Mesh extends RenderObject{
   constructor() {
@@ -7,5 +7,7 @@ export class Mesh extends RenderObject{
     this.drawType = DrawMode.TRIANGLES;
   }
 
-
+  foreachPrimitive(visitor: PrimitiveVisitor) {
+    
+  }
 }

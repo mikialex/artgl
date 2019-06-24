@@ -5,7 +5,6 @@ export class DrawState {
   blending = BlendingMode.NormalBlending;
   cullSide = CullSide.CullFaceBack;
 
-  opacity = 1;
   transparent = false;
 
   blendSrc = SrcAlphaFactor;
