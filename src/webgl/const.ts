@@ -67,12 +67,16 @@ export var NoColors = 0;
 export var FaceColors = 1;
 export var VertexColors = 2;
 
+export const enum BlendEquation {
+  AddEquation = 100,
+  SubtractEquation = 101,
+  ReverseSubtractEquation = 102,
+  MinEquation = 103,
+  MaxEquation = 104,
+}
 
-export var AddEquation = 100;
-export var SubtractEquation = 101;
-export var ReverseSubtractEquation = 102;
-export var MinEquation = 103;
-export var MaxEquation = 104;
+
+
 export var ZeroFactor = 200;
 export var OneFactor = 201;
 export var SrcColorFactor = 202;

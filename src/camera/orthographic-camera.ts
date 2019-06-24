@@ -47,3 +47,7 @@ export class OrthographicCamera extends Camera {
 		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far );
   }
 }
+
+const serializationConfig = {
+  
+}
