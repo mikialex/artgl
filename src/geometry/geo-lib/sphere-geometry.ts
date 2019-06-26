@@ -1,10 +1,10 @@
 
-import { Geometry, defaultGeometryLayoutDataInfo } from '../../core/geometry';
 import { Vector3 } from '../../math/index';;
 import { Float32BufferData, Uint16BufferData } from '../../core/buffer-data';
+import { StandradGeometry } from '../standrad-geometry';
 
 
-export class SphereGeometry extends Geometry {
+export class SphereGeometry extends StandradGeometry {
   constructor(radius?: number, widthSegments?: number, heightSegments?: number,
     phiStart?: number, phiLength?: number, thetaStart?: number, thetaLength?: number) {
     super();
@@ -17,9 +17,6 @@ export class SphereGeometry extends Geometry {
     this.thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
     this.thetaEnd = this.thetaStart + this.thetaLength;
 
-    this.layout = {
-      dataInfo: defaultGeometryLayoutDataInfo,
-    }
     this.populate();
   }
   name = 'SphereGeometry'
@@ -32,12 +29,9 @@ export class SphereGeometry extends Geometry {
   thetaLength = Math.PI * 2;
   thetaEnd: number;
 
-  updateBoundingShere() { }
-  updateAABBBox() { }
-
   populate() {
 
-    let ix, iy;
+    let ix: number, iy: number;
     let index = 0;
     let grid = [];
     let vertex = new Vector3(0, 0, 0);

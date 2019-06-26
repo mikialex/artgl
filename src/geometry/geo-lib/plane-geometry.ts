@@ -1,9 +1,9 @@
 
-import { Geometry, defaultGeometryLayoutDataInfo } from '../../core/geometry';
 import { Float32BufferData, Uint16BufferData } from '../../core/buffer-data';
+import { StandradGeometry } from '../standrad-geometry';
 
 
-export class PlaneGeometry extends Geometry {
+export class PlaneGeometry extends StandradGeometry {
   constructor(width?: number, height?: number,
     widthSegments?: number, heightSegments?: number) {
     super();
@@ -13,10 +13,6 @@ export class PlaneGeometry extends Geometry {
     this.widthSegments = widthSegments !== undefined ? widthSegments : 1;
     this.heightSegments = heightSegments !== undefined ? heightSegments : 1;
 
-    this.layout = {
-      dataInfo: defaultGeometryLayoutDataInfo,
-    }
-
     this.populate();
   }
   name = 'PlaneGeometry'
@@ -24,10 +20,6 @@ export class PlaneGeometry extends Geometry {
   height: number;
   widthSegments: number;
   heightSegments: number;
-
-
-  updateBoundingShere() { }
-  updateAABBBox() { }
 
   populate() {
 

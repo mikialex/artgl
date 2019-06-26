@@ -34,7 +34,7 @@ export class RenderRange {
 
 }
 
-const enum PrimitiveType {
+export const enum PrimitiveType {
   triangle,
   point,
   linesegment,

@@ -3,21 +3,7 @@ import { AttributeUsage } from "../webgl/attribute";
 import { Box3 } from "../math/entity/box3";
 import { Sphere } from "../math/entity/sphere";
 import { generateUUID } from '../math/uuid';
-
-/**
- * Define a attribute usage detail
- *
- * @interface LayoutInfo
- */
-interface LayoutInfo{
-  usage: AttributeUsage,
-  stride: number,
-}
-
-// layout is specify this geomeotry's data usage info
-export interface GeometryDataLayout {
-  dataInfo: { [index: string]: LayoutInfo };
-}
+import { RenderRange, PrimitiveVisitor } from "./render-object";
 
 /**
  * geometry define what to draw
@@ -33,7 +19,6 @@ export abstract class Geometry {
   uuid = generateUUID();
   readonly bufferDatas: { [index: string]: BufferData } = {};
   indexBuffer: BufferData;
-  layout: GeometryDataLayout;
   get needUpdate(): boolean{
     for (const key in this.bufferDatas) {
       if (this.bufferDatas[key].shouldUpdate) {
@@ -55,6 +40,9 @@ export abstract class Geometry {
   _boundingShere: Sphere = new Sphere();
   abstract updateBoundingShere(): void;
   get boundingShere(): Sphere {
+    if (this.needUpdate) {
+      this.updateBoundingShere();
+    }
     return this._boundingShere;
   }
 
@@ -65,35 +53,12 @@ export abstract class Geometry {
    */
   abstract populate(): void;
 
+  abstract foreachPrimitive(visitor: PrimitiveVisitor, range: RenderRange): any;
+
   dispose() {
 
   }
 
 }
 
-export const defaultNoTexGeometryLayoutDataInfo = {
-  position: {
-    usage: AttributeUsage.position,
-    stride: 3
-  },
-  normal: {
-    usage: AttributeUsage.normal,
-    stride: 3
-  },
-}
-
-export const defaultGeometryLayoutDataInfo = {
-  position: {
-    usage: AttributeUsage.position,
-    stride: 3
-  },
-  normal: {
-    usage: AttributeUsage.normal,
-    stride: 3
-  },
-  uv: {
-    usage: AttributeUsage.uv,
-    stride: 2
-  },
-}
 

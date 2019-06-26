@@ -1,4 +1,4 @@
-import { Geometry } from "../../core/geometry";
+import { StandradGeometry } from "../standrad-geometry";
 
 interface CubeGeometryParam {
   width: number,
@@ -8,7 +8,7 @@ interface CubeGeometryParam {
   heightSegments: number,
   depthSegments: number,
 }
-export class CubeGeometry extends Geometry {
+export class CubeGeometry extends StandradGeometry {
   // constructor(width?: number, height?: number, depth?: number) {
   //   super();
   //   if (width !== undefined) { this.parameters.width = width; }
@@ -27,9 +27,6 @@ export class CubeGeometry extends Geometry {
     heightSegments: 1,
     depthSegments: 1,
   }
-  
-  updateBoundingShere() { }
-  updateAABBBox() { }
 
   populate() {
     const position = [];

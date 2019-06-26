@@ -1,4 +1,4 @@
-import { Geometry, defaultNoTexGeometryLayoutDataInfo } from "../core/geometry";
+import { Geometry } from "../core/geometry";
 import { Vector3 } from "../math/vector3";
 import { Vector2 } from "../math/vector2";
 import { loadStringFromFile } from "../util/file-io";
@@ -205,7 +205,7 @@ export class OBJLoader extends GeometryLoader{
     }
   };
 
-  parse(objStr: string, fileName?:string): Geometry {
+  parse(objStr: string, fileName?:string): StandradGeometry {
     this.reset();
 
     //Split the file into lines
@@ -313,9 +313,6 @@ export class OBJLoader extends GeometryLoader{
     }
     console.log('indexlength:' + indexBuffer.length);
     console.log('positionBuffer:' + positionBuffer.length);
-    geometry.layout = {
-      dataInfo: defaultNoTexGeometryLayoutDataInfo,
-    }
 
     if (fileName) {
       geometry.name = "Objfile-" + fileName;
