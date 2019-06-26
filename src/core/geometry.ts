@@ -1,9 +1,11 @@
 import { BufferData } from "./buffer-data";
-import { AttributeUsage } from "../webgl/attribute";
 import { Box3 } from "../math/entity/box3";
 import { Sphere } from "../math/entity/sphere";
 import { generateUUID } from '../math/uuid';
 import { RenderRange, PrimitiveVisitor } from "./render-object";
+import { Face3 } from "../math/entity/face3";
+import { Line3 } from "../math/entity/line3";
+import { Vector3 } from "../math/vector3";
 
 /**
  * geometry define what to draw
@@ -53,7 +55,9 @@ export abstract class Geometry {
    */
   abstract populate(): void;
 
-  abstract foreachPrimitive(visitor: PrimitiveVisitor, range: RenderRange): any;
+  abstract foreachFace(visitor: (face: Face3) => any, range: RenderRange): any;
+  abstract foreachLineSegment(visitor:  (face: Line3) => any, range: RenderRange): any;
+  abstract foreachLineVertex(visitor:  (face: Vector3) => any, range: RenderRange): any;
 
   dispose() {
 

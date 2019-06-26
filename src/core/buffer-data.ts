@@ -13,11 +13,12 @@ export class BufferData{
     this.data = data;
   }
   data: BufferDataType;
+  stride: number = 1;
   shouldUpdate = true;
 
   setIndex(index: number, value: number) {
     this.shouldUpdate = true;
-    this.data[index] = value;
+    this.data[index * this.stride] = value;
   }
   setData(data: BufferDataType) {
     this.shouldUpdate = true;
@@ -30,24 +31,5 @@ export class BufferData{
 
   getDataSizeByte() {
     return this.data.byteLength;
-  }
-}
-
-export class Float32BufferData extends BufferData{
-  constructor(data: Float32Array) {
-    super(data);
-  }
-
-}
-
-export class Uint16BufferData extends BufferData {
-  constructor(data: Uint16Array) {
-    super(data);
-  }
-}
-
-export class Uint32BufferData extends BufferData {
-  constructor(data: Uint32Array) {
-    super(data);
   }
 }

@@ -126,11 +126,11 @@ export class GLRenderer implements GLRealeaseable{
     this.state.textureSlot.resetSlotIndex();
   }
 
-  currentFrambuffer: Nullable<GLFramebuffer> = null;
+  currentFramebuffer: Nullable<GLFramebuffer> = null;
   setRenderTarget(framebuffer: Nullable<GLFramebuffer>) {
-    if (this.currentFrambuffer !== framebuffer) {
+    if (this.currentFramebuffer !== framebuffer) {
       this.stat.framebufferSwitch++;
-      this.currentFrambuffer = framebuffer;
+      this.currentFramebuffer = framebuffer;
       const gl = this.gl;
       if (framebuffer === null) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);

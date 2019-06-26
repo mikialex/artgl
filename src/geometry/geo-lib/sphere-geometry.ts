@@ -1,6 +1,6 @@
 
 import { Vector3 } from '../../math/index';;
-import { Float32BufferData, Uint16BufferData } from '../../core/buffer-data';
+import { BufferData } from '../../core/buffer-data';
 import { StandradGeometry } from '../standrad-geometry';
 
 
@@ -76,16 +76,16 @@ export class SphereGeometry extends StandradGeometry {
       }
     }
 
-    const positionBuffer = new Float32BufferData(new Float32Array(vertices));
+    const positionBuffer = new BufferData(new Float32Array(vertices));
     this.bufferDatas.position = positionBuffer;
 
-    const normalBuffer = new Float32BufferData(new Float32Array(normals));
+    const normalBuffer = new BufferData(new Float32Array(normals));
     this.bufferDatas.normal = normalBuffer;
 
-    const uvBuffer = new Float32BufferData(new Float32Array(uvs));
+    const uvBuffer = new BufferData(new Float32Array(uvs));
     this.bufferDatas.uv = uvBuffer;
 
-    const indexBuffer = new Uint16BufferData(new Uint16Array(indices));
+    const indexBuffer = new BufferData(new Uint16Array(indices));
     this.indexBuffer = indexBuffer;
 
   }

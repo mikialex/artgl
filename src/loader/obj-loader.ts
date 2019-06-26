@@ -2,7 +2,7 @@ import { Geometry } from "../core/geometry";
 import { Vector3 } from "../math/vector3";
 import { Vector2 } from "../math/vector2";
 import { loadStringFromFile } from "../util/file-io";
-import { Float32BufferData, Uint16BufferData, Uint32BufferData } from "../core/buffer-data";
+import { BufferData } from "../core/buffer-data";
 import { generateNormalFromPostion } from "../util/normal-generation";
 import { StandradGeometry } from "../geometry/standrad-geometry";
 import { GeometryLoader } from "../core/loader";
@@ -299,17 +299,17 @@ export class OBJLoader extends GeometryLoader{
     let indexBuffer;
     if (this.indicesForArtgl.length > 65535) {
       indexBuffer = new Uint32Array(this.indicesForArtgl);
-      geometry.indexBuffer = new Uint32BufferData(indexBuffer);
+      geometry.indexBuffer = new BufferData(indexBuffer);
     } else {
       indexBuffer = new Uint16Array(this.indicesForArtgl);
-      geometry.indexBuffer = new Uint16BufferData(indexBuffer);
+      geometry.indexBuffer = new BufferData(indexBuffer);
     }
-    geometry.bufferDatas.position = new Float32BufferData(positionBuffer);
+    geometry.bufferDatas.position = new BufferData(positionBuffer);
     const useGeneraetNormal = false;
     if (useGeneraetNormal) {
-      geometry.bufferDatas.normal = new Float32BufferData(generateNormalFromPostion(positionBuffer));
+      geometry.bufferDatas.normal = new BufferData(generateNormalFromPostion(positionBuffer));
     } else {
-      geometry.bufferDatas.normal = new Float32BufferData(normalBuffer);
+      geometry.bufferDatas.normal = new BufferData(normalBuffer);
     }
     console.log('indexlength:' + indexBuffer.length);
     console.log('positionBuffer:' + positionBuffer.length);
