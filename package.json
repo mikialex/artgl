@@ -17,10 +17,13 @@
     "html-webpack-plugin": "^2.29.0",
     "ts-loader": "^2.2.2",
     "tslint": "^5.12.0",
+    "typedoc": "^0.14.2",
     "typescript": "^3.1",
     "webpack": "^3.1.0",
     "webpack-bundle-analyzer": "^2.13.1",
-    "webpack-dev-server": "^2.5.1",
-    "typedoc": "^0.14.2"
+    "webpack-dev-server": "^2.5.1"
+  },
+  "dependencies": {
+    "parjs": "^0.11.1"
   }
 }
