@@ -3,5 +3,6 @@ dist
 package
 static
 typedocs
+coverage
 
 yarn.lock
