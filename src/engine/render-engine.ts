@@ -4,7 +4,7 @@ import { Camera } from "../core/camera";
 import { Matrix4 } from "../math/matrix4";
 import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
-import { BufferData, Uint32BufferData } from "../core/buffer-data";
+import { BufferData } from "../core/buffer-data";
 import { Technique } from "../core/technique";
 import { DrawMode } from "../webgl/const";
 import { Texture } from "../core/texture";
@@ -322,7 +322,7 @@ export class ARTEngine implements GLRealeaseable{
         throw 'indexBuffer not found for index draw'
       }
       const geometryIndexBuffer = geometry.indexBuffer;
-      if (geometryIndexBuffer instanceof Uint32BufferData) {
+      if (geometryIndexBuffer.data instanceof Uint32Array) {
         program.indexUINT = true;
       } else {
         program.indexUINT = false;

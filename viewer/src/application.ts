@@ -133,7 +133,7 @@ export class Application {
           beforePassExecute: () => {
             this.engine.unjit();
             const VPInv: Matrix4 = TAATech.uniforms.get('VPMatrixInverse').value;
-            const VP: Matrix4 = this.engine.globalUniforms.get(InnerSupportUniform.VPMatrix).value
+            const VP: Matrix4 = this.engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
             VPInv.getInverse(VP, true);
             TAATech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
             TAATech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
@@ -152,7 +152,7 @@ export class Application {
           enableColorClear: false,
           beforePassExecute: () => {
             const VPInv: Matrix4 = SSAOTech.uniforms.get('VPMatrixInverse').value;
-            const VP: Matrix4 = this.engine.globalUniforms.get(InnerSupportUniform.VPMatrix).value
+            const VP: Matrix4 = this.engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
             VPInv.getInverse(VP, true);
             SSAOTech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
             SSAOTech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
