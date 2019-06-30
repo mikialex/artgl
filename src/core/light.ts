@@ -5,7 +5,7 @@ import { GLDataType } from '../webgl/shader-util';
 
 interface LightConfig{
   
-}
+} 
 
 export class Light extends SceneNode{
   constructor() {
@@ -15,26 +15,12 @@ export class Light extends SceneNode{
 }
 
 const PointLightShader = new ShaderFunction({
-  name: 'pointLight',
   description: 'compute a pointlight output',
   source: `
-    return sourceA + sourceB;
+    vec3 pointLight(vec3 color, vec3 lightposition, vec3 normal){
+      return sourceA + sourceB;
+    }
   `,
-  inputs: [
-    {
-      name: "color",
-      type: GLDataType.floatVec3
-    },
-    {
-      name: "light_position",
-      type: GLDataType.floatVec3
-    },
-    {
-      name: "normal",
-      type: GLDataType.floatVec3
-    },
-  ],
-  returnType: GLDataType.floatVec3
 })
 
 export class PointLight extends Light {

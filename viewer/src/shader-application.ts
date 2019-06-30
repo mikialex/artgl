@@ -35,17 +35,10 @@ export class ShaderApplication {
     this.start();
 
     this.graph.registShaderFunction(new ShaderFunction({
-      name: 'diffuse',
       source: `
-      return vec4(diffuseColor, 1.0);
-        `,
-      inputs: [
-        {
-          name: "diffuseColor",
-          type: GLDataType.floatVec3
-        }
-      ],
-      returnType: GLDataType.floatVec4
+      diffuse(vec3 diffuseColor){
+        return vec4(diffuseColor, 1.0);
+      }`
     }))
 
 

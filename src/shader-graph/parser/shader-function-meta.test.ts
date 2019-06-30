@@ -60,13 +60,7 @@ test('param list parser', () => {
 test('function parser', () => {
   expect(functionp.parse( 
     `
-    vec4 depth_pack (float frag_depth) {
-      vec4 bitSh = vec4(256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0);
-      vec4 bitMsk = vec4(0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0);
-      vec4 enc = fract(frag_depth * bitSh);
-      enc -= enc.xxyz * bitMsk;
-      return enc; 
-    }
+    vec4 depth_pack (float frag_depth) {a}
     `
   ).value).toStrictEqual(
     [
@@ -77,7 +71,8 @@ test('function parser', () => {
           name: "frag_depth",
           type: GLDataType.float
         }
-      ]
+      ],
+      "a"   
     ]
   );
   

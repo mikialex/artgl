@@ -1,6 +1,6 @@
 import { DAGNode } from "../render-graph/dag/dag-node";
 import { ShaderGraphNodeDefine } from "./shader-graph";
-import { ShaderFunction, ShaderFunctionDefine } from "./shader-function";
+import { ShaderFunction, ShaderFunctionParsedDefine } from "./shader-function";
 import { GLDataType } from "../webgl/shader-util";
 import { InnerSupportUniform, UniformDescriptor, InnerUniformMapDescriptor, InnerUniformMap } from "../webgl/uniform/uniform";
 import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
@@ -20,7 +20,7 @@ export class ShaderNode extends DAGNode {
  * @extends {DAGNode}
  */
 export class ShaderFunctionNode extends ShaderNode {
-  constructor(define: ShaderGraphNodeDefine, functionDefine: ShaderFunctionDefine) {
+  constructor(define: ShaderGraphNodeDefine, functionDefine: ShaderFunctionParsedDefine) {
     super(define.name, functionDefine.returnType);
     this.define = define;
   }
