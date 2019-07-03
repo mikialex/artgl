@@ -5,9 +5,6 @@ import { Vector2 } from "../math/vector2";
 import { Vector3, MathUtil } from "../math/index";
 import { PerspectiveCamera } from "../camera/perspective-camera";
 
-const MaxPolarAngle = 179 / 180 * Math.PI;
-const MinPolarAngle = 0.1;
-const RotateAngleFactor = 2.5;
 
 const tempVec = new Vector3();
 
@@ -16,14 +13,24 @@ export class OrbitController extends Controler {
   constructor(public camera: PerspectiveCamera) {
     super();
     this.camera = camera;
-    this.spherical = new Spherical();
 
     const v = new Vector3();
     v.copy(camera.transform.position).sub(this.spherical.center);
     this.spherical.setFromVector(v);
   }
 
-  private spherical: Spherical;
+  spherical: Spherical = new Spherical();
+  rotateAngleFactor = 0.5
+
+  // restriction
+  maxPolarAngle = 179 / 180 * Math.PI;
+  minPolarAngle = 0.1;
+
+  // damping
+  sphericalDelta: Spherical = new Spherical(0, 0, 0);
+  enableDamping = true;
+  dampingFactor = 0.25;
+
 
   public registerInteractor(interactor: Interactor) {
     if (this.interactor !== undefined) {
@@ -35,20 +42,22 @@ export class OrbitController extends Controler {
     this.interactor.bindMouseWheel(this, this.zoom);
   }
 
-  private rotate = (offset: Vector2) => {
+
+  // operate methods
+  rotate = (offset: Vector2) => {
     const viewWidth = this.camera.width * 5000;
     const viewHeight = this.camera.height * 5000;
-    this.spherical.azim += offset.x / viewWidth * Math.PI * RotateAngleFactor;
-    this.spherical.polar = MathUtil.clamp(this.spherical.polar + offset.y / viewHeight * Math.PI * RotateAngleFactor, MinPolarAngle, MaxPolarAngle);
+
+    this.sphericalDelta.polar += offset.y / viewHeight * Math.PI * this.rotateAngleFactor
+    this.sphericalDelta.azim += offset.x / viewWidth * Math.PI * this.rotateAngleFactor
+
     this.needUpdate = true;
   }
-
-  private zoom = (factor: number) => {
+  zoom = (factor: number) => {
     this.spherical.radius *= factor;
     this.needUpdate = true;
   }
-
-  private move = (offset: Vector2) => {
+  move = (offset: Vector2) => {
     offset.rotate(-this.spherical.azim).multiplyScalar(this.spherical.radius * 0.002);
     this.spherical.center.x += offset.x;
     this.spherical.center.z += offset.y;
@@ -56,13 +65,37 @@ export class OrbitController extends Controler {
   }
 
   public needUpdate: boolean = true;
+
+
   public update() {
-    if (this.needUpdate) { 
+
+    if (this.sphericalDelta.azim > 0.0001 ||
+      this.sphericalDelta.polar > 0.0001 ||
+      this.sphericalDelta.radius > 0.0001) {
+      this.needUpdate = true;
+    }
+
+
+    if (this.needUpdate) {
+      this.spherical.azim += this.sphericalDelta.azim;
+      this.spherical.polar = MathUtil.clamp(
+        this.spherical.polar + this.sphericalDelta.polar,
+        this.minPolarAngle, this.maxPolarAngle);
       tempVec.setFromSpherical(this.spherical).add(this.spherical.center);
       this.camera.transform.position.copy(tempVec);
       this.camera.lookAt(this.spherical.center);
     }
     this.needUpdate = false;
+
+    // update damping effect
+    if (this.enableDamping === true) {
+      this.sphericalDelta.azim *= (1 - this.dampingFactor);
+      this.sphericalDelta.polar *= (1 - this.dampingFactor);
+      // panOffset.multiplyScalar( 1 - this.dampingFactor );
+    } else {
+      this.sphericalDelta.set(0, 0, 0);
+      // this.panOffset.set( 0, 0, 0 );
+    }
   }
 
 }

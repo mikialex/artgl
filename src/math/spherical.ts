@@ -9,9 +9,9 @@ export class Spherical {
   public azim: number;
 
   constructor(radius?: number, polar?: number, azim?: number) {
-    this.radius = radius || 1;
-    this.polar = polar || 0;
-    this.azim = azim || 0;
+    this.radius = radius !== undefined ? radius : 1;
+    this.polar = polar !== undefined ? polar : 0;
+    this.azim = azim !== undefined ? azim : 0;
   }
 
   public set(radius: number, polar: number, azim: number): Spherical {
