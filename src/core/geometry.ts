@@ -50,14 +50,12 @@ export abstract class Geometry {
 
   /**
    * creat or update the geometry's data in bufferdatas
-   * 
-   * @memberof Geometry
    */
   abstract populate(): void;
 
   abstract foreachFace(visitor: (face: Face3) => any, range: RenderRange): any;
   abstract foreachLineSegment(visitor:  (face: Line3) => any, range: RenderRange): any;
-  abstract foreachLineVertex(visitor:  (face: Vector3) => any, range: RenderRange): any;
+  abstract foreachVertex(visitor:  (face: Vector3) => any, range: RenderRange): any;
 
   dispose() {
 

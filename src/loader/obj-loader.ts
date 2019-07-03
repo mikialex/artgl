@@ -299,17 +299,17 @@ export class OBJLoader extends GeometryLoader{
     let indexBuffer;
     if (this.indicesForArtgl.length > 65535) {
       indexBuffer = new Uint32Array(this.indicesForArtgl);
-      geometry.indexBuffer = new BufferData(indexBuffer);
+      geometry.indexBuffer = new BufferData(indexBuffer, 1);
     } else {
       indexBuffer = new Uint16Array(this.indicesForArtgl);
-      geometry.indexBuffer = new BufferData(indexBuffer);
+      geometry.indexBuffer = new BufferData(indexBuffer, 1);
     }
-    geometry.bufferDatas.position = new BufferData(positionBuffer);
+    geometry.bufferDatas.position = new BufferData(positionBuffer, 3);
     const useGeneraetNormal = false;
     if (useGeneraetNormal) {
-      geometry.bufferDatas.normal = new BufferData(generateNormalFromPostion(positionBuffer));
+      geometry.bufferDatas.normal = new BufferData(generateNormalFromPostion(positionBuffer), 3);
     } else {
-      geometry.bufferDatas.normal = new BufferData(normalBuffer);
+      geometry.bufferDatas.normal = new BufferData(normalBuffer, 3);
     }
     console.log('indexlength:' + indexBuffer.length);
     console.log('positionBuffer:' + positionBuffer.length);

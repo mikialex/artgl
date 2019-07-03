@@ -69,16 +69,16 @@ export class PlaneGeometry extends StandradGeometry {
     }
   
 
-    const positionBuffer = new BufferData(new Float32Array(vertices));
+    const positionBuffer = new BufferData(new Float32Array(vertices), 3);
     this.bufferDatas.position = positionBuffer;
 
-    const normalBuffer = new BufferData(new Float32Array(normals));
+    const normalBuffer = new BufferData(new Float32Array(normals), 3);
     this.bufferDatas.normal = normalBuffer;
 
-    const uvBuffer = new BufferData(new Float32Array(uvs));
+    const uvBuffer = new BufferData(new Float32Array(uvs), 2);
     this.bufferDatas.uv = uvBuffer;
 
-    const indexBuffer = new BufferData(new Uint16Array(indices));
+    const indexBuffer = new BufferData(new Uint16Array(indices), 1);
     this.indexBuffer = indexBuffer;
 
   }
