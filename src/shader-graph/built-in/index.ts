@@ -5,7 +5,8 @@ import { ShaderFunction } from "../shader-function";
 export const BuildInShaderFuntions = [
   MVPTransformFunction,
   depthPackFunction,
-  new ShaderFunction({
+  new ShaderFunction(
+    {
     description: 'simple add function',
     source: `
     vec4 composeAddVec4(vec4 sourceA, vec4 sourceB){

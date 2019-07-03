@@ -1,4 +1,4 @@
-import { DAGNode } from "./dag-node";
+import { DAGNode } from "../../core/dag-node";
 import { PassDefine, PassInputMapInfo } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { RenderPass } from "../pass";

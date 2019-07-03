@@ -10,32 +10,32 @@ import { GLDataType } from "../webgl/shader-util";
 //   }
 // }
 
-const gamma = new ShaderFunction({
-  name: 'gammaCorrection',
-  source: `
-    vec4 gammaed = sqrt(input.rgb);
-    return vec4(gammaed, input.a);
-  `,
-  inputs: [
-    {
-      name: "input",
-      type: GLDataType.floatVec4
-    }
-  ],
-  returnType: GLDataType.floatVec4
-})
+// const gamma = new ShaderFunction({
+//   name: 'gammaCorrection',
+//   source: `
+//     vec4 gammaed = sqrt(input.rgb);
+//     return vec4(gammaed, input.a);
+//   `,
+//   inputs: [
+//     {
+//       name: "input",
+//       type: GLDataType.floatVec4
+//     }
+//   ],
+//   returnType: GLDataType.floatVec4
+// })
 
-const add = new ShaderFunction({
-  name: 'add',
-  source: `
-    return input1 + input2;
-  `,
-  inputs: [
-    {name: "input1",type: GLDataType.floatVec4},
-    {name: "input2",type: GLDataType.floatVec4},
-  ],
-  returnType: GLDataType.floatVec4
-})
+// const add = new ShaderFunction({
+//   name: 'add',
+//   source: `
+//     return input1 + input2;
+//   `,
+//   inputs: [
+//     {name: "input1",type: GLDataType.floatVec4},
+//     {name: "input2",type: GLDataType.floatVec4},
+//   ],
+//   returnType: GLDataType.floatVec4
+// })
 
 
 // const gammaCorrection = createEffectComposer(gamma);

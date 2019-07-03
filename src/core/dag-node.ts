@@ -1,4 +1,4 @@
-import { generateUUID } from '../../math/uuid';
+import { generateUUID } from "../math/uuid";
 
 export class DAGNode {
   uuid:string = generateUUID();

@@ -1,7 +1,7 @@
 import { RenderGraph } from '../../../src/artgl';
-import { PassGraphNode } from '../../../src/render-graph/dag/pass-graph-node';
-import { DAGNode } from '../../../src/render-graph/dag/dag-node';
-import { RenderTargetNode } from '../../../src/render-graph/dag/render-target-node';
+import { PassGraphNode } from '../../../src/render-graph/node/pass-graph-node';
+import { DAGNode } from '../../../src/core/dag-node';
+import { RenderTargetNode } from '../../../src/render-graph/node/render-target-node';
 
 import { ShaderGraph } from '../../../src/shader-graph/shader-graph';
 import { ShaderFunctionNode } from '../../../src/shader-graph/shader-node';

@@ -3,7 +3,7 @@ import { ARTEngine, RenderSource } from "../engine/render-engine";
 import { Technique } from "../core/technique";
 import { RenderGraph } from "./render-graph";
 import { PassDefine, PassInputMapInfo } from "./interface";
-import { RenderTargetNode } from "./dag/render-target-node";
+import { RenderTargetNode } from "./node/render-target-node";
 import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
 

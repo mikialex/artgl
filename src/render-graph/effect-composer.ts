@@ -1,8 +1,8 @@
 import { RenderPass } from "./pass";
 import { ARTEngine, RenderSource } from "../engine/render-engine";
 import { RenderGraph } from "./render-graph";
-import { PassGraphNode } from "./dag/pass-graph-node";
-import { RenderTargetNode } from "./dag/render-target-node";
+import { PassGraphNode } from "./node/pass-graph-node";
+import { RenderTargetNode } from "./node/render-target-node";
 
 export type RenderGraphNode = PassGraphNode | RenderTargetNode;
 

@@ -1,4 +1,4 @@
-import { DAGNode } from "../render-graph/dag/dag-node";
+import { DAGNode } from "../core/dag-node";
 import { ShaderGraphNodeDefine } from "./shader-graph";
 import { ShaderFunction, ShaderFunctionParsedDefine } from "./shader-function";
 import { GLDataType } from "../webgl/shader-util";

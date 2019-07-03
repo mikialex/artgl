@@ -1,8 +1,7 @@
-import { DAGNode } from "./dag-node";
+import { DAGNode } from "../../core/dag-node";
 import { RenderTargetDefine, DimensionType, PixelFormat } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { GLFramebuffer } from "../../webgl/gl-framebuffer";
-import { PassGraphNode } from './pass-graph-node';
 import { MathUtil } from '../../math/util'
 import { Observer } from "../../core/observable";
 import { Size } from "../../engine/render-engine";

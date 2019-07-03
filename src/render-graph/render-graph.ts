@@ -1,7 +1,7 @@
 import { EffectComposer, RenderGraphNode } from "./effect-composer";
 import { PassDefine, GraphDefine, RenderTargetDefine } from "./interface";
-import { PassGraphNode } from "./dag/pass-graph-node";
-import { RenderTargetNode } from "./dag/render-target-node";
+import { PassGraphNode } from "./node/pass-graph-node";
+import { RenderTargetNode } from "./node/render-target-node";
 import { ARTEngine, RenderSource } from "../engine/render-engine";
 import { Technique } from "../core/technique";
 import { QuadSource } from './quad-source';

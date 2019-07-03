@@ -16,10 +16,11 @@
     // "baseUrl": "./src"
   },
   "include": [
-    "src", "example/contents/texture.ts", "example/contents/load-obj.ts"
+    "src", 
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "src/wasm-scene/**"
   ],
   "paths": {},
   "atom": {
