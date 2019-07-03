@@ -37,4 +37,10 @@ export class Box3 {
     return this.isEmpty() ? target.set(0, 0, 0) : target.addVectors(this.min, this.max).multiplyScalar(0.5);
   }
 
+  expandByPoint(point: Vector3) {
+    this.min.min(point);
+    this.max.max(point);
+    return this;
+  }
+
 }

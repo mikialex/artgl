@@ -12,12 +12,30 @@ export class StandradGeometry extends Geometry {
     super();
   }
 
-  updateBoundingShere() { }
-  updateAABBBox() { }
-  foreachFace(visitor: (face: Face3) => any, range: RenderRange) {
-    const end = (range.start + range.count) / 3;
+  updateBoundingShere() {
+    const sphere = this._boundingShere;
+    const box = this.AABBBox; // udpate box
+    const center = box.getCenter(sphere.center);
+    let maxRadiusSq = 0;
+    this.foreachVertex((point) => {
+      maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(point));
+    })
+    sphere.radius = maxRadiusSq;
+  }
+  
+  updateAABBBox() { 
+    const box = this._AABBBox;
+    box.makeEmpty();
+    this.foreachVertex((point) => {
+      box.expandByPoint(point);
+    })
+  }
+
+  foreachFace(visitor: (face: Face3) => any, range?: RenderRange) {
     const position = this.bufferDatas.position;
-    for (let i = range.start / 3; i < end; i++) {
+    const start = (range === undefined ? 0 : range.start) / 3;
+    const end = (range === undefined ? position.count:(range.start + range.count)) / 3;
+    for (let i = start; i < end; i++) {
       const p1Index = i * 3;
       const p2Index = i * 3 + 1;
       const p3Index = i * 3 + 2;
@@ -31,10 +49,11 @@ export class StandradGeometry extends Geometry {
   /**
    * this may redundant visit a lot
    */
-  foreachLineSegment(visitor: (line: Line3) => any, range: RenderRange) {
-    const end = (range.start + range.count) / 3;
+  foreachLineSegment(visitor: (line: Line3) => any, range?: RenderRange) {
     const position = this.bufferDatas.position;
-    for (let i = range.start / 3; i < end; i++) {
+    const start = (range === undefined ? 0 : range.start) / 3;
+    const end = (range === undefined ? position.count:(range.start + range.count)) / 3;
+    for (let i = start; i < end; i++) {
       const p1Index = i * 3;
       const p2Index = i * 3 + 1;
       const p3Index = i * 3 + 2;
@@ -52,10 +71,11 @@ export class StandradGeometry extends Geometry {
     }
   };
 
-  foreachVertex(visitor: (point: Vector3) => any, range: RenderRange) {
-    const end = range.start + range.count;
+  foreachVertex(visitor: (point: Vector3) => any, range?: RenderRange) {
     const position = this.bufferDatas.position;
-    for (let i = range.start; i <end; i++) {
+    const start = range === undefined ? 0 : range.start;
+    const end = range === undefined ? position.count:(range.start + range.count);
+    for (let i = start; i < end; i++) {
       tempVector3.set(position.getIndex(i), position.getIndex(i + 1), position.getIndex(i + 2));
       visitor(tempVector3);
     }
