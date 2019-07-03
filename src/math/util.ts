@@ -8,7 +8,7 @@ export const MathUtil = {
     return Math.max(min, Math.min(max, value));
   },
 
-  // compute euclidian modulo of m % n
+  // compute euclidean modulo of m % n
   // https://en.wikipedia.org/wiki/Modulo_operation
   euclideanModulo: function (n: number, m: number) {
     return ((n % m) + m) % m;

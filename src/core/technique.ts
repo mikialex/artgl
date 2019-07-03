@@ -1,29 +1,17 @@
 import { generateUUID } from "../math/index";
 import { GLProgramConfig, GLProgram } from "../webgl/program";
-import { GLDataType } from "../webgl/shader-util";
-import { AttributeUsage } from "../webgl/attribute";
 import { ARTEngine } from "../engine/render-engine";
 import { UniformProxy } from "../engine/uniform-proxy";
-
-export const standradMeshAttributeLayout = [
-  { name:'position',type:GLDataType.floatVec3, usage: AttributeUsage.position, stride: 3 },
-  { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal, stride: 3 },
-  { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
-]
 
 export interface TechniqueConfig {
   programConfig: GLProgramConfig;
 }
 
 /**
- * mateiral defined how to draw a things
- * typically, one mateiral is corespondent to a gl program
- *  program's shader and infos are defined in technique config
- * technique config is wrap a program condig
- * that the engine will use this to tell underlayer gl renderer
- * to create and compiled shader.
- * @export
- * @class Technique
+ * Technique defined how to draw a things typically, one technique is corespondent to a gl program.
+ * Program's shader and infos are defined in technique config.
+ * Technique config is wrap a program config that the engine will use this to tell the
+ *  under layer gl renderer to create and compiled shader.
  */
 export class Technique{
   constructor(config: TechniqueConfig) {
@@ -45,7 +33,9 @@ export class Technique{
 
   uniforms: Map<string, UniformProxy> = new Map();
 
-
+  /**
+   * t
+   */
   getProgram(engine: ARTEngine): GLProgram {
     const program = engine.getProgram(this);
     if (program === undefined) {

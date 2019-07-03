@@ -2,7 +2,7 @@ import { ShaderFunction, ShaderFunctionInput } from "./shader-function";
 import { AttributeDescriptor } from "../webgl/attribute";
 import { InnerUniformMapDescriptor, UniformDescriptor } from "../webgl/uniform/uniform";
 import { GLProgramConfig, VaryingDescriptor } from "../webgl/program";
-import { BuildInShaderFuntions } from "./built-in/index";
+import { BuildInShaderFunctions } from "./built-in/index";
 import { genFragShader, genVertexShader } from "./code-gen";
 import { TextureDescriptor } from '../webgl/uniform/uniform-texture';
 import {
@@ -12,7 +12,7 @@ import {
 } from "./shader-node";
 
 export enum ShaderGraphNodeInputType {
-  commenUniform,
+  commonUniform,
   innerUniform,
   textureUniform,
 
@@ -52,7 +52,7 @@ export interface ShaderGraphDefine {
 export class ShaderGraph {
 
   constructor() {
-    BuildInShaderFuntions.forEach(fun => {
+    BuildInShaderFunctions.forEach(fun => {
       this.registShaderFunction(fun);
     })
   }

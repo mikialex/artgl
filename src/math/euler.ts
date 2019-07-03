@@ -8,7 +8,7 @@ enum EulerOrder {
   'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX'
 }
 
-const tempMatirx = new Matrix4();
+const tempMatrix = new Matrix4();
 
 export class Euler implements DataObject<Euler>{
   constructor(x?: number, y?: number, z?: number, order?: EulerOrder) {
@@ -145,8 +145,8 @@ export class Euler implements DataObject<Euler>{
   }
 
   setFromQuaternion(q: Quaternion, order: EulerOrder, update: boolean) {
-    tempMatirx.makeRotationFromQuaternion(q);
-    return this.setFromRotationMatrix(tempMatirx, order, update);
+    tempMatrix.makeRotationFromQuaternion(q);
+    return this.setFromRotationMatrix(tempMatrix, order, update);
   };
 
   set(x: number, y: number, z: number, order: EulerOrder) {

@@ -1,7 +1,7 @@
 import { GLRenderer } from "./gl-renderer";
-import { GLRealeaseable } from '../type';
+import { GLReleasable } from '../type';
 
-export class GLAttributeBufferDataManager implements GLRealeaseable {
+export class GLAttributeBufferDataManager implements GLReleasable {
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
   }

@@ -1,4 +1,4 @@
-import { StandradGeometry } from "../standrad-geometry";
+import { StandardGeometry } from "../standard-geometry";
 
 interface CubeGeometryParam {
   width: number,
@@ -8,7 +8,7 @@ interface CubeGeometryParam {
   heightSegments: number,
   depthSegments: number,
 }
-export class CubeGeometry extends StandradGeometry {
+export class CubeGeometry extends StandardGeometry {
   // constructor(width?: number, height?: number, depth?: number) {
   //   super();
   //   if (width !== undefined) { this.parameters.width = width; }

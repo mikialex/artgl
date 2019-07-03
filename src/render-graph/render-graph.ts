@@ -66,7 +66,7 @@ export class RenderGraph {
    */
   public setGraph(graphDefine: GraphDefine): void {
     this.reset();
-    this.allocaterenderTargetNodes(graphDefine.renderTargets);
+    this.allocateRenderTargetNodes(graphDefine.renderTargets);
     this.constructPassGraph(graphDefine.passes);
     this.update();
   }
@@ -123,10 +123,10 @@ export class RenderGraph {
     return screenNode;
   }
 
-  private allocaterenderTargetNodes(textsDefine: RenderTargetDefine[]) {
+  private allocateRenderTargetNodes(textsDefine: RenderTargetDefine[]) {
     textsDefine.forEach(define => {
       if (this.renderTargetNodes.has(define.name)) {
-        throw 'render graph build error, dupilcate texture key namefound '
+        throw 'render graph build error, duplicate texture key name found '
       }
       const renderTargetNode = new RenderTargetNode(this, define);
       if (define.name === RenderGraph.screenRoot) {
@@ -173,7 +173,7 @@ export class RenderGraph {
       throw `inner source ${name} not supported`
     }
   }
-  registSource(name: string, source: RenderSource) {
+  registerSource(name: string, source: RenderSource) {
     if (this.isInnerSourceType(name)) {
       throw 'start with artgl.** is inner source and should not be registered'
     }
@@ -183,7 +183,7 @@ export class RenderGraph {
     }
     this.passSources.set(name, source);
   }
-  getResgisteredSource(name: string) {
+  getRegisteredSource(name: string) {
     return this.passSources.get(name);
   }
 

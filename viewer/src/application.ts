@@ -53,7 +53,7 @@ export class Application {
     this.hasInitialized = true;
     this.createScene(this.scene);
 
-    this.graph.registSource('AllScreen', this.scene)
+    this.graph.registerSource('AllScreen', this.scene)
     const TAATech = new TAATechnique();
     const SSAOTech = new SSAOTechnique();
     const copyTech = new BlendTechnique();
@@ -131,7 +131,7 @@ export class Application {
           source: ['artgl.screenQuad'],
           enableColorClear: false,
           beforePassExecute: () => {
-            this.engine.unjit();
+            this.engine.unJit();
             const VPInv: Matrix4 = TAATech.uniforms.get('VPMatrixInverse').value;
             const VP: Matrix4 = this.engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
             VPInv.getInverse(VP, true);

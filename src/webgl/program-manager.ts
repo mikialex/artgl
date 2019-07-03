@@ -1,8 +1,8 @@
 import { GLRenderer } from "./gl-renderer";
 import { GLProgram } from "./program";
-import { GLRealeaseable } from '../type';
+import { GLReleasable } from '../type';
 
-export class GLProgramManager implements GLRealeaseable {
+export class GLProgramManager implements GLReleasable {
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
   }

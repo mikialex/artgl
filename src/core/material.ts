@@ -5,7 +5,7 @@ import { Vector3 } from "../math/index";
 export const enum ChannelType{
   diffuse = 'diffuse',
   roughness = 'roughness',
-  metalic = 'metalic',
+  metallic = 'metallic',
   ao = 'ao'
 }
 

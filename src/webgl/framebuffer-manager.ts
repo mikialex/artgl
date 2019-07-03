@@ -1,8 +1,8 @@
 import { GLFramebuffer } from "./gl-framebuffer";
 import { GLRenderer } from "./gl-renderer";
-import { GLRealeaseable } from '../type';
+import { GLReleasable } from '../type';
 
-export class GLFrameBufferManager implements GLRealeaseable{
+export class GLFrameBufferManager implements GLReleasable{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
     this.gl = renderer.gl;

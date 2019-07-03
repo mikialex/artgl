@@ -7,7 +7,7 @@ const v12 = new Vector3();
 const v13 = new Vector3();
 const n = new Vector3();
 
-export function generateNormalFromPostion(vertices: Float32Array): Float32Array {
+export function generateNormalFromPosition(vertices: Float32Array): Float32Array {
   const vertices_length = vertices.length;
   const step = 9;
   const normals = new Float32Array(vertices_length);

@@ -3,8 +3,8 @@ import { Vector3 } from "../math/vector3";
 import { Vector2 } from "../math/vector2";
 import { loadStringFromFile } from "../util/file-io";
 import { BufferData } from "../core/buffer-data";
-import { generateNormalFromPostion } from "../util/normal-generation";
-import { StandradGeometry } from "../geometry/standrad-geometry";
+import { generateNormalFromPosition } from "../util/normal-generation";
+import { StandardGeometry } from "../geometry/standard-geometry";
 import { GeometryLoader } from "../core/loader";
 
 export async function loadObjFile(): Promise<Geometry> {
@@ -77,7 +77,7 @@ export class OBJLoader extends GeometryLoader{
   private wrappedPositionForArtgl: Vector3[] = [];//The list of position in vectors
   private wrappedUvsForArtgl: Vector2[] = [];     //Array with all value of uvs to match with the indices
   private wrappedNormalsForArtgl: Vector3[] = []; //Array with all value of normals to match with the indices
-  //Create a tuple with indice of Position, Normal, UV  [pos, norm, uvs]
+  //Create a tuple with indices of Position, Normal, UV  [pos, norm, uvs]
   private tuplePosNorm: Array<{ normals: Array<number>; idx: Array<number> }> = [];
   private curPositionInIndices: number = 0;
 
@@ -205,7 +205,7 @@ export class OBJLoader extends GeometryLoader{
     }
   };
 
-  parse(objStr: string, fileName?:string): StandradGeometry {
+  parse(objStr: string, fileName?: string): StandardGeometry {
     this.reset();
 
     //Split the file into lines
@@ -280,7 +280,7 @@ export class OBJLoader extends GeometryLoader{
       }
 
     }
-    const geometry = new StandradGeometry();
+    const geometry = new StandardGeometry();
     const position: number[] = [];
     this.wrappedPositionForArtgl.forEach(po => {
       position.push(po.x);
@@ -304,12 +304,12 @@ export class OBJLoader extends GeometryLoader{
       indexBuffer = new Uint16Array(this.indicesForArtgl);
       geometry.indexBuffer = new BufferData(indexBuffer, 1);
     }
-    geometry.bufferDatas.position = new BufferData(positionBuffer, 3);
-    const useGeneraetNormal = false;
-    if (useGeneraetNormal) {
-      geometry.bufferDatas.normal = new BufferData(generateNormalFromPostion(positionBuffer), 3);
+    geometry.bufferDatum.position = new BufferData(positionBuffer, 3);
+    const useGeneratedNormal = false;
+    if (useGeneratedNormal) {
+      geometry.bufferDatum.normal = new BufferData(generateNormalFromPosition(positionBuffer), 3);
     } else {
-      geometry.bufferDatas.normal = new BufferData(normalBuffer, 3);
+      geometry.bufferDatum.normal = new BufferData(normalBuffer, 3);
     }
     console.log('indexlength:' + indexBuffer.length);
     console.log('positionBuffer:' + positionBuffer.length);

@@ -32,7 +32,7 @@ export class RenderTargetNode extends DAGNode{
 
     let width: number;
     let height: number;
-    // decide inital size and create resize observer
+    // decide initial size and create resize observer
     if (define.format.dimensionType === DimensionType.fixed) {
       width = define.format.width !== undefined ? define.format.width : graph.engine.renderer.width;
       height = define.format.height !== undefined ? define.format.height : graph.engine.renderer.height;
@@ -47,7 +47,7 @@ export class RenderTargetNode extends DAGNode{
     }
 
     const enableDepth = define.format.disableDepthBuffer !== undefined ? define.format.disableDepthBuffer : true;
-    this.framebuffer = graph.engine.renderer.frambufferManager.createFrameBuffer(
+    this.framebuffer = graph.engine.renderer.framebufferManager.createFrameBuffer(
       this.name, width, height, enableDepth);
     
   }

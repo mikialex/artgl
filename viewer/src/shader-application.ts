@@ -17,7 +17,7 @@ export class ShaderApplication {
   technique: Technique;
   mesh: Mesh;
   interactor: Interactor;
-  orbitControler: OrbitController;
+  orbitController: OrbitController;
 
   engine: ARTEngine;
 
@@ -27,8 +27,8 @@ export class ShaderApplication {
     this.engine = new ARTEngine(canvas);
     this.engine.camera.transform.position.set(20, 10, 10)
     this.interactor = new Interactor(canvas);
-    this.orbitControler = new OrbitController(this.engine.camera as PerspectiveCamera);
-    this.orbitControler.registerInteractor(this.interactor);
+    this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);
+    this.orbitController.registerInteractor(this.interactor);
     this.technique = new ARTGL.NormalTechnique();
     this.loadScene();
     this.tick();
@@ -90,7 +90,7 @@ export class ShaderApplication {
           type: "diffuse",
           input: {
             diffuseColor: {
-              type: ShaderGraphNodeInputType.commenUniform,
+              type: ShaderGraphNodeInputType.commonUniform,
               value: "u_color1"
             }
           }
@@ -100,7 +100,7 @@ export class ShaderApplication {
           type: "diffuse",
           input: {
             diffuseColor: {
-              type: ShaderGraphNodeInputType.commenUniform,
+              type: ShaderGraphNodeInputType.commonUniform,
               value: "u_color2"
             }
           }
@@ -170,7 +170,7 @@ export class ShaderApplication {
   }
 
   render() {
-    this.orbitControler.update();
+    this.orbitController.update();
     this.engine.connectCamera();
     this.engine.render(this.scene);
   }

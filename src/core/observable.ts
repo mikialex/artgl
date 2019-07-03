@@ -68,7 +68,7 @@ export class Observable<T> {
   }
 
   /**
-   * Create a new Observer with the specified callback and unregisters after the next notification
+   * Create a new Observer with the specified callback and unregister after the next notification
    * @param callback the callback that will be executed for that Observer
    * @returns the new observer created for the callback
    */

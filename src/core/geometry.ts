@@ -19,11 +19,11 @@ export abstract class Geometry {
   }
   name: string
   uuid = generateUUID();
-  readonly bufferDatas: { [index: string]: BufferData } = {};
+  readonly bufferDatum: { [index: string]: BufferData } = {};
   indexBuffer: BufferData;
   get needUpdate(): boolean{
-    for (const key in this.bufferDatas) {
-      if (this.bufferDatas[key].shouldUpdate) {
+    for (const key in this.bufferDatum) {
+      if (this.bufferDatum[key].shouldUpdate) {
         return true
       }
     }
@@ -39,17 +39,17 @@ export abstract class Geometry {
     return this._AABBBox;
   }
 
-  _boundingShere: Sphere = new Sphere();
-  abstract updateBoundingShere(): void;
-  get boundingShere(): Sphere {
+  _boundingSphere: Sphere = new Sphere();
+  abstract updateBoundingSphere(): void;
+  get boundingSphere(): Sphere {
     if (this.needUpdate) {
-      this.updateBoundingShere();
+      this.updateBoundingSphere();
     }
-    return this._boundingShere;
+    return this._boundingSphere;
   }
 
   /**
-   * creat or update the geometry's data in bufferdatas
+   * creat or update the geometry's data in BufferDatum
    */
   abstract populate(): void;
 

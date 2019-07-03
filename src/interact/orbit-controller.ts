@@ -1,4 +1,4 @@
-import { Controler } from "./controler";
+import { Controller } from "./controller";
 import { Spherical } from "../math/spherical";
 import { Interactor } from "./interactor";
 import { Vector2 } from "../math/vector2";
@@ -8,7 +8,7 @@ import { PerspectiveCamera } from "../camera/perspective-camera";
 
 const tempVec = new Vector3();
 
-export class OrbitController extends Controler {
+export class OrbitController extends Controller {
 
   constructor(public camera: PerspectiveCamera) {
     super();
@@ -34,7 +34,7 @@ export class OrbitController extends Controler {
 
   public registerInteractor(interactor: Interactor) {
     if (this.interactor !== undefined) {
-      this.interactor.unbindControlerAllListener(this);
+      this.interactor.unbindControllerAllListener(this);
     }
     this.interactor = interactor;
     this.interactor.bindLeftMouseMove(this, this.rotate);

@@ -1,4 +1,4 @@
-import { Technique, standradMeshAttributeLayout } from "../core/technique";
+import { Technique } from "../core/technique";
 import { GLDataType } from "../webgl/shader-util";
 import { Matrix4 } from "../math/index";
 import { AttributeUsage } from "../webgl/attribute";

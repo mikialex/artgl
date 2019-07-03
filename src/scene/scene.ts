@@ -94,7 +94,7 @@ export class Scene implements RenderSource {
 
   disposeRootNode() {
     if (!this.root) {
-      throw 'scene hasnt root';
+      throw 'scene hasn\'t root';
     }
     this.root.traverse((node) => {
       node.scene = null;

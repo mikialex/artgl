@@ -10,7 +10,7 @@ interface TreeNode{
 
 /**
  * a scene node in a scene tree
- * organize the scene hierachy
+ * organize the scene hierarchy
  *
  * @export
  * @class SceneNode

@@ -12,7 +12,7 @@ export class ShaderNode extends DAGNode {
 }
 
 /**
- * A node instance of a shaderfunction
+ * A node instance of a shader function
  * used in shadergraph for connection
  *
  * @export
@@ -28,7 +28,7 @@ export class ShaderFunctionNode extends ShaderNode {
   define: ShaderGraphNodeDefine;
   factory: ShaderFunction
 
-  // create a fragmentshader from this node
+  // create a fragment shader from this node
   makeFragmentShader() {
 
   }

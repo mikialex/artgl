@@ -169,7 +169,7 @@ export class GraphNodeView {
       const inputNode = graph.nodeMap.get(id);
       return {
         id: this.uuid + inputNode.uuid,
-        line: createConectionSVGLine(
+        line: createConnectionSVGLine(
           inputNode.positionX + inputNode.width + boardInfo.transformX,
           inputNode.positionY + inputNode.height / 2 + boardInfo.transformY,
           this.positionX + boardInfo.transformX,
@@ -182,7 +182,7 @@ export class GraphNodeView {
 }
 
 
-function createConectionSVGLine(
+function createConnectionSVGLine(
   x1: number, y1: number,
   x2: number, y2: number,
   ) {

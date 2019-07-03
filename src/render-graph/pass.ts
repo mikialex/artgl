@@ -28,16 +28,16 @@ export class RenderPass{
     this.afterPassExecute = define.afterPassExecute;
 
     define.source.forEach(so => {
-      let renderso: RenderSource;
+      let source: RenderSource;
       if (this.graph.isInnerSourceType(so)) {
-        renderso = this.graph.getInnerSource(so);
+        source = this.graph.getInnerSource(so);
       } else {
-        renderso = graph.getResgisteredSource(so);
-        if (renderso === undefined) {
-          throw `rendersource '${so}' not defined`
+        source = graph.getRegisteredSource(so);
+        if (source === undefined) {
+          throw `renderSource '${so}' not defined`
         }
       }
-      this.sourceUse.push(renderso);
+      this.sourceUse.push(source);
     })
 
   }
@@ -65,7 +65,7 @@ export class RenderPass{
   private sourceUse: RenderSource[] = [];
   private overrideTechnique: Nullable<Technique> = null;
 
-  // key: uniformName ;   value: inputFrambufferName
+  // key: uniformName ;   value: inputFramebufferName
   private inputTarget: Map<string, string> = new Map();
   private outputTarget: GLFramebuffer
   setOutPutTarget(renderTargetNode: RenderTargetNode) {
@@ -82,8 +82,8 @@ export class RenderPass{
   renderDebugResult(engine: ARTEngine) {
     engine.renderDebugFrameBuffer(this.outputTarget)
     // this will cause no use draw TODO
-    this.inputTarget.forEach((inputFrambufferName, uniformName) => {
-      const framebuffer = engine.renderer.frambufferManager.getFramebuffer(inputFrambufferName);
+    this.inputTarget.forEach((inputFramebufferName, uniformName) => {
+      const framebuffer = engine.renderer.framebufferManager.getFramebuffer(inputFramebufferName);
       engine.renderDebugFrameBuffer(framebuffer)
     })
   }
@@ -122,9 +122,9 @@ export class RenderPass{
     // input binding 
     if (this.overrideTechnique !== null) {
       engine.overrideTechnique = this.overrideTechnique;
-      this.inputTarget.forEach((inputFrambufferName, uniformName) => {
+      this.inputTarget.forEach((inputFramebufferName, uniformName) => {
         (engine.overrideTechnique as Technique).getProgram(engine).defineFrameBufferTextureDep(
-          inputFrambufferName, uniformName
+          inputFramebufferName, uniformName
         );
       })
     }

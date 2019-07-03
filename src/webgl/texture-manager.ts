@@ -2,7 +2,7 @@ import { GLRenderer } from "./gl-renderer";
 import { generateUUID } from "../math/uuid";
 import { TextureFilter, TextureWrap } from "./const";
 import { Texture } from "../core/texture";
-import { GLRealeaseable } from '../type';
+import { GLReleasable } from '../type';
 
 enum TextureFormat {
   RGBA,
@@ -38,7 +38,7 @@ interface WebGLTextureWithVersionIDWrap{
  * @export
  * @class GLTextureManager
  */
-export class GLTextureManager implements GLRealeaseable{
+export class GLTextureManager implements GLReleasable{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
   }

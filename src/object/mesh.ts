@@ -1,6 +1,10 @@
 import { RenderObject, PrimitiveVisitor, PrimitiveType } from "../core/render-object";
 import { DrawMode } from "../webgl/const";
-export class Mesh extends RenderObject{
+import { RayCasterable } from "../core/raycaster";
+export class Mesh extends RenderObject
+  implements RayCasterable
+{
+
   constructor() {
     super();
 
@@ -10,7 +14,16 @@ export class Mesh extends RenderObject{
 
   foreachPrimitive(visitor: PrimitiveVisitor) {
     if (this.geometry !== undefined) {
-      // this.geometry.foreachPrimitive(visitor, this.range)
+      this.geometry.foreachFace(visitor, this.range)
     }
   }
+
+  raycastHit(): boolean {
+    throw new Error("Method not implemented.");
+  }
+  
+  raycast(): import("../core/raycaster").RayCastResult {
+    throw new Error("Method not implemented.");
+  }
+
 }

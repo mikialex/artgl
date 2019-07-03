@@ -1,9 +1,9 @@
 import { GLRenderer } from "./gl-renderer";
 import { GLExtList } from "./gl-info";
-import { GLRealeaseable } from "../type";
+import { GLReleasable } from "../type";
 import { Geometry } from "../core/geometry";
 
-export class GLVAOManager implements GLRealeaseable{
+export class GLVAOManager implements GLReleasable{
   readonly gl: WebGLRenderingContext;
   readonly renderer: GLRenderer;
   readonly vaoExt: any;

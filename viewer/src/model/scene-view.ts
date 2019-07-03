@@ -21,9 +21,9 @@ export class GeometryView{
     view.uuid = geometry.uuid;
     view.name = geometry.name === undefined ? 'unnamed' : geometry.name;
     view.buffers = [];
-    for (const key in geometry.bufferDatas) {
-      if (geometry.bufferDatas.hasOwnProperty(key)) {
-        const bufferdata = geometry.bufferDatas[key];
+    for (const key in geometry.bufferDatum) {
+      if (geometry.bufferDatum.hasOwnProperty(key)) {
+        const bufferdata = geometry.bufferDatum[key];
         view.buffers.push({
           name: key,
           type: 'bufferdata',
@@ -50,9 +50,9 @@ export class MaterialView{
     view.uuid = material.uuid;
     // view.name = geometry.name === undefined ? 'unnamed' : geometry.name;
     // view.buffers = [];
-    // for (const key in geometry.bufferDatas) {
-    //   if (geometry.bufferDatas.hasOwnProperty(key)) {
-    //     const bufferdata = geometry.bufferDatas[key];
+    // for (const key in geometry.bufferDatum) {
+    //   if (geometry.bufferDatum.hasOwnProperty(key)) {
+    //     const bufferdata = geometry.bufferDatum[key];
     //     view.buffers.push({
     //       name: key,
     //       type: 'bufferdata',

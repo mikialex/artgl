@@ -2,7 +2,7 @@ import { MVPTransformFunction } from "./mvp-transform";
 import { depthPackFunction } from "./depth-pack";
 import { ShaderFunction } from "../shader-function";
 
-export const BuildInShaderFuntions = [
+export const BuildInShaderFunctions = [
   MVPTransformFunction,
   depthPackFunction,
   new ShaderFunction(

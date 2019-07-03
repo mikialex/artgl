@@ -4,6 +4,6 @@ export type Nullable<T> = T | null;
 
 export type Filter<T> = (item: T) => boolean;
 
-export interface GLRealeaseable {
+export interface GLReleasable {
   releaseGL(renderer: GLRenderer): void;
 }

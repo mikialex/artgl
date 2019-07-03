@@ -1,5 +1,5 @@
 
-// lowlevel gl layer
+// low level gl layer
 export { GLRenderer } from "./webgl/gl-renderer";
 export { GLProgram } from "./webgl/program";
 
@@ -40,7 +40,7 @@ export { PerspectiveCamera } from "./camera/perspective-camera";
 
 //interaction
 export { Interactor } from "./interact/interactor";
-export { OrbitController } from "./interact/orbit-controler";
+export { OrbitController } from "./interact/orbit-controller";
 
 //loader
 export { OBJLoader } from './loader/obj-loader';

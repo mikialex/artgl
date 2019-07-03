@@ -10,7 +10,7 @@ export class Texture {
 
   image?: HTMLImageElement;
   textureData?: Uint8ClampedArray;
-  gltextureId: string;
+  glTextureId: string;
   updateVersionId: number = 0;
 
   setNeedUpdate() {

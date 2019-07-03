@@ -4,14 +4,14 @@ import { GLProgramManager } from "./program-manager";
 import { GLAttributeBufferDataManager } from "./attribute-buffer-manager";
 import { GLState } from "./states/gl-state";
 import { DrawMode } from "./const";
-import { Nullable, GLRealeaseable } from "../type";
+import { Nullable, GLReleasable } from "../type";
 import { GLTextureManager } from "./texture-manager";
 import { GLFrameBufferManager } from "./framebuffer-manager";
 import { GLFramebuffer } from "./gl-framebuffer";
 import { GLStat } from "./gl-stat";
 import { GLVAOManager } from "./vao";
 
-export class GLRenderer implements GLRealeaseable{
+export class GLRenderer implements GLReleasable{
   constructor(el?: HTMLCanvasElement, options?: any) {
     if (el === undefined) {
       el = document.createElement('canvas');
@@ -26,7 +26,7 @@ export class GLRenderer implements GLRealeaseable{
     this.gl = ctx;
     this.el = el;
     this.glInfo = new GLInfo(this);
-    this.frambufferManager = new GLFrameBufferManager(this);
+    this.framebufferManager = new GLFrameBufferManager(this);
     this.vaoManager = new GLVAOManager(this);
     this.state = new GLState(this);
     this.textureManger.init();
@@ -74,7 +74,7 @@ export class GLRenderer implements GLRealeaseable{
   readonly textureManger = new GLTextureManager(this);
   readonly attributeBufferManager = new GLAttributeBufferDataManager(this);
   readonly vaoManager: GLVAOManager;
-  readonly frambufferManager: GLFrameBufferManager;
+  readonly framebufferManager: GLFrameBufferManager;
 
   createProgram(conf: GLProgramConfig): GLProgram {
     const program = new GLProgram(this, conf);
@@ -148,7 +148,7 @@ export class GLRenderer implements GLRealeaseable{
     this.attributeBufferManager.releaseGL();
     this.programManager.releaseGL();
     this.textureManger.releaseGL();
-    this.frambufferManager.releaseGL();
+    this.framebufferManager.releaseGL();
   }
 
 }

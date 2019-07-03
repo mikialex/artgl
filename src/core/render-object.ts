@@ -23,9 +23,9 @@ export class RenderRange {
     this.count = count;
   }
 
-  // static getFullRangeFromGeometry(geomemtry: Geometry): RenderRange {
-  //   if (geomemtry.indexBuffer !== undefined) {
-  //     return geomemtry.indexBuffer.data.length;
+  // static getFullRangeFromGeometry(geometry: Geometry): RenderRange {
+  //   if (geometry.indexBuffer !== undefined) {
+  //     return geometry.indexBuffer.data.length;
   //   }
   // }
 
@@ -37,7 +37,7 @@ export class RenderRange {
 export const enum PrimitiveType {
   triangle,
   point,
-  linesegment,
+  lineSegment,
 }
 
 export type RenderablePrimitive = Line3 | Vector3 | Face3
@@ -45,10 +45,10 @@ export type PrimitiveVisitor = (prim: RenderablePrimitive) => any
 
 /**
  * Class for render drawcall description,  which is describe all drawable things
- * a drawable thing should have a geomemtry to define what to draw
+ * a drawable thing should have a geometry to define what to draw
  * and a technique to defined how to draw
- * and many other draw config such as blending depth behaviour defined in state object
- * engine will read these infomantion and organize things properly
+ * and many other draw config such as blending depth behavior defined in state object
+ * engine will read these information and organize things properly
  * 
  * @export
  * @class RenderObject
@@ -62,7 +62,7 @@ export class RenderObject extends SceneNode {
   range?: RenderRange;
   state?: DrawState;
 
-  // sometimes something draw as mesh(tri), but act like line, like fatline 
+  // sometimes something draw as mesh(tri), but act like line, like fatLine 
   // so, drawType and primitiveType is different things 
   drawType: DrawMode = DrawMode.TRIANGLES;
   primitiveType: PrimitiveType = PrimitiveType.triangle;

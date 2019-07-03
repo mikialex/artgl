@@ -1,10 +1,10 @@
 
 import { Vector3 } from '../../math/index';;
 import { BufferData } from '../../core/buffer-data';
-import { StandradGeometry } from '../standrad-geometry';
+import { StandardGeometry } from '../standard-geometry';
 
 
-export class SphereGeometry extends StandradGeometry {
+export class SphereGeometry extends StandardGeometry {
   constructor(radius?: number, widthSegments?: number, heightSegments?: number,
     phiStart?: number, phiLength?: number, thetaStart?: number, thetaLength?: number) {
     super();
@@ -77,13 +77,13 @@ export class SphereGeometry extends StandradGeometry {
     }
 
     const positionBuffer = new BufferData(new Float32Array(vertices), 3);
-    this.bufferDatas.position = positionBuffer;
+    this.bufferDatum.position = positionBuffer;
 
     const normalBuffer = new BufferData(new Float32Array(normals), 3);
-    this.bufferDatas.normal = normalBuffer;
+    this.bufferDatum.normal = normalBuffer;
 
     const uvBuffer = new BufferData(new Float32Array(uvs), 2);
-    this.bufferDatas.uv = uvBuffer;
+    this.bufferDatum.uv = uvBuffer;
 
     const indexBuffer = new BufferData(new Uint16Array(indices), 1);
     this.indexBuffer = indexBuffer;

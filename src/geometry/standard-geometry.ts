@@ -7,14 +7,14 @@ import { Vector3 } from "../math/vector3";
 const tempFace3 = new Face3();
 const tempLine3 = new Line3();
 const tempVector3 = new Vector3();
-export class StandradGeometry extends Geometry {
+export class StandardGeometry extends Geometry {
   constructor() {
     super();
   }
 
-  updateBoundingShere() {
-    const sphere = this._boundingShere;
-    const box = this.AABBBox; // udpate box
+  updateBoundingSphere() {
+    const sphere = this._boundingSphere;
+    const box = this.AABBBox; // update box
     const center = box.getCenter(sphere.center);
     let maxRadiusSq = 0;
     this.foreachVertex((point) => {
@@ -32,7 +32,7 @@ export class StandradGeometry extends Geometry {
   }
 
   foreachFace(visitor: (face: Face3) => any, range?: RenderRange) {
-    const position = this.bufferDatas.position;
+    const position = this.bufferDatum.position;
     const start = (range === undefined ? 0 : range.start) / 3;
     const end = (range === undefined ? position.count:(range.start + range.count)) / 3;
     for (let i = start; i < end; i++) {
@@ -50,7 +50,7 @@ export class StandradGeometry extends Geometry {
    * this may redundant visit a lot
    */
   foreachLineSegment(visitor: (line: Line3) => any, range?: RenderRange) {
-    const position = this.bufferDatas.position;
+    const position = this.bufferDatum.position;
     const start = (range === undefined ? 0 : range.start) / 3;
     const end = (range === undefined ? position.count:(range.start + range.count)) / 3;
     for (let i = start; i < end; i++) {
@@ -72,7 +72,7 @@ export class StandradGeometry extends Geometry {
   };
 
   foreachVertex(visitor: (point: Vector3) => any, range?: RenderRange) {
-    const position = this.bufferDatas.position;
+    const position = this.bufferDatum.position;
     const start = range === undefined ? 0 : range.start;
     const end = range === undefined ? position.count:(range.start + range.count);
     for (let i = start; i < end; i++) {
@@ -82,6 +82,6 @@ export class StandradGeometry extends Geometry {
   };
 
   populate() {
-    throw 'genenate methods not impl'
+    throw 'generate methods not impl'
   }
 }

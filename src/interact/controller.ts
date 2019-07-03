@@ -1,8 +1,8 @@
 
 import { Interactor } from "./interactor";
 
-// controler is about how to minupulate camera easliy
-export class Controler{
+// controller is about how to manipulate camera easily
+export class Controller{
   constructor() {
   }
 

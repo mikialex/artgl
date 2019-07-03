@@ -11,7 +11,7 @@ import { Texture } from "../core/texture";
 import { Material } from "../core/material";
 import { GLTextureUniform } from "../webgl/uniform/uniform-texture";
 import { PerspectiveCamera } from "../camera/perspective-camera";
-import { Nullable, GLRealeaseable } from "../type";
+import { Nullable, GLReleasable } from "../type";
 import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
 import { UniformProxy } from "./uniform-proxy";
 import { Observable } from "../core/observable";
@@ -36,10 +36,10 @@ export interface Size{
 const copyTechnique = new CopyTechnique();
 const quad = new QuadSource();
 
-export class ARTEngine implements GLRealeaseable{
+export class ARTEngine implements GLReleasable{
   constructor(el?: HTMLCanvasElement, ctxOptions?: any) {
     this.renderer = new GLRenderer(el, ctxOptions);
-    // if we have a element param, use it as the default camera's param for convienience
+    // if we have a element param, use it as the default camera's param for convenience
     if (el !== undefined) {
       (this.camera as PerspectiveCamera).aspect = el.width / el.height;
     }
@@ -103,8 +103,8 @@ export class ARTEngine implements GLRealeaseable{
     this._camera = camera;
     this.isCameraChanged = true;
   };
-  private cameraMatrixRerverse = new Matrix4();
-  private ProjectionMatirx = new Matrix4();
+  private cameraMatrixReverse = new Matrix4();
+  private ProjectionMatrix = new Matrix4();
   private VPMatrix = new Matrix4();
   private LastVPMatrix = new Matrix4();
 
@@ -112,19 +112,19 @@ export class ARTEngine implements GLRealeaseable{
   private jitterVPMatrix = new Matrix4();
 
   jitterProjectionMatrix() {
-    this.jitterPMatrix.copy(this.ProjectionMatirx);
+    this.jitterPMatrix.copy(this.ProjectionMatrix);
     this.jitterPMatrix.elements[8] += ((2 * Math.random() - 1) / this.renderer.width);
     this.jitterPMatrix.elements[9] += ((2 * Math.random() - 1) / this.renderer.height);
-    this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.cameraMatrixRerverse);
+    this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.cameraMatrixReverse);
     this.getGlobalUniform(InnerSupportUniform.VPMatrix).setValue(this.jitterVPMatrix);
   }
 
-  unjit() {
+  unJit() {
     this.getGlobalUniform(InnerSupportUniform.VPMatrix).setValue(this.VPMatrix);
   }
 
   /**
-   * call this to update enginelayer camera related render info
+   * call this to update engine layer camera related render info
    * such as matrix global uniform.
    *
    * @memberof ARTEngine
@@ -134,13 +134,13 @@ export class ARTEngine implements GLRealeaseable{
     // 
     if (this.camera.projectionMatrixNeedUpdate) {
       this.camera.updateProjectionMatrix();
-      this.ProjectionMatirx.copy(this.camera.projectionMatrix);
+      this.ProjectionMatrix.copy(this.camera.projectionMatrix);
       needUpdateVP = true;
     }
     if (this.camera.transform.transformFrameChanged) {
       this.camera.transform.matrix;
       this.camera.updateWorldMatrix(true);
-      this.cameraMatrixRerverse.getInverse(this.camera.worldMatrix, true);
+      this.cameraMatrixReverse.getInverse(this.camera.worldMatrix, true);
       needUpdateVP = true;
     }
 
@@ -148,7 +148,7 @@ export class ARTEngine implements GLRealeaseable{
     this.getGlobalUniform(InnerSupportUniform.LastVPMatrix).setValue(this.LastVPMatrix);
 
     if (needUpdateVP) {
-      this.VPMatrix.multiplyMatrices(this.ProjectionMatirx, this.cameraMatrixRerverse);
+      this.VPMatrix.multiplyMatrices(this.ProjectionMatrix, this.cameraMatrixReverse);
       this.getGlobalUniform(InnerSupportUniform.VPMatrix).setValue(this.VPMatrix);
       needUpdateVP = false;
       this.isCameraChanged = true;
@@ -219,11 +219,11 @@ export class ARTEngine implements GLRealeaseable{
 
 
 
-  //// low level resouce binding
+  //// low level resource binding
 
   /**
    *
-   * GlobalUniforms is store useful inner support unifroms
+   * GlobalUniforms is store useful inner support uniforms
    * Engine will update these values and auto bind them to
    * program that you will draw as needed
    *
@@ -260,33 +260,33 @@ export class ARTEngine implements GLRealeaseable{
   private connectMaterial(material: Material, program: GLProgram) {
 
     program.forTextures((tex: GLTextureUniform) => {
-      let webgltexture: WebGLTexture | undefined;
+      let glTexture: WebGLTexture | undefined;
 
-      // aquire texuture from material or framebuffers
+      // acquire texture from material or framebuffer
       if (material !== undefined) {
         if (tex.channel === undefined) {
-          throw 'use texture in material / use material to render should set textureuniform channel type'
+          throw 'use texture in material / use material to render should set texture uniform channel type'
         }
         const texture = material.getChannelTexture(tex.channel);
-        if (texture.gltextureId === undefined) {
-          texture.gltextureId = this.renderer.textureManger.createTextureFromImageElement(texture.image);
-          webgltexture = this.renderer.textureManger.getGLTexture(texture.gltextureId);
+        if (texture.glTextureId === undefined) {
+          texture.glTextureId = this.renderer.textureManger.createTextureFromImageElement(texture.image);
+          glTexture = this.renderer.textureManger.getGLTexture(texture.glTextureId);
         }
       } 
 
-      if (webgltexture === undefined) {
-        const frambufferName = program.framebufferTextureMap[tex.name];
-        if (frambufferName === undefined) {
-          throw  `cant find frambuffer for tex ${tex.name}, please define before use`
+      if (glTexture === undefined) {
+        const framebufferName = program.framebufferTextureMap[tex.name];
+        if (framebufferName === undefined) {
+          throw  `cant find framebuffer for tex ${tex.name}, please define before use`
         }
-        webgltexture = this.renderer.frambufferManager.getFramebufferTexture(frambufferName);
+        glTexture = this.renderer.framebufferManager.getFramebufferTexture(framebufferName);
       }
 
-      if (webgltexture === undefined) {
+      if (glTexture === undefined) {
         throw 'texture bind failed'
       }
       
-      tex.useTexture(webgltexture);
+      tex.useTexture(glTexture);
     })
   }
 
@@ -305,7 +305,7 @@ export class ARTEngine implements GLRealeaseable{
     }
 
     program.forAttributes(att => {
-      const bufferData = geometry.bufferDatas[att.name];
+      const bufferData = geometry.bufferDatum[att.name];
       if (bufferData === undefined) {
         throw `program ${program.name} needs an attribute named ${att.name}, but cant find in geometry data`;
       }
@@ -358,9 +358,9 @@ export class ARTEngine implements GLRealeaseable{
 
 
 
-  //  GL resouce aqusition
+  //  GL resource acquisition
   getGLTexture(texture: Texture): WebGLTexture {
-    const id = texture.gltextureId;
+    const id = texture.glTextureId;
     return this.renderer.getGLTexture(id);
   }
   private programTechniqueMap: Map<Technique, GLProgram> = new Map();
@@ -378,8 +378,8 @@ export class ARTEngine implements GLRealeaseable{
     return this.renderer.attributeBufferManager.getGLBuffer(bufferData.data.buffer as ArrayBuffer);
   }
 
-  createOrUpdateAttributeBuffer(bufferData: BufferData, useforIndex: boolean): WebGLBuffer {
-    return this.renderer.attributeBufferManager.updateOrCreateBuffer(bufferData.data.buffer as ArrayBuffer, useforIndex);
+  createOrUpdateAttributeBuffer(bufferData: BufferData, useForIndex: boolean): WebGLBuffer {
+    return this.renderer.attributeBufferManager.updateOrCreateBuffer(bufferData.data.buffer as ArrayBuffer, useForIndex);
   }
 
 

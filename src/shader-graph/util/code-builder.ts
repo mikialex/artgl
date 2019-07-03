@@ -19,9 +19,9 @@ export class CodeBuilder{
   writeBlock(value: string) {
     const lines = value.split("\n");
     lines.forEach(line => {
-      const trimed = line.trim()
-      if (trimed.length > 0) {
-        this.writeLine(trimed);
+      const trimmed = line.trim()
+      if (trimmed.length > 0) {
+        this.writeLine(trimmed);
       }
     })
   }

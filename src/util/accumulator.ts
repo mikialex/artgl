@@ -1,4 +1,4 @@
-export class Acumulator {
+export class Accumulator {
   constructor(size?: number) {
     this.size = size || 10;
     this.reset();

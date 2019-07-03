@@ -28,25 +28,25 @@ export class PassGraphNode extends DAGNode {
   readonly define: PassDefine;
 
   updateDependNode() {
-    // deconnect all depends node
+    // disconnect all depends node
     Object.keys(this.inputs).forEach(inputUniformKey => {
-      const frambufferName = this.inputs[inputUniformKey]
-      const renderTargetNode = this.graph.getRenderTargetDependence(frambufferName);
+      const framebufferName = this.inputs[inputUniformKey]
+      const renderTargetNode = this.graph.getRenderTargetDependence(framebufferName);
       if (renderTargetNode === undefined) {
-        throw `render graph updating error, renderTarget depend node ${frambufferName} cant found`;
+        throw `render graph updating error, renderTarget depend node ${framebufferName} cant found`;
       }
       renderTargetNode.deConnectTo(this);
     })
-    // reeval getter
+    // reval getter
     if (this.inputsGetter !== null) {
       this.inputs = this.inputsGetter();
     }
     // connect new depends node
     Object.keys(this.inputs).forEach(inputUniformKey => {
-      const frambufferName = this.inputs[inputUniformKey]
-      const renderTargetNode = this.graph.getRenderTargetDependence(frambufferName);
+      const framebufferName = this.inputs[inputUniformKey]
+      const renderTargetNode = this.graph.getRenderTargetDependence(framebufferName);
       if (renderTargetNode === undefined) {
-        throw `render graph updating error, renderTarget depend node ${frambufferName} cant found`;
+        throw `render graph updating error, renderTarget depend node ${framebufferName} cant found`;
       }
       renderTargetNode.connectTo(this);
     })

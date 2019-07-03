@@ -4,7 +4,7 @@ export class DAGNode {
   uuid:string = generateUUID();
   protected toNode: DAGNode[] = [];
   protected fromNode: DAGNode[] = [];
-  protected fullfillList: boolean[] = [];
+  protected fulfillList: boolean[] = [];
 
   public getFromNodeByIndex(index:number) {
     return this.fromNode[index]
@@ -57,7 +57,7 @@ export class DAGNode {
   generateDependencyOrderList(): DAGNode[] {
     let allDepNodes = this.generateAllDependencyList();
     allDepNodes.forEach(node => {
-      node.fullfillList = node.fromNode.map(n => false);
+      node.fulfillList = node.fromNode.map(n => false);
     })
     let preventEndlessCounter = 1;
     const result: DAGNode[] = [];
@@ -66,19 +66,19 @@ export class DAGNode {
       node.toNode.forEach(n => {
         const selfIndex = n.fromNode.indexOf(node);
         if (selfIndex === -1) {
-          throw 'comection error'
+          throw 'connection error'
         } 
-        n.fullfillList[selfIndex] = true;
+        n.fulfillList[selfIndex] = true;
       })
     }
     while (allDepNodes.length > 0) {
       allDepNodes = allDepNodes.filter(node => {
-        if (node.fullfillList.length === 0) {
+        if (node.fulfillList.length === 0) {
           resolveNext(node);
           return false
         }
-        for (let i = 0; i < node.fullfillList.length; i++) {
-          if (!node.fullfillList[i]) {
+        for (let i = 0; i < node.fulfillList.length; i++) {
+          if (!node.fulfillList[i]) {
             return true;
           }
         }

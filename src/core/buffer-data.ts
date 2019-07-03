@@ -3,10 +3,8 @@ import { ARTEngine } from "../engine/render-engine";
 export type BufferDataType = Float32Array | Uint16Array | Uint32Array;
 
 /**
- * bufferdata is webglbuffer container
- * 
- * @export
- * @class BufferData
+ * BufferData is a container for webglBuffer.
+ * Provided some convenient methods for data manipulating
  */
 export class BufferData{
   constructor(data: BufferDataType, stride: number) {

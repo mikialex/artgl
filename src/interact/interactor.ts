@@ -1,8 +1,8 @@
-import { Controler } from "./controler";
+import { Controller } from "./controller";
 import { Vector2 } from "../math/vector2";
 
-interface ControlerCallback {
-  controler: Controler,
+interface ControllerCallback {
+  controller: Controller,
   callback: Function
 }
 
@@ -22,7 +22,7 @@ export class Interactor{
   mouseButton: number = -1; // -1 is default state for no button pressed 
   inputElement: HTMLElement;
 
-  controlers: Controler[] = [];
+  controlers: Controller[] = [];
 
   private bind(): void {
     const el = this.inputElement;
@@ -100,47 +100,47 @@ export class Interactor{
     this.groupEmit(this.mouseWheelCallBacks, delta);
   }
 
-  private leftMouseMoveCallBacks: ControlerCallback[] = [];
-  private rightMouseMoveCallBacks: ControlerCallback[] = [];
-  private mouseWheelCallBacks: ControlerCallback[] = [];
-  private mouseDownCallBacks: ControlerCallback[] = [];
-  private mouseUpCallBacks: ControlerCallback[] = [];
+  private leftMouseMoveCallBacks: ControllerCallback[] = [];
+  private rightMouseMoveCallBacks: ControllerCallback[] = [];
+  private mouseWheelCallBacks: ControllerCallback[] = [];
+  private mouseDownCallBacks: ControllerCallback[] = [];
+  private mouseUpCallBacks: ControllerCallback[] = [];
 
-  private groupEmit(callBackList: ControlerCallback[], ...param: any) {
+  private groupEmit(callBackList: ControllerCallback[], ...param: any) {
     callBackList.forEach(callback => {
       callback.callback(...param);
     });
   }
-  private removeControler(controler: Controler, callBackList: ControlerCallback[]) {
-    callBackList = callBackList.filter(callback => { return callback.controler === controler });
+  private removeController(controller: Controller, callBackList: ControllerCallback[]) {
+    callBackList = callBackList.filter(callback => { return callback.controller === controller });
   }
 
-  public bindLeftMouseMove(controler: Controler, callback: (offset: Vector2) => any) {
-    this.leftMouseMoveCallBacks.push({controler, callback});
+  public bindLeftMouseMove(controller: Controller, callback: (offset: Vector2) => any) {
+    this.leftMouseMoveCallBacks.push({controller, callback});
   }
 
-  public bindRightMouseMove(controler: Controler, callback: (offset: Vector2) => any) {
-    this.rightMouseMoveCallBacks.push({controler, callback});
+  public bindRightMouseMove(controller: Controller, callback: (offset: Vector2) => any) {
+    this.rightMouseMoveCallBacks.push({controller, callback});
   }
 
-  public bindMouseWheel(controler: Controler, callback: (delta: number) => any) {
-    this.mouseWheelCallBacks.push({controler, callback});
+  public bindMouseWheel(controller: Controller, callback: (delta: number) => any) {
+    this.mouseWheelCallBacks.push({controller, callback});
   }
 
-  public bindMouseDown(controler: Controler, callback: () => any) {
-    this.mouseDownCallBacks.push({controler, callback});
+  public bindMouseDown(controller: Controller, callback: () => any) {
+    this.mouseDownCallBacks.push({controller, callback});
   }
 
-  public bindMouseUp(controler: Controler, callback: () => any) {
-    this.mouseUpCallBacks.push({controler, callback});
+  public bindMouseUp(controller: Controller, callback: () => any) {
+    this.mouseUpCallBacks.push({controller, callback});
   }
 
-  public unbindControlerAllListener(controler: Controler) {
-    this.removeControler(controler, this.mouseUpCallBacks);
-    this.removeControler(controler, this.rightMouseMoveCallBacks);
-    this.removeControler(controler, this.mouseWheelCallBacks);
-    this.removeControler(controler, this.mouseDownCallBacks);
-    this.removeControler(controler, this.mouseUpCallBacks);
+  public unbindControllerAllListener(controller: Controller) {
+    this.removeController(controller, this.mouseUpCallBacks);
+    this.removeController(controller, this.rightMouseMoveCallBacks);
+    this.removeController(controller, this.mouseWheelCallBacks);
+    this.removeController(controller, this.mouseDownCallBacks);
+    this.removeController(controller, this.mouseUpCallBacks);
   }
 
   dispose() {

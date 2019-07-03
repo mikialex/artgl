@@ -5,8 +5,8 @@ import { Observer } from './observable';
 import { Nullable } from '../type';
 
 /**
- * Camera is abstration of a params set to a projection matrix.
- * extender can support more usefull interface
+ * Camera is abstraction of a params set to a projection matrix.
+ * extender can support more useful interface
  * to make the projection relation more easy to 
  * understand and modified;
  * 

@@ -3,22 +3,22 @@ import { RenderList } from "../engine/render-list";
 import { Mesh } from "../object/mesh";
 import { PlaneGeometry } from "../geometry/geo-lib/plane-geometry";
 
-const renderlist = new RenderList();
+const renderList = new RenderList();
 const quadMesh = new Mesh();
 const geometry = new PlaneGeometry(2, 2, 1, 1);
 quadMesh.geometry = geometry;
-renderlist.addRenderItem(quadMesh);
+renderList.addRenderItem(quadMesh);
 export class QuadSource implements RenderSource{
   getRenderList(): RenderList {
-    return renderlist;
+    return renderList;
   }
 
   resetSource() {
-    renderlist.resetCursor();
+    renderList.resetCursor();
   }
 
   nextRenderable() {
-    return renderlist.next();
+    return renderList.next();
   }
 
   updateSource() {

@@ -1,6 +1,6 @@
 
 /**
- * wrap class for uniform change cache and needupdate optimize
+ * wrap class for uniform change cache and need update optimize
  *
  * @export
  * @class UniformProxy

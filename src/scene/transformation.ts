@@ -5,9 +5,9 @@ const tempVector3 = new Vector3();
 const tempMatrix = new Matrix4();
 
 /**
- * Decribe a node's local transformation info.
+ * Describe a node's local transformation info.
  * Users can set values and, from getter to get cleaned value
- * not need to update manully. ALl calculation is lazy.
+ * not need to update manually. ALl calculation is lazy.
  * @export
  * @class Transformation
  */
