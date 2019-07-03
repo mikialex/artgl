@@ -1,4 +1,4 @@
-import { EffectComposer } from "./effect-composer";
+import { EffectComposer, RenderGraphNode } from "./effect-composer";
 import { PassDefine, GraphDefine, RenderTargetDefine } from "./interface";
 import { PassGraphNode } from "./dag/pass-graph-node";
 import { RenderTargetNode } from "./dag/render-target-node";
@@ -101,7 +101,7 @@ export class RenderGraph {
   }
 
   private updateComposer() {
-    const renderPassQueue = this.screenNode.generateDependencyOrderList();
+    const renderPassQueue = this.screenNode.generateDependencyOrderList()  as RenderGraphNode[];
     this.composer.updatePasses(renderPassQueue);
   }
 

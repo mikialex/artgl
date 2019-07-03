@@ -4,6 +4,7 @@ import { RenderGraph } from "../render-graph";
 import { RenderPass } from "../pass";
 import { RenderTargetNode } from './render-target-node';
 import { Nullable } from "../../type";
+import { RenderGraphNode } from "../effect-composer";
 
 export class PassGraphNode extends DAGNode {
   constructor(graph: RenderGraph, define: PassDefine) {
@@ -32,7 +33,7 @@ export class PassGraphNode extends DAGNode {
       const frambufferName = this.inputs[inputUniformKey]
       const renderTargetNode = this.graph.getRenderTargetDependence(frambufferName);
       if (renderTargetNode === undefined) {
-        throw `render graph updating error, renderTarget depend ${frambufferName} cant found`;
+        throw `render graph updating error, renderTarget depend node ${frambufferName} cant found`;
       }
       renderTargetNode.deConnectTo(this);
     })
@@ -45,23 +46,26 @@ export class PassGraphNode extends DAGNode {
       const frambufferName = this.inputs[inputUniformKey]
       const renderTargetNode = this.graph.getRenderTargetDependence(frambufferName);
       if (renderTargetNode === undefined) {
-        throw `render graph updating error, renderTarget depend ${frambufferName} cant found`;
+        throw `render graph updating error, renderTarget depend node ${frambufferName} cant found`;
       }
       renderTargetNode.connectTo(this);
     })
   }
 
-  updatePass(activeNodes: DAGNode[]) {
+  updatePass(activeNodes: RenderGraphNode[]) {
     this.pass.updateInputTargets(this.inputs);
-    let hasFoundTarget = false;
+    let foundedNode = null;
     this.toNode.forEach(node => {
       if (node instanceof RenderTargetNode) {
         for (let i = 0; i < activeNodes.length; i++) {
           if (activeNodes[i] === node) {
-            if (hasFoundTarget) {
-              throw 'output recive multiple active pass'
+            if (foundedNode !== null) {
+              throw `RenderGraph update error: one target node should only has one pass targeted;
+privous found target pass: ${foundedNode.name};
+new found target pass: ${activeNodes[i].name};
+              `
             }
-            hasFoundTarget = true
+            foundedNode = node
             this.pass.setOutPutTarget(node);
           }
         }

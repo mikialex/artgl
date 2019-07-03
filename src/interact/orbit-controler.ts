@@ -23,7 +23,7 @@ export class OrbitController extends Controler {
     this.spherical.setFromVector(v);
   }
 
-  public spherical: Spherical;
+  private spherical: Spherical;
 
   public registerInteractor(interactor: Interactor) {
     if (this.interactor !== undefined) {

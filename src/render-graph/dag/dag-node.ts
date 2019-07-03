@@ -93,13 +93,16 @@ export class DAGNode {
     return result;
   }
 
-  // FIX ME, this traverse is a joke
   travserseDFS(visitor: (node: DAGNode) => any) {
+    const visited: Set<DAGNode> = new Set();
     function visit(node: DAGNode) {
-      visitor(node);
-      node.fromNode.forEach(n => {
-        visit(n);
-      });
+      if (!visited.has(node)) {
+        visited.add(node);
+        visitor(node);
+        node.fromNode.forEach(n => {
+          visit(n);
+        });
+      }
     }
     visit(this);
   }

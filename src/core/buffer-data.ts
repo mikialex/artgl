@@ -20,6 +20,12 @@ export class BufferData{
     this.shouldUpdate = true;
     this.data[index * this.stride] = value;
   }
+
+  getIndex(index: number): number {
+    this.shouldUpdate = true;
+    return this.data[index * this.stride];
+  }
+
   setData(data: BufferDataType) {
     this.shouldUpdate = true;
     this.data = data;

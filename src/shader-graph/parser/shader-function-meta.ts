@@ -10,7 +10,7 @@ export const Mat2Type = Parjs.string("mat2").map(_value => GLDataType.Mat2);
 export const Mat3Type = Parjs.string("mat3").map(_value => GLDataType.Mat3);
 export const Mat4Type = Parjs.string("mat4").map(_value => GLDataType.Mat4);
 
-export const dataType = floatType.or(Vec2Type).or(Vec3Type).or(Vec4Type)
+export const dataType = floatType.or(Vec2Type).or(Vec3Type).or(Vec4Type).or(Mat2Type).or(Mat3Type).or(Mat4Type)
 
 const extendLetter =  Parjs.letter.or("_")
 export const varName = extendLetter.then(Parjs.digit.or(extendLetter).many()).str;

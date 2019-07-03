@@ -1,8 +1,10 @@
 import { RenderPass } from "./pass";
 import { ARTEngine, RenderSource } from "../engine/render-engine";
 import { RenderGraph } from "./render-graph";
-import { DAGNode } from "./dag/dag-node";
 import { PassGraphNode } from "./dag/pass-graph-node";
+import { RenderTargetNode } from "./dag/render-target-node";
+
+export type RenderGraphNode = PassGraphNode | RenderTargetNode;
 
 export class EffectComposer{
   constructor(graph: RenderGraph) {
@@ -14,7 +16,7 @@ export class EffectComposer{
   private engine: ARTEngine;
   private passes: RenderPass[] = [];
 
-  updatePasses(nodeQueue: DAGNode[]) {
+  updatePasses(nodeQueue: RenderGraphNode[]) {
     this.clearPasses();
     nodeQueue.forEach(node => {
       if (node instanceof PassGraphNode) {
