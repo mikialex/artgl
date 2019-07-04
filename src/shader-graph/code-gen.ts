@@ -3,7 +3,7 @@ import { ShaderFunction } from "./shader-function";
 import { getShaderTypeStringFromGLDataType } from "../webgl/shader-util";
 import { findFirst } from "../util/array";
 import { CodeBuilder } from "./util/code-builder";
-import { ShaderFunctionNode, ShaderNode } from "./shader-node";
+import { ShaderFunctionNode, ShaderNode, ShaderInputNode } from "./shader-node";
 
 const builder = new CodeBuilder()
 
@@ -67,18 +67,18 @@ function genTempVarExpFromShaderNode(
     }
 
     let functionInputs = "";
-    functionDefine.inputs.forEach((_inputDefine, index) => {
-      const nodeDepend = node.getFromNodeByIndex(index) as ShaderNode;
+    Object.keys(functionDefine.inputs).forEach((key, index) => {
+      const nodeDepend = node.getFromNode(key) as ShaderNode;
       functionInputs += getParamKeyFromVarList(ctx, nodeDepend);
-      if (index !== functionDefine.inputs.length - 1) {
+      if (index !== Object.keys(functionDefine.inputs).length - 1) {
         functionInputs += ", "
       }
-
     })
+
     const result = `${functionDefine.name}(${functionInputs});`
     return result;
   } else {
-    return node.name + ';';
+    return (node as ShaderInputNode).name + ';';
   }
 }
 
@@ -105,7 +105,7 @@ function codeGenGraph(
       if (varRc.refedNode instanceof ShaderFunctionNode) {
         varType = getShaderTypeStringFromGLDataType(varRc.refedNode.factory.define.returnType);
       } else {
-        varType = getShaderTypeStringFromGLDataType(varRc.refedNode.dataType);
+        varType = getShaderTypeStringFromGLDataType((varRc.refedNode as ShaderInputNode).dataType);
       }
       builder.writeLine(`${varType} ${varRc.varKey} = ${varRc.expression}`)
     } else {
@@ -122,9 +122,9 @@ function genShaderFunctionDeclare(shaderFunction: ShaderFunction): string {
   const functionDefine = shaderFunction.define;
   const varType = getShaderTypeStringFromGLDataType(functionDefine.returnType);
   let functionInputs = "";
-  functionDefine.inputs.forEach((inputDefine, index) => {
-    const paramType = getShaderTypeStringFromGLDataType(inputDefine.type);
-    const paramStr = `${paramType} ${inputDefine.name}`
+  Object.keys(functionDefine.inputs).forEach((key, index) => {
+    const paramType = getShaderTypeStringFromGLDataType(functionDefine.inputs[key]);
+    const paramStr = `${paramType} ${key}`
     functionInputs += paramStr
     if (index !== functionDefine.inputs.length - 1) {
       functionInputs += ", "

@@ -47,11 +47,15 @@ export const functionp = Parjs.seq(
 export function parseShaderFunctionMetaInfo(input: ShaderFunctionDefine): ShaderFunctionParsedDefine {
   try {
     const result = functionp.parse(input.source).value
+    const inputMap = {};
+    result[2].forEach(item => {
+      inputMap[item.name] = item.type;
+    });
     return {
       name: result[1],
       description: input.description,
       source: result[3],
-      inputs: result[2],
+      inputs: inputMap,
       returnType: result[0],
     }
   } catch (error) {

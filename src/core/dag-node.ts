@@ -1,48 +1,46 @@
 import { generateUUID } from "../math/uuid";
 
 export class DAGNode {
-  uuid:string = generateUUID();
-  protected toNodeMap: Map<string, DAGNode> = new Map();
-  protected fromNodeMap: Map<string, DAGNode> = new Map();
-  protected fulfillList: Map<string, boolean>  = new Map();
+  uuid: string = generateUUID();
+  toNodeMap: Map<string, DAGNode> = new Map();
+  fromNodeMap: Map<string, DAGNode> = new Map();
+  protected fulfillList: Map<string, boolean> = new Map();
 
-  public getFromNode(key:string) {
+  getFromNode(key: string) {
     return this.fromNodeMap.get(key);
   }
 
-  public getToNode(key:string) {
+  getToNode(key: string) {
     return this.toNodeMap.get(key);
   }
 
-  public forFromNode(visitor: (node: DAGNode)=>any) {
-    this.fromNodeMap.forEach(visitor);
-  }
-
-  public forToNode(visitor: (node: DAGNode)=>any) {
-    this.toNodeMap.forEach(visitor);
-  }
-
-  public connectTo(key:string, node: DAGNode) {
+  connectTo(key: string, node: DAGNode) {
     this.toNodeMap.set(key, node);
     node._addFromRef(key, this);
   }
 
-  public disconnectTo(key: string, node: DAGNode) {
+  disconnectTo(key: string, node: DAGNode) {
     this.toNodeMap.delete(key);
     node._removeFromRef(key);
   }
 
-  public clearAllTo() {
+  clearAllTo() {
     this.toNodeMap.forEach((node, key) => {
       this.disconnectTo(key, node);
     })
   }
 
-  public _addFromRef(key: string, node: DAGNode) {
+  clearAllFrom() {
+    this.fromNodeMap.forEach((node, key) => {
+      node.disconnectTo(key, this);
+    })
+  }
+
+  _addFromRef(key: string, node: DAGNode) {
     this.fromNodeMap.set(key, node);
   }
 
-  public _removeFromRef(key: string) {
+  _removeFromRef(key: string) {
     this.fromNodeMap.delete(key);
   }
 

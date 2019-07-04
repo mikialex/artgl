@@ -53,7 +53,11 @@ export class ShaderFunctionNode extends ShaderNode {
 export class ShaderInputNode extends ShaderNode {
   constructor(name: string, dataType: GLDataType) {
     super();
+    this.name = name;
+    this.dataType = dataType;
   }
+  name: string;
+  dataType: GLDataType;
 }
 
 export class ShaderCommonUniformInputNode extends ShaderInputNode {
