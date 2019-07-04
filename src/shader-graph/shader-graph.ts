@@ -9,6 +9,8 @@ import {
   ShaderAttributeInputNode, ShaderInnerUniformInputNode,
   ShaderCommonUniformInputNode, ShaderVaryInputNode, ShaderNode
 } from "./shader-node";
+import { Nullable } from "../type";
+import { Technique } from "../core/technique";
 
 export enum ShaderGraphNodeInputType {
   commonUniform,
@@ -33,39 +35,28 @@ export interface ShaderGraphNodeDefine {
 }
 
 
-export interface ShaderGraphDefine {
-  attributes: AttributeDescriptor[];
-  uniforms?: UniformDescriptor[];
-  uniformsIncludes?: InnerUniformMapDescriptor[];
-  varyings?: VaryingDescriptor[];
-  textures?: TextureDescriptor[];
-  effect: ShaderGraphNodeDefine[],
-  effectRoot: string,
-  transform: ShaderGraphNodeDefine[],
-  transformRoot: string
-
-}
-
-
-
 export class ShaderGraph {
 
-  constructor() {
+  fragmentRoot: Nullable<ShaderFunctionNode>;
+  vertexRoot: Nullable<ShaderFunctionNode>;
+
+  setFragmentRoot(root: ShaderFunctionNode): ShaderGraph {
+    this.fragmentRoot = root;
+    return this;
   }
 
-  define: ShaderGraphDefine;
+  setVertexRoot(root: ShaderFunctionNode): ShaderGraph {
+    this.vertexRoot = root;
+    return this;
+  }
 
-  functionNodeFactories: Map<string, ShaderFunction> = new Map();
+  // compile(): Technique {
+  //   return new Technique()
+  // }
 
-  functionNodes: ShaderFunctionNode[] = [];
-  inputNodes: ShaderInputNode[] = [];
-
-  // map shaderNodes define name to 
-  functionNodesMap: Map<string, ShaderFunctionNode> = new Map();
-  inputNodesMap: Map<string, ShaderInputNode> = new Map();
-
-  setFragmentRoot(shaderFunctionNode) {
-    
+  reset() {
+    this.fragmentRoot = null;
+    this.vertexRoot = null;
   }
 
   // private checkDataTypeIsMatch(node: ShaderFunctionNode, nodeInput: ShaderNode, inputIndex: number) {
@@ -76,13 +67,6 @@ export class ShaderGraph {
   //     throw "constructFragmentGraph failed: type mismatch"
   //   }
   // }
-
-  reset() {
-    this.functionNodesMap.clear();
-    this.functionNodes = [];
-    this.inputNodesMap.clear();
-    this.inputNodes = [];
-  }
 
   // compile(): GLProgramConfig {
   //   return {

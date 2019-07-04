@@ -1,9 +1,7 @@
-import { Technique, TechniqueConfig } from "../../core/technique";
+import { Technique } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
-import { Matrix4 } from "../../math/matrix4";
 import { GLTextureType } from "../../webgl/uniform/uniform-texture";
-import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 
 const vertexShaderSource =
   `
@@ -22,24 +20,21 @@ const fragmentShaderSource =
 
 export class CopyTechnique extends Technique {
   constructor() {
-    const config: TechniqueConfig = {
-      programConfig: {
-        attributes: [
-          { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position },
-          { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv },
-        ],
-        varyings: [
-          { name: 'v_uv', type: GLDataType.floatVec2 },
-        ],
-        textures: [
-          { name: 'copySource', type: GLTextureType.texture2D },
-        ],
-        vertexShaderString: vertexShaderSource,
-        fragmentShaderString: fragmentShaderSource,
-        autoInjectHeader: true,
-      }
+    super({
+      attributes: [
+        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position },
+        { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv },
+      ],
+      varyings: [
+        { name: 'v_uv', type: GLDataType.floatVec2 },
+      ],
+      textures: [
+        { name: 'copySource', type: GLTextureType.texture2D },
+      ],
+      vertexShaderMain: vertexShaderSource,
+      fragmentShaderMain: fragmentShaderSource,
     }
-    super(config);
+    );
   }
 
 }

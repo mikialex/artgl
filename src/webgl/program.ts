@@ -26,7 +26,7 @@ export interface GLProgramConfig {
   useIndex?: boolean;
 }
 
-function fullfillProgramConfig(config: GLProgramConfig){
+function fulfillProgramConfig(config: GLProgramConfig){
   if (config.useIndex === undefined) {
     config.useIndex = true;
   }
@@ -45,7 +45,7 @@ function fullfillProgramConfig(config: GLProgramConfig){
 
 export class GLProgram{
   constructor(renderer: GLRenderer, config: GLProgramConfig) {
-    fullfillProgramConfig(config);
+    fulfillProgramConfig(config);
     this.renderer = renderer;
     this.id = generateUUID();
 

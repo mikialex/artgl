@@ -1,10 +1,30 @@
 import { generateUUID } from "../math/index";
-import { GLProgramConfig, GLProgram } from "../webgl/program";
+import { GLProgramConfig, GLProgram, VaryingDescriptor } from "../webgl/program";
 import { ARTEngine } from "../engine/render-engine";
 import { UniformProxy } from "../engine/uniform-proxy";
+import { AttributeDescriptor } from "../webgl/attribute";
+import { UniformDescriptor, InnerUniformMapDescriptor } from "../webgl/uniform/uniform";
+import { TextureDescriptor } from "../webgl/uniform/uniform-texture";
 
+
+/**
+ * Technique config is used for creating a technique.
+ * It's similar to program config, but has higher level abstraction.
+ * You cant write plain shader code here. Instead of this, headers is auto injected,
+ * and main function is input separately(maybe not need when support full parser. TODO)
+ *
+ */
 export interface TechniqueConfig {
-  programConfig: GLProgramConfig;
+  attributes: AttributeDescriptor[];
+  uniforms?: UniformDescriptor[];
+  uniformsIncludes?: InnerUniformMapDescriptor[];
+  varyings?: VaryingDescriptor[];
+  textures?: TextureDescriptor[];
+  vertexShaderIncludes?: string;
+  vertexShaderMain: string;
+  fragmentShaderIncludes?: string;
+  fragmentShaderMain: string;
+  useIndex?: boolean
 }
 
 /**
@@ -17,8 +37,8 @@ export class Technique{
   constructor(config: TechniqueConfig) {
     // setup default uniform value
     this.config = config;
-    if (this.config.programConfig.uniforms !== undefined) {
-      this.config.programConfig.uniforms.forEach(uniform => {
+    if (config.uniforms !== undefined) {
+      config.uniforms.forEach(uniform => {
         this.uniforms.set(uniform.name, new UniformProxy(uniform.default));
       })
     }
@@ -42,6 +62,21 @@ export class Technique{
       return engine.createProgram(this);
     }
     return program;
+  }
+
+  createProgramConfig(): GLProgramConfig{
+    const config = this.config;
+    return {
+      autoInjectHeader: true,
+      attributes: config.attributes,
+      uniforms: config.uniforms,
+      uniformsIncludes: config.uniformsIncludes,
+      varyings: config.varyings,
+      textures: config.textures,
+      vertexShaderString: config.vertexShaderIncludes ? config.vertexShaderIncludes: "" + "\n" + config.vertexShaderMain,
+      fragmentShaderString: config.fragmentShaderIncludes ? config.fragmentShaderIncludes : "" + "\n" + config.fragmentShaderMain,
+      useIndex: config.useIndex
+    }
   }
 
   dispose(engine: ARTEngine): void {

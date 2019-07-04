@@ -1,7 +1,6 @@
 import { Technique } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
-import { Matrix4 } from "../../math/matrix4";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 
 const vertexShaderSource =
@@ -22,26 +21,21 @@ const fragmentShaderSource =
 
 export class NormalTechnique extends Technique{
   constructor() {
-    const config = {
-      programConfig:{
-        attributes: [
-          { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position},
-          { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal },
-          // { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv, stride: 2 },
-        ],
-        uniformsIncludes: [
-          { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix,},
-          { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix,}
-        ],
-        varyings: [
-          {name:'color', type: GLDataType.floatVec3}
-        ],
-        vertexShaderString: vertexShaderSource,
-        fragmentShaderString: fragmentShaderSource,
-        autoInjectHeader: true,
-      }
-    }
-    super(config);
+    super({
+      attributes: [
+        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position },
+        { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal },
+      ],
+      uniformsIncludes: [
+        { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix, },
+        { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix, }
+      ],
+      varyings: [
+        { name: 'color', type: GLDataType.floatVec3 }
+      ],
+      vertexShaderMain: vertexShaderSource,
+      fragmentShaderMain: fragmentShaderSource,
+    });
   }
 
 }

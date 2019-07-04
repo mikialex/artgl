@@ -25,7 +25,7 @@ export class Application {
   scene: Scene = new Scene();
   active: boolean = false;
   interactor: Interactor;
-  orbitControler: OrbitController;
+  orbitController: OrbitController;
 
   lightCamera: Camera;
 
@@ -48,8 +48,8 @@ export class Application {
     this.graph = new RenderGraph(this.engine);
     this.engine.camera.transform.position.set(20, 10, 10)
     this.interactor = new Interactor(canvas);
-    this.orbitControler = new OrbitController(this.engine.camera as PerspectiveCamera);
-    this.orbitControler.registerInteractor(this.interactor);
+    this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);
+    this.orbitController.registerInteractor(this.interactor);
     this.hasInitialized = true;
     this.createScene(this.scene);
 
@@ -94,10 +94,6 @@ export class Application {
           name: 'SSAOHistoryB',
           from: () => this.isEvenTick ? 'SSAO' : null,
         },
-        // {
-        //   name: 'LightDepthMapResult',
-        //   from: () => 'LightDepthMap',
-        // }
       ],
       passes: [
         { // general scene origin
@@ -109,16 +105,7 @@ export class Application {
           technique: 'depthTech',
           source: ['AllScreen'],
         },
-        // { // general scene origin
-        //   name: "LightDepthMap",
-        //   source: ['AllScreen'],
-        //   beforePassExecute: () => {
-        //     // random sample lightcamera
-        //   },
-        //   technique: 'depthTech',
-        //   overideCamera: this.lightCamera,
-        // },
-        { // mix newrender and old samples
+        { // mix new render and old samples
           name: "TAA",
           inputs: () => {
             return {
@@ -139,7 +126,7 @@ export class Application {
             TAATech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
           },
         },
-        { // mix newrender and old samples
+        {
           name: "SSAO",
           inputs: () => {
             return {
@@ -224,7 +211,7 @@ export class Application {
   render = () => {
     this.beforeRender.notifyObservers(this.engine);
     this.tickNum++;
-    this.orbitControler.update();
+    this.orbitController.update();
 
     this.engine.connectCamera();
     if (this.engine.isCameraChanged || this.scene.isFrameChange) {

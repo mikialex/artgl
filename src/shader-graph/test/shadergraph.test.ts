@@ -39,6 +39,15 @@ test('shader graph set fragment root', () => {
       "sourceB", diffuse.make().input(
         "diffuseColor", makeUniform("u_color2",GLDataType.floatVec3)
       ))
+  ).setVertexRoot(
+    composeAddVec4.make().input(
+      "sourceA", diffuse.make().input(
+        "diffuseColor", makeUniform("u_color1", GLDataType.floatVec3)
+      )
+    ).input(
+      "sourceB", diffuse.make().input(
+        "diffuseColor", makeUniform("u_color2", GLDataType.floatVec3)
+      ))
   )
   // expect(v.z).toBe(4);
 });

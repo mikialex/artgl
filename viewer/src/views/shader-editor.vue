@@ -46,9 +46,9 @@ export default class ShaderEditor extends Vue {
   }
 
   codeGen(){
-    this.showCode = true;
-    const result = ShaderApp.graph.compile();
-    this.codeGenResult = injectFragmentShaderHeaders(result, result.fragmentShaderString);
+    // this.showCode = true;
+    // const result = ShaderApp.graph.compile();
+    // this.codeGenResult = injectFragmentShaderHeaders(result, result.fragmentShaderString);
   }
 
   updateTechnique(){

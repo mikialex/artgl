@@ -29,7 +29,6 @@ export { SphereGeometry } from "./geometry/geo-lib/sphere-geometry";
 export { PlaneGeometry } from "./geometry/geo-lib/plane-geometry";
 
 // technique lib
-export { TestTechnique } from "./technique/test-technique";
 export { NormalTechnique } from "./technique/technique-lib/normal-technique";
 
 // math
