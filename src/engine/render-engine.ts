@@ -27,6 +27,18 @@ export interface RenderSource{
   updateSource(): void;
 }
 
+export function foreachRenderableInSource(source: RenderSource, visitor: (obj: RenderObject) => any) {
+  source.updateSource();
+  source.resetSource();
+  let nextSource: RenderObject | null = null;
+  do {
+    nextSource = source.nextRenderable();
+    if (nextSource !== null) {
+      visitor(nextSource);
+    }
+  } while (nextSource !== null);
+}
+
 export interface Size{
   width: number;
   height: number;
@@ -165,15 +177,9 @@ export class ARTEngine implements GLReleasable{
   //// render APIs
   // render renderList from given source
   render(source: RenderSource) {
-    source.updateSource();
-    source.resetSource();
-    let nextSource: RenderObject | null;
-    do {
-      nextSource = source.nextRenderable();
-      if (nextSource !== null) {
-        this.renderObject(nextSource);
-      }
-    } while (nextSource !== null);
+    foreachRenderableInSource(source, (obj) => {
+      this.renderObject(obj);
+    })
   }
 
   renderObjects(objects: RenderObject[]) {

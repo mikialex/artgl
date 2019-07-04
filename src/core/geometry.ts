@@ -10,7 +10,7 @@ import { Vector3 } from "../math/vector3";
 /**
  * geometry define what to draw
  * by defined data layout and data content
- * also handle gl buffer updatation
+ * also handle gl buffer update
  * @export
  * @class Geometry
  */

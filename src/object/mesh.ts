@@ -4,6 +4,7 @@ import { RayCasterable } from "../core/raycaster";
 export class Mesh extends RenderObject
   implements RayCasterable
 {
+  raycasterable: true = true;
 
   constructor() {
     super();

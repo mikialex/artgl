@@ -2,14 +2,32 @@ import { Vector3, Matrix4 } from "../math/index";
 import { Nullable } from "../type";
 import { Camera } from "./camera";
 import { Ray } from "../math/entity/ray";
-import { RenderSource } from "../engine/render-engine";
+import { RenderSource, foreachRenderableInSource } from "../engine/render-engine";
 import { RenderObject } from "./render-object";
 
 
 
 export interface RayCasterable {
-  raycastHit(): boolean
-  raycast(): Nullable<RayCastResult>
+
+  /**
+   * mark this obj is raycasterable
+   */
+  raycasterable: true
+
+  /**
+   * check if this obj has any hit, should early return.
+   */
+  raycastIfHit(raycaster: Raycaster): boolean
+
+  /**
+   * get all raycast point on this obj, push the results in results array
+   */
+  raycast(raycaster: Raycaster, results: RayCasterable[]);
+
+  /**
+   * get first raycast point on this obj, return null if not hit
+   */
+  raycastFirst(raycaster: Raycaster): Nullable<RayCastResult>
 }
 
 
@@ -39,6 +57,8 @@ export class Raycaster {
   projection: Matrix4;
   ray: Ray;
 
+  results: RayCasterable[] = [];
+
   setProjection(matrix: Matrix4) {
     
   }
@@ -47,11 +67,15 @@ export class Raycaster {
 
   }
 
-  pick(source: RenderSource, preFilter) {
-    
+  pick(source: RenderSource, preFilter?: (obj: RenderObject) => boolean) {
+    foreachRenderableInSource(source, (obj) => {
+      if (preFilter(obj) && (obj as unknown as RayCasterable).raycasterable) {
+        (obj as unknown as RayCasterable).raycast(this, this.results);
+      }
+    })
   }
 
-  pickFirst(source: RenderSource, preFilter) {
+  pickFirst(source: RenderSource, preFilter?: (obj: RenderObject) => boolean) {
     
   }
 }
