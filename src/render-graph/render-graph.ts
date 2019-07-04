@@ -1,11 +1,13 @@
-import { EffectComposer, RenderGraphNode } from "./effect-composer";
 import { PassDefine, GraphDefine, RenderTargetDefine } from "./interface";
 import { PassGraphNode } from "./node/pass-graph-node";
 import { RenderTargetNode } from "./node/render-target-node";
-import { ARTEngine, RenderSource } from "../engine/render-engine";
+import { ARTEngine } from "../engine/render-engine";
 import { QuadSource } from './quad-source';
 import { Vector4 } from "../math/vector4";
 import { RenderPass } from "./pass";
+
+
+export type RenderGraphNode = PassGraphNode | RenderTargetNode;
 
 export class RenderGraph {
 
@@ -14,10 +16,10 @@ export class RenderGraph {
 
   constructor(engine: ARTEngine) {
     this.engine = engine;
-    this.composer = new EffectComposer(this);
   }
   engine: ARTEngine;
-  composer: EffectComposer;
+
+  private passes: RenderPass[] = [];
 
   enableDebuggingView: boolean = false;
 
@@ -40,13 +42,25 @@ export class RenderGraph {
     return n;
   }
 
+  updatePasses(nodeQueue: RenderGraphNode[]) {
+    this.passes = [];
+    nodeQueue.forEach(node => {
+      if (node instanceof PassGraphNode) {
+        node.updatePass(nodeQueue);
+        this.passes.push(node.pass);
+      }
+    })
+  }
+
   /**
    * Render a frame by this graph
    *
    * @memberof RenderGraph
    */
   public render() {
-    this.composer.render();
+    this.passes.forEach(pass => {
+      pass.execute();
+    });
   }
 
   /**
@@ -57,7 +71,7 @@ export class RenderGraph {
   public reset() {
     this.renderTargetNodes.clear();
     this.passNodes.clear();
-    this.composer.clearPasses();
+    this.passes = [];
   }
 
   /**
@@ -80,7 +94,14 @@ export class RenderGraph {
    */
   update() {
     this.updateNodesConnection();
-    this.updateComposer();
+    const nodeQueue = this.screenNode.generateDependencyOrderList() as RenderGraphNode[];
+    this.passes = [];
+    nodeQueue.forEach(node => {
+      if (node instanceof PassGraphNode) {
+        node.updatePass(nodeQueue);
+        this.passes.push(node.pass);
+      }
+    })
   }
 
   private constructPassGraph(passesDefine: PassDefine[]) {
@@ -102,10 +123,6 @@ export class RenderGraph {
     });
   }
 
-  private updateComposer() {
-    const renderPassQueue = this.screenNode.generateDependencyOrderList()  as RenderGraphNode[];
-    this.composer.updatePasses(renderPassQueue);
-  }
 
   getRenderTargetDependence(name: string): RenderTargetNode {
     return this.renderTargetNodes.get(name);

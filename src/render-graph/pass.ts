@@ -1,5 +1,5 @@
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
-import { ARTEngine, RenderSource } from "../engine/render-engine";
+import { ARTEngine } from "../engine/render-engine";
 import { Technique } from "../core/technique";
 import { RenderGraph } from "./render-graph";
 import { PassDefine, PassInputMapInfo } from "./interface";

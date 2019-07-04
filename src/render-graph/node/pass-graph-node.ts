@@ -1,10 +1,9 @@
 import { DAGNode } from "../../core/dag-node";
 import { PassDefine, PassInputMapInfo } from "../interface";
-import { RenderGraph } from "../render-graph";
+import { RenderGraph, RenderGraphNode } from "../render-graph";
 import { RenderPass } from "../pass";
 import { RenderTargetNode } from './render-target-node';
 import { Nullable } from "../../type";
-import { RenderGraphNode } from "../effect-composer";
 
 export class PassGraphNode extends DAGNode {
   constructor(graph: RenderGraph, define: PassDefine) {
