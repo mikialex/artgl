@@ -32,3 +32,17 @@ test('dag connect and disconnect', () => {
 });
 
 
+test('dag dep sort', () => {
+  const node1 = new DAGNode();
+  const node2 = new DAGNode();
+  const node3 = new DAGNode();
+  node1.connectTo("test", node2);
+  node2.connectTo("test2", node3);
+  node1.connectTo("test3", node3);
+
+  const list = node3.generateDependencyOrderList();
+  expect(list.length).toBe(3);
+  expect(list).toStrictEqual([node3, node2, node1])
+  
+});
+
