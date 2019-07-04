@@ -53,17 +53,14 @@ export class Application {
     this.hasInitialized = true;
     this.createScene(this.scene);
 
-    this.graph.registerSource('AllScreen', this.scene)
     const TAATech = new TAATechnique();
     const SSAOTech = new SSAOTechnique();
     const copyTech = new BlendTechnique();
     this.taaTech = TAATech;
     this.tssaoTech = SSAOTech;
     this.composeTech = copyTech;
-    this.graph.registTechnique('depthTech', new DepthTechnique())
-    this.graph.registTechnique('TAATech', TAATech)
-    this.graph.registTechnique('SSAO', SSAOTech)
-    this.graph.registTechnique('copyTech', copyTech);
+    const depthTech = new DepthTechnique()
+    
     this.graph.setGraph({
       renderTargets: [
         {
@@ -98,12 +95,12 @@ export class Application {
       passes: [
         { // general scene origin
           name: "SceneOrigin",
-          source: ['AllScreen'],
+          source: [this.scene],
         },
         { // depth
           name: "Depth",
-          technique: 'depthTech',
-          source: ['AllScreen'],
+          technique: depthTech,
+          source: [this.scene],
         },
         { // mix new render and old samples
           name: "TAA",
@@ -114,8 +111,8 @@ export class Application {
               TAAHistoryOld: this.isEvenTick ? "TAAHistoryA" : "TAAHistoryB",
             }
           },
-          technique: 'TAATech',
-          source: ['artgl.screenQuad'],
+          technique: TAATech,
+          source: [RenderGraph.quadSource],
           enableColorClear: false,
           beforePassExecute: () => {
             this.engine.unJit();
@@ -134,8 +131,8 @@ export class Application {
               AOAcc: this.isEvenTick ? "SSAOHistoryA" : "SSAOHistoryB",
             }
           },
-          technique: 'SSAO',
-          source: ['artgl.screenQuad'],
+          technique: SSAOTech,
+          source: [RenderGraph.quadSource],
           enableColorClear: false,
           beforePassExecute: () => {
             const VPInv: Matrix4 = SSAOTech.uniforms.get('VPMatrixInverse').value;
@@ -169,8 +166,8 @@ export class Application {
           afterPassExecute: () => {
             this.sampleCount++;
           },
-          technique: 'copyTech',
-          source: ['artgl.screenQuad'],
+          technique: copyTech,
+          source: [RenderGraph.quadSource],
         },
       ]
     })

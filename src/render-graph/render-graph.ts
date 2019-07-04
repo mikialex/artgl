@@ -3,13 +3,15 @@ import { PassDefine, GraphDefine, RenderTargetDefine } from "./interface";
 import { PassGraphNode } from "./node/pass-graph-node";
 import { RenderTargetNode } from "./node/render-target-node";
 import { ARTEngine, RenderSource } from "../engine/render-engine";
-import { Technique } from "../core/technique";
 import { QuadSource } from './quad-source';
 import { Vector4 } from "../math/vector4";
 import { RenderPass } from "./pass";
 
 export class RenderGraph {
+
   static screenRoot: string = 'artgl-rendergraph-screen-rt';
+  static quadSource = new QuadSource();
+
   constructor(engine: ARTEngine) {
     this.engine = engine;
     this.composer = new EffectComposer(this);
@@ -142,51 +144,6 @@ export class RenderGraph {
       throw "screen root not found"
     }
   }
-
-
-
-  // pass technique registration
-  private passTechniques: Map<string, Technique> = new Map();
-  registTechnique(name: string, technique: Technique) {
-    if (this.passTechniques.has(name)) {
-      throw 'duplicated technique registration'
-    }
-    this.passTechniques.set(name, technique);
-  }
-  getResgisteredTechnique(name: string) {
-    return this.passTechniques.get(name);
-  }
-
-
-
-  // pass source registration
-  private passSources: Map<string, RenderSource> = new Map();
-  private innerSourceRegx = /^artgl.\w*$/;
-  isInnerSourceType(name: string) {
-    return this.innerSourceRegx.test(name);
-  }
-  private quadSource = new QuadSource();
-  getInnerSource(name: string): RenderSource {
-    if (name === 'artgl.screenQuad') {
-      return this.quadSource;
-    } else {
-      throw `inner source ${name} not supported`
-    }
-  }
-  registerSource(name: string, source: RenderSource) {
-    if (this.isInnerSourceType(name)) {
-      throw 'start with artgl.** is inner source and should not be registered'
-    }
-
-    if (this.passSources.has(name)) {
-      throw 'duplicated source registration'
-    }
-    this.passSources.set(name, source);
-  }
-  getRegisteredSource(name: string) {
-    return this.passSources.get(name);
-  }
-
 
   updateRenderTargetDebugView(nodeId: string, viewPort: Vector4) {
     if (this.screenNode.uuid === nodeId) {

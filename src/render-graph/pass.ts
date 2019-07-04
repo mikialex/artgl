@@ -13,7 +13,7 @@ export class RenderPass{
     this.define = define;
     this.name = define.name;
     if (define.technique !== undefined) {
-      const overrideTechnique = graph.getResgisteredTechnique(define.technique);
+      const overrideTechnique = define.technique;
       if (overrideTechnique === undefined) {
         throw `technique '${define.technique}' not defined`
       }
@@ -26,19 +26,6 @@ export class RenderPass{
 
     this.beforePassExecute = define.beforePassExecute;
     this.afterPassExecute = define.afterPassExecute;
-
-    define.source.forEach(so => {
-      let source: RenderSource;
-      if (this.graph.isInnerSourceType(so)) {
-        source = this.graph.getInnerSource(so);
-      } else {
-        source = graph.getRegisteredSource(so);
-        if (source === undefined) {
-          throw `renderSource '${so}' not defined`
-        }
-      }
-      this.sourceUse.push(source);
-    })
 
   }
 
@@ -61,8 +48,6 @@ export class RenderPass{
   private afterPassExecute?: () => any;
   private beforePassExecute?: () => any;
   
-
-  private sourceUse: RenderSource[] = [];
   private overrideTechnique: Nullable<Technique> = null;
 
   // key: uniformName ;   value: inputFramebufferName
@@ -147,10 +132,9 @@ export class RenderPass{
     }
 
     //////  render //////
-    for (let i = 0; i < this.sourceUse.length; i++) {
-      const source = this.sourceUse[i];
+    this.define.source.forEach(source => {
       engine.render(source);
-    }
+    })
     /////////////////////
 
     if (this.afterPassExecute !== undefined) {
