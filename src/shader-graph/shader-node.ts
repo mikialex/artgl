@@ -6,7 +6,7 @@ import { InnerSupportUniform, UniformDescriptor, InnerUniformMapDescriptor, Inne
 import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
 
 export class ShaderNode extends DAGNode {
-  constructor(public name: string, public dataType: GLDataType) {
+  constructor() {
     super();
   }
 }
@@ -20,28 +20,39 @@ export class ShaderNode extends DAGNode {
  * @extends {DAGNode}
  */
 export class ShaderFunctionNode extends ShaderNode {
-  constructor(define: ShaderGraphNodeDefine, functionDefine: ShaderFunctionParsedDefine) {
-    super(define.name, functionDefine.returnType);
-    this.define = define;
+  constructor(factory: ShaderFunction) {
+    super();
+    this.factory = factory;
   }
 
-  define: ShaderGraphNodeDefine;
+  meaningfulName: string
   factory: ShaderFunction
 
-  // create a fragment shader from this node
-  makeFragmentShader() {
-
+  /**
+   * give this node a meaningful name!
+   */
+  name(name: string): ShaderFunctionNode {
+    this.meaningfulName = name;
+    return this;
   }
 
-  fillInput(key: string, input) {
-
+  /**
+   * fill this node a input!
+   */
+  input(key: string, node: ShaderNode): ShaderFunctionNode {
+    if (this.factory.define.inputs[key] === undefined) {
+      throw `this shader function node has not a input which key is ${key}`
+    }
+    this.connectTo(key, node);
+    return this;
   }
+
 }
 
 
 export class ShaderInputNode extends ShaderNode {
   constructor(name: string, dataType: GLDataType) {
-    super(name, dataType);
+    super();
   }
 }
 

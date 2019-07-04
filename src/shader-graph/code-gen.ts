@@ -7,22 +7,22 @@ import { ShaderFunctionNode, ShaderNode } from "./shader-node";
 
 const builder = new CodeBuilder()
 
-export function genFragShader(graph: ShaderGraph): string {
-  let result = "";
-  result += genShaderFunctionDepend(graph)
-  result += "\n"
-  result += codeGenGraph(graph.effectRoot, "gl_FragColor")
-  return result;
-}
+// export function genFragShader(graph: ShaderGraph): string {
+//   let result = "";
+//   result += genShaderFunctionDepend(graph)
+//   result += "\n"
+//   result += codeGenGraph(graph.effectRoot, "gl_FragColor")
+//   return result;
+// }
 
 
-export function genVertexShader(graph: ShaderGraph): string {
-  let result = "";
-  result += genShaderFunctionDepend(graph)
-  result += "\n"
-  result += codeGenGraph(graph.transformRoot, "gl_Position")
-  return result;
-}
+// export function genVertexShader(graph: ShaderGraph): string {
+//   let result = "";
+//   result += genShaderFunctionDepend(graph)
+//   result += "\n"
+//   result += codeGenGraph(graph.transformRoot, "gl_Position")
+//   return result;
+// }
 
 
 
