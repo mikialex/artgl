@@ -53,7 +53,7 @@ export class ShaderGraph {
 
   constructor() {
     BuildInShaderFunctions.forEach(fun => {
-      this.registShaderFunction(fun);
+      this.registerShaderFunction(fun);
     })
   }
 
@@ -140,7 +140,7 @@ export class ShaderGraph {
     if (!result) {
       console.warn("node:", node);
       console.warn("inputnode:", nodeInput);
-      throw "constructFragmentGraph failed: type missmatch"
+      throw "constructFragmentGraph failed: type mismatch"
     }
   }
 
@@ -230,7 +230,7 @@ export class ShaderGraph {
     return genFragShader(this);
   }
 
-  registShaderFunction(shaderFn: ShaderFunction) {
+  registerShaderFunction(shaderFn: ShaderFunction) {
     this.functionNodeFactories.set(shaderFn.define.name, shaderFn);
   }
 

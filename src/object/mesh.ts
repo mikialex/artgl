@@ -1,10 +1,9 @@
 import { RenderObject, PrimitiveVisitor, PrimitiveType } from "../core/render-object";
 import { DrawMode } from "../webgl/const";
-import { RayCasterable } from "../core/raycaster";
+import { RayCasterable, Raycaster } from "../core/raycaster";
 export class Mesh extends RenderObject
   implements RayCasterable
 {
-  raycasterable: true = true;
 
   constructor() {
     super();
@@ -19,12 +18,15 @@ export class Mesh extends RenderObject
     }
   }
 
-  raycastHit(): boolean {
-    throw new Error("Method not implemented.");
-  }
-  
-  raycast(): import("../core/raycaster").RayCastResult {
-    throw new Error("Method not implemented.");
-  }
 
+  raycast(raycaster: Raycaster, results: RayCasterable[]) {
+    throw new Error("Method not implemented.");
+  }
+  raycastIfHit(raycaster: Raycaster): boolean {
+    throw new Error("Method not implemented.");
+  }
+  raycastFirst(raycaster: Raycaster): import("../core/raycaster").RayCastResult {
+    throw new Error("Method not implemented.");
+  }
+  raycasterable: true = true;
 }

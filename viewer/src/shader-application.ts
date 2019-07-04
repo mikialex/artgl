@@ -34,13 +34,29 @@ export class ShaderApplication {
     this.tick();
     this.start();
 
-    this.graph.registShaderFunction(new ShaderFunction({
+    this.graph.registerShaderFunction(new ShaderFunction({
       source: `
-      diffuse(vec3 diffuseColor){
+      vec4 diffuse(vec3 diffuseColor){
         return vec4(diffuseColor, 1.0);
       }`
     }))
 
+    // this.graph.setFragmentRoot(
+    //   composeAddVec4.input({
+    //     sourceA: diffuse.input({
+    //       diffuseColor: makeUniform({
+    //         name: "u_color1",
+    //         type: GLDataType.floatVec3,
+    //       })
+    //     }),
+    //     sourceB: diffuse.input({
+    //       diffuseColor: makeUniform({
+    //         name: "u_color2",
+    //         type: GLDataType.floatVec3,
+    //       })
+    //     }),
+    //   })
+    // )
 
     this.graph.setGraph({
       uniforms: [
@@ -67,7 +83,7 @@ export class ShaderApplication {
       ],
 
 
-      // decalare your fragment shader graph
+      // declare your fragment shader graph
       // fragment shader graph should have a root node
       // which output is gl_FragColor as the screen fragment output
       effect: [
@@ -113,7 +129,7 @@ export class ShaderApplication {
       transform: [
         {
           name: "transformOutput",
-          type: "VPtransfrom",
+          type: "VPtransform",
           input: {
             VPMatrix: {
               type: ShaderGraphNodeInputType.innerUniform,

@@ -1,43 +1,43 @@
-import { Technique } from "../core/technique";
-import { ShaderFunction } from "./shader-function";
-import { GLDataType } from "../webgl/shader-util";
+// import { Technique } from "../core/technique";
+// import { ShaderFunction } from "./shader-function";
+// import { GLDataType } from "../webgl/shader-util";
 
+// /*
+// * convert a shader function that can compose other shader function
+// */
 // export function createEffectComposer(shaderfunction: ShaderFunction)
-//   : (params: any) => Technique {
+//   : any {
   
-//   return (params) => {
-//     return new Technique();
+//   return (a: ShaderFunction, b: ShaderFunction) => {
+    
+//     return new ShaderFunction();
 //   }
 // }
 
+// export function createUniformInput() {
+  
+// }
+
 // const gamma = new ShaderFunction({
-//   name: 'gammaCorrection',
 //   source: `
-//     vec4 gammaed = sqrt(input.rgb);
-//     return vec4(gammaed, input.a);
+//     vec4 gammaCorrection(vec4 input){
+//       vec4 gammaed = sqrt(input.rgb);
+//       return vec4(gammaed, input.a)
+//     };
 //   `,
-//   inputs: [
-//     {
-//       name: "input",
-//       type: GLDataType.floatVec4
-//     }
-//   ],
-//   returnType: GLDataType.floatVec4
 // })
 
 // const add = new ShaderFunction({
-//   name: 'add',
 //   source: `
-//     return input1 + input2;
+//     vec4 add(vec4 input1, vec4 input2){
+//       return input1 + input2;
+//     }
 //   `,
-//   inputs: [
-//     {name: "input1",type: GLDataType.floatVec4},
-//     {name: "input2",type: GLDataType.floatVec4},
-//   ],
-//   returnType: GLDataType.floatVec4
 // })
 
+// const effect = createUniformInput("baseColor", GLDataType.floatVec3);
 
 // const gammaCorrection = createEffectComposer(gamma);
 // const composeAdd = createEffectComposer(add);
+
 // const technique = gammaCorrection(composeAdd(effect, light));

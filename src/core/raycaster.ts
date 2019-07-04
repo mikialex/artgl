@@ -55,7 +55,8 @@ export interface RayCastResult{
  */
 export class Raycaster {
   projection: Matrix4;
-  ray: Ray;
+  worldRay: Ray;
+  localRay: Ray;
 
   results: RayCasterable[] = [];
 

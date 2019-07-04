@@ -1,6 +1,5 @@
-import { Vector3, Matrix4, Quaternion, generateUUID } from "../math/index";
+import { Matrix4, generateUUID } from "../math/index";
 import { Scene } from "./scene";
-import { Euler } from "../math/euler";
 import { Nullable } from "../type";
 import { Transformation } from "./transformation";
 
@@ -9,7 +8,7 @@ interface TreeNode{
 }
 
 /**
- * a scene node in a scene tree
+ * SceneNode is a node in a scene tree that
  * organize the scene hierarchy
  *
  * @export
@@ -34,6 +33,7 @@ export class SceneNode {
   _visibleNet: Boolean = true;
   _visibleUpdateFrameId: number = 0;
   set visible(value: boolean) {
+    this._visible = value;
     if (this.scene !== null) {
       this.scene.isFrameVisibleChange = true;
     }
@@ -44,7 +44,7 @@ export class SceneNode {
 
   addChild(node: SceneNode) {
     if (node === this) {
-      throw 'cant add self to self';
+      throw 'Cant add a scene node to it self';
     }
 
     if (this.scene !== null) {
@@ -99,8 +99,8 @@ export class SceneNode {
     const rootNode = this.traversePair((nodeParent: Nullable<SceneNode>, node: SceneNode) => {
       const mapNode = fn(node);
       nodes.set(node, mapNode);
-      if (node.parent !== null && nodes.has(node.parent)) {
-        const mapParentNode = nodes.get(node.parent);
+      if (nodeParent !== null && nodes.has(nodeParent)) {
+        const mapParentNode = nodes.get(nodeParent);
         if (mapParentNode === undefined) {
           throw 'tree map error: cant find mapped parent'
         }

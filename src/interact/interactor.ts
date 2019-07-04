@@ -10,8 +10,8 @@ const prev = new Vector2();
 const mousePosition = new Vector2();
 const v1 = new Vector2();
 
-// interactor resposible for handle web event from an element
-// and dispatch control event to controlers
+// interactor responsible for handle web event from an element
+// and dispatch control event to controllers
 export class Interactor{
   constructor(inputElement:HTMLElement) {
     this.inputElement = inputElement;
@@ -22,7 +22,7 @@ export class Interactor{
   mouseButton: number = -1; // -1 is default state for no button pressed 
   inputElement: HTMLElement;
 
-  controlers: Controller[] = [];
+  private controllers: Controller[] = [];
 
   private bind(): void {
     const el = this.inputElement;
