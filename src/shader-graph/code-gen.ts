@@ -29,14 +29,14 @@ const builder = new CodeBuilder()
 function genShaderFunctionDepend(graph: ShaderGraph): string {
   let functionsStr = "\n";
   const dependFunctions = {};
-  graph.functionNodes.forEach(node => {
-    if (dependFunctions[node.factory.define.name] === undefined) {
-      dependFunctions[node.factory.define.name] = node.factory;
-    }
-  })
-  Object.keys(dependFunctions).forEach(key => {
-    functionsStr += genShaderFunctionDeclare(dependFunctions[key])
-  })
+  // graph.functionNodes.forEach(node => {
+  //   if (dependFunctions[node.factory.define.name] === undefined) {
+  //     dependFunctions[node.factory.define.name] = node.factory;
+  //   }
+  // })
+  // Object.keys(dependFunctions).forEach(key => {
+  //   functionsStr += genShaderFunctionDeclare(dependFunctions[key])
+  // })
   return functionsStr
 }
 

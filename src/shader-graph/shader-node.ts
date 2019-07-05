@@ -29,7 +29,7 @@ export class ShaderFunctionNode extends ShaderNode {
   factory: ShaderFunction
 
   /**
-   * give this node a meaningful name!
+   * give this node a meaningful name!, this name may show in compiled shader.
    */
   name(name: string): ShaderFunctionNode {
     this.meaningfulName = name;

@@ -28,18 +28,14 @@ const diffuse = new ShaderFunction({
   }`
 })
 
+// const realTechnique = composeAddVec4.make()
+//   .input("sourceA", lightResult)
+//   .link("sourceB", baseTechnique)
+//   .compile()
+
 
 test('shader graph set fragment root', () => {
-  graph.setFragmentRoot(
-    composeAddVec4.make().input(
-      "sourceA", diffuse.make().input(
-        "diffuseColor", makeUniform("u_color1",GLDataType.floatVec3)
-      )
-    ).input(
-      "sourceB", diffuse.make().input(
-        "diffuseColor", makeUniform("u_color2",GLDataType.floatVec3)
-      ))
-  ).setVertexRoot(
+  graph.setVertexRoot(
     composeAddVec4.make().input(
       "sourceA", diffuse.make().input(
         "diffuseColor", makeUniform("u_color1", GLDataType.floatVec3)
@@ -48,6 +44,20 @@ test('shader graph set fragment root', () => {
       "sourceB", diffuse.make().input(
         "diffuseColor", makeUniform("u_color2", GLDataType.floatVec3)
       ))
+  ).setVary(
+    "v_normal", composeAddVec4.make()
+  ).setFragmentRoot(
+    composeAddVec4.make().input(
+      "sourceA", diffuse.make().input(
+        "diffuseColor", makeUniform("u_color1",GLDataType.floatVec3)
+      )
+    ).input(
+      "sourceB",
+      diffuse.make().input(
+        "diffuseColor", makeUniform("u_color2",GLDataType.floatVec3)
+      )).input(
+        "diffuseColor", graph.getVary("v_normal")
+      )
   )
   // expect(v.z).toBe(4);
 });

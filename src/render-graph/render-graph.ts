@@ -42,16 +42,6 @@ export class RenderGraph {
     return n;
   }
 
-  updatePasses(nodeQueue: RenderGraphNode[]) {
-    this.passes = [];
-    nodeQueue.forEach(node => {
-      if (node instanceof PassGraphNode) {
-        node.updatePass(nodeQueue);
-        this.passes.push(node.pass);
-      }
-    })
-  }
-
   /**
    * Render a frame by this graph
    *
@@ -93,7 +83,16 @@ export class RenderGraph {
    * @memberof RenderGraph
    */
   update() {
-    this.updateNodesConnection();
+    
+    //updateNodesConnection
+    this.passNodes.forEach(node => {
+      node.updateDependNode();
+    });
+    this.renderTargetNodes.forEach(node => {
+      node.updateDependNode();
+    });
+
+    // update pass queue
     const nodeQueue = this.screenNode.generateDependencyOrderList() as RenderGraphNode[];
     this.passes = [];
     nodeQueue.forEach(node => {
@@ -113,16 +112,6 @@ export class RenderGraph {
       }
     })
   }
-
-  private updateNodesConnection() {
-    this.passNodes.forEach(node => {
-      node.updateDependNode();
-    });
-    this.renderTargetNodes.forEach(node => {
-      node.updateDependNode();
-    });
-  }
-
 
   getRenderTargetDependence(name: string): RenderTargetNode {
     return this.renderTargetNodes.get(name);

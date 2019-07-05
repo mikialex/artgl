@@ -50,7 +50,7 @@ export class DAGNode {
     let allDepNodes = this.generateAllDependencyList();
     allDepNodes.forEach(node => {
       node.fulfillList.clear();
-      node.fromNodeMap.forEach((node, key) => {
+      node.toNodeMap.forEach((node, key) => {
         node.fulfillList.set(key, false);
       })
     })

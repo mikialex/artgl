@@ -5,6 +5,7 @@ import { UniformProxy } from "../engine/uniform-proxy";
 import { AttributeDescriptor } from "../webgl/attribute";
 import { UniformDescriptor, InnerUniformMapDescriptor } from "../webgl/uniform/uniform";
 import { TextureDescriptor } from "../webgl/uniform/uniform-texture";
+import { ShaderGraph } from "../shader-graph/shader-graph";
 
 
 /**
@@ -45,6 +46,7 @@ export class Technique{
   }
 
   config: TechniqueConfig;
+  graph: ShaderGraph = new ShaderGraph;
   name: string = "noname technique";
   uuid: string = generateUUID();
   _techniqueId: string;
@@ -52,6 +54,11 @@ export class Technique{
   isTransparent = false;
 
   uniforms: Map<string, UniformProxy> = new Map();
+
+  update() {
+    
+  }
+
 
   /**
    * t
@@ -73,8 +80,10 @@ export class Technique{
       uniformsIncludes: config.uniformsIncludes,
       varyings: config.varyings,
       textures: config.textures,
-      vertexShaderString: config.vertexShaderIncludes ? config.vertexShaderIncludes: "" + "\n" + config.vertexShaderMain,
-      fragmentShaderString: config.fragmentShaderIncludes ? config.fragmentShaderIncludes : "" + "\n" + config.fragmentShaderMain,
+      vertexShaderString: (config.vertexShaderIncludes ? config.vertexShaderIncludes : "")
+         + config.vertexShaderMain,
+      fragmentShaderString: (config.fragmentShaderIncludes ? config.fragmentShaderIncludes : "")
+         + config.fragmentShaderMain,
       useIndex: config.useIndex
     }
   }

@@ -42,7 +42,7 @@ test('dag dep sort', () => {
 
   const list = node3.generateDependencyOrderList();
   expect(list.length).toBe(3);
-  expect(list).toStrictEqual([node3, node2, node1])
+  expect(list).toStrictEqual([node1, node2, node3])
   
 });
 
