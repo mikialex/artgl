@@ -375,7 +375,7 @@ export class ARTEngine implements GLReleasable{
   }
 
   createProgram(technique: Technique): GLProgram  {
-    const program = this.renderer.createProgram(technique.config.programConfig);
+    const program = this.renderer.createProgram(technique.createProgramConfig());
     this.programTechniqueMap.set(technique, program);
     return program;
   }

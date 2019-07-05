@@ -1,9 +1,7 @@
-import { Technique, TechniqueConfig } from "../../core/technique";
+import { Technique } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
-import { Matrix4 } from "../../math/matrix4";
 import { GLTextureType } from "../../webgl/uniform/uniform-texture";
-import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 
 const vertexShaderSource =
   `
@@ -25,31 +23,27 @@ const fragmentShaderSource =
 
 export class BlendTechnique extends Technique {
   constructor() {
-    const config: TechniqueConfig = {
-      programConfig: {
-        attributes: [
-          { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position},
-          { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv },
-        ],
-        uniforms:[
-          {name: 'u_tssaoComposeRate',  default: 1.0, type: GLDataType.float},
-          {name: 'u_tssaoComposeThreshold',  default: 0.5, type: GLDataType.float},
-          {name: 'u_tssaoShowThreshold',  default: 200, type: GLDataType.float},
-          {name: 'u_sampleCount',  default: 0, type: GLDataType.float},
-        ],
-        varyings: [
-          { name: 'v_uv', type: GLDataType.floatVec2 },
-        ],
-        textures: [
-          { name: 'basic', type: GLTextureType.texture2D },
-          { name: 'tssao', type: GLTextureType.texture2D },
-        ],
-        vertexShaderString: vertexShaderSource,
-        fragmentShaderString: fragmentShaderSource,
-        autoInjectHeader: true,
-      }
-    }
-    super(config);
+    super({
+      attributes: [
+        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position },
+        { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv },
+      ],
+      uniforms: [
+        { name: 'u_tssaoComposeRate', default: 1.0, type: GLDataType.float },
+        { name: 'u_tssaoComposeThreshold', default: 0.5, type: GLDataType.float },
+        { name: 'u_tssaoShowThreshold', default: 200, type: GLDataType.float },
+        { name: 'u_sampleCount', default: 0, type: GLDataType.float },
+      ],
+      varyings: [
+        { name: 'v_uv', type: GLDataType.floatVec2 },
+      ],
+      textures: [
+        { name: 'basic', type: GLTextureType.texture2D },
+        { name: 'tssao', type: GLTextureType.texture2D },
+      ],
+      vertexShaderMain: vertexShaderSource,
+      fragmentShaderMain: fragmentShaderSource,
+    });
   }
 
 }

@@ -25,7 +25,7 @@ export class Application {
   scene: Scene = new Scene();
   active: boolean = false;
   interactor: Interactor;
-  orbitControler: OrbitController;
+  orbitController: OrbitController;
 
   lightCamera: Camera;
 
@@ -48,22 +48,19 @@ export class Application {
     this.graph = new RenderGraph(this.engine);
     this.engine.camera.transform.position.set(20, 10, 10)
     this.interactor = new Interactor(canvas);
-    this.orbitControler = new OrbitController(this.engine.camera as PerspectiveCamera);
-    this.orbitControler.registerInteractor(this.interactor);
+    this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);
+    this.orbitController.registerInteractor(this.interactor);
     this.hasInitialized = true;
     this.createScene(this.scene);
 
-    this.graph.registerSource('AllScreen', this.scene)
     const TAATech = new TAATechnique();
     const SSAOTech = new SSAOTechnique();
     const copyTech = new BlendTechnique();
     this.taaTech = TAATech;
     this.tssaoTech = SSAOTech;
     this.composeTech = copyTech;
-    this.graph.registTechnique('depthTech', new DepthTechnique())
-    this.graph.registTechnique('TAATech', TAATech)
-    this.graph.registTechnique('SSAO', SSAOTech)
-    this.graph.registTechnique('copyTech', copyTech);
+    const depthTech = new DepthTechnique()
+    
     this.graph.setGraph({
       renderTargets: [
         {
@@ -94,31 +91,18 @@ export class Application {
           name: 'SSAOHistoryB',
           from: () => this.isEvenTick ? 'SSAO' : null,
         },
-        // {
-        //   name: 'LightDepthMapResult',
-        //   from: () => 'LightDepthMap',
-        // }
       ],
       passes: [
         { // general scene origin
           name: "SceneOrigin",
-          source: ['AllScreen'],
+          source: [this.scene],
         },
         { // depth
           name: "Depth",
-          technique: 'depthTech',
-          source: ['AllScreen'],
+          technique: depthTech,
+          source: [this.scene],
         },
-        // { // general scene origin
-        //   name: "LightDepthMap",
-        //   source: ['AllScreen'],
-        //   beforePassExecute: () => {
-        //     // random sample lightcamera
-        //   },
-        //   technique: 'depthTech',
-        //   overideCamera: this.lightCamera,
-        // },
-        { // mix newrender and old samples
+        { // mix new render and old samples
           name: "TAA",
           inputs: () => {
             return {
@@ -127,8 +111,8 @@ export class Application {
               TAAHistoryOld: this.isEvenTick ? "TAAHistoryA" : "TAAHistoryB",
             }
           },
-          technique: 'TAATech',
-          source: ['artgl.screenQuad'],
+          technique: TAATech,
+          source: [RenderGraph.quadSource],
           enableColorClear: false,
           beforePassExecute: () => {
             this.engine.unJit();
@@ -139,7 +123,7 @@ export class Application {
             TAATech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
           },
         },
-        { // mix newrender and old samples
+        {
           name: "SSAO",
           inputs: () => {
             return {
@@ -147,8 +131,8 @@ export class Application {
               AOAcc: this.isEvenTick ? "SSAOHistoryA" : "SSAOHistoryB",
             }
           },
-          technique: 'SSAO',
-          source: ['artgl.screenQuad'],
+          technique: SSAOTech,
+          source: [RenderGraph.quadSource],
           enableColorClear: false,
           beforePassExecute: () => {
             const VPInv: Matrix4 = SSAOTech.uniforms.get('VPMatrixInverse').value;
@@ -182,8 +166,8 @@ export class Application {
           afterPassExecute: () => {
             this.sampleCount++;
           },
-          technique: 'copyTech',
-          source: ['artgl.screenQuad'],
+          technique: copyTech,
+          source: [RenderGraph.quadSource],
         },
       ]
     })
@@ -224,7 +208,7 @@ export class Application {
   render = () => {
     this.beforeRender.notifyObservers(this.engine);
     this.tickNum++;
-    this.orbitControler.update();
+    this.orbitController.update();
 
     this.engine.connectCamera();
     if (this.engine.isCameraChanged || this.scene.isFrameChange) {

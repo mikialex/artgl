@@ -1,5 +1,7 @@
 import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
+import { Technique } from "../core/technique";
+import { RenderSource } from "../engine/render-engine";
 export interface GraphDefine {
   passes: PassDefine[],
   renderTargets: RenderTargetDefine[];
@@ -12,11 +14,11 @@ export interface PassInputMapInfo{
 export interface PassDefine {
   name: string,
   inputs?: () => PassInputMapInfo,
-  source: string[],
+  source: RenderSource[],
   filter?: () => boolean,
   sorter?: () => number,
   states?: stateType[],
-  technique?: string,
+  technique?: Technique,
   enableColorClear?:boolean,
   enableDepthClear?:boolean,
   clearColor?: Vector4,

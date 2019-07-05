@@ -1,7 +1,6 @@
 import { Technique } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
-import { Matrix4 } from "../../math/matrix4";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 
 const vertexShaderSource =
@@ -12,9 +11,9 @@ const vertexShaderSource =
       gl_Position = worldPosition;
     }
     `
-const fragmentShaderSource =
+
+const fragmentInclude =
   `
-  
     vec4 PackDepth(in float frag_depth) {
       vec4 bitSh = vec4(256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0);
       vec4 bitMsk = vec4(0.0, 1.0 / 256.0, 1.0 / 256.0, 1.0 / 256.0);
@@ -28,7 +27,10 @@ const fragmentShaderSource =
         float decoded = dot( enc, bit_shift );
         return decoded;
     }
+  `;
 
+const fragmentShaderSource =
+  `
     void main() {
       gl_FragColor = PackDepth(depth);
     }
@@ -36,24 +38,21 @@ const fragmentShaderSource =
 
 export class DepthTechnique extends Technique {
   constructor() {
-    const config = {
-      programConfig: {
-        attributes: [
-          { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position },
-        ],
-        uniformsIncludes: [
-          { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix,},
-          { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix,}
-        ],
-        varyings: [
-          { name: 'depth', type: GLDataType.float }
-        ],
-        vertexShaderString: vertexShaderSource,
-        fragmentShaderString: fragmentShaderSource,
-        autoInjectHeader: true,
-      }
-    }
-    super(config);
+    super({
+      attributes: [
+        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position },
+      ],
+      uniformsIncludes: [
+        { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix, },
+        { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix, }
+      ],
+      varyings: [
+        { name: 'depth', type: GLDataType.float }
+      ],
+      vertexShaderMain: vertexShaderSource,
+      fragmentShaderMain: fragmentShaderSource,
+      fragmentShaderIncludes: fragmentInclude,
+    });
   }
 
 }

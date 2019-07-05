@@ -12,9 +12,8 @@ const vertexShaderSource =
       v_uv = uv;
     }
     `
-const fragmentShaderSource =
-  `
 
+const fragInclude = `
     float UnpackDepth( const in vec4 enc ) {
         const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
         float decoded = dot( enc, bit_shift );
@@ -55,6 +54,11 @@ const fragmentShaderSource =
       return vec3(rate);
     }
 
+`;
+
+
+const fragmentShaderSource =
+  `
     void main() {
       vec3 oldColor = texture2D(AOAcc, v_uv).rgb;
       vec3 newColor = sampleAO(v_uv);
@@ -64,34 +68,31 @@ const fragmentShaderSource =
 
 export class SSAOTechnique extends Technique {
   constructor() {
-    const config: TechniqueConfig = {
-      programConfig: {
-        attributes: [
-          { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position},
-          { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv},
-        ],
-        uniforms: [
-          { name: 'u_sampleCount', default: 0, type: GLDataType.float, },
-          { name: 'VPMatrixInverse', default: new Matrix4(), type: GLDataType.Mat4, },
-          { name: 'u_aoRadius', default: 1.0, type: GLDataType.float, },
-        ],
-        uniformsIncludes: [
-          { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix, },
-          { name: 'LastVPMatrix', mapInner: InnerSupportUniform.LastVPMatrix, },
-        ],
-        varyings: [
-          { name: 'v_uv', type: GLDataType.floatVec2 },
-        ],
-        textures: [
-          { name: 'depthResult', type: GLTextureType.texture2D },
-          { name: 'AOAcc', type: GLTextureType.texture2D },
-        ],
-        vertexShaderString: vertexShaderSource,
-        fragmentShaderString: fragmentShaderSource,
-        autoInjectHeader: true,
-      }
-    }
-    super(config);
+    super({
+      attributes: [
+        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position },
+        { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv },
+      ],
+      uniforms: [
+        { name: 'u_sampleCount', default: 0, type: GLDataType.float, },
+        { name: 'VPMatrixInverse', default: new Matrix4(), type: GLDataType.Mat4, },
+        { name: 'u_aoRadius', default: 1.0, type: GLDataType.float, },
+      ],
+      uniformsIncludes: [
+        { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix, },
+        { name: 'LastVPMatrix', mapInner: InnerSupportUniform.LastVPMatrix, },
+      ],
+      varyings: [
+        { name: 'v_uv', type: GLDataType.floatVec2 },
+      ],
+      textures: [
+        { name: 'depthResult', type: GLTextureType.texture2D },
+        { name: 'AOAcc', type: GLTextureType.texture2D },
+      ],
+      vertexShaderMain: vertexShaderSource,
+      fragmentShaderMain: fragmentShaderSource,
+      fragmentShaderIncludes: fragInclude
+    });
   }
 
 }

@@ -1,21 +1,25 @@
-import { EffectComposer, RenderGraphNode } from "./effect-composer";
 import { PassDefine, GraphDefine, RenderTargetDefine } from "./interface";
 import { PassGraphNode } from "./node/pass-graph-node";
 import { RenderTargetNode } from "./node/render-target-node";
-import { ARTEngine, RenderSource } from "../engine/render-engine";
-import { Technique } from "../core/technique";
+import { ARTEngine } from "../engine/render-engine";
 import { QuadSource } from './quad-source';
 import { Vector4 } from "../math/vector4";
 import { RenderPass } from "./pass";
 
+
+export type RenderGraphNode = PassGraphNode | RenderTargetNode;
+
 export class RenderGraph {
+
   static screenRoot: string = 'artgl-rendergraph-screen-rt';
+  static quadSource = new QuadSource();
+
   constructor(engine: ARTEngine) {
     this.engine = engine;
-    this.composer = new EffectComposer(this);
   }
   engine: ARTEngine;
-  composer: EffectComposer;
+
+  private passes: RenderPass[] = [];
 
   enableDebuggingView: boolean = false;
 
@@ -38,13 +42,25 @@ export class RenderGraph {
     return n;
   }
 
+  updatePasses(nodeQueue: RenderGraphNode[]) {
+    this.passes = [];
+    nodeQueue.forEach(node => {
+      if (node instanceof PassGraphNode) {
+        node.updatePass(nodeQueue);
+        this.passes.push(node.pass);
+      }
+    })
+  }
+
   /**
    * Render a frame by this graph
    *
    * @memberof RenderGraph
    */
   public render() {
-    this.composer.render();
+    this.passes.forEach(pass => {
+      pass.execute();
+    });
   }
 
   /**
@@ -55,7 +71,7 @@ export class RenderGraph {
   public reset() {
     this.renderTargetNodes.clear();
     this.passNodes.clear();
-    this.composer.clearPasses();
+    this.passes = [];
   }
 
   /**
@@ -78,7 +94,14 @@ export class RenderGraph {
    */
   update() {
     this.updateNodesConnection();
-    this.updateComposer();
+    const nodeQueue = this.screenNode.generateDependencyOrderList() as RenderGraphNode[];
+    this.passes = [];
+    nodeQueue.forEach(node => {
+      if (node instanceof PassGraphNode) {
+        node.updatePass(nodeQueue);
+        this.passes.push(node.pass);
+      }
+    })
   }
 
   private constructPassGraph(passesDefine: PassDefine[]) {
@@ -100,10 +123,6 @@ export class RenderGraph {
     });
   }
 
-  private updateComposer() {
-    const renderPassQueue = this.screenNode.generateDependencyOrderList()  as RenderGraphNode[];
-    this.composer.updatePasses(renderPassQueue);
-  }
 
   getRenderTargetDependence(name: string): RenderTargetNode {
     return this.renderTargetNodes.get(name);
@@ -142,51 +161,6 @@ export class RenderGraph {
       throw "screen root not found"
     }
   }
-
-
-
-  // pass technique registration
-  private passTechniques: Map<string, Technique> = new Map();
-  registTechnique(name: string, technique: Technique) {
-    if (this.passTechniques.has(name)) {
-      throw 'duplicated technique registration'
-    }
-    this.passTechniques.set(name, technique);
-  }
-  getResgisteredTechnique(name: string) {
-    return this.passTechniques.get(name);
-  }
-
-
-
-  // pass source registration
-  private passSources: Map<string, RenderSource> = new Map();
-  private innerSourceRegx = /^artgl.\w*$/;
-  isInnerSourceType(name: string) {
-    return this.innerSourceRegx.test(name);
-  }
-  private quadSource = new QuadSource();
-  getInnerSource(name: string): RenderSource {
-    if (name === 'artgl.screenQuad') {
-      return this.quadSource;
-    } else {
-      throw `inner source ${name} not supported`
-    }
-  }
-  registerSource(name: string, source: RenderSource) {
-    if (this.isInnerSourceType(name)) {
-      throw 'start with artgl.** is inner source and should not be registered'
-    }
-
-    if (this.passSources.has(name)) {
-      throw 'duplicated source registration'
-    }
-    this.passSources.set(name, source);
-  }
-  getRegisteredSource(name: string) {
-    return this.passSources.get(name);
-  }
-
 
   updateRenderTargetDebugView(nodeId: string, viewPort: Vector4) {
     if (this.screenNode.uuid === nodeId) {
