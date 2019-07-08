@@ -6,7 +6,8 @@ import { InnerSupportUniform, UniformDescriptor, InnerUniformMapDescriptor, Inne
 import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
 
 export class ShaderNode extends DAGNode {
-  constructor() {
+  constructor(
+    public dataType: GLDataType) {
     super();
   }
 }
@@ -21,7 +22,7 @@ export class ShaderNode extends DAGNode {
  */
 export class ShaderFunctionNode extends ShaderNode {
   constructor(factory: ShaderFunction) {
-    super();
+    super(factory.define.returnType);
     this.factory = factory;
   }
 
@@ -40,8 +41,14 @@ export class ShaderFunctionNode extends ShaderNode {
    * fill this node a input!
    */
   input(key: string, node: ShaderNode): ShaderFunctionNode {
-    if (this.factory.define.inputs[key] === undefined) {
+    const dataType = this.factory.define.inputs[key]
+    if (dataType === undefined) {
       throw `this shader function node has not a input which key is ${key}`
+    }
+    if (dataType !== node.dataType) {
+          console.warn("node:", this);
+          console.warn("inputNode:", node);
+          throw "constructFragmentGraph failed: type mismatch"
     }
     this.connectTo(key, node);
     return this;
@@ -52,12 +59,11 @@ export class ShaderFunctionNode extends ShaderNode {
 
 export class ShaderInputNode extends ShaderNode {
   constructor(name: string, dataType: GLDataType) {
-    super();
+    super(dataType);
     this.name = name;
     this.dataType = dataType;
   }
   name: string;
-  dataType: GLDataType;
 }
 
 export class ShaderCommonUniformInputNode extends ShaderInputNode {

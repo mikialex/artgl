@@ -1,16 +1,11 @@
-import { ShaderFunction } from "./shader-function";
-import { AttributeDescriptor } from "../webgl/attribute";
-import { InnerUniformMapDescriptor, UniformDescriptor } from "../webgl/uniform/uniform";
-import { GLProgramConfig, VaryingDescriptor } from "../webgl/program";
-// import { genFragShader, genVertexShader } from "./code-gen";
-import { TextureDescriptor } from '../webgl/uniform/uniform-texture';
+import { GLProgramConfig } from "../webgl/program";
+import { genFragShader, genVertexShader } from "./code-gen";
 import {
   ShaderFunctionNode, ShaderInputNode,
   ShaderAttributeInputNode, ShaderInnerUniformInputNode,
   ShaderCommonUniformInputNode, ShaderVaryInputNode, ShaderNode
 } from "./shader-node";
 import { Nullable } from "../type";
-import { Technique } from "../core/technique";
 
 export enum ShaderGraphNodeInputType {
   commonUniform,
@@ -76,104 +71,80 @@ export class ShaderGraph {
     this.vertexRoot = null;
   }
 
-  // private checkDataTypeIsMatch(node: ShaderFunctionNode, nodeInput: ShaderNode, inputIndex: number) {
-  //   const result = node.factory.define.inputs[inputIndex].type === nodeInput.dataType;
-  //   if (!result) {
-  //     console.warn("node:", node);
-  //     console.warn("inputnode:", nodeInput);
-  //     throw "constructFragmentGraph failed: type mismatch"
-  //   }
-  // }
+  compile(): GLProgramConfig {
+    return {
+      ...this.collectInputs(),
+      vertexShaderString: this.compileVertexSource(),
+      fragmentShaderString: this.compileFragSource(),
+      autoInjectHeader: true,
+    };
+  }
 
-  // compile(): GLProgramConfig {
-  //   return {
-  //     attributes: this.collectAttributeDepend(),
-  //     uniforms: this.collectUniformDepend(),
-  //     uniformsIncludes: this.collectInnerUniformDepend(),
-  //     varyings: this.collectVaryDepend(),
-  //     vertexShaderString: this.compileVertexSource(),
-  //     fragmentShaderString: this.compileFragSource(),
-  //     autoInjectHeader: true,
-  //   };
-  // }
+  // TODO maybe should cache
+  get nodes() {
+    const nodes: Set<ShaderNode> = new Set();
+    this.fragmentRoot.traverseDFS(node => {
+      nodes.add(node as ShaderNode);
+    })
+    this.vertexRoot.traverseDFS(node => {
+      nodes.add(node as ShaderNode);
+    })
+    const nodeList: ShaderNode[] = [];
+    nodes.forEach(n => {
+      nodeList.push(n);
+    })
+    return nodeList
+  }
 
-  // public visiteAllNodesInput(visitor: (
-  //   node: ShaderFunctionNode,
-  //   input: ShaderGraphDefineInput,
-  //   inputDefine: ShaderFunctionInput,
-  //   inputKey: string) => any) {
-  //   this.functionNodes.forEach(node => {
-  //     Object.keys(node.define.input).forEach((key, index) => {
-  //       const input = node.define.input[key];
-  //       const inputDefine = node.factory.define.inputs[index];
-  //       visitor(node, input, inputDefine, key);
-  //     })
-  //   })
-  // }
+  collectInputs() {
+    const inputNodes = this.nodes.filter(
+      n => n instanceof ShaderInputNode
+    );
 
-  // collectVaryDepend(): VaryingDescriptor[] {
-  //   return this.inputNodes
-  //     .filter(node => node instanceof ShaderVaryInputNode)
-  //     .map((node: ShaderVaryInputNode) => {
-  //       return {
-  //         name: node.name,
-  //         type: node.dataType,
-  //       }
-  //     });
-  // }
+    const attributes = inputNodes
+      .filter(node => node instanceof ShaderAttributeInputNode)
+      .map((node: ShaderAttributeInputNode) => {
+        return {
+          name: node.name,
+          usage: node.attributeUsage,
+          type: node.dataType,
+        }
+      });
+    const uniforms = inputNodes
+      .filter(node => node instanceof ShaderCommonUniformInputNode)
+      .map((node: ShaderCommonUniformInputNode) => {
+        return {
+          name: node.name,
+          type: node.dataType,
+        }
+      });
+    const uniformsIncludes = inputNodes
+        .filter(node => node instanceof ShaderInnerUniformInputNode)
+        .map((node: ShaderInnerUniformInputNode) => {
+          return {
+            name: node.name,
+            mapInner: node.mapInner,
+          }
+        });
+    const varyings = inputNodes
+        .filter(node => node instanceof ShaderVaryInputNode)
+        .map((node: ShaderVaryInputNode) => {
+          return {
+            name: node.name,
+            type: node.dataType,
+          }
+        });
 
-  // collectAttributeDepend(): AttributeDescriptor[] {
-  //   return this.inputNodes
-  //     .filter(node => node instanceof ShaderAttributeInputNode)
-  //     .map((node: ShaderAttributeInputNode) => {
-  //       return {
-  //         name: node.name,
-  //         usage: node.attributeUsage,
-  //         type: node.dataType,
-  //       }
-  //     });
-  // }
+    return { attributes, uniforms, varyings, uniformsIncludes }
+  }
 
-  // collectUniformDepend(): UniformDescriptor[] {
-  //   return this.inputNodes
-  //     .filter(node => node instanceof ShaderCommonUniformInputNode)
-  //     .map((node: ShaderCommonUniformInputNode) => {
-  //       return {
-  //         name: node.name,
-  //         type: node.dataType,
-  //       }
-  //     });
-  // }
+  compileVertexSource(): string {
+    return genVertexShader(this);
+  }
 
-  // collectInnerUniformDepend(): InnerUniformMapDescriptor[] {
-  //   return this.inputNodes
-  //     .filter(node => node instanceof ShaderInnerUniformInputNode)
-  //     .map((node: ShaderInnerUniformInputNode) => {
-  //       return {
-  //         name: node.name,
-  //         mapInner: node.mapInner,
-  //       }
-  //     });
-  // }
+  compileFragSource(): string {
+    return genFragShader(this);
+  }
 
-  // compileVertexSource(): string {
-  //   return genVertexShader(this);
-  // }
-
-  // compileFragSource(): string {
-  //   return genFragShader(this);
-  // }
-
-  // registerShaderFunction(shaderFn: ShaderFunction) {
-  //   this.functionNodeFactories.set(shaderFn.define.name, shaderFn);
-  // }
-
-  // get effectRoot(): ShaderFunctionNode {
-  //   return this.functionNodesMap.get(this.define.effectRoot);
-  // }
-
-  // get transformRoot(): ShaderFunctionNode {
-  //   return this.functionNodesMap.get(this.define.transformRoot);
-  // }
 }
 

@@ -7,36 +7,36 @@ import { ShaderFunctionNode, ShaderNode, ShaderInputNode } from "./shader-node";
 
 const builder = new CodeBuilder()
 
-// export function genFragShader(graph: ShaderGraph): string {
-//   let result = "";
-//   result += genShaderFunctionDepend(graph)
-//   result += "\n"
-//   result += codeGenGraph(graph.effectRoot, "gl_FragColor")
-//   return result;
-// }
+export function genFragShader(graph: ShaderGraph): string {
+  let result = "";
+  result += genShaderFunctionDepend(graph)
+  result += "\n"
+  result += codeGenGraph(graph.fragmentRoot, "gl_FragColor")
+  return result;
+}
 
 
-// export function genVertexShader(graph: ShaderGraph): string {
-//   let result = "";
-//   result += genShaderFunctionDepend(graph)
-//   result += "\n"
-//   result += codeGenGraph(graph.transformRoot, "gl_Position")
-//   return result;
-// }
+export function genVertexShader(graph: ShaderGraph): string {
+  let result = "";
+  result += genShaderFunctionDepend(graph)
+  result += "\n"
+  result += codeGenGraph(graph.vertexRoot, "gl_Position")
+  return result;
+}
 
 
 
 function genShaderFunctionDepend(graph: ShaderGraph): string {
   let functionsStr = "\n";
-  const dependFunctions = {};
-  // graph.functionNodes.forEach(node => {
-  //   if (dependFunctions[node.factory.define.name] === undefined) {
-  //     dependFunctions[node.factory.define.name] = node.factory;
-  //   }
-  // })
-  // Object.keys(dependFunctions).forEach(key => {
-  //   functionsStr += genShaderFunctionDeclare(dependFunctions[key])
-  // })
+  const dependFunctions = new Set();
+  graph.nodes.forEach(node => {
+    if (node instanceof ShaderFunctionNode) {
+      dependFunctions.add(node.factory)
+    }
+  })
+  Object.keys(dependFunctions).forEach(key => {
+    functionsStr += genShaderFunctionDeclare(dependFunctions[key])
+  })
   return functionsStr
 }
 

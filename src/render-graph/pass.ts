@@ -80,9 +80,6 @@ export class RenderPass{
   static screenDebugViewPort = new Vector4(200, 0, 200, 200)
   execute() {
     const engine = this.graph.engine;
-    // if (this.isOutputScreen) {
-    //   return
-    // }
 
     // setup viewport and render target
     if (this.isOutputScreen) {
@@ -158,7 +155,8 @@ export class RenderPass{
     const target = this.outputTarget.name;
     this.inputTarget.forEach(input => {
       if (input === target) {
-        throw 'not valid'
+        throw `you cant output to the render target which is depend on: 
+Duplicate target: ${this.outputTarget.name};`
       }
     })
   }
