@@ -25,7 +25,7 @@ export class GLRenderer implements GLReleasable{
     }
     this.gl = ctx;
     this.el = el;
-    this.glInfo = new GLInfo(this);
+    this.glInfo = new GLInfo(ctx);
     this.framebufferManager = new GLFrameBufferManager(this);
     this.vaoManager = new GLVAOManager(this);
     this.state = new GLState(this);
@@ -50,7 +50,7 @@ export class GLRenderer implements GLReleasable{
 
   private devicePixelRatio = window.devicePixelRatio;
 
-  // set rendersize by device logic size
+  // set render size by device logic size
   setSize(width: number, height: number): boolean {
     return this.setRawRenderSize(width * this.devicePixelRatio, height * this.devicePixelRatio);
   }
@@ -101,7 +101,7 @@ export class GLRenderer implements GLReleasable{
 
   render(mode: DrawMode, useIndex: boolean) {
     if (this.activeProgram === null) {
-      throw 'renderer hasnt active program'
+      throw 'renderer hasn\'t active program'
     }
     if (useIndex) {
       this.gl.drawElements(
@@ -135,7 +135,7 @@ export class GLRenderer implements GLReleasable{
       if (framebuffer === null) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       } else {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.wegbglFrameBuffer);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.webglFrameBuffer);
       }
     }
   }

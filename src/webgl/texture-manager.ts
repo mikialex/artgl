@@ -87,8 +87,8 @@ export class GLTextureManager implements GLReleasable{
     this.textures.set(id, texture);
     return id;
   }
+  
   // updateRenderTargetSize
-
   fillRenderTarget(glTexture: WebGLTexture, width: number, height: number) {
     const gl = this.renderer.gl;
     gl.bindTexture(gl.TEXTURE_2D, glTexture);

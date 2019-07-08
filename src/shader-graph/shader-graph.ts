@@ -62,10 +62,6 @@ export class ShaderGraph {
     return ret;
   }
 
-  // compile(): Technique {
-  //   return new Technique()
-  // }
-
   reset() {
     this.fragmentRoot = null;
     this.vertexRoot = null;

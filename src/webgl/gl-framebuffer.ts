@@ -23,7 +23,7 @@ export class GLFrameAttachedTexture{
       createTextureForRenderTarget(framebuffer.width, framebuffer.height);
     this.gltexture = framebuffer.renderer.textureManger.getGLTexture(this.textureStoreId);
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.wegbglFrameBuffer);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.webglFrameBuffer);
     const attachmentPoint = GLAttachmentPoints[this.attachPoint];
     gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, this.gltexture, 0);
   }
@@ -60,7 +60,7 @@ export class GLFramebuffer{
     this.renderer = renderer;
     this.gl = renderer.gl;
     loadGLAttachmentPoints(this.gl);
-    this.wegbglFrameBuffer = this.createGLFramebuffer();
+    this.webglFrameBuffer = this.createGLFramebuffer();
     this.width = width;
     this.height = height;
   }
@@ -73,7 +73,7 @@ export class GLFramebuffer{
 
   enableDepth: boolean = true;
   webglDepthBuffer: WebGLRenderbuffer;
-  wegbglFrameBuffer: WebGLFramebuffer;
+  webglFrameBuffer: WebGLFramebuffer;
 
   textureAttachedSlot: GLFrameAttachedTexture[] = [];
 
@@ -100,8 +100,8 @@ export class GLFramebuffer{
       this.width = width;
       this.height = height;
 
-      this.gl.deleteFramebuffer(this.wegbglFrameBuffer);
-      this.wegbglFrameBuffer = this.createGLFramebuffer();
+      this.gl.deleteFramebuffer(this.webglFrameBuffer);
+      this.webglFrameBuffer = this.createGLFramebuffer();
       
       this.textureAttachedSlot.forEach(text => {
         if (text) {
@@ -132,7 +132,7 @@ export class GLFramebuffer{
     gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width, this.height);
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.wegbglFrameBuffer);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.webglFrameBuffer);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
   }
 
@@ -156,7 +156,7 @@ export class GLFramebuffer{
       }
     })
     this.disposeAttachedDepthBuffer();
-    this.gl.deleteFramebuffer(this.wegbglFrameBuffer);
-    this.wegbglFrameBuffer = null;
+    this.gl.deleteFramebuffer(this.webglFrameBuffer);
+    this.webglFrameBuffer = null;
   }
 }
