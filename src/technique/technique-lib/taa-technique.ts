@@ -1,4 +1,4 @@
-import { Technique, TechniqueConfig } from "../../core/technique";
+import { Technique } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { Matrix4 } from "../../math/matrix4";

@@ -1,6 +1,6 @@
 import { ShaderFunction } from "../shader-function";
 
-export const depthPackFunction = new ShaderFunction({
+export const depthPack = new ShaderFunction({
   description: 'pack depth to RGBA output',
   source: `
     vec4 depthPack(float frag_depth){
@@ -13,3 +13,12 @@ export const depthPackFunction = new ShaderFunction({
   `,
 })
 
+export const unPackDepth = new ShaderFunction({
+  description: 'unpack depth from RGBA channel',
+  source: `
+  float UnpackDepth( const in vec4 enc ) {
+    const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
+    float decoded = dot( enc, bit_shift );
+    return decoded;
+}`
+})

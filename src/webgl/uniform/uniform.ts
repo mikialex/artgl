@@ -6,7 +6,7 @@ import { GLRenderer } from "../gl-renderer";
 
 export type uniformUploadType = number | Float32Array | number[]
 export type flattenerType= (value: any, receiveData: uniformUploadType) => uniformUploadType;
-export type setterType= (gl: WebGLRenderingContext, localtion: WebGLUniformLocation, data: uniformUploadType) => void
+export type setterType= (gl: WebGLRenderingContext, location: WebGLUniformLocation, data: uniformUploadType) => void
 export type copyerType = (newValue: uniformUploadType, target: uniformUploadType) => uniformUploadType;
 export type differType= (newValue: uniformUploadType, oldValue: uniformUploadType) => boolean;
 
@@ -107,7 +107,7 @@ export class GLUniform{
     }
     this.receiveData = this.flattener(value, this.receiveData);
 
-    if (this.lastReceiveData === undefined) { // this uniform never uploadever
+    if (this.lastReceiveData === undefined) { // this uniform never upload
       this.lastReceiveData = this.flattener(value, this.lastReceiveData);
       this.setter(this.gl, this.location, this.receiveData);
       this.program.renderer.stat.uniformUpload++;

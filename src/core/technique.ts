@@ -7,27 +7,6 @@ import { UniformDescriptor, InnerUniformMapDescriptor } from "../webgl/uniform/u
 import { TextureDescriptor } from "../webgl/uniform/uniform-texture";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 
-
-/**
- * Technique config is used for creating a technique.
- * It's similar to program config, but has higher level abstraction.
- * You cant write plain shader code here. Instead of this, headers is auto injected,
- * and main function is input separately(maybe not need when support full parser. TODO)
- *
- */
-export interface TechniqueConfig {
-  attributes: AttributeDescriptor[];
-  uniforms?: UniformDescriptor[];
-  uniformsIncludes?: InnerUniformMapDescriptor[];
-  varyings?: VaryingDescriptor[];
-  textures?: TextureDescriptor[];
-  vertexShaderIncludes?: string;
-  vertexShaderMain: string;
-  fragmentShaderIncludes?: string;
-  fragmentShaderMain: string;
-  useIndex?: boolean
-}
-
 /**
  * Technique defined how to draw a things typically, one technique is corespondent to a gl program.
  * Program's shader and infos are defined in technique config.
@@ -35,19 +14,18 @@ export interface TechniqueConfig {
  *  under layer gl renderer to create and compiled shader.
  */
 export class Technique{
-  constructor(config: TechniqueConfig) {
+  constructor() {
     // setup default uniform value
-    this.config = config;
-    if (config.uniforms !== undefined) {
-      config.uniforms.forEach(uniform => {
-        this.uniforms.set(uniform.name, new UniformProxy(uniform.default));
-      })
-    }
+    // this.config = config;
+    // if (config.uniforms !== undefined) {
+    //   config.uniforms.forEach(uniform => {
+    //     this.uniforms.set(uniform.name, new UniformProxy(uniform.default));
+    //   })
+    // }
   }
 
-  config: TechniqueConfig;
   graph: ShaderGraph = new ShaderGraph;
-  name: string = "noname technique";
+  name: string = "no named technique";
   uuid: string = generateUUID();
   _techniqueId: string;
 
@@ -55,14 +33,13 @@ export class Technique{
 
   uniforms: Map<string, UniformProxy> = new Map();
 
+  /**
+   * impl this to build your shader source
+   */
   update() {
     
   }
 
-
-  /**
-   * t
-   */
   getProgram(engine: ARTEngine): GLProgram {
     const program = engine.getProgram(this);
     if (program === undefined) {
@@ -73,6 +50,9 @@ export class Technique{
 
   createProgramConfig(): GLProgramConfig{
     const config = this.config;
+    // config.uniforms.forEach(uniform => {
+    //   this.uniforms.set(uniform.name, new UniformProxy(uniform.default));
+    // })
     return {
       autoInjectHeader: true,
       attributes: config.attributes,

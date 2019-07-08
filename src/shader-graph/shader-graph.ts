@@ -33,7 +33,7 @@ export interface ShaderGraphNodeDefine {
 export class ShaderGraph {
   fragmentRoot: Nullable<ShaderFunctionNode>;
   vertexRoot: Nullable<ShaderFunctionNode>;
-  varyings: Map<string, ShaderFunctionNode> = new Map();
+  varyings: Map<string, ShaderNode> = new Map();
 
   setFragmentRoot(root: ShaderFunctionNode): ShaderGraph {
     this.fragmentRoot = root;
@@ -45,7 +45,7 @@ export class ShaderGraph {
     return this;
   }
 
-  setVary(key: string, root: ShaderFunctionNode): ShaderGraph {
+  setVary(key: string, root: ShaderNode): ShaderGraph {
     const ret = this.varyings.get(key);
     if (ret !== undefined) {
       throw 'duplicate vary key found'
@@ -54,7 +54,7 @@ export class ShaderGraph {
     return this;
   }
 
-  getVary(key): ShaderFunctionNode {
+  getVary(key): ShaderNode {
     const ret = this.varyings.get(key);
     if (ret === undefined) {
       throw 'cant get vary'
@@ -62,9 +62,10 @@ export class ShaderGraph {
     return ret;
   }
 
-  reset() {
+  reset(): ShaderGraph {
     this.fragmentRoot = null;
     this.vertexRoot = null;
+    return this;
   }
 
   compile(): GLProgramConfig {
