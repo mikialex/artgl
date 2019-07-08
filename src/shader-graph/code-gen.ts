@@ -68,7 +68,7 @@ function genTempVarExpFromShaderNode(
 
     let functionInputs = "";
     Object.keys(functionDefine.inputs).forEach((key, index) => {
-      const nodeDepend = node.getFromNode(key) as ShaderNode;
+      const nodeDepend = node.inputMap.get(key) as ShaderNode;
       functionInputs += getParamKeyFromVarList(ctx, nodeDepend);
       if (index !== Object.keys(functionDefine.inputs).length - 1) {
         functionInputs += ", "

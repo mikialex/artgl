@@ -134,7 +134,7 @@ export class GraphNodeView {
     const view = new GraphNodeView();
     view.uuid = node.uuid;
     view.inputsID = [];
-    node.fromNodeMap.forEach(node => {
+    node.fromNodes.forEach(node => {
       view.inputsID.push(node.uuid);
     })
 

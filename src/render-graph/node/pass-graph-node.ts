@@ -42,17 +42,17 @@ export class PassGraphNode extends DAGNode {
       if (renderTargetNode === undefined) {
         throw `render graph updating error, renderTarget depend node ${framebufferName} cant found`;
       }
-      renderTargetNode.connectTo(inputUniformKey, this);
+      renderTargetNode.connectTo(this);
     })
   }
 
   updatePass(activeNodes: RenderGraphNode[]) {
     this.pass.updateInputTargets(this.inputs);
     let foundedNode = null;
-    if (this.toNodeMap.size === 0) {
+    if (this.toNodes.size === 0) {
       throw "cant found render target node for a render pass"
     }
-    this.toNodeMap.forEach(node => {
+    this.toNodes.forEach(node => {
       if (node instanceof RenderTargetNode) {
         for (let i = 0; i < activeNodes.length; i++) {
           if (activeNodes[i] === node) {

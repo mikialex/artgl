@@ -2,46 +2,48 @@ import { generateUUID } from "../math/uuid";
 
 export class DAGNode {
   uuid: string = generateUUID();
-  toNodeMap: Map<string, DAGNode> = new Map();
-  fromNodeMap: Map<string, DAGNode> = new Map();
+  toNodes: Set<DAGNode> = new Set();
+  fromNodes: Set<DAGNode> = new Set();
   protected fulfillList: Map<string, boolean> = new Map();
 
-  getFromNode(key: string) {
-    return this.fromNodeMap.get(key);
+  connectTo(node: DAGNode) {
+    this.toNodes.add(node);
+    node._addFromRef(this);
   }
 
-  getToNode(key: string) {
-    return this.toNodeMap.get(key);
-  }
-
-  connectTo(key: string, node: DAGNode) {
-    this.toNodeMap.set(key, node);
-    node._addFromRef(key, this);
-  }
-
-  disconnectTo(key: string, node: DAGNode) {
-    this.toNodeMap.delete(key);
-    node._removeFromRef(key);
+  disconnectTo(node: DAGNode) {
+    this.toNodes.delete(node);
+    node._removeFromRef(this);
   }
 
   clearAllTo() {
-    this.toNodeMap.forEach((node, key) => {
-      this.disconnectTo(key, node);
+    this.toNodes.forEach((node) => {
+      node._removeFromRef(this)
     })
+    this.toNodes.clear();
   }
 
   clearAllFrom() {
-    this.fromNodeMap.forEach((node, key) => {
-      node.disconnectTo(key, this);
+    this.fromNodes.forEach((node) => {
+      node._removeToRef(this);
     })
+    this.fromNodes.clear();
   }
 
-  _addFromRef(key: string, node: DAGNode) {
-    this.fromNodeMap.set(key, node);
+  _addFromRef(node: DAGNode) {
+    this.fromNodes.add(node);
   }
 
-  _removeFromRef(key: string) {
-    this.fromNodeMap.delete(key);
+  _removeFromRef(node: DAGNode) {
+    this.fromNodes.delete(node);
+  }
+
+  _addToRef(node: DAGNode) {
+    this.toNodes.add(node);
+  }
+
+  _removeToRef(node: DAGNode) {
+    this.toNodes.delete(node);
   }
 
   // TODO this should be optimized
@@ -50,8 +52,8 @@ export class DAGNode {
     let allDepNodes = this.generateAllDependencyList();
     allDepNodes.forEach(node => {
       node.fulfillList.clear();
-      node.toNodeMap.forEach((node, key) => {
-        node.fulfillList.set(key, false);
+      node.toNodes.forEach((n) => {
+        n.fulfillList.set(node.uuid, false);
       })
     })
 
@@ -60,8 +62,8 @@ export class DAGNode {
 
     function resolveNext(node: DAGNode) {
       result.push(node);
-      node.toNodeMap.forEach((n, key) => {
-        n.fulfillList.delete(key);
+      node.toNodes.forEach((n) => {
+        n.fulfillList.delete(node.uuid);
       })
     }
 
@@ -89,7 +91,7 @@ export class DAGNode {
       if (!visited.has(node)) {
         visited.add(node);
         visitor(node);
-        node.fromNodeMap.forEach(n => {
+        node.fromNodes.forEach(n => {
           visit(n);
         });
       }

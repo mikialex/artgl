@@ -16,32 +16,29 @@ test('single dag traverse', () => {
 test('dag connect and disconnect', () => {
   const node1 = new DAGNode();
   const node2 = new DAGNode();
-  node1.connectTo("test", node2);
+  node1.connectTo(node2);
+  
+  expect(node2.fromNodes.size).toBe(1);
+  expect(node1.toNodes.size).toBe(1);
 
-  expect(node1.getFromNode("test")).toBe(undefined);
-  expect(node1.getToNode("test")).toBe(node2);
-  expect(node2.getFromNode("test")).toBe(node1);
-  expect(node2.getToNode("test")).toBe(undefined);
+  node1.disconnectTo(node2);
 
-  node1.disconnectTo("test", node2);
+  expect(node2.fromNodes.size).toBe(0);
+  expect(node1.toNodes.size).toBe(0);
 
-  expect(node1.getFromNode("test")).toBe(undefined);
-  expect(node1.getToNode("test")).toBe(undefined);
-  expect(node2.getFromNode("test")).toBe(undefined);
-  expect(node2.getToNode("test")).toBe(undefined);
 });
 
 test('dag clear all', () => {
   const node1 = new DAGNode();
   const node2 = new DAGNode();
   const node3 = new DAGNode();
-  node1.connectTo("test", node3);
-  node2.connectTo("test2", node3);
+  node1.connectTo(node3);
+  node2.connectTo(node3);
   node3.clearAllFrom();
 
-  expect(node3.fromNodeMap.size).toBe(0);
-  expect(node2.toNodeMap.size).toBe(0);
-  expect(node1.toNodeMap.size).toBe(0);
+  expect(node3.fromNodes.size).toBe(0);
+  expect(node2.toNodes.size).toBe(0);
+  expect(node1.toNodes.size).toBe(0);
 });
 
 
@@ -49,9 +46,9 @@ test('dag dep sort', () => {
   const node1 = new DAGNode();
   const node2 = new DAGNode();
   const node3 = new DAGNode();
-  node1.connectTo("test", node2);
-  node2.connectTo("test2", node3);
-  node1.connectTo("test3", node3);
+  node1.connectTo(node2);
+  node2.connectTo(node3);
+  node1.connectTo(node3);
 
   const list = node3.generateDependencyOrderList();
   expect(list.length).toBe(3);

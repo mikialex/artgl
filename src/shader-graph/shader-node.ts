@@ -28,6 +28,7 @@ export class ShaderFunctionNode extends ShaderNode {
 
   meaningfulName: string
   factory: ShaderFunction
+  inputMap: Map<string, ShaderNode> = new Map();
 
   /**
    * give this node a meaningful name!, this name may show in compiled shader.
@@ -50,7 +51,8 @@ export class ShaderFunctionNode extends ShaderNode {
           console.warn("inputNode:", node);
           throw "constructFragmentGraph failed: type mismatch"
     }
-    this.connectTo(key, node);
+    this.connectTo(node);
+    this.inputMap.set(key, node);
     return this;
   }
 
