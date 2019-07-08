@@ -6,7 +6,7 @@ const quadMesh = new Mesh();
 const geometry = new PlaneGeometry(2, 2, 1, 1);
 quadMesh.geometry = geometry;
 export class QuadSource implements RenderSource{
-  hasRendered: false;
+  hasRendered: boolean = false;
 
   resetSource() {
     this.hasRendered = false;
@@ -16,6 +16,7 @@ export class QuadSource implements RenderSource{
     if (this.hasRendered) {
       return null
     }
+    this.hasRendered = true;
     return quadMesh
   }
 

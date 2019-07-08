@@ -31,10 +31,10 @@ export class PassGraphNode extends DAGNode {
     this.clearAllFrom();
 
     // reval getter
-    const inputs = this.inputs;
     if (this.inputsGetter !== null) {
       this.inputs = this.inputsGetter();
     }
+    const inputs = this.inputs;
     // connect new depends node
     Object.keys(inputs).forEach(inputUniformKey => {
       const framebufferName = inputs[inputUniformKey]
@@ -49,6 +49,9 @@ export class PassGraphNode extends DAGNode {
   updatePass(activeNodes: RenderGraphNode[]) {
     this.pass.updateInputTargets(this.inputs);
     let foundedNode = null;
+    if (this.toNodeMap.size === 0) {
+      throw "cant found render target node for a render pass"
+    }
     this.toNodeMap.forEach(node => {
       if (node instanceof RenderTargetNode) {
         for (let i = 0; i < activeNodes.length; i++) {
@@ -65,6 +68,7 @@ new found target pass: ${activeNodes[i].name};
         }
       }
     })
+    this.pass.checkIsValid();
   }
 
   pass: RenderPass;

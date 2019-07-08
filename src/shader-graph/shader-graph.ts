@@ -68,6 +68,12 @@ export class ShaderGraph {
   }
 
   compile(): GLProgramConfig {
+    if (this.vertexRoot === null) {
+      throw "can't compile shadergraph, vertex root not set"
+    }
+    if (this.fragmentRoot === null) {
+      throw "can't compile shadergraph, fragment root not set"
+    }
     return {
       ...this.collectInputs(),
       vertexShaderString: this.compileVertexSource(),

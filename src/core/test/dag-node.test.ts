@@ -31,6 +31,19 @@ test('dag connect and disconnect', () => {
   expect(node2.getToNode("test")).toBe(undefined);
 });
 
+test('dag clear all', () => {
+  const node1 = new DAGNode();
+  const node2 = new DAGNode();
+  const node3 = new DAGNode();
+  node1.connectTo("test", node3);
+  node2.connectTo("test2", node3);
+  node3.clearAllFrom();
+
+  expect(node3.fromNodeMap.size).toBe(0);
+  expect(node2.toNodeMap.size).toBe(0);
+  expect(node1.toNodeMap.size).toBe(0);
+});
+
 
 test('dag dep sort', () => {
   const node1 = new DAGNode();

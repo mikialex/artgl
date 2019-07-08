@@ -98,8 +98,6 @@ export class RenderPass{
       engine.renderer.setRenderTarget(this.outputTarget);
       engine.renderer.state.setViewport(0, 0, this.outputTarget.width, this.outputTarget.height);
     }
-
-    this.checkIsValid();
   
     // input binding 
     if (this.overrideTechnique !== null) {
