@@ -105,7 +105,7 @@ function codeGenGraph(
       if (varRc.refedNode instanceof ShaderFunctionNode) {
         varType = getShaderTypeStringFromGLDataType(varRc.refedNode.factory.define.returnType);
       } else {
-        varType = getShaderTypeStringFromGLDataType((varRc.refedNode as ShaderInputNode).dataType);
+        varType = getShaderTypeStringFromGLDataType((varRc.refedNode as ShaderInputNode).type);
       }
       builder.writeLine(`${varType} ${varRc.varKey} = ${varRc.expression}`)
     } else {

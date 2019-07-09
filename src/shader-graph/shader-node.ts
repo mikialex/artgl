@@ -3,15 +3,19 @@ import { ShaderFunction } from "./shader-function";
 import { GLDataType } from "../webgl/shader-util";
 import { InnerSupportUniform, UniformDescriptor, InnerUniformMapDescriptor, InnerUniformMap } from "../webgl/uniform/uniform";
 import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
+import { Vector2 } from "../math/vector2";
+import { Vector3 } from "../math/index";
+import { Vector4 } from "../math/vector4";
 
 export class ShaderNode extends DAGNode {
   constructor(
-    public dataType: GLDataType) {
+    public type: GLDataType
+  ) {
     super();
   }
 
   swizzling(part: string) {
-    
+    return new ShaderSwizzleNode(this).swizzle(part);
   }
 }
 
@@ -49,7 +53,7 @@ export class ShaderFunctionNode extends ShaderNode {
     if (dataType === undefined) {
       throw `this shader function node has not a input which key is ${key}`
     }
-    if (dataType !== node.dataType) {
+    if (dataType !== node.type) {
           console.warn("node:", this);
           console.warn("inputNode:", node);
           throw "constructFragmentGraph failed: type mismatch"
@@ -63,10 +67,10 @@ export class ShaderFunctionNode extends ShaderNode {
 
 
 export class ShaderInputNode extends ShaderNode {
-  constructor(name: string, dataType: GLDataType) {
-    super(dataType);
+  constructor(name: string, type: GLDataType) {
+    super(type);
     this.name = name;
-    this.dataType = dataType;
+    this.type = type;
   }
   name: string;
 }
@@ -94,29 +98,89 @@ export class ShaderAttributeInputNode extends ShaderInputNode {
   attributeUsage: AttributeUsage
 }
 
-export class ShaderTextureInputNode extends ShaderInputNode {
-  constructor(des) {
-    super(des.name, des.type);
+export type ShaderConstType = number | Vector2 | Vector3 | Vector4;
+export class ShaderConstNode extends ShaderNode {
+  constructor(value: ShaderConstType) {
+    if (typeof value === "number") {
+      super(GLDataType.float)
+    } else if (value instanceof Vector2) {
+      super(GLDataType.floatVec2)
+    } else if (value instanceof Vector3) {
+      super(GLDataType.floatVec3)
+    } else if (value instanceof Vector4) {
+      super(GLDataType.floatVec4)
+    } else {
+      
+    }
+    this.value = value;
+  }
+  value: ShaderConstType
+}
+
+export class ShaderTexture {
+  constructor(
+    public name: string,
+    public type: GLDataType
+  ) {
   }
 
   fetch(node: ShaderNode): ShaderTextureFetchNode {
-    return new ShaderTextureFetchNode();
+    return new ShaderTextureFetchNode(this);
   }
 }
 
 export class ShaderTextureFetchNode extends ShaderNode {
-  constructor(source: ShaderTextureInputNode, ) {
-    super(des.name, des.type);
+  constructor(
+    public source: ShaderTexture,
+  ) {
+    super(source.type);
   }
-
 
 }
 
 
-export class ShaderDataWrapNode extends ShaderNode {
-  constructor(source: ShaderTextureInputNode, ) {
-    super(des.name, des.type);
+export class ShaderCombineNode extends ShaderNode {
+  constructor(combines: ShaderNode[], type: GLDataType) {
+    // TODO
+    super(type);
   }
 
+  combines: ShaderNode[];
+}
+
+export class ShaderSwizzleNode extends ShaderNode {
+  constructor(node: ShaderNode) {
+    super(node.type);
+    this.connectTo(node);
+  }
+  swizzleType: string[]
+
+  swizzle(swizzleType: string): ShaderNode {
+
+    const parts = swizzleType.trim().split("");
+    if (parts.length > 4) {
+      throw "swizzle not valid"
+    }
+    this.swizzleType = parts;
+    switch (parts.length) {
+      case 1:
+        this.type = GLDataType.float;
+        break;
+      case 2:
+        this.type = GLDataType.floatVec2;
+      break;
+      case 3:
+        this.type = GLDataType.floatVec3;
+      break;
+      case 4:
+        this.type = GLDataType.floatVec4;
+        break;
+    
+      default:
+        break;
+    }
+
+    return this;
+  }
 
 }

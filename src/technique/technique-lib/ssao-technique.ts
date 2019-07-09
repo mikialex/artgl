@@ -122,17 +122,18 @@ export class SSAOTechnique extends Technique {
         { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
       ))
 
-    const depth = depthTex.fetch(this.graph.getVary("v_uv"))
+    const vUV = this.graph.getVary("v_uv");
+    const depth = depthTex.fetch(vUV)
 
     const worldPosition = getWorldPosition.make()
-      .input("uv", this.graph.getVary("v_uv"))
+      .input("uv", vUV)
       .input("depth", depth)
       .input("VPMatrix", VPMatrix)
       .input("VPMatrixInverse", uniform("VPMatrixInverse", GLDataType.Mat4))
 
     const randDir = randDir3D.make()
-      .input("randA")
-      .input("randB")
+      .input("randA", vUV.swizzling("x"))
+      .input("randB", vUV.swizzling("y"))
 
     const newPositionRand = newSamplePosition.make()
       .input("positionOld", worldPosition)
@@ -156,7 +157,7 @@ export class SSAOTechnique extends Technique {
 
     this.graph.setFragmentRoot(
       tssaoMix.make()
-        .input("oldColor", texture("AOAcc").fetch(this.graph.getVary("v_uv")))
+        .input("oldColor", texture("AOAcc").fetch(vUV))
         .input("newColor",
           sampleAO.make()
             .input("depth", unPackDepth.make().input("enc", depth))

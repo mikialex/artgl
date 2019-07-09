@@ -87,7 +87,7 @@ export class ShaderGraph {
         return {
           name: node.name,
           usage: node.attributeUsage,
-          type: node.dataType,
+          type: node.type,
         }
       });
     const uniforms = inputNodes
@@ -95,7 +95,7 @@ export class ShaderGraph {
       .map((node: ShaderCommonUniformInputNode) => {
         return {
           name: node.name,
-          type: node.dataType,
+          type: node.type,
         }
       });
     const uniformsIncludes = inputNodes
@@ -111,7 +111,7 @@ export class ShaderGraph {
         .map((node: ShaderVaryInputNode) => {
           return {
             name: node.name,
-            type: node.dataType,
+            type: node.type,
           }
         });
 
