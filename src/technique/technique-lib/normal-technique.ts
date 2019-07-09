@@ -2,7 +2,7 @@ import { Technique } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
-import { MVPTransformFunction } from "../../shader-graph/built-in/mvp-transform";
+import { MVPTransform } from "../../shader-graph/built-in/transform";
 import { innerUniform, attribute } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 
@@ -19,7 +19,7 @@ export class NormalTechnique extends Technique {
   update() {
     this.graph.reset()
       .setVertexRoot(
-        MVPTransformFunction.make()
+        MVPTransform.make()
           .input("VPMatrix", innerUniform(InnerSupportUniform.VPMatrix))
           .input("MMatrix", innerUniform(InnerSupportUniform.MMatrix))
           .input("position", attribute(

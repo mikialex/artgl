@@ -99,7 +99,24 @@ export class ShaderTextureInputNode extends ShaderInputNode {
     super(des.name, des.type);
   }
 
-  fetch(node: ShaderNode) {
-    
+  fetch(node: ShaderNode): ShaderTextureFetchNode {
+    return new ShaderTextureFetchNode();
   }
+}
+
+export class ShaderTextureFetchNode extends ShaderNode {
+  constructor(source: ShaderTextureInputNode, ) {
+    super(des.name, des.type);
+  }
+
+
+}
+
+
+export class ShaderDataWrapNode extends ShaderNode {
+  constructor(source: ShaderTextureInputNode, ) {
+    super(des.name, des.type);
+  }
+
+
 }

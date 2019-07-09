@@ -1,11 +1,12 @@
 import { Technique } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
-import { Matrix4 } from "../../math/matrix4";
-import { GLTextureType } from "../../webgl/uniform/uniform-texture";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
-import { attribute, uniform } from "../../shader-graph/node-maker";
+import { attribute, uniform, texture, innerUniform } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
+import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
+import { randDir3D } from "../../shader-graph/built-in/rand";
+import { getLastWorldPosition, NDCxyToUV } from "../../shader-graph/built-in/transform";
 
 const vertexShaderSource =
   `
@@ -36,20 +37,35 @@ const fragInclude = `
 
 `;
 
-const getWorldPosition = new ShaderFunction({
-  source:
-    `
-    vec4 getWorldPosition(
-      vec2 cood, 
-      float depth, 
-      mat4 VPMatrix, 
-      mat4 VPMatrixInverse){
-      float clipW = VPMatrix[2][3] * depth + VPMatrix[3][3];
-      return VPMatrixInverse * (vec4(cood * 2.0 - 1.0, depth, 1.0) * clipW);
-    }
-    `
+const newSamplePosition = new ShaderFunction({
+  source: `
+  vec3 newPosition(vec3 positionOld, float distance, vec3 dir){
+    return distance * dir + positionOld
+  }
+  `
 })
 
+const NDCFromWorldPositionAndVPMatrix = new ShaderFunction({
+  source: `
+  float depthFromWorldPositionAndVPMatrix(vec3 position, mat4 matrix){
+    vec4 ndc = matrix * newSamplePosition;
+    ndc = ndc / ndc.w;
+    return ndc;
+  }
+  `
+})
+
+const sampleAO = new ShaderFunction({
+  source: `
+  vec3 sampleAO(float depth, float newDepth){
+    if (depth >0.999){
+      return vec3(0.5);
+    }
+    float rate =  newNDC.z > newDepth ? 0.0 : 1.0;
+    return vec3(rate);
+  }
+  `
+})
 
 const fragmentShaderSource =
   `
@@ -69,50 +85,85 @@ const tssaoMix = new ShaderFunction({
 })
 
 export class SSAOTechnique extends Technique {
-  constructor() {
-    super({
-      attributes: [
-        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position },
-        { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv },
-      ],
-      uniforms: [
-        { name: 'u_sampleCount', default: 0, type: GLDataType.float, },
-        { name: 'VPMatrixInverse', default: new Matrix4(), type: GLDataType.Mat4, },
-        { name: 'u_aoRadius', default: 1.0, type: GLDataType.float, },
-      ],
-      uniformsIncludes: [
-        { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix, },
-        { name: 'LastVPMatrix', mapInner: InnerSupportUniform.LastVPMatrix, },
-      ],
-      textures: [
-        { name: 'depthResult', type: GLTextureType.texture2D },
-        { name: 'AOAcc', type: GLTextureType.texture2D },
-      ],
-      vertexShaderMain: vertexShaderSource,
-      fragmentShaderMain: fragmentShaderSource,
-      fragmentShaderIncludes: fragInclude
-    });
-  }
+  // constructor() {
+  //   super({
+  //     attributes: [
+  //       { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position },
+  //       { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv },
+  //     ],
+  //     uniforms: [
+  //       { name: 'u_sampleCount', default: 0, type: GLDataType.float, },
+  //       { name: 'VPMatrixInverse', default: new Matrix4(), type: GLDataType.Mat4, },
+  //       { name: 'u_aoRadius', default: 1.0, type: GLDataType.float, },
+  //     ],
+  //     uniformsIncludes: [
+  //       { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix, },
+  //       { name: 'LastVPMatrix', mapInner: InnerSupportUniform.LastVPMatrix, },
+  //     ],
+  //     textures: [
+  //       { name: 'depthResult', type: GLTextureType.texture2D },
+  //       { name: 'AOAcc', type: GLTextureType.texture2D },
+  //     ],
+  //     vertexShaderMain: vertexShaderSource,
+  //     fragmentShaderMain: fragmentShaderSource,
+  //     fragmentShaderIncludes: fragInclude
+  //   });
+  // }
 
 
   update() {
-
-    const oldColor = ;
-    const newColor = ;
-
+    const VPMatrix = innerUniform(InnerSupportUniform.VPMatrix);
+    const depthTex = texture("depthResult");
     this.graph.reset()
       .setVertexRoot(attribute(
         { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
       ))
-      .setVary("v_uv",attribute(
+      .setVary("v_uv", attribute(
         { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
       ))
-      .setFragmentRoot(
-        tssaoMix.make()
-          .input("oldColor", oldColor)
-          .input("newColor", newColor)
-          .input("sampleCount", uniform("u_sampleCount", GLDataType.float))
+
+    const depth = depthTex.fetch(this.graph.getVary("v_uv"))
+
+    const worldPosition = getLastWorldPosition.make()
+      .input("cood", this.graph.getVary("v_uv"))
+      .input("depth", depth)
+      .input("VPMatrix", VPMatrix)
+      .input("LastVPMatrixInverse", uniform("VPMatrixInverse", GLDataType.Mat4))
+
+    const randDir = randDir3D.make()
+      .input("randA")
+      .input("randB")
+
+    const newPositionRand = newSamplePosition.make()
+      .input("positionOld", worldPosition)
+      .input("distance", uniform("u_aoRadius", GLDataType.float))
+      .input("dir", randDir)
+
+    const newDepth = unPackDepth.make()
+      .input("enc",
+        depthTex.fetch(
+          NDCxyToUV.make()
+            .input(
+              "ndc", NDCFromWorldPositionAndVPMatrix.make()
+                .input(
+                  "position", newPositionRand
+                ).input(
+                  "matrix", VPMatrix
+                )
+            )
+        )
       )
+
+    this.graph.setFragmentRoot(
+      tssaoMix.make()
+        .input("oldColor", texture("AOAcc").fetch(this.graph.getVary("v_uv")))
+        .input("newColor",
+          sampleAO.make()
+            .input("depth", unPackDepth.make().input("enc", depth))
+            .input("newDepth", newDepth)
+        )
+        .input("sampleCount", uniform("u_sampleCount", GLDataType.float))
+    )
   }
 
 }

@@ -1,5 +1,5 @@
 import { AttributeDescriptor } from "../webgl/attribute";
-import { ShaderAttributeInputNode, ShaderCommonUniformInputNode, ShaderInnerUniformInputNode, ShaderTextureInputNode } from "./shader-node";
+import { ShaderAttributeInputNode, ShaderCommonUniformInputNode, ShaderInnerUniformInputNode, ShaderTextureInputNode, ShaderNode } from "./shader-node";
 import { GLDataType } from "../webgl/shader-util";
 import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
 
@@ -15,13 +15,25 @@ export function texture(tex) {
 
 export function uniform(name: string, type: GLDataType) {
   return new ShaderCommonUniformInputNode({
-   name, type
+    name, type
   })
 }
 
 export function innerUniform(type: InnerSupportUniform) {
   return new ShaderInnerUniformInputNode({
     name: 'inner' + InnerUniformMap.get(type).name,
-    mapInner: type, 
+    mapInner: type,
   })
+}
+
+export function vec2(r: ShaderNode, g: ShaderNode) {
+
+}
+
+export function vec3(r: ShaderNode, g: ShaderNode, b: ShaderNode) {
+
+}
+
+export function vec4(r: ShaderNode, g: ShaderNode, b: ShaderNode, a: ShaderNode) {
+
 }

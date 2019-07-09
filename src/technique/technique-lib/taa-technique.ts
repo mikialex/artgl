@@ -15,15 +15,6 @@ const vertexShaderSource =
 
 
 const fragInclude = `
-    float lightness(vec3 color){
-      return 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b;
-    }
-
-    float UnpackDepth( const in vec4 enc ) {
-        const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
-        float decoded = dot( enc, bit_shift );
-        return decoded;
-    }
 
     vec4 getNDCPosition(vec2 cood){
       float depth = UnpackDepth(texture2D(depthResult, cood));
