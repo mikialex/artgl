@@ -1,4 +1,4 @@
-import { ShaderGraph, ShaderGraphNodeInputType } from '../../src/shader-graph/shader-graph';
+import { ShaderGraph } from '../../src/shader-graph/shader-graph';
 import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
 import { ARTEngine, Technique, Mesh, Interactor, OrbitController, PerspectiveCamera } from '../../src/artgl';
 import { GLDataType } from '../../src/webgl/shader-util';

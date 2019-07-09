@@ -18,6 +18,7 @@ const depthV = new ShaderFunction(
 )
 
 export class DepthTechnique extends Technique {
+  name = "drawDepth"
 
   update() {
     const worldPosition = MVPTransformFunction.make()

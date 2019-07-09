@@ -1,6 +1,5 @@
 import { DAGNode } from "../core/dag-node";
-import { ShaderGraphNodeDefine } from "./shader-graph";
-import { ShaderFunction, ShaderFunctionParsedDefine } from "./shader-function";
+import { ShaderFunction } from "./shader-function";
 import { GLDataType } from "../webgl/shader-util";
 import { InnerSupportUniform, UniformDescriptor, InnerUniformMapDescriptor, InnerUniformMap } from "../webgl/uniform/uniform";
 import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
@@ -9,6 +8,10 @@ export class ShaderNode extends DAGNode {
   constructor(
     public dataType: GLDataType) {
     super();
+  }
+
+  swizzling(part: string) {
+    
   }
 }
 
@@ -91,3 +94,12 @@ export class ShaderAttributeInputNode extends ShaderInputNode {
   attributeUsage: AttributeUsage
 }
 
+export class ShaderTextureInputNode extends ShaderInputNode {
+  constructor(des) {
+    super(des.name, des.type);
+  }
+
+  fetch(node: ShaderNode) {
+    
+  }
+}

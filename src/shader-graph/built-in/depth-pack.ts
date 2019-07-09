@@ -16,9 +16,8 @@ export const depthPack = new ShaderFunction({
 export const unPackDepth = new ShaderFunction({
   description: 'unpack depth from RGBA channel',
   source: `
-  float UnpackDepth( const in vec4 enc ) {
+  float UnpackDepth( vec4 enc ) {
     const vec4 bit_shift = vec4( 1.0 / ( 256.0 * 256.0 * 256.0 ), 1.0 / ( 256.0 * 256.0 ), 1.0 / 256.0, 1.0 );
-    float decoded = dot( enc, bit_shift );
-    return decoded;
+    return dot( enc, bit_shift );
 }`
 })

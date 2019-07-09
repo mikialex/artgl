@@ -7,40 +7,17 @@ import {
 } from "./shader-node";
 import { Nullable } from "../type";
 
-export enum ShaderGraphNodeInputType {
-  commonUniform,
-  innerUniform,
-  textureUniform,
-
-  shaderFunctionNode,
-  attribute,
-  varying,
-}
-
-
-export interface ShaderGraphDefineInput {
-  type: ShaderGraphNodeInputType,
-  value: string
-}
-
-export interface ShaderGraphNodeDefine {
-  name: string,
-  type: string,
-  input: { [index: string]: ShaderGraphDefineInput }
-}
-
-
 export class ShaderGraph {
-  fragmentRoot: Nullable<ShaderFunctionNode>;
-  vertexRoot: Nullable<ShaderFunctionNode>;
+  fragmentRoot: Nullable<ShaderNode>;
+  vertexRoot: Nullable<ShaderNode>;
   varyings: Map<string, ShaderNode> = new Map();
 
-  setFragmentRoot(root: ShaderFunctionNode): ShaderGraph {
+  setFragmentRoot(root: ShaderNode): ShaderGraph {
     this.fragmentRoot = root;
     return this;
   }
 
-  setVertexRoot(root: ShaderFunctionNode): ShaderGraph {
+  setVertexRoot(root: ShaderNode): ShaderGraph {
     this.vertexRoot = root;
     return this;
   }
