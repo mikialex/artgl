@@ -1,7 +1,6 @@
 import { ShaderGraph } from "../shader-graph";
 import { ShaderFunction } from "../shader-function";
 import { GLDataType } from "../../webgl/shader-util";
-import { makeUniform } from "../node-maker";
 
 const graph = new ShaderGraph();
 const composeAddVec4 = new ShaderFunction({

@@ -6,7 +6,7 @@ import { attribute, uniform, texture, innerUniform } from "../../shader-graph/no
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
 import { randDir3D } from "../../shader-graph/built-in/rand";
-import { getLastWorldPosition, NDCxyToUV } from "../../shader-graph/built-in/transform";
+import { getWorldPosition, NDCxyToUV } from "../../shader-graph/built-in/transform";
 
 const vertexShaderSource =
   `
@@ -124,11 +124,11 @@ export class SSAOTechnique extends Technique {
 
     const depth = depthTex.fetch(this.graph.getVary("v_uv"))
 
-    const worldPosition = getLastWorldPosition.make()
-      .input("cood", this.graph.getVary("v_uv"))
+    const worldPosition = getWorldPosition.make()
+      .input("uv", this.graph.getVary("v_uv"))
       .input("depth", depth)
       .input("VPMatrix", VPMatrix)
-      .input("LastVPMatrixInverse", uniform("VPMatrixInverse", GLDataType.Mat4))
+      .input("VPMatrixInverse", uniform("VPMatrixInverse", GLDataType.Mat4))
 
     const randDir = randDir3D.make()
       .input("randA")
