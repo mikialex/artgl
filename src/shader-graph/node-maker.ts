@@ -10,7 +10,7 @@ export function attribute(att: AttributeDescriptor) {
 
 // TODO support default
 export function texture(name: string, type?: GLDataType) {
-  const t = type !== undefined ? type : GLDataType.floatVec3;
+  const t = type !== undefined ? type : GLDataType.floatVec4;
   return new ShaderTexture(name, t);
 }
 

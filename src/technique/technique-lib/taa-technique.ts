@@ -128,7 +128,7 @@ export class TAATechnique extends Technique {
         getLastPixelNDC.make()
           .input("ndc",
             UVDepthToNDC.make()
-              .input("depth", texture("depthResult").fetch(this.graph.getVary("v_uv")))
+              .input("depth", texture("depthResult").fetch(this.graph.getVary("v_uv")).swizzling("x"))
               .input("uv", this.graph.getVary("v_uv"))
             )
           .input("VPMatrixInverse",  uniform("VPMatrixInverse", GLDataType.Mat4))
@@ -138,8 +138,8 @@ export class TAATechnique extends Technique {
 
     this.graph.setFragmentRoot(
         TAAMix.make()
-          .input("oldColor", colorOld)
-          .input("newColor", texture("sceneResult").fetch(this.graph.getVary("v_uv")))
+          .input("oldColor", colorOld.swizzling("xyz"))
+          .input("newColor", texture("sceneResult").fetch(this.graph.getVary("v_uv")).swizzling("xyz"))
           .input("sampleCount", uniform("u_sampleCount", GLDataType.float))
     )
     

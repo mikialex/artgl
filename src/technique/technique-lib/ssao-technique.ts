@@ -40,17 +40,17 @@ const fragInclude = `
 const newSamplePosition = new ShaderFunction({
   source: `
   vec3 newPosition(vec3 positionOld, float distance, vec3 dir){
-    return distance * dir + positionOld
+    return distance * dir + positionOld;
   }
   `
 })
 
 const NDCFromWorldPositionAndVPMatrix = new ShaderFunction({
   source: `
-  float depthFromWorldPositionAndVPMatrix(vec3 position, mat4 matrix){
+  vec3 depthFromWorldPositionAndVPMatrix(vec3 position, mat4 matrix){
     vec4 ndc = matrix * newSamplePosition;
     ndc = ndc / ndc.w;
-    return ndc;
+    return ndc.xyz;
   }
   `
 })
@@ -123,7 +123,7 @@ export class SSAOTechnique extends Technique {
       ))
 
     const vUV = this.graph.getVary("v_uv");
-    const depth = depthTex.fetch(vUV)
+    const depth = unPackDepth.make().input("enc", depthTex.fetch(vUV))
 
     const worldPosition = getWorldPosition.make()
       .input("uv", vUV)
@@ -136,7 +136,7 @@ export class SSAOTechnique extends Technique {
       .input("randB", vUV.swizzling("y"))
 
     const newPositionRand = newSamplePosition.make()
-      .input("positionOld", worldPosition)
+      .input("positionOld", worldPosition.swizzling("xyz"))
       .input("distance", uniform("u_aoRadius", GLDataType.float))
       .input("dir", randDir)
 
@@ -157,10 +157,10 @@ export class SSAOTechnique extends Technique {
 
     this.graph.setFragmentRoot(
       tssaoMix.make()
-        .input("oldColor", texture("AOAcc").fetch(vUV))
+        .input("oldColor", texture("AOAcc").fetch(vUV).swizzling("xyz"))
         .input("newColor",
           sampleAO.make()
-            .input("depth", unPackDepth.make().input("enc", depth))
+            .input("depth", depth)
             .input("newDepth", newDepth)
         )
         .input("sampleCount", uniform("u_sampleCount", GLDataType.float))

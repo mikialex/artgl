@@ -17,9 +17,15 @@ export class ShaderNode extends DAGNode {
   enableSwizzle: boolean = false;
   swizzleType: string[] = [];
 
-  get returnType() {
+  get returnType(): GLDataType {
     if (this.enableSwizzle) {
-      return this.swizzleType.length
+      switch (this.swizzleType.length) {
+        case 1: return GLDataType.float
+        case 2: return GLDataType.floatVec2
+        case 3: return GLDataType.floatVec3
+        case 4: return GLDataType.floatVec4
+        default: throw "error"
+      }
     } else {
       return this.type
     }
@@ -31,6 +37,7 @@ export class ShaderNode extends DAGNode {
       throw "swizzle not valid"
     }
     this.swizzleType = parts;
+    this.enableSwizzle = true;
     return this;
   }
 
@@ -71,9 +78,9 @@ export class ShaderFunctionNode extends ShaderNode {
       throw `this shader function node has not a input which key is ${key}`
     }
     if (dataType !== node.returnType) {
-          console.warn("node:", this);
-          console.warn("inputNode:", node);
-          throw "constructFragmentGraph failed: type mismatch"
+      console.warn("node:", this);
+      console.warn("inputNode:", node);
+      throw "constructFragmentGraph failed: type mismatch"
     }
     this.connectTo(node);
     this.inputMap.set(key, node);
@@ -127,7 +134,7 @@ export class ShaderConstNode extends ShaderNode {
     } else if (value instanceof Vector4) {
       super(GLDataType.floatVec4)
     } else {
-      
+
     }
     this.value = value;
   }

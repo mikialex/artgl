@@ -58,8 +58,8 @@ export class TSSAOBlendTechnique extends Technique {
     ))
       .setFragmentRoot(
         tssaoBlend.make()
-          .input("color", texture("basic").fetch(this.graph.getVary('uv')))
-          .input("aocolor", texture("tssao").fetch(this.graph.getVary('uv')))
+          .input("color", texture("basic").fetch(this.graph.getVary('v_uv')).swizzling("xyz"))
+          .input("aocolor", texture("tssao").fetch(this.graph.getVary('v_uv')).swizzling("xyz"))
           .input('sampleCount', uniform("u_sampleCount", GLDataType.float))
           .input('tssaoComposeRate', uniform("u_tssaoComposeRate", GLDataType.float))
           .input('tssaoShowThreshold', uniform("u_tssaoShowThreshold", GLDataType.float))

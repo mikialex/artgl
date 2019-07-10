@@ -33,7 +33,7 @@ export const NDCxyToUV = new ShaderFunction({
 
 export const UVDepthToNDC = new ShaderFunction({
   source: `
-  vec2 UVDepthToNDC(float depth, vec2 uv){
+  vec4 UVDepthToNDC(float depth, vec2 uv){
     return vec4(uv, depth, 1.0);
   }`
 })
