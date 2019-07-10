@@ -44,8 +44,9 @@ const TAAMix = new ShaderFunction({
   vec4 TAAMix (vec3 oldColor, vec3 newColor, float sampleCount){
     float rate = 0.05;
     if(sampleCount < 0.1){
-      vec3 clampedOldColor = getClampColor(v_uv, oldColor);
-      return vec4(newColor * rate + (1.0 - rate) * clampedOldColor, 1.0);
+      // vec3 clampedOldColor = getClampColor(v_uv, oldColor);
+      // return vec4(newColor * rate + (1.0 - rate) * clampedOldColor, 1.0);
+      return vec4(newColor * rate + (1.0 - rate) * oldColor, 1.0);
     } else{
       return vec4((oldColor * sampleCount + newColor) / (sampleCount + 1.0), 1.0);
     }

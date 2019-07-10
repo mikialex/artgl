@@ -14,9 +14,26 @@ export class ShaderNode extends DAGNode {
     super();
   }
 
-  swizzling(part: string) {
-    return new ShaderSwizzleNode(this).swizzle(part);
+  enableSwizzle: boolean = false;
+  swizzleType: string[] = [];
+
+  get returnType() {
+    if (this.enableSwizzle) {
+      return this.swizzleType.length
+    } else {
+      return this.type
+    }
   }
+
+  swizzling(swizzleType: string) {
+    const parts = swizzleType.trim().split("");
+    if (parts.length > 4) {
+      throw "swizzle not valid"
+    }
+    this.swizzleType = parts;
+    return this;
+  }
+
 }
 
 /**
@@ -53,7 +70,7 @@ export class ShaderFunctionNode extends ShaderNode {
     if (dataType === undefined) {
       throw `this shader function node has not a input which key is ${key}`
     }
-    if (dataType !== node.type) {
+    if (dataType !== node.returnType) {
           console.warn("node:", this);
           console.warn("inputNode:", node);
           throw "constructFragmentGraph failed: type mismatch"
@@ -152,35 +169,6 @@ export class ShaderSwizzleNode extends ShaderNode {
   constructor(node: ShaderNode) {
     super(node.type);
     this.connectTo(node);
-  }
-  swizzleType: string[]
-
-  swizzle(swizzleType: string): ShaderNode {
-
-    const parts = swizzleType.trim().split("");
-    if (parts.length > 4) {
-      throw "swizzle not valid"
-    }
-    this.swizzleType = parts;
-    switch (parts.length) {
-      case 1:
-        this.type = GLDataType.float;
-        break;
-      case 2:
-        this.type = GLDataType.floatVec2;
-      break;
-      case 3:
-        this.type = GLDataType.floatVec3;
-      break;
-      case 4:
-        this.type = GLDataType.floatVec4;
-        break;
-    
-      default:
-        break;
-    }
-
-    return this;
   }
 
 }

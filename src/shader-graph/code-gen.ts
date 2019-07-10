@@ -84,7 +84,7 @@ function genTempVarExpFromShaderNode(
 
 
 function codeGenGraph(
-  root: ShaderFunctionNode,
+  root: ShaderNode,
   rootOutputName: string): string {
   builder.reset();
   const nodeDependList = root.generateDependencyOrderList() as ShaderNode[];

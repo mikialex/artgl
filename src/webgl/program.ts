@@ -94,6 +94,10 @@ export class GLProgram{
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
 
+  getConfig(): Readonly<GLProgramConfig>{
+    return this.config;
+  }
+
   framebufferTextureMap: { [index: string]: string } = {};
 
   drawFrom: number = 0;
@@ -102,8 +106,8 @@ export class GLProgram{
   indexUINT: boolean = false;
 
 
-  public defineFrameBufferTextureDep(frambufferName: string, uniformName: string) {
-    this.framebufferTextureMap[uniformName] = frambufferName;
+  public defineFrameBufferTextureDep(framebufferName: string, uniformName: string) {
+    this.framebufferTextureMap[uniformName] = framebufferName;
   }
 
   public forUniforms(cb: (uniform: GLUniform) => any): void {

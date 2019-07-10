@@ -381,6 +381,14 @@ export class ARTEngine implements GLReleasable{
     return program;
   }
 
+  deleteProgram(technique: Technique) {
+    const program = this.programTechniqueMap.get(technique);
+    if (program !== undefined) {
+      program.dispose();
+      this.programTechniqueMap.delete(technique);
+    }
+  }
+
   getGLAttributeBuffer(bufferData: BufferData): WebGLBuffer {
     return this.renderer.attributeBufferManager.getGLBuffer(bufferData.data.buffer as ArrayBuffer);
   }

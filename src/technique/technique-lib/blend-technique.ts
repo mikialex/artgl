@@ -14,7 +14,7 @@ const tssaoBlend = new ShaderFunction({
     float sampleCount, 
     float tssaoComposeRate,
     float tssaoShowThreshold,
-    float tssaoComposeThreshold,
+    float tssaoComposeThreshold
     ) {
     vec3 aoModify = vec3(1.0) - tssaoComposeRate * (vec3(1.0) - aocolor) * vec3(min(sampleCount / tssaoShowThreshold, 1.0));
     aoModify = clamp(aoModify + vec3(tssaoComposeThreshold), vec3(0.0), vec3(1.0));

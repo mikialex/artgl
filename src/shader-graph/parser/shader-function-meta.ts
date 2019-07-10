@@ -28,7 +28,7 @@ export const paramList = oneParam.manySepBy(",").between("(", ")");
 // const paramList = oneParam.manySepBy(",").maybe(Parjs.string(",").q).then(Parjs.whitespaces.q);
 // const paramList = Parjs.whitespaces.maybe(oneParam).manySepBy(",")
 
-const functionBody = Parjs.string("{").q.then(Parjs.anyChar.manyTill(Parjs.string("}"))).map(
+const functionBody = Parjs.string("{").q.then(Parjs.anyChar.manyTill(Parjs.string("}#"))).map(
   value => value.join("")
 )
 
@@ -46,7 +46,8 @@ export const functionp = Parjs.seq(
 
 export function parseShaderFunctionMetaInfo(input: ShaderFunctionDefine): ShaderFunctionParsedDefine {
   try {
-    const result = functionp.parse(input.source).value
+    const s = input.source.trim() + "#"
+    const result = functionp.parse(s).value
     const inputMap = {};
     result[2].forEach(item => {
       inputMap[item.name] = item.type;
