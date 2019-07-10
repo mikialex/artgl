@@ -14,9 +14,12 @@ export class Technique{
   constructor() {
     this.update();
     this.needRebuildShader = false;
+    this.createProgramConfig();
   }
   graph: ShaderGraph = new ShaderGraph();
   needRebuildShader: boolean = true;
+  _programConfigCache: GLProgramConfig;
+
   name: string = "no named technique";
   uuid: string = generateUUID();
   _techniqueId: string;
@@ -41,16 +44,17 @@ export class Technique{
     let program = engine.getProgram(this);
     if (program === undefined) {
       program = engine.createProgram(this);
-      this.uniforms.clear();
-      program.getConfig().uniforms.forEach(uniform => {
-        this.uniforms.set(uniform.name, new UniformProxy(uniform.default));
-      })
     }
     return program;
   }
 
   createProgramConfig(): GLProgramConfig{
     const config = this.graph.compile();
+    this.uniforms.clear();
+    config.uniforms.forEach(uniform => {
+      this.uniforms.set(uniform.name, new UniformProxy(uniform.default));
+    })
+    this._programConfigCache = config;
     return config;
   }
 

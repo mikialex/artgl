@@ -28,3 +28,25 @@ Performance matters.
 
 ....
 
+Some sample code here:
+
+```ts
+
+const scene = new Scene();
+const light = new PointLight();
+
+scene.add(light)
+
+const mesh = new Mesh();
+
+mesh.geometry = new SphereGeometry();
+mesh.material = new Material();
+mesh.material.channel(Channel.Diffuse).load("../diff.png");
+
+mesh.shading = (new MeshBasicShading()).decorate();
+mesh.shadingParam = mesh.shading.make();
+mesh.shading.set("opacity", 0.5);
+
+mesh.lights = 
+
+```
