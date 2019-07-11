@@ -3,7 +3,7 @@ import { ShaderFunction } from "./shader-function";
 import { getShaderTypeStringFromGLDataType } from "../webgl/shader-util";
 import { findFirst } from "../util/array";
 import { CodeBuilder } from "./util/code-builder";
-import { ShaderFunctionNode, ShaderNode } from "./shader-node";
+import { ShaderFunctionNode, ShaderNode, ShaderInputNode } from "./shader-node";
 
 const builder = new CodeBuilder()
 
@@ -11,7 +11,7 @@ export function genFragShader(graph: ShaderGraph): string {
   let result = "";
   result += genShaderFunctionDepend(graph)
   result += "\n"
-  result += codeGenGraph(graph.effectRoot, "gl_FragColor")
+  result += codeGenGraph(graph.fragmentRoot, "gl_FragColor")
   return result;
 }
 
@@ -20,7 +20,7 @@ export function genVertexShader(graph: ShaderGraph): string {
   let result = "";
   result += genShaderFunctionDepend(graph)
   result += "\n"
-  result += codeGenGraph(graph.transformRoot, "gl_Position")
+  result += codeGenGraph(graph.vertexRoot, "gl_Position")
   return result;
 }
 
@@ -28,10 +28,10 @@ export function genVertexShader(graph: ShaderGraph): string {
 
 function genShaderFunctionDepend(graph: ShaderGraph): string {
   let functionsStr = "\n";
-  const dependFunctions = {};
-  graph.functionNodes.forEach(node => {
-    if (dependFunctions[node.factory.define.name] === undefined) {
-      dependFunctions[node.factory.define.name] = node.factory;
+  const dependFunctions = new Set();
+  graph.nodes.forEach(node => {
+    if (node instanceof ShaderFunctionNode) {
+      dependFunctions.add(node.factory)
     }
   })
   Object.keys(dependFunctions).forEach(key => {
@@ -67,24 +67,24 @@ function genTempVarExpFromShaderNode(
     }
 
     let functionInputs = "";
-    functionDefine.inputs.forEach((_inputDefine, index) => {
-      const nodeDepend = node.getFromNodeByIndex(index) as ShaderNode;
+    Object.keys(functionDefine.inputs).forEach((key, index) => {
+      const nodeDepend = node.inputMap.get(key) as ShaderNode;
       functionInputs += getParamKeyFromVarList(ctx, nodeDepend);
-      if (index !== functionDefine.inputs.length - 1) {
+      if (index !== Object.keys(functionDefine.inputs).length - 1) {
         functionInputs += ", "
       }
-
     })
+
     const result = `${functionDefine.name}(${functionInputs});`
     return result;
   } else {
-    return node.name + ';';
+    return (node as ShaderInputNode).name + ';';
   }
 }
 
 
 function codeGenGraph(
-  root: ShaderFunctionNode,
+  root: ShaderNode,
   rootOutputName: string): string {
   builder.reset();
   const nodeDependList = root.generateDependencyOrderList() as ShaderNode[];
@@ -105,7 +105,7 @@ function codeGenGraph(
       if (varRc.refedNode instanceof ShaderFunctionNode) {
         varType = getShaderTypeStringFromGLDataType(varRc.refedNode.factory.define.returnType);
       } else {
-        varType = getShaderTypeStringFromGLDataType(varRc.refedNode.dataType);
+        varType = getShaderTypeStringFromGLDataType((varRc.refedNode as ShaderInputNode).type);
       }
       builder.writeLine(`${varType} ${varRc.varKey} = ${varRc.expression}`)
     } else {
@@ -122,9 +122,9 @@ function genShaderFunctionDeclare(shaderFunction: ShaderFunction): string {
   const functionDefine = shaderFunction.define;
   const varType = getShaderTypeStringFromGLDataType(functionDefine.returnType);
   let functionInputs = "";
-  functionDefine.inputs.forEach((inputDefine, index) => {
-    const paramType = getShaderTypeStringFromGLDataType(inputDefine.type);
-    const paramStr = `${paramType} ${inputDefine.name}`
+  Object.keys(functionDefine.inputs).forEach((key, index) => {
+    const paramType = getShaderTypeStringFromGLDataType(functionDefine.inputs[key]);
+    const paramStr = `${paramType} ${key}`
     functionInputs += paramStr
     if (index !== functionDefine.inputs.length - 1) {
       functionInputs += ", "

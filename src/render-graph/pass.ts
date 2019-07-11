@@ -1,5 +1,5 @@
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
-import { ARTEngine, RenderSource } from "../engine/render-engine";
+import { ARTEngine } from "../engine/render-engine";
 import { Technique } from "../core/technique";
 import { RenderGraph } from "./render-graph";
 import { PassDefine, PassInputMapInfo } from "./interface";
@@ -13,7 +13,7 @@ export class RenderPass{
     this.define = define;
     this.name = define.name;
     if (define.technique !== undefined) {
-      const overrideTechnique = graph.getResgisteredTechnique(define.technique);
+      const overrideTechnique = define.technique;
       if (overrideTechnique === undefined) {
         throw `technique '${define.technique}' not defined`
       }
@@ -26,19 +26,6 @@ export class RenderPass{
 
     this.beforePassExecute = define.beforePassExecute;
     this.afterPassExecute = define.afterPassExecute;
-
-    define.source.forEach(so => {
-      let source: RenderSource;
-      if (this.graph.isInnerSourceType(so)) {
-        source = this.graph.getInnerSource(so);
-      } else {
-        source = graph.getRegisteredSource(so);
-        if (source === undefined) {
-          throw `renderSource '${so}' not defined`
-        }
-      }
-      this.sourceUse.push(source);
-    })
 
   }
 
@@ -61,8 +48,6 @@ export class RenderPass{
   private afterPassExecute?: () => any;
   private beforePassExecute?: () => any;
   
-
-  private sourceUse: RenderSource[] = [];
   private overrideTechnique: Nullable<Technique> = null;
 
   // key: uniformName ;   value: inputFramebufferName
@@ -95,9 +80,6 @@ export class RenderPass{
   static screenDebugViewPort = new Vector4(200, 0, 200, 200)
   execute() {
     const engine = this.graph.engine;
-    // if (this.isOutputScreen) {
-    //   return
-    // }
 
     // setup viewport and render target
     if (this.isOutputScreen) {
@@ -116,8 +98,6 @@ export class RenderPass{
       engine.renderer.setRenderTarget(this.outputTarget);
       engine.renderer.state.setViewport(0, 0, this.outputTarget.width, this.outputTarget.height);
     }
-
-    this.checkIsValid();
   
     // input binding 
     if (this.overrideTechnique !== null) {
@@ -147,10 +127,9 @@ export class RenderPass{
     }
 
     //////  render //////
-    for (let i = 0; i < this.sourceUse.length; i++) {
-      const source = this.sourceUse[i];
+    this.define.source.forEach(source => {
       engine.render(source);
-    }
+    })
     /////////////////////
 
     if (this.afterPassExecute !== undefined) {
@@ -174,7 +153,8 @@ export class RenderPass{
     const target = this.outputTarget.name;
     this.inputTarget.forEach(input => {
       if (input === target) {
-        throw 'not valid'
+        throw `you cant output to the render target which is depend on: 
+Duplicate target: ${this.outputTarget.name};`
       }
     })
   }

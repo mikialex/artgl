@@ -60,7 +60,7 @@ test('param list parser', () => {
 test('function parser', () => {
   expect(functionp.parse( 
     `
-    vec4 depth_pack (float frag_depth) {a}
+    vec4 depth_pack (float frag_depth) {a}#
     `
   ).value).toStrictEqual(
     [

@@ -17,7 +17,7 @@ export function createConf(app: Application): RenderConfig {
                 value: app.engine.renderer.width,
                 onChange: (value: number) => {
                   app.sampleCount = 0;
-                  app.graph.engine.setActualSize(value, app.graph.engine.renderer.height);
+                  app.engine.setActualSize(value, app.engine.renderer.height);
                 },
                 editors: [
                   {
@@ -33,7 +33,7 @@ export function createConf(app: Application): RenderConfig {
                 value: app.engine.renderer.height,
                 onChange: (value: number) => {
                   app.sampleCount = 0;
-                  app.graph.engine.setActualSize(app.graph.engine.renderer.width, value);
+                  app.engine.setActualSize(app.engine.renderer.width, value);
                 },
                 editors: [
                   {
@@ -53,16 +53,16 @@ export function createConf(app: Application): RenderConfig {
         value: [
           {
             name: 'preferUseVAO',
-            value: app.graph.engine.preferVAO,
+            value: app.engine.preferVAO,
             onChange: (value: boolean) => {
-              app.graph.engine.preferVAO = value
+              app.engine.preferVAO = value
             },
           },
           {
             name: 'enableUniformDiffUpload',
-            value: app.graph.engine.renderer.enableUniformDiff,
+            value: app.engine.renderer.enableUniformDiff,
             onChange: (value: boolean) => {
-              app.graph.engine.renderer.enableUniformDiff = value
+              app.engine.renderer.enableUniformDiff = value
             },
             description: 'this is a demo description'
           },

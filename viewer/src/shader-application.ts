@@ -1,4 +1,4 @@
-import { ShaderGraph, ShaderGraphNodeInputType } from '../../src/shader-graph/shader-graph';
+import { ShaderGraph } from '../../src/shader-graph/shader-graph';
 import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
 import { ARTEngine, Technique, Mesh, Interactor, OrbitController, PerspectiveCamera } from '../../src/artgl';
 import { GLDataType } from '../../src/webgl/shader-util';
@@ -34,134 +34,111 @@ export class ShaderApplication {
     this.tick();
     this.start();
 
-    this.graph.registerShaderFunction(new ShaderFunction({
-      source: `
-      vec4 diffuse(vec3 diffuseColor){
-        return vec4(diffuseColor, 1.0);
-      }`
-    }))
 
-    // this.graph.setFragmentRoot(
-    //   composeAddVec4.input({
-    //     sourceA: diffuse.input({
-    //       diffuseColor: makeUniform({
-    //         name: "u_color1",
-    //         type: GLDataType.floatVec3,
-    //       })
-    //     }),
-    //     sourceB: diffuse.input({
-    //       diffuseColor: makeUniform({
-    //         name: "u_color2",
-    //         type: GLDataType.floatVec3,
-    //       })
-    //     }),
-    //   })
-    // )
+    // this.graph.setGraph({
+    //   uniforms: [
+    //     { name: 'u_color1', type: GLDataType.floatVec3 },
+    //     { name: 'u_color2', type: GLDataType.floatVec3 },
+    //   ],
 
-    this.graph.setGraph({
-      uniforms: [
-        { name: 'u_color1', type: GLDataType.floatVec3 },
-        { name: 'u_color2', type: GLDataType.floatVec3 },
-      ],
+    //   uniformsIncludes: [
+    //     { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix, },
+    //     { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix, }
+    //   ],
 
-      uniformsIncludes: [
-        { name: 'MMatrix', mapInner: InnerSupportUniform.MMatrix, },
-        { name: 'VPMatrix', mapInner: InnerSupportUniform.VPMatrix, }
-      ],
+    //   textures: [
+    //     { name: 'copySource', type: GLTextureType.texture2D },
+    //   ],
 
-      textures: [
-        { name: 'copySource', type: GLTextureType.texture2D },
-      ],
+    //   varyings: [
+    //     { name: 'color', type: GLDataType.floatVec3 }
+    //   ],
 
-      varyings: [
-        { name: 'color', type: GLDataType.floatVec3 }
-      ],
-
-      attributes: [
-        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position },
-        { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal },
-      ],
+    //   attributes: [
+    //     { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position },
+    //     { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal },
+    //   ],
 
 
-      // declare your fragment shader graph
-      // fragment shader graph should have a root node
-      // which output is gl_FragColor as the screen fragment output
-      effect: [
-        {
-          name: "effectOutput",
-          type: "composeAddVec4",
-          input: {
-            sourceA: {
-              type: ShaderGraphNodeInputType.shaderFunctionNode,
-              value: "diffuse"
-            },
-            sourceB: {
-              type: ShaderGraphNodeInputType.shaderFunctionNode,
-              value: "IBL"
-            },
-          }
-        },
-        {
-          name: "diffuse",
-          type: "diffuse",
-          input: {
-            diffuseColor: {
-              type: ShaderGraphNodeInputType.commonUniform,
-              value: "u_color1"
-            }
-          }
-        },
-        {
-          name: "IBL",
-          type: "diffuse",
-          input: {
-            diffuseColor: {
-              type: ShaderGraphNodeInputType.commonUniform,
-              value: "u_color2"
-            }
-          }
-        },
-      ],
-      effectRoot: "effectOutput",
+    //   // declare your fragment shader graph
+    //   // fragment shader graph should have a root node
+    //   // which output is gl_FragColor as the screen fragment output
+    //   effect: [
+    //     {
+    //       name: "effectOutput",
+    //       type: "composeAddVec4",
+    //       input: {
+    //         sourceA: {
+    //           type: ShaderGraphNodeInputType.shaderFunctionNode,
+    //           value: "diffuse"
+    //         },
+    //         sourceB: {
+    //           type: ShaderGraphNodeInputType.shaderFunctionNode,
+    //           value: "IBL"
+    //         },
+    //       }
+    //     },
+    //     {
+    //       name: "diffuse",
+    //       type: "diffuse",
+    //       input: {
+    //         diffuseColor: {
+    //           type: ShaderGraphNodeInputType.commonUniform,
+    //           value: "u_color1"
+    //         }
+    //       }
+    //     },
+    //     {
+    //       name: "IBL",
+    //       type: "diffuse",
+    //       input: {
+    //         diffuseColor: {
+    //           type: ShaderGraphNodeInputType.commonUniform,
+    //           value: "u_color2"
+    //         }
+    //       }
+    //     },
+    //   ],
+    //   effectRoot: "effectOutput",
 
-      // declare your vertex shader graph
-      // like frag, we export the graph root as gl_Position
-      transform: [
-        {
-          name: "transformOutput",
-          type: "VPtransform",
-          input: {
-            VPMatrix: {
-              type: ShaderGraphNodeInputType.innerUniform,
-              value: "VPMatrix"
-            },
-            MMatrix: {
-              type: ShaderGraphNodeInputType.innerUniform,
-              value: "MMatrix"
-            },
-            position: {
-              type: ShaderGraphNodeInputType.attribute,
-              value: "position"
-            }
-          }
-        },
-      ],
-      transformRoot: "transformOutput",
+    //   // declare your vertex shader graph
+    //   // like frag, we export the graph root as gl_Position
+    //   transform: [
+    //     {
+    //       name: "transformOutput",
+    //       type: "VPtransform",
+    //       input: {
+    //         VPMatrix: {
+    //           type: ShaderGraphNodeInputType.innerUniform,
+    //           value: "VPMatrix"
+    //         },
+    //         MMatrix: {
+    //           type: ShaderGraphNodeInputType.innerUniform,
+    //           value: "MMatrix"
+    //         },
+    //         position: {
+    //           type: ShaderGraphNodeInputType.attribute,
+    //           value: "position"
+    //         }
+    //       }
+    //     },
+    //   ],
+    //   transformRoot: "transformOutput",
 
 
-    })
+    // })
 
     window.addEventListener('resize', this.onContainerResize);
     this.onContainerResize();
   }
 
   updateShader() {
-    const newConf = this.graph.compile();
-    console.log(newConf)
-    this.technique = new Technique({
-      programConfig: newConf
-    });
-    this.mesh.technique = this.technique;
+    // const newConf = this.graph.compile();
+    // console.log(newConf)
+    // this.technique = new Technique({
+    //   programConfig: newConf
+    // });
+    // this.mesh.technique = this.technique;
   }
 
   loadScene() {

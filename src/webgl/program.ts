@@ -26,7 +26,7 @@ export interface GLProgramConfig {
   useIndex?: boolean;
 }
 
-function fullfillProgramConfig(config: GLProgramConfig){
+function fulfillProgramConfig(config: GLProgramConfig){
   if (config.useIndex === undefined) {
     config.useIndex = true;
   }
@@ -45,7 +45,7 @@ function fullfillProgramConfig(config: GLProgramConfig){
 
 export class GLProgram{
   constructor(renderer: GLRenderer, config: GLProgramConfig) {
-    fullfillProgramConfig(config);
+    fulfillProgramConfig(config);
     this.renderer = renderer;
     this.id = generateUUID();
 
@@ -94,6 +94,10 @@ export class GLProgram{
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
 
+  getConfig(): Readonly<GLProgramConfig>{
+    return this.config;
+  }
+
   framebufferTextureMap: { [index: string]: string } = {};
 
   drawFrom: number = 0;
@@ -102,8 +106,8 @@ export class GLProgram{
   indexUINT: boolean = false;
 
 
-  public defineFrameBufferTextureDep(frambufferName: string, uniformName: string) {
-    this.framebufferTextureMap[uniformName] = frambufferName;
+  public defineFrameBufferTextureDep(framebufferName: string, uniformName: string) {
+    this.framebufferTextureMap[uniformName] = framebufferName;
   }
 
   public forUniforms(cb: (uniform: GLUniform) => any): void {

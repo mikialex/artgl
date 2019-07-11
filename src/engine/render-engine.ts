@@ -72,7 +72,7 @@ export class ARTEngine implements GLReleasable{
     this._preferVAO = val;
     if (val) {
       if (!this.renderer.vaoManager.isSupported) {
-        console.warn(`prefer vao is set to true, but your environvent cant support vao, vaoEnabled is false`)
+        console.warn(`prefer vao is set to true, but your environment cant support vao, vaoEnabled is false`)
       }
       this._vaoEnabled = true
     } else {
@@ -311,6 +311,7 @@ export class ARTEngine implements GLReleasable{
     }
 
     program.forAttributes(att => {
+      // TODO should not by name but by attributeUsage
       const bufferData = geometry.bufferDatum[att.name];
       if (bufferData === undefined) {
         throw `program ${program.name} needs an attribute named ${att.name}, but cant find in geometry data`;
@@ -375,9 +376,17 @@ export class ARTEngine implements GLReleasable{
   }
 
   createProgram(technique: Technique): GLProgram  {
-    const program = this.renderer.createProgram(technique.config.programConfig);
+    const program = this.renderer.createProgram(technique.createProgramConfig());
     this.programTechniqueMap.set(technique, program);
     return program;
+  }
+
+  deleteProgram(technique: Technique) {
+    const program = this.programTechniqueMap.get(technique);
+    if (program !== undefined) {
+      program.dispose();
+      this.programTechniqueMap.delete(technique);
+    }
   }
 
   getGLAttributeBuffer(bufferData: BufferData): WebGLBuffer {

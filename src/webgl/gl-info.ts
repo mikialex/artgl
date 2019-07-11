@@ -1,7 +1,5 @@
 // https://github.com/pissang/claygl/blob/master/src/core/GLInfo.js
 
-import { GLRenderer } from "./gl-renderer";
-
 export enum GLExtList {
   OES_texture_float = "OES_texture_float",
   OES_texture_half_float = "OES_texture_half_float",
@@ -28,18 +26,17 @@ const EXTENSION_LIST = Object.keys(GLExtList);
 const PARAMETER_NAMES = Object.keys(GLParamList);
 
 export class GLInfo{
-  constructor(renderer: GLRenderer) {
-    this.renderer = renderer;
-    const gl = renderer.gl;
+  constructor(gl: WebGLRenderingContext) {
+    this.gl = gl;
     this.createAllExtension();
     this.getAllParams();
   }
-  renderer: GLRenderer;
+  private gl: WebGLRenderingContext
   private extensions: { [index: string]: any } = {}
   private parameters: { [index: string]: any } = {}
 
   private createExtension(name: string) {
-    const gl = this.renderer.gl;
+    const gl = this.gl;
     var ext = gl.getExtension(name);
     if (!ext) {
       ext = gl.getExtension('MOZ_' + name);
@@ -71,7 +68,7 @@ export class GLInfo{
   private getAllParams() {
     for (var i = 0; i < PARAMETER_NAMES.length; i++) {
       var name = PARAMETER_NAMES[i];
-      this.parameters[name] = this.renderer.gl.getParameter((this.renderer.gl as any)[name]);
+      this.parameters[name] = this.gl.getParameter((this.gl as any)[name]);
     }
   }
 }

@@ -1,5 +1,4 @@
 import { GLDataType } from "../webgl/shader-util";
-import { ShaderGraphNodeDefine } from "./shader-graph";
 import { ShaderFunctionNode } from "./shader-node";
 import { parseShaderFunctionMetaInfo } from "./parser/shader-function-meta";
 
@@ -8,24 +7,13 @@ export interface ShaderFunctionDefine {
   description?: string;
 }
 
-export interface ShaderFunctionInput{
-  name: string
-  type: GLDataType,
-}
-
 export interface ShaderFunctionParsedDefine{
   name: string;
   description?: string;
   source: string;
-  inputs: ShaderFunctionInput[];
+  inputs: { [index: string]: GLDataType };
   returnType: GLDataType
 }
-
-
-export enum GLFragmentInnerVar{
-  
-}
-
 
 /**
  *  Define a shader function node factory
@@ -41,9 +29,8 @@ export class ShaderFunction{
 
   define: ShaderFunctionParsedDefine
 
-  createNode(define: ShaderGraphNodeDefine): ShaderFunctionNode {
-    const node = new ShaderFunctionNode(define, this.define);
-    node.factory = this;
+  make(): ShaderFunctionNode {
+    const node = new ShaderFunctionNode(this);
     return node;
   }
 

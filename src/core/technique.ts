@@ -2,10 +2,7 @@ import { generateUUID } from "../math/index";
 import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { ARTEngine } from "../engine/render-engine";
 import { UniformProxy } from "../engine/uniform-proxy";
-
-export interface TechniqueConfig {
-  programConfig: GLProgramConfig;
-}
+import { ShaderGraph } from "../shader-graph/shader-graph";
 
 /**
  * Technique defined how to draw a things typically, one technique is corespondent to a gl program.
@@ -14,18 +11,16 @@ export interface TechniqueConfig {
  *  under layer gl renderer to create and compiled shader.
  */
 export class Technique{
-  constructor(config: TechniqueConfig) {
-    // setup default uniform value
-    this.config = config;
-    if (this.config.programConfig.uniforms !== undefined) {
-      this.config.programConfig.uniforms.forEach(uniform => {
-        this.uniforms.set(uniform.name, new UniformProxy(uniform.default));
-      })
-    }
+  constructor() {
+    this.update();
+    this.needRebuildShader = false;
+    this.createProgramConfig();
   }
+  graph: ShaderGraph = new ShaderGraph();
+  needRebuildShader: boolean = true;
+  _programConfigCache: GLProgramConfig;
 
-  config: TechniqueConfig;
-  name: string = "noname technique";
+  name: string = "no named technique";
   uuid: string = generateUUID();
   _techniqueId: string;
 
@@ -34,21 +29,37 @@ export class Technique{
   uniforms: Map<string, UniformProxy> = new Map();
 
   /**
-   * t
+   * impl this to build your shader source
    */
+  update() {
+    throw "technique not impl"
+  }
+
   getProgram(engine: ARTEngine): GLProgram {
-    const program = engine.getProgram(this);
+    if (this.needRebuildShader) {
+      this.disposeProgram(engine);
+      this.update();
+      this.needRebuildShader = false;
+    }
+    let program = engine.getProgram(this);
     if (program === undefined) {
-      return engine.createProgram(this);
+      program = engine.createProgram(this);
     }
     return program;
   }
 
-  dispose(engine: ARTEngine): void {
-    const program = this.getProgram(engine);
-    if (program) {
-      program.dispose();
-    }
+  createProgramConfig(): GLProgramConfig{
+    const config = this.graph.compile();
+    this.uniforms.clear();
+    config.uniforms.forEach(uniform => {
+      this.uniforms.set(uniform.name, new UniformProxy(uniform.default));
+    })
+    this._programConfigCache = config;
+    return config;
+  }
+
+  disposeProgram(engine: ARTEngine): void {
+    engine.deleteProgram(this);
   }
 
 }

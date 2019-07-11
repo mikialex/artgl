@@ -40,26 +40,26 @@ export class GraphView {
 
   static createFromShaderGraph(graph: ShaderGraph) {
     const view = new GraphView();
-    graph.functionNodes.forEach(node => {
-      const nodeView = GraphNodeView.create(node)
-      view.nodeMap.set(node.uuid, nodeView)
-      view.nodes.push(nodeView);
-    })
-    graph.inputNodes.forEach(node => {
-      const nodeView = GraphNodeView.create(node)
-      view.nodeMap.set(node.uuid, nodeView)
-      view.nodes.push(nodeView);
-    })
+    // graph.functionNodes.forEach(node => {
+    //   const nodeView = GraphNodeView.create(node)
+    //   view.nodeMap.set(node.uuid, nodeView)
+    //   view.nodes.push(nodeView);
+    // })
+    // graph.inputNodes.forEach(node => {
+    //   const nodeView = GraphNodeView.create(node)
+    //   view.nodeMap.set(node.uuid, nodeView)
+    //   view.nodes.push(nodeView);
+    // })
     
-    view.nodes.forEach(node => {
-      node.inputsID.forEach(id => {
-        node.inputs.push(view.nodeMap.get(id));
-      })
-    })
+    // view.nodes.forEach(node => {
+    //   node.inputsID.forEach(id => {
+    //     node.inputs.push(view.nodeMap.get(id));
+    //   })
+    // })
 
-    view.rootNode = view.nodeMap.get(graph.effectRoot.uuid)
+    // view.rootNode = view.nodeMap.get(graph.effectRoot.uuid)
     
-    view.layout();
+    // view.layout();
     return view;
   }
 
@@ -134,7 +134,7 @@ export class GraphNodeView {
     const view = new GraphNodeView();
     view.uuid = node.uuid;
     view.inputsID = [];
-    node.forFromNode(node => {
+    node.fromNodes.forEach(node => {
       view.inputsID.push(node.uuid);
     })
 
@@ -153,13 +153,13 @@ export class GraphNodeView {
       view.name = node.name;
       view.type = GraphNodeViewType.targetNode;
     } else if (node instanceof ShaderFunctionNode) {
-      view.name = node.factory.define.name;
-      view.type = GraphNodeViewType.shaderFuncNode;
-      view.inputDefine = Object.keys(node.define.input).map(key => {
-        return {
-          name: key
-        }
-      })
+      // view.name = node.factory.define.name;
+      // view.type = GraphNodeViewType.shaderFuncNode;
+      // view.inputDefine = Object.keys(node.define.input).map(key => {
+      //   return {
+      //     name: key
+      //   }
+      // })
     }
     return view;
   }

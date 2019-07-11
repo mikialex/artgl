@@ -8,6 +8,7 @@ interface LightConfig{
 } 
 
 export class Light extends SceneNode{
+  shaderFunction: ShaderFunction;
   constructor() {
     super();
   }
@@ -17,16 +18,16 @@ export class Light extends SceneNode{
 const PointLightShader = new ShaderFunction({
   description: 'compute a pointlight output',
   source: `
-    vec3 pointLight(vec3 color, vec3 lightposition, vec3 normal){
+    vec3 pointLight(vec3 position, vec3 lightposition, vec3 normal){
       return sourceA + sourceB;
     }
   `,
 })
 
 export class PointLight extends Light {
-  static shaderFunction = PointLightShader;
   constructor() {
     super();
+    this.shaderFunction = PointLightShader;
   }
   color: Vector3
 }

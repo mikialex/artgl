@@ -82,10 +82,9 @@ export class RenderTargetNode extends DAGNode{
   private from: string = null;
 
   updateDependNode() {
-    if (this.from !== null) {
-      const passNode = this.graph.getRenderPassDependence(this.from);
-      passNode.deConnectTo(this);
-    }
+    
+    // disconnect depends pass node
+    this.clearAllFrom();
 
     this.from = this.fromGetter();
 
