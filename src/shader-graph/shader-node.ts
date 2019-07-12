@@ -82,7 +82,7 @@ export class ShaderFunctionNode extends ShaderNode {
       console.warn("inputNode:", node);
       throw "constructFragmentGraph failed: type mismatch"
     }
-    this.connectTo(node);
+    node.connectTo(this);
     this.inputMap.set(key, node);
     return this;
   }
@@ -149,7 +149,7 @@ export class ShaderTexture {
   }
 
   fetch(node: ShaderNode): ShaderTextureFetchNode {
-    return new ShaderTextureFetchNode(this);
+    return new ShaderTextureFetchNode(this).sample(node);
   }
 }
 
@@ -160,6 +160,13 @@ export class ShaderTextureFetchNode extends ShaderNode {
     super(source.type);
   }
 
+  fetchByNode: ShaderNode;
+
+  sample(node: ShaderNode) {
+    this.fetchByNode = node;
+    node.connectTo(this);
+    return this;
+  }
 }
 
 

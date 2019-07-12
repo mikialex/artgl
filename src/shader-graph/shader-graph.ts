@@ -69,6 +69,11 @@ export class ShaderGraph {
     this.vertexRoot.traverseDFS(node => {
       nodes.add(node as ShaderNode);
     })
+    this.varyings.forEach(vary => {
+      vary.traverseDFS(node => {
+        nodes.add(node as ShaderNode);
+      })
+    })
     const nodeList: ShaderNode[] = [];
     nodes.forEach(n => {
       nodeList.push(n);

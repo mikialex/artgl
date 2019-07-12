@@ -3,7 +3,7 @@ import { ShaderFunction } from "./shader-function";
 import { getShaderTypeStringFromGLDataType } from "../webgl/shader-util";
 import { findFirst } from "../util/array";
 import { CodeBuilder } from "./util/code-builder";
-import { ShaderFunctionNode, ShaderNode, ShaderInputNode } from "./shader-node";
+import { ShaderFunctionNode, ShaderNode, ShaderInputNode, ShaderTextureFetchNode } from "./shader-node";
 
 const builder = new CodeBuilder()
 
@@ -28,14 +28,14 @@ export function genVertexShader(graph: ShaderGraph): string {
 
 function genShaderFunctionDepend(graph: ShaderGraph): string {
   let functionsStr = "\n";
-  const dependFunctions = new Set();
+  const dependFunctions = new Set<ShaderFunction>();
   graph.nodes.forEach(node => {
     if (node instanceof ShaderFunctionNode) {
       dependFunctions.add(node.factory)
     }
   })
-  Object.keys(dependFunctions).forEach(key => {
-    functionsStr += genShaderFunctionDeclare(dependFunctions[key])
+  dependFunctions.forEach(func => {
+    functionsStr += genShaderFunctionDeclare(func)
   })
   return functionsStr
 }
@@ -51,20 +51,25 @@ function genTempVarExpFromShaderNode(
   node: ShaderNode,
   ctx: varRecord[]
 ): string {
+  function getParamKeyFromVarList(ctx: varRecord[], node: ShaderNode): string {
+    const record = findFirst(ctx, varRc => {
+      return varRc.refedNode === node
+    })
+
+    if (record === undefined) {
+      throw "_var_miss"
+    }
+
+    // if depends input node, just use it.
+    if (record.refedNode instanceof ShaderInputNode) {
+      return record.refedNode.name;
+    }
+
+    return record.varKey
+  }
+
   if (node instanceof ShaderFunctionNode) {
     const functionDefine = node.factory.define;
-
-    function getParamKeyFromVarList(ctx: varRecord[], node: ShaderNode): string {
-      const record = findFirst(ctx, varRc => {
-        return varRc.refedNode === node
-      })
-
-      if (record === undefined) {
-        return "_var_miss"
-      } else {
-        return record.varKey
-      }
-    }
 
     let functionInputs = "";
     Object.keys(functionDefine.inputs).forEach((key, index) => {
@@ -77,9 +82,17 @@ function genTempVarExpFromShaderNode(
 
     const result = `${functionDefine.name}(${functionInputs});`
     return result;
-  } else {
+  }
+
+  if (node instanceof ShaderInputNode) {
     return (node as ShaderInputNode).name + ';';
   }
+
+  if (node instanceof ShaderTextureFetchNode) {
+    return `texture2D(${node.source.name}, ${getParamKeyFromVarList(ctx, node.fetchByNode)})`
+  }
+
+  throw "unknown shader node"
 }
 
 

@@ -60,6 +60,8 @@ export class Application {
     this.tssaoTech = SSAOTech;
     this.composeTech = copyTech;
     const depthTech = new DepthTechnique()
+
+    return;
     
     this.graph.setGraph({
       renderTargets: [

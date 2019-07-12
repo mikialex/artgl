@@ -30,12 +30,12 @@ Performance matters.
 
 ## Some sample here:
 
-This may not work yet, contribution welcomed;
+**This may not work yet now, contribution welcomed;**
 
 ### Shading API
 
 Decouple light effect with material effect, decorate any shading with
-any other light shading.
+any other shading.
 
 ```ts
 
@@ -69,7 +69,7 @@ const engine = new ARTEngine(canvas);
 const graph = new RenderGraph(this.engine);
 
 // this is not a real example, just demo how it looks
-graph.setGraph(
+graph.setGraph({
   renderTargets: [
     {
       name: RenderGraph.screenRoot,
@@ -85,41 +85,40 @@ graph.setGraph(
     },
     ...
   ],
-    passes: [
-      { // general scene origin
-        name: "SceneOrigin",
-        source: [this.scene],
+  passes: [
+    { // general scene origin
+      name: "SceneOrigin",
+      source: [this.scene],
+    },
+    { // depth
+      name: "Depth",
+      technique: depthTech,
+      source: [this.scene],
+    },
+    { // mix new render and old samples
+      name: "TAA",
+      inputs: () => {
+        return {
+          sceneResult: "sceneResult",
+          depthResult: "depthResult",
+          TAAHistoryOld: this.isEvenTick ? "TAAHistoryA" : "TAAHistoryB",
+        }
       },
-      { // depth
-        name: "Depth",
-        technique: depthTech,
-        source: [this.scene],
+      technique: TAATech,
+      source: [RenderGraph.quadSource],
+      enableColorClear: false,
+      beforePassExecute: () => {
+        this.engine.unJit();
+        const VPInv: Matrix4 = TAATech.uniforms.get('VPMatrixInverse').value;
+        const VP: Matrix4 = this.engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
+        VPInv.getInverse(VP, true);
+        TAATech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
+        TAATech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
       },
-      { // mix new render and old samples
-        name: "TAA",
-        inputs: () => {
-          return {
-            sceneResult: "sceneResult",
-            depthResult: "depthResult",
-            TAAHistoryOld: this.isEvenTick ? "TAAHistoryA" : "TAAHistoryB",
-          }
-        },
-        technique: TAATech,
-        source: [RenderGraph.quadSource],
-        enableColorClear: false,
-        beforePassExecute: () => {
-          this.engine.unJit();
-          const VPInv: Matrix4 = TAATech.uniforms.get('VPMatrixInverse').value;
-          const VP: Matrix4 = this.engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
-          VPInv.getInverse(VP, true);
-          TAATech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
-          TAATech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
-        },
-      }
-      ...
-    ]
-  }
-)
+    }
+    ...
+  ]
+})
 
 ```
 
@@ -181,6 +180,5 @@ this.graph.setFragmentRoot(
     )
     .input("sampleCount", uniform("u_sampleCount", GLDataType.float))
 )
-}
 
 ```
