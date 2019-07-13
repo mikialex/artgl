@@ -23,6 +23,7 @@ const tssaoBlend = new ShaderFunction({
 })
 
 export class TSSAOBlendTechnique extends Technique {
+  name = "tssaoTechnique"
   // constructor() {
   //   super({
   //     attributes: [

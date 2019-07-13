@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from './views/home.vue'
 import Viewer from './views/viewer.vue'
 import ShaderEditor from './views/shader-editor.vue'
+import Debug from './views/debug.vue'
 
 Vue.use(Router)
 
@@ -12,6 +13,11 @@ export default new Router({
       path: '/',
       name: 'home',
       component: Home
+    },
+    {
+      path: '/debug',
+      name: 'debug',
+      component: Debug
     },
     {
       path: '/viewer',

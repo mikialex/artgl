@@ -15,7 +15,7 @@ export class ShaderNode extends DAGNode {
   }
 
   enableSwizzle: boolean = false;
-  swizzleType: string[] = [];
+  swizzleType: string = "";
 
   get returnType(): GLDataType {
     if (this.enableSwizzle) {
@@ -34,9 +34,10 @@ export class ShaderNode extends DAGNode {
   swizzling(swizzleType: string) {
     const parts = swizzleType.trim().split("");
     if (parts.length > 4) {
+      // TODO check more
       throw "swizzle not valid"
     }
-    this.swizzleType = parts;
+    this.swizzleType = swizzleType.trim();
     this.enableSwizzle = true;
     return this;
   }

@@ -16,7 +16,6 @@ export class Technique{
     this.needRebuildShader = false;
     this.createProgramConfig();
     this.graph.compile();
-    console.log(this._programConfigCache.vertexShaderString)
   }
   graph: ShaderGraph = new ShaderGraph();
   needRebuildShader: boolean = true;
