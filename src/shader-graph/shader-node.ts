@@ -104,6 +104,13 @@ export class ShaderCommonUniformInputNode extends ShaderInputNode {
   constructor(des: UniformDescriptor) {
     super(des.name, des.type);
   }
+
+  defaultValue: any;
+
+  default(value: any): ShaderCommonUniformInputNode {
+    this.defaultValue = value;
+    return this;
+  }
 }
 export class ShaderVaryInputNode extends ShaderInputNode { }
 

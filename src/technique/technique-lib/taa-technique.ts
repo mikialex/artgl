@@ -131,7 +131,7 @@ export class TAATechnique extends Technique {
               .input("depth", texture("depthResult").fetch(this.graph.getVary("v_uv")).swizzling("x"))
               .input("uv", this.graph.getVary("v_uv"))
             )
-          .input("VPMatrixInverse",  uniform("VPMatrixInverse", GLDataType.Mat4))
+          .input("VPMatrixInverse",  uniform("VPMatrixInverse", GLDataType.Mat4).default(new Matrix4()))
           .input("LastVPMatrix", innerUniform(InnerSupportUniform.LastVPMatrix))
       )
     )
@@ -140,7 +140,7 @@ export class TAATechnique extends Technique {
         TAAMix.make()
           .input("oldColor", colorOld.swizzling("xyz"))
           .input("newColor", texture("sceneResult").fetch(this.graph.getVary("v_uv")).swizzling("xyz"))
-          .input("sampleCount", uniform("u_sampleCount", GLDataType.float))
+          .input("sampleCount", uniform("u_sampleCount", GLDataType.float).default(0))
     )
     
   }

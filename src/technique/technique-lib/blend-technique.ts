@@ -60,10 +60,10 @@ export class TSSAOBlendTechnique extends Technique {
         tssaoBlend.make()
           .input("color", texture("basic").fetch(this.graph.getVary('v_uv')).swizzling("xyz"))
           .input("aoColor", texture("tssao").fetch(this.graph.getVary('v_uv')).swizzling("xyz"))
-          .input('sampleCount', uniform("u_sampleCount", GLDataType.float))
-          .input('tssaoComposeRate', uniform("u_tssaoComposeRate", GLDataType.float))
-          .input('tssaoShowThreshold', uniform("u_tssaoShowThreshold", GLDataType.float))
-          .input('tssaoComposeThreshold', uniform("u_tssaoComposeThreshold", GLDataType.float))
+          .input('sampleCount', uniform("u_sampleCount", GLDataType.float).default(0))
+          .input('tssaoComposeRate', uniform("u_tssaoComposeRate", GLDataType.float).default(1))
+          .input('tssaoShowThreshold', uniform("u_tssaoShowThreshold", GLDataType.float).default(200))
+          .input('tssaoComposeThreshold', uniform("u_tssaoComposeThreshold", GLDataType.float).default(0.5))
       )
   }
 

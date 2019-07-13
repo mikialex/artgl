@@ -101,24 +101,25 @@ export class ShaderGraph {
         return {
           name: node.name,
           type: node.type,
+          default: node.defaultValue
         }
       });
     const uniformsIncludes = inputNodes
-        .filter(node => node instanceof ShaderInnerUniformInputNode)
-        .map((node: ShaderInnerUniformInputNode) => {
-          return {
-            name: node.name,
-            mapInner: node.mapInner,
-          }
-        });
-    const varyings = inputNodes
-        .filter(node => node instanceof ShaderVaryInputNode)
-        .map((node: ShaderVaryInputNode) => {
-          return {
-            name: node.name,
-            type: node.type,
-          }
-        });
+      .filter(node => node instanceof ShaderInnerUniformInputNode)
+      .map((node: ShaderInnerUniformInputNode) => {
+        return {
+          name: node.name,
+          mapInner: node.mapInner,
+        }
+      });
+
+    const varyings = [];
+    this.varyings.forEach((node, key) => {
+      varyings.push({
+        name: key,
+        type: node.type,
+      })
+    })
 
     return { attributes, uniforms, varyings, uniformsIncludes }
   }

@@ -56,7 +56,6 @@ mesh.shading = shade.decorate(light);
 mesh.shadingParam = shade.make();
 mesh.shading.set("opacity", 0.5);
 
-mesh.lights = 
 
 ```
 

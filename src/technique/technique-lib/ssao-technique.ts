@@ -7,6 +7,7 @@ import { ShaderFunction } from "../../shader-graph/shader-function";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
 import { randDir3D } from "../../shader-graph/built-in/rand";
 import { getWorldPosition, NDCxyToUV } from "../../shader-graph/built-in/transform";
+import { Matrix4 } from "../../math/index";
 
 const vertexShaderSource =
   `
@@ -129,7 +130,7 @@ export class SSAOTechnique extends Technique {
       .input("uv", vUV)
       .input("depth", depth)
       .input("VPMatrix", VPMatrix)
-      .input("VPMatrixInverse", uniform("VPMatrixInverse", GLDataType.Mat4))
+      .input("VPMatrixInverse", uniform("VPMatrixInverse", GLDataType.Mat4).default(new Matrix4()))
 
     const randDir = randDir3D.make()
       .input("randA", vUV.swizzling("x"))
@@ -137,7 +138,7 @@ export class SSAOTechnique extends Technique {
 
     const newPositionRand = newSamplePosition.make()
       .input("positionOld", worldPosition.swizzling("xyz"))
-      .input("distance", uniform("u_aoRadius", GLDataType.float))
+      .input("distance", uniform("u_aoRadius", GLDataType.float).default(1))
       .input("dir", randDir)
 
     const newDepth = unPackDepth.make()
@@ -163,7 +164,7 @@ export class SSAOTechnique extends Technique {
             .input("depth", depth)
             .input("newDepth", newDepth)
         )
-        .input("sampleCount", uniform("u_sampleCount", GLDataType.float))
+        .input("sampleCount", uniform("u_sampleCount", GLDataType.float).default(0))
     )
   }
 
