@@ -5,27 +5,48 @@ import { findFirst } from "../util/array";
 import { CodeBuilder } from "./util/code-builder";
 import { ShaderFunctionNode, ShaderNode, ShaderInputNode, ShaderTextureFetchNode } from "./shader-node";
 
-const builder = new CodeBuilder()
-
 export function genFragShader(graph: ShaderGraph): string {
-  let result = "";
+  const builder = new CodeBuilder()
+  builder.reset();
 
   const nodeDependList = graph.fragmentRoot.generateDependencyOrderList() as ShaderNode[];
-  result += genShaderFunctionDepend(nodeDependList)
-  result += "\n"
-  result += codeGenGraph(nodeDependList, "gl_FragColor")
-  return result;
+  builder.writeBlockRaw(genShaderFunctionDepend(nodeDependList))
+  builder.emptyLine()
+
+  builder.writeLine("void main(){")
+  builder.addIndent()
+
+  builder.writeBlock(codeGenGraph(nodeDependList, "gl_FragColor"))
+
+  builder.reduceIndent()
+  builder.writeLine("}")
+  return builder.output();
 }
 
 
 export function genVertexShader(graph: ShaderGraph): string {
-  let result = "";
+  const builder = new CodeBuilder()
+  builder.reset();
 
   const nodeDependList = graph.vertexRoot.generateDependencyOrderList() as ShaderNode[];
-  result += genShaderFunctionDepend(nodeDependList)
-  result += "\n"
-  result += codeGenGraph(nodeDependList, "gl_Position")
-  return result;
+  builder.writeBlockRaw(genShaderFunctionDepend(nodeDependList))
+  builder.emptyLine()
+
+  builder.writeLine("void main(){")
+  builder.addIndent()
+
+  builder.writeBlock(codeGenGraph(nodeDependList, "gl_Position"))
+  builder.emptyLine()
+
+  graph.varyings.forEach((varyNode, key) => {
+    const varyDependList =  varyNode.generateDependencyOrderList() as ShaderNode[];
+    builder.writeBlock(codeGenGraph(varyDependList, key))
+    builder.emptyLine()
+  })
+
+  builder.reduceIndent()
+  builder.writeLine("}")
+  return builder.output();
 }
 
 
@@ -39,7 +60,7 @@ function genShaderFunctionDepend(nodes: ShaderNode[]): string {
     }
   })
   dependFunctions.forEach(func => {
-    functionsStr += genShaderFunctionDeclare(func)
+    functionsStr += func.genShaderFunctionIncludeCode()
     functionsStr += "\n"
   })
   return functionsStr
@@ -112,6 +133,7 @@ function genTempVarExpFromShaderNode(
 function codeGenGraph(
   nodeDependList: ShaderNode[],
   rootOutputName: string): string {
+  const builder = new CodeBuilder()
   builder.reset();
   const varList: varRecord[] = [];
   nodeDependList.forEach(nodeToGen => {
@@ -122,8 +144,6 @@ function codeGenGraph(
       expression: genTempVarExpFromShaderNode(nodeToGen, varList),
     })
   })
-  builder.writeLine("void main(){")
-  builder.addIndent()
   varList.forEach((varRc, index) => {
     if (index !== varList.length - 1) {
       if (varRc.refedNode instanceof ShaderFunctionNode) {
@@ -138,29 +158,5 @@ function codeGenGraph(
       builder.writeLine(`${rootOutputName} = ${varRc.expression}`)
     }
   })
-  builder.reduceIndent()
-  builder.writeLine("}")
-  return builder.output();
-}
-
-function genShaderFunctionDeclare(shaderFunction: ShaderFunction): string {
-  builder.reset();
-  const functionDefine = shaderFunction.define;
-  const varType = getShaderTypeStringFromGLDataType(functionDefine.returnType);
-  let functionInputs = "";
-  Object.keys(functionDefine.inputs).forEach((key, index) => {
-    const paramType = getShaderTypeStringFromGLDataType(functionDefine.inputs[key]);
-    const paramStr = `${paramType} ${key}`
-    functionInputs += paramStr
-    if (index !== functionDefine.inputs.length - 1) {
-      functionInputs += ", "
-    }
-  })
-
-  builder.writeLine(`${varType} ${functionDefine.name}(${functionInputs}){`)
-  builder.addIndent()
-  builder.writeBlock(functionDefine.source)
-  builder.reduceIndent()
-  builder.writeLine("}")
   return builder.output();
 }

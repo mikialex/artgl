@@ -1,6 +1,7 @@
-import { GLDataType } from "../webgl/shader-util";
+import { GLDataType, getShaderTypeStringFromGLDataType } from "../webgl/shader-util";
 import { ShaderFunctionNode } from "./shader-node";
 import { parseShaderFunctionMetaInfo } from "./parser/shader-function-meta";
+import { CodeBuilder } from "./util/code-builder";
 
 export interface ShaderFunctionDefine {
   source: string, 
@@ -32,6 +33,34 @@ export class ShaderFunction{
   make(): ShaderFunctionNode {
     const node = new ShaderFunctionNode(this);
     return node;
+  }
+
+  genShaderFunctionIncludeCode(): string {
+    const builder = new CodeBuilder()
+    builder.reset();
+    const define = this.define;
+    const varType = getShaderTypeStringFromGLDataType(define.returnType);
+    let functionInputs = "";
+    const keys = Object.keys(define.inputs)
+    keys.forEach((key, index) => {
+      const paramType = getShaderTypeStringFromGLDataType(define.inputs[key]);
+      const paramStr = `${paramType} ${key}`
+      functionInputs += paramStr
+      if (index !== keys.length - 1) {
+        functionInputs += ", "
+      }
+    })
+
+    if (define.description !== undefined) {
+      builder.writeCommentBlock(define.description)
+    }
+  
+    builder.writeLine(`${varType} ${define.name}(${functionInputs}){`)
+    builder.addIndent()
+    builder.writeBlock(define.source)
+    builder.reduceIndent()
+    builder.writeLine("}")
+    return builder.output();
   }
 
 }

@@ -12,6 +12,10 @@ export class CodeBuilder{
     this.currentIndent--;
   }
 
+  emptyLine() {
+    this.writeLine("")
+  }
+
   writeLine(value: string) {
     this.result += getIndent(this.currentIndent) + value + "\n"
   }
@@ -24,6 +28,18 @@ export class CodeBuilder{
         this.writeLine(trimmed);
       }
     })
+  }
+
+  writeBlockRaw(value: string) {
+    this.result += value;
+  }
+
+  writeCommentBlock(value: string) {
+    this.writeLine("/*")
+    value.split("\n").forEach(line => {
+      this.writeLine(" * " + line)
+    })
+    this.writeLine(" */")
   }
 
   reset() {
