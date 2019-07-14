@@ -189,8 +189,8 @@ export class Application {
     this.engine.setSize(width, height);
     (this.engine.camera as PerspectiveCamera).aspect = width / height;
 
-    this.taaTech.uniforms.get('screenPixelXStep').setValue(1 / (2 * window.devicePixelRatio * width));
-    this.taaTech.uniforms.get('screenPixelYStep').setValue(1 / (2 * window.devicePixelRatio * height));
+    // this.taaTech.uniforms.get('screenPixelXStep').setValue(1 / (2 * window.devicePixelRatio * width));
+    // this.taaTech.uniforms.get('screenPixelYStep').setValue(1 / (2 * window.devicePixelRatio * height));
   }
   notifyResize() {
     this.onContainerResize();

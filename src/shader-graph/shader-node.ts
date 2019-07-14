@@ -113,6 +113,12 @@ export class ShaderCommonUniformInputNode extends ShaderInputNode {
   }
 }
 
+export class ShaderVaryInputNode extends ShaderInputNode {
+  constructor(name: string, type: GLDataType) {
+    super(name, type);
+  }
+ }
+
 export class ShaderInnerUniformInputNode extends ShaderInputNode {
   constructor(uni: InnerUniformMapDescriptor) {
     super(uni.name, InnerUniformMap.get(uni.mapInner).type)

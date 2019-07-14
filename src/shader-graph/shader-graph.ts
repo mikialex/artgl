@@ -3,7 +3,7 @@ import { genFragShader, genVertexShader } from "./code-gen";
 import {
   ShaderFunctionNode, ShaderInputNode,
   ShaderAttributeInputNode, ShaderInnerUniformInputNode,
-  ShaderCommonUniformInputNode, ShaderNode
+  ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode
 } from "./shader-node";
 import { Nullable } from "../type";
 
@@ -34,12 +34,12 @@ export class ShaderGraph {
     return this;
   }
 
-  getVary(key: string): ShaderNode {
+  getVary(key: string): ShaderVaryInputNode {
     const ret = this.varyings.get(key);
     if (ret === undefined) {
       throw 'cant get vary'
     }
-    return ret;
+    return new ShaderVaryInputNode(key, ret.returnType);
   }
 
   reset(): ShaderGraph {

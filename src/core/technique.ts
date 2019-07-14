@@ -3,13 +3,14 @@ import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { ARTEngine } from "../engine/render-engine";
 import { UniformProxy } from "../engine/uniform-proxy";
 import { ShaderGraph } from "../shader-graph/shader-graph";
+import { Nullable } from '../type';
 
 
 export class Shading {
   graph: ShaderGraph = new ShaderGraph();
 
-  programConfigCache: GLProgramConfig
-  needRebuildShader: boolean;
+  programConfigCache: Nullable<GLProgramConfig> = null;
+  needRebuildShader: boolean = true;
 
   /**
    * impl this to build your shader source
@@ -19,8 +20,9 @@ export class Shading {
   }
 
   getProgramConfig() {
-    if (this.needRebuildShader) {
+  if (this.needRebuildShader) {
       this.update();
+      this.programConfigCache = this.graph.compile();
       this.needRebuildShader = false;
     }
     return this.programConfigCache;
@@ -51,6 +53,13 @@ export class Technique {
   uniforms: Map<string, UniformProxy> = new Map();
   constructor(shading: Shading) {
     this.shading = shading;
+    const config = this.shading.getProgramConfig(); 
+    this.uniforms = new Map();
+    if (config.uniforms !== undefined) {
+      config.uniforms.forEach(uni => {
+        this.uniforms.set(uni.name, uni.default);
+      })
+    }
   }
 }
 
