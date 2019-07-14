@@ -32,7 +32,7 @@ Performance matters.
 
 **This may not work yet now, contribution welcomed;**
 
-### Shading API
+<!-- ### Shading API
 
 Decouple light effect with material effect, decorate any shading with
 any other shading.
@@ -43,7 +43,7 @@ const scene = new Scene();
 const lightShade = new PointLightShade();
 const light = lightShade.make();
 
-scene.add(light)
+scene.lights.add(light)
 
 const mesh = new Mesh();
 
@@ -52,12 +52,12 @@ mesh.material = new Material();
 mesh.material.channel(Channel.Diffuse).load("../diff.png");
 
 const shade = new MeshBasicShading()
-mesh.shading = shade.decorate(light);
+mesh.shading = shade.decorate(lightShade);
 mesh.shadingParam = shade.make();
-mesh.shading.set("opacity", 0.5);
+mesh.shadingParam.set("opacity", 0.5);
 
 
-```
+``` -->
 
 ### RenderGraph API
 

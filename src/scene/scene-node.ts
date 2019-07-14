@@ -42,7 +42,7 @@ export class SceneNode {
     return this._visible;
   }
 
-  addChild(node: SceneNode) {
+  addChild(node: SceneNode): SceneNode {
     if (node === this) {
       throw 'Cant add a scene node to it self';
     }
@@ -57,9 +57,10 @@ export class SceneNode {
     }
     node.parent = this;
     this.children.push(node);
+    return this;
   }
 
-  removeChild(node: SceneNode) {
+  removeChild(node: SceneNode): SceneNode {
     if (this.scene !== null) {
       this.scene.isFrameStructureChange = true;
       this.scene.removeNode(node);
@@ -70,9 +71,10 @@ export class SceneNode {
       node.parent = null;
       this.children.splice(index, 1);
     }
+    return this;
   }
 
-  traverse(fn: (sceneNode: SceneNode) => any) {
+  traverse(fn: (sceneNode: SceneNode) => any): SceneNode  {
     function visit(node: SceneNode) {
       if (fn(node) !== false) {
         for (let i = 0; i < node.children.length; i++) {
@@ -81,6 +83,7 @@ export class SceneNode {
       }
     }
     visit(this);
+    return this;
   }
 
   traversePair(fn: (sceneNodeParent: Nullable<SceneNode>, sceneNode: SceneNode) => any): any {
@@ -122,7 +125,7 @@ export class SceneNode {
     return result;
   }
 
-  updateWorldMatrix(force?: boolean): void {
+  updateWorldMatrix(force?: boolean): SceneNode  {
     if (this.transform.transformFrameChanged || force) {
 
       if (this.parent === null) {
@@ -137,6 +140,7 @@ export class SceneNode {
     for (var i = 0, l = children.length; i < l; i++) {
       children[i].updateWorldMatrix(force);
     }
+    return this;
   }
 
 
