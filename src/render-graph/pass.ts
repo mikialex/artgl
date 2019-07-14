@@ -103,7 +103,7 @@ export class RenderPass{
     if (this.overrideTechnique !== null) {
       engine.overrideTechnique = this.overrideTechnique;
       this.inputTarget.forEach((inputFramebufferName, uniformName) => {
-        (engine.overrideTechnique as Technique).getProgram(engine).defineFrameBufferTextureDep(
+        (engine.overrideTechnique as Technique).shading.getProgram(engine).defineFrameBufferTextureDep(
           inputFramebufferName, uniformName
         );
       })

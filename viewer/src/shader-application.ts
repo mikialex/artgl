@@ -7,6 +7,7 @@ import { Scene } from '../../src/scene/scene';
 import ARTGL from '../../src/export';
 import { AttributeUsage } from '../../src/webgl/attribute';
 import { GLTextureType } from '../../src/webgl/uniform/uniform-texture';
+import { Shading } from '../../src/core/technique';
 
 export class ShaderApplication {
 
@@ -14,7 +15,7 @@ export class ShaderApplication {
   graph: ShaderGraph = new ShaderGraph();
   scene: Scene = new Scene();
 
-  technique: Technique;
+  shader: Shading;
   mesh: Mesh;
   interactor: Interactor;
   orbitController: OrbitController;
@@ -29,7 +30,7 @@ export class ShaderApplication {
     this.interactor = new Interactor(canvas);
     this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);
     this.orbitController.registerInteractor(this.interactor);
-    this.technique = new ARTGL.NormalTechnique();
+    this.shader = new ARTGL.NormalShading();
     this.loadScene();
     this.tick();
     this.start();
@@ -145,7 +146,7 @@ export class ShaderApplication {
     let testGeo = new ARTGL.SphereGeometry(1, 40, 40);
     const mesh = new Mesh();
     mesh.geometry = testGeo;
-    mesh.technique = this.technique;
+    mesh.technique = new Technique(this.shader);
     this.mesh = mesh;
     this.scene.root.addChild(mesh);
   }

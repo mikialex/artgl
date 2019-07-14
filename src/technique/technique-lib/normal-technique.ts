@@ -1,4 +1,4 @@
-import { Technique } from "../../core/technique";
+import { Technique, Shading } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
@@ -14,7 +14,7 @@ const normalShading = new ShaderFunction({
     }`
 })
 
-export class NormalTechnique extends Technique {
+export class NormalShading extends Shading {
 
   update() {
     this.graph.reset()

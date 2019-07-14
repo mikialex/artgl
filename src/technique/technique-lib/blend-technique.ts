@@ -1,4 +1,4 @@
-import { Technique } from "../../core/technique";
+import { Shading } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { ShaderFunction } from "../../shader-graph/shader-function";
@@ -22,7 +22,7 @@ const tssaoBlend = new ShaderFunction({
   `
 })
 
-export class TSSAOBlendTechnique extends Technique {
+export class TSSAOBlendShading extends Shading {
   name = "tssaoTechnique"
   // constructor() {
   //   super({

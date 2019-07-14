@@ -1,4 +1,4 @@
-import { Technique } from "../../core/technique";
+import { Technique, Shading } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { Matrix4 } from "../../math/matrix4";
@@ -75,7 +75,7 @@ const fragmentShaderSource =
     }
     `
 
-export class TAATechnique extends Technique {
+export class TAAShading extends Shading {
   // constructor() {
   //   super({
   //     attributes: [

@@ -1,4 +1,4 @@
-import { Technique } from "../../core/technique";
+import { Technique, Shading } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { GLTextureType } from "../../webgl/uniform/uniform-texture";
@@ -19,7 +19,7 @@ import { attribute, texture } from "../../shader-graph/node-maker";
 //     }
 //     `
 
-export class CopyTechnique extends Technique {
+export class CopyShading extends Shading {
   // constructor() {
   //   super({
   //     attributes: [

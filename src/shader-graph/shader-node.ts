@@ -112,7 +112,6 @@ export class ShaderCommonUniformInputNode extends ShaderInputNode {
     return this;
   }
 }
-export class ShaderVaryInputNode extends ShaderInputNode { }
 
 export class ShaderInnerUniformInputNode extends ShaderInputNode {
   constructor(uni: InnerUniformMapDescriptor) {

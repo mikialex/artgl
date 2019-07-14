@@ -3,7 +3,7 @@ import { genFragShader, genVertexShader } from "./code-gen";
 import {
   ShaderFunctionNode, ShaderInputNode,
   ShaderAttributeInputNode, ShaderInnerUniformInputNode,
-  ShaderCommonUniformInputNode, ShaderVaryInputNode, ShaderNode
+  ShaderCommonUniformInputNode, ShaderNode
 } from "./shader-node";
 import { Nullable } from "../type";
 
@@ -11,6 +11,9 @@ export class ShaderGraph {
   fragmentRoot: Nullable<ShaderNode>;
   vertexRoot: Nullable<ShaderNode>;
   varyings: Map<string, ShaderNode> = new Map();
+
+  fragmentDecorator: Nullable<ShaderFunctionNode> = null;
+  vertexDecorator: Nullable<ShaderFunctionNode> = null;
 
   setFragmentRoot(root: ShaderNode): ShaderGraph {
     this.fragmentRoot = root;
@@ -31,7 +34,7 @@ export class ShaderGraph {
     return this;
   }
 
-  getVary(key): ShaderNode {
+  getVary(key: string): ShaderNode {
     const ret = this.varyings.get(key);
     if (ret === undefined) {
       throw 'cant get vary'

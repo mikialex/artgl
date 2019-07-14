@@ -1,4 +1,4 @@
-import { Technique } from "../../core/technique";
+import { Technique, Shading } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
@@ -85,7 +85,7 @@ const tssaoMix = new ShaderFunction({
   `
 })
 
-export class SSAOTechnique extends Technique {
+export class SSAOShading extends Shading {
   // constructor() {
   //   super({
   //     attributes: [

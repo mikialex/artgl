@@ -1,4 +1,4 @@
-import { Technique } from "../../core/technique";
+import {  Shading } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
@@ -17,7 +17,7 @@ const depthV = new ShaderFunction(
     `}
 )
 
-export class DepthTechnique extends Technique {
+export class DepthShading extends Shading {
   name = "drawDepth"
 
   update() {
