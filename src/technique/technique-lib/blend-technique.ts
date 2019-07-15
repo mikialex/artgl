@@ -23,39 +23,15 @@ const tssaoBlend = new ShaderFunction({
 })
 
 export class TSSAOBlendShading extends Shading {
-  name = "tssaoTechnique"
-  // constructor() {
-  //   super({
-  //     attributes: [
-  //       { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position },
-  //       { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv },
-  //     ],
-  //     uniforms: [
-  //       { name: 'u_tssaoComposeRate', default: 1.0, type: GLDataType.float },
-  //       { name: 'u_tssaoComposeThreshold', default: 0.5, type: GLDataType.float },
-  //       { name: 'u_tssaoShowThreshold', default: 200, type: GLDataType.float },
-  //       { name: 'u_sampleCount', default: 0, type: GLDataType.float },
-  //     ],
-  //     varyings: [
-  //       { name: 'v_uv', type: GLDataType.floatVec2 },
-  //     ],
-  //     textures: [
-  //       { name: 'basic', type: GLTextureType.texture2D },
-  //       { name: 'tssao', type: GLTextureType.texture2D },
-  //     ],
-  //     vertexShaderMain: vertexShaderSource,
-  //     fragmentShaderMain: fragmentShaderSource,
-  //   });
-  // }
 
   update() {
     this.graph.reset()
-    .setVertexRoot(vec4(attribute(
-      { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-    ), constValue(1)))
-    .setVary("v_uv",attribute(
-      { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
-    ))
+      .setVertexRoot(vec4(attribute(
+        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
+      ), constValue(1)))
+      .setVary("v_uv", attribute(
+        { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
+      ))
       .setFragmentRoot(
         tssaoBlend.make()
           .input("color", texture("basic").fetch(this.graph.getVary('v_uv')).swizzling("xyz"))

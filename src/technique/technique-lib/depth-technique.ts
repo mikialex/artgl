@@ -1,4 +1,4 @@
-import {  Shading } from "../../core/technique";
+import { Shading } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
