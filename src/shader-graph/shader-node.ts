@@ -117,7 +117,7 @@ export class ShaderVaryInputNode extends ShaderInputNode {
   constructor(name: string, type: GLDataType) {
     super(name, type);
   }
- }
+}
 
 export class ShaderInnerUniformInputNode extends ShaderInputNode {
   constructor(uni: InnerUniformMapDescriptor) {
@@ -135,23 +135,37 @@ export class ShaderAttributeInputNode extends ShaderInputNode {
   attributeUsage: AttributeUsage
 }
 
+// castValidFloat
+function svf(value: number) {
+  let str = value + "";
+  if (str.indexOf(".") === -1) {
+    str = str + ".0"
+  }
+  return str
+}
+
 export type ShaderConstType = number | Vector2 | Vector3 | Vector4;
 export class ShaderConstNode extends ShaderNode {
   constructor(value: ShaderConstType) {
     if (typeof value === "number") {
       super(GLDataType.float)
+      this.shaderString = svf(value);
     } else if (value instanceof Vector2) {
       super(GLDataType.floatVec2)
+      this.shaderString = `vec2(${svf(value.x)}, ${svf(value.y)})`;
     } else if (value instanceof Vector3) {
       super(GLDataType.floatVec3)
+      this.shaderString = `vec2(${svf(value.x)}, ${svf(value.y)}, ${svf(value.z)})`;
     } else if (value instanceof Vector4) {
       super(GLDataType.floatVec4)
+      this.shaderString = `vec4(${svf(value.x)}, ${svf(value.y)}, ${svf(value.z)}, ${svf(value.w)})`;
     } else {
-
+      throw "un support shader const node value"
     }
     this.value = value;
   }
   value: ShaderConstType
+  shaderString: string;
 }
 
 export class ShaderTexture {
@@ -182,20 +196,40 @@ export class ShaderTextureFetchNode extends ShaderNode {
   }
 }
 
+function getValueCount(type: GLDataType) {
+  switch (type) {
+    case GLDataType.float:
+      return 1
+    case GLDataType.floatVec2:
+      return 2
+    case GLDataType.floatVec3:
+      return 3
+    case GLDataType.floatVec4:
+      return 4
+    default:
+      throw "not support combine type"
+  }
+}
 
 export class ShaderCombineNode extends ShaderNode {
   constructor(combines: ShaderNode[], type: GLDataType) {
-    // TODO
     super(type);
+    let count = 0;
+    combines.forEach(node => {
+      count += getValueCount(node.returnType)
+    })
+    if (count !== getValueCount(type)) {
+      throw 'combine node input not satisfied'
+    }
+    this.combineCount = count;
+    this.combines = combines;
+    this.combines.forEach(node => {
+      node.connectTo(this);
+    })
   }
 
   combines: ShaderNode[];
-}
+  combineCount: number;
 
-export class ShaderSwizzleNode extends ShaderNode {
-  constructor(node: ShaderNode) {
-    super(node.type);
-    this.connectTo(node);
-  }
 
 }

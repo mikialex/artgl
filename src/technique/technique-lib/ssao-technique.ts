@@ -2,7 +2,7 @@ import { Technique, Shading } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
-import { attribute, uniform, texture, innerUniform } from "../../shader-graph/node-maker";
+import { attribute, uniform, texture, innerUniform, constValue, vec4 } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
 import { randDir3D } from "../../shader-graph/built-in/rand";
@@ -116,9 +116,10 @@ export class SSAOShading extends Shading {
     const VPMatrix = innerUniform(InnerSupportUniform.VPMatrix);
     const depthTex = texture("depthResult");
     this.graph.reset()
-      .setVertexRoot(attribute(
+      .setVertexRoot(
+        vec4(attribute(
         { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-      ))
+      ), constValue(1)))
       .setVary("v_uv", attribute(
         { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
       ))

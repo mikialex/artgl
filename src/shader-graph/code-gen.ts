@@ -3,7 +3,7 @@ import { ShaderFunction } from "./shader-function";
 import { getShaderTypeStringFromGLDataType } from "../webgl/shader-util";
 import { findFirst } from "../util/array";
 import { CodeBuilder } from "./util/code-builder";
-import { ShaderFunctionNode, ShaderNode, ShaderInputNode, ShaderTextureFetchNode } from "./shader-node";
+import { ShaderFunctionNode, ShaderNode, ShaderInputNode, ShaderTextureFetchNode, ShaderCombineNode, ShaderConstNode } from "./shader-node";
 
 export function genFragShader(graph: ShaderGraph): string {
   const builder = new CodeBuilder()
@@ -45,7 +45,7 @@ export function genVertexShader(graph: ShaderGraph): string {
   graph.varyings.forEach((varyNode, key) => {
     const varyDependList = varyNode.generateDependencyOrderList() as ShaderNode[];
     const varyResult = codeGenGraph(varyDependList, key, evaluatedNode);
-    pushListToMap(evaluatedNode, vertexResult.varList)
+    pushListToMap(evaluatedNode, varyResult.varList)
     builder.writeBlock(varyResult.code)
     builder.emptyLine()
   })
@@ -139,7 +139,6 @@ function genTempVarExpFromShaderNode(
 
   if (node instanceof ShaderFunctionNode) {
     const functionDefine = node.factory.define;
-
     let functionInputs = "";
     Object.keys(functionDefine.inputs).forEach((key, index) => {
       const nodeDepend = node.inputMap.get(key) as ShaderNode;
@@ -148,17 +147,32 @@ function genTempVarExpFromShaderNode(
         functionInputs += ", "
       }
     })
-
     const result = `${functionDefine.name}(${functionInputs})`
     return result;
   }
 
   if (node instanceof ShaderInputNode) {
-    return (node as ShaderInputNode).name + ';';
+    return (node as ShaderInputNode).name;
   }
 
   if (node instanceof ShaderTextureFetchNode) {
     return `texture2D(${node.source.name}, ${getParamKeyFromVarList(node.fetchByNode)})`
+  }
+
+  if (node instanceof ShaderCombineNode) {
+    let combineResult = "";
+    node.combines.forEach((nodeDepend, index) => {
+      combineResult += getParamKeyFromVarList(nodeDepend);
+      if (index !== node.combines.length - 1) {
+        combineResult += ", "
+      }
+    })
+    const result = `vec${node.combineCount}(${combineResult})`
+    return result;
+  }
+
+  if (node instanceof ShaderConstNode) {
+    return node.shaderString;
   }
 
   throw "unknown shader node"

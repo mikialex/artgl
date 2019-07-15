@@ -8,7 +8,6 @@ export function attribute(att: AttributeDescriptor) {
   return new ShaderAttributeInputNode(att);
 }
 
-// TODO support default
 export function texture(name: string, type?: GLDataType) {
   const t = type !== undefined ? type : GLDataType.floatVec4;
   return new ShaderTexture(name, t);
@@ -41,4 +40,8 @@ export function vec3(...args: ShaderNode[] ) {
 
 export function vec4(...args: ShaderNode[] ) {
   return new ShaderCombineNode(args, GLDataType.floatVec4)
+}
+
+export function constValue(value: any){
+  return new ShaderConstNode(value);
 }
