@@ -5,7 +5,7 @@ import { Matrix4 } from "../../math/matrix4";
 import { GLTextureType } from "../../webgl/uniform/uniform-texture";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 import { ShaderFunction } from "../../shader-graph/shader-function";
-import { attribute, texture, uniform, innerUniform } from "../../shader-graph/node-maker";
+import { attribute, texture, uniform, innerUniform, vec4, constValue } from "../../shader-graph/node-maker";
 import { NDCxyToUV, getLastPixelNDC, UVDepthToNDC } from "../../shader-graph/built-in/transform";
 
 
@@ -116,9 +116,9 @@ export class TAAShading extends Shading {
 
   update() {
     this.graph.reset()
-    .setVertexRoot(attribute(
+    .setVertexRoot(vec4(attribute(
       { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-    ))
+    ), constValue(1)))
     .setVary("v_uv",attribute(
       { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
     ))

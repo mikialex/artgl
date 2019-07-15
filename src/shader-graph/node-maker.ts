@@ -2,14 +2,15 @@ import { AttributeDescriptor } from "../webgl/attribute";
 import { ShaderAttributeInputNode, ShaderCommonUniformInputNode, ShaderInnerUniformInputNode, ShaderTexture, ShaderNode, ShaderConstType, ShaderConstNode, ShaderCombineNode } from "./shader-node";
 import { GLDataType } from "../webgl/shader-util";
 import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
+import { GLTextureType } from "../webgl/uniform/uniform-texture";
 
 // TODO simplify it
 export function attribute(att: AttributeDescriptor) {
   return new ShaderAttributeInputNode(att);
 }
 
-export function texture(name: string, type?: GLDataType) {
-  const t = type !== undefined ? type : GLDataType.floatVec4;
+export function texture(name: string, type?: GLTextureType) {
+  const t = type !== undefined ? type :  GLTextureType.texture2D;
   return new ShaderTexture(name, t);
 }
 

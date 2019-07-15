@@ -3,7 +3,7 @@ import { ShaderFunction } from "./shader-function";
 import { getShaderTypeStringFromGLDataType } from "../webgl/shader-util";
 import { findFirst } from "../util/array";
 import { CodeBuilder } from "./util/code-builder";
-import { ShaderFunctionNode, ShaderNode, ShaderInputNode, ShaderTextureFetchNode, ShaderCombineNode, ShaderConstNode } from "./shader-node";
+import { ShaderFunctionNode, ShaderNode, ShaderInputNode, ShaderTextureFetchNode, ShaderCombineNode, ShaderConstNode, ShaderSwizzleNode } from "./shader-node";
 
 export function genFragShader(graph: ShaderGraph): string {
   const builder = new CodeBuilder()
@@ -117,11 +117,12 @@ function genTempVarExpFromShaderNode(
       key = record.varKey;
     }
 
-    if (record.refedNode.enableSwizzle) {
-      return key + "." + record.refedNode.swizzleType;
-    } else {
-      return key;
-    }
+    // if (record.refedNode.enableSwizzle) {
+    //   return key + "." + record.refedNode.swizzleType;
+    // } else {
+    //   return key;
+    // }
+    return key
   }
 
   function getParamKeyFromVarList(node: ShaderNode): string {
@@ -175,6 +176,11 @@ function genTempVarExpFromShaderNode(
     return node.shaderString;
   }
 
+  if (node instanceof ShaderSwizzleNode) {
+    return getParamKeyFromVarList(node.from) + '.' + node.swizzleType;
+  }
+
+
   throw "unknown shader node"
 }
 
@@ -205,7 +211,7 @@ function codeGenGraph(
     if (preEvaluatedList.has(varRc.refedNode)) {
       return;
     }
-    const varType = getShaderTypeStringFromGLDataType(varRc.refedNode.returnType);
+    const varType = getShaderTypeStringFromGLDataType(varRc.refedNode.type);
     builder.writeLine(`${varType} ${varRc.varKey} = ${varRc.expression};`)
   })
 

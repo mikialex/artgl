@@ -49,7 +49,7 @@ const newSamplePosition = new ShaderFunction({
 const NDCFromWorldPositionAndVPMatrix = new ShaderFunction({
   source: `
   vec3 depthFromWorldPositionAndVPMatrix(vec3 position, mat4 matrix){
-    vec4 ndc = matrix * newSamplePosition;
+    vec4 ndc = matrix * vec4(position, 1.0);
     ndc = ndc / ndc.w;
     return ndc.xyz;
   }
@@ -62,7 +62,7 @@ const sampleAO = new ShaderFunction({
     if (depth >0.999){
       return vec3(0.5);
     }
-    float rate =  newNDC.z > newDepth ? 0.0 : 1.0;
+    float rate =  depth > newDepth ? 0.0 : 1.0;
     return vec3(rate);
   }
   `

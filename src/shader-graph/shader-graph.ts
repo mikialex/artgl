@@ -3,7 +3,7 @@ import { genFragShader, genVertexShader } from "./code-gen";
 import {
   ShaderFunctionNode, ShaderInputNode,
   ShaderAttributeInputNode, ShaderInnerUniformInputNode,
-  ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode
+  ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode, ShaderTextureFetchNode, ShaderTexture
 } from "./shader-node";
 import { Nullable } from "../type";
 
@@ -39,7 +39,7 @@ export class ShaderGraph {
     if (ret === undefined) {
       throw 'cant get vary'
     }
-    return new ShaderVaryInputNode(key, ret.returnType);
+    return new ShaderVaryInputNode(key, ret.type);
   }
 
   reset(): ShaderGraph {
@@ -85,7 +85,8 @@ export class ShaderGraph {
   }
 
   collectInputs() {
-    const inputNodes = this.nodes.filter(
+    const nodes = this.nodes;
+    const inputNodes = nodes.filter(
       n => n instanceof ShaderInputNode
     );
 
@@ -115,6 +116,19 @@ export class ShaderGraph {
           mapInner: node.mapInner,
         }
       });
+    
+    const textureSet = new Set<ShaderTexture>();
+    nodes.filter(n => n instanceof ShaderTextureFetchNode)
+      .forEach((node: ShaderTextureFetchNode)  => {
+        textureSet.add(node.source)
+      })
+    const textures = [];
+    textureSet.forEach(st => {
+      textures.push({
+        name:st.name,
+        type:st.type 
+        })
+      })
 
     const varyings = [];
     this.varyings.forEach((node, key) => {
@@ -124,7 +138,7 @@ export class ShaderGraph {
       })
     })
 
-    return { attributes, uniforms, varyings, uniformsIncludes }
+    return { attributes, uniforms, textures, varyings, uniformsIncludes }
   }
 
   compileVertexSource(): string {

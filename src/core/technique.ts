@@ -57,7 +57,7 @@ export class Technique {
     this.uniforms = new Map();
     if (config.uniforms !== undefined) {
       config.uniforms.forEach(uni => {
-        this.uniforms.set(uni.name, uni.default);
+        this.uniforms.set(uni.name, new UniformProxy(uni.default));
       })
     }
   }
