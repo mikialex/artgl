@@ -34,7 +34,7 @@ export const NDCxyToUV = new ShaderFunction({
 export const UVDepthToNDC = new ShaderFunction({
   source: `
   vec4 UVDepthToNDC(float depth, vec2 uv){
-    return vec4(uv, depth, 1.0);
+    return vec4(uv.x * 2.0 - 1.0, uv.y * 2.0 - 1.0,depth, 1.0);
   }`
 })
 
@@ -50,7 +50,7 @@ export const getLastPixelNDC = new ShaderFunction({
     
     vec4 worldPosition = VPMatrixInverse * ndc;
     vec4 oldPosition = LastVPMatrix * worldPosition;
-    oldPosition = oldPosition / oldPosition.w
+    oldPosition = oldPosition / oldPosition.w;
     return  oldPosition.xyz;
   }
   `

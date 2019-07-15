@@ -3,24 +3,28 @@ import { ShaderFunction } from "./shader-function";
 import { getShaderTypeStringFromGLDataType } from "../webgl/shader-util";
 import { findFirst } from "../util/array";
 import { CodeBuilder } from "./util/code-builder";
-import { ShaderFunctionNode, ShaderNode, ShaderInputNode, ShaderTextureFetchNode } from "./shader-node";
+import { ShaderFunctionNode, ShaderNode, ShaderInputNode, ShaderTextureFetchNode, ShaderCombineNode, ShaderConstNode, ShaderSwizzleNode } from "./shader-node";
 
 export function genFragShader(graph: ShaderGraph): string {
   const builder = new CodeBuilder()
   builder.reset();
 
-  const nodeDependList = graph.fragmentRoot.generateDependencyOrderList() as ShaderNode[];
-  builder.writeBlockRaw(genShaderFunctionDepend(nodeDependList))
-  builder.emptyLine()
-
   builder.writeLine("void main(){")
   builder.addIndent()
 
-  builder.writeBlock(codeGenGraph(nodeDependList, "gl_FragColor"))
+  const evaluatedNode = new Map<ShaderNode, varRecord>();
+  const nodeDependList = graph.fragmentRoot.generateDependencyOrderList() as ShaderNode[];
+  const fragResult = codeGenGraph(nodeDependList, "gl_FragColor", evaluatedNode);
+  builder.writeBlock(fragResult.code)
+  pushListToMap(evaluatedNode, fragResult.varList)
 
   builder.reduceIndent()
   builder.writeLine("}")
-  return builder.output();
+  const mainCode = builder.output();
+  
+  const includedCode = genShaderFunctionDepend(evaluatedNode);
+
+  return includedCode + mainCode
 }
 
 
@@ -28,33 +32,46 @@ export function genVertexShader(graph: ShaderGraph): string {
   const builder = new CodeBuilder()
   builder.reset();
 
-  const nodeDependList = graph.vertexRoot.generateDependencyOrderList() as ShaderNode[];
-  builder.writeBlockRaw(genShaderFunctionDepend(nodeDependList))
-  builder.emptyLine()
-
   builder.writeLine("void main(){")
   builder.addIndent()
 
-  builder.writeBlock(codeGenGraph(nodeDependList, "gl_Position"))
+  const evaluatedNode = new Map<ShaderNode, varRecord>();
+  const nodeDependList = graph.vertexRoot.generateDependencyOrderList() as ShaderNode[];
+  const vertexResult = codeGenGraph(nodeDependList, "gl_Position", evaluatedNode)
+  pushListToMap(evaluatedNode, vertexResult.varList)
+  builder.writeBlock(vertexResult.code)
   builder.emptyLine()
 
   graph.varyings.forEach((varyNode, key) => {
-    const varyDependList =  varyNode.generateDependencyOrderList() as ShaderNode[];
-    builder.writeBlock(codeGenGraph(varyDependList, key))
+    const varyDependList = varyNode.generateDependencyOrderList() as ShaderNode[];
+    const varyResult = codeGenGraph(varyDependList, key, evaluatedNode);
+    pushListToMap(evaluatedNode, varyResult.varList)
+    builder.writeBlock(varyResult.code)
     builder.emptyLine()
   })
 
   builder.reduceIndent()
   builder.writeLine("}")
-  return builder.output();
+  const mainCode = builder.output();
+  
+  const includedCode = genShaderFunctionDepend(evaluatedNode);
+
+  return includedCode + mainCode
+}
+
+function pushListToMap(map:Map<ShaderNode, varRecord>, list:varRecord[]) {
+  list.forEach(item => {
+    if (!map.has(item.refedNode)) {
+      map.set(item.refedNode, item)
+    }
+  })
 }
 
 
-
-function genShaderFunctionDepend(nodes: ShaderNode[]): string {
+function genShaderFunctionDepend(nodes: Map<ShaderNode, varRecord>): string {
   let functionsStr = "\n";
   const dependFunctions = new Set<ShaderFunction>();
-  nodes.forEach(node => {
+  nodes.forEach((_record, node) => {
     if (node instanceof ShaderFunctionNode) {
       dependFunctions.add(node.factory)
     }
@@ -75,17 +92,22 @@ interface varRecord {
 
 function genTempVarExpFromShaderNode(
   node: ShaderNode,
-  ctx: varRecord[]
+  ctx: varRecord[],
+  preEvaluatedList: Map<ShaderNode, varRecord>
 ): string {
-  function getParamKeyFromVarList(ctx: varRecord[], node: ShaderNode): string {
-    const record = findFirst(ctx, varRc => {
-      return varRc.refedNode === node
-    })
-
-    if (record === undefined) {
-      throw "_var_miss"
+  function findRecordFromEvaluatedNode(node: ShaderNode) {
+    let record: varRecord;
+    if (preEvaluatedList.has(node)) {
+      record = preEvaluatedList.get(node)
+    } else {
+      record = findFirst(ctx, varRc => {
+        return varRc.refedNode === node
+      })
     }
+    return record;
+  }
 
+  function genRecordVar(record: varRecord): string {
     let key = "";
 
     // if depends input node, just use it.
@@ -95,36 +117,69 @@ function genTempVarExpFromShaderNode(
       key = record.varKey;
     }
 
-    if (record.refedNode.enableSwizzle) {
-      return key + "." + record.refedNode.swizzleType;
-    } else {
-      return key;
+    // if (record.refedNode.enableSwizzle) {
+    //   return key + "." + record.refedNode.swizzleType;
+    // } else {
+    //   return key;
+    // }
+    return key
+  }
+
+  function getParamKeyFromVarList(node: ShaderNode): string {
+    const record = findRecordFromEvaluatedNode(node);
+    if (record === undefined) {
+      throw "_var_miss"
     }
+    return genRecordVar(record);
+  }
+
+  let record = findRecordFromEvaluatedNode(node)
+  if (record) {
+    return genRecordVar(record);
   }
 
   if (node instanceof ShaderFunctionNode) {
     const functionDefine = node.factory.define;
-
     let functionInputs = "";
     Object.keys(functionDefine.inputs).forEach((key, index) => {
       const nodeDepend = node.inputMap.get(key) as ShaderNode;
-      functionInputs += getParamKeyFromVarList(ctx, nodeDepend);
+      functionInputs += getParamKeyFromVarList(nodeDepend);
       if (index !== Object.keys(functionDefine.inputs).length - 1) {
         functionInputs += ", "
       }
     })
-
-    const result = `${functionDefine.name}(${functionInputs});`
+    const result = `${functionDefine.name}(${functionInputs})`
     return result;
   }
 
   if (node instanceof ShaderInputNode) {
-    return (node as ShaderInputNode).name + ';';
+    return (node as ShaderInputNode).name;
   }
 
   if (node instanceof ShaderTextureFetchNode) {
-    return `texture2D(${node.source.name}, ${getParamKeyFromVarList(ctx, node.fetchByNode)})`
+    return `texture2D(${node.source.name}, ${getParamKeyFromVarList(node.fetchByNode)})`
   }
+
+  if (node instanceof ShaderCombineNode) {
+    let combineResult = "";
+    node.combines.forEach((nodeDepend, index) => {
+      combineResult += getParamKeyFromVarList(nodeDepend);
+      if (index !== node.combines.length - 1) {
+        combineResult += ", "
+      }
+    })
+    const result = `vec${node.combineCount}(${combineResult})`
+    return result;
+  }
+
+  if (node instanceof ShaderConstNode) {
+    return node.shaderString;
+  }
+
+  if (node instanceof ShaderSwizzleNode) {
+    return getParamKeyFromVarList(node.from) + '.' + node.swizzleType;
+  }
+
 
   throw "unknown shader node"
 }
@@ -132,7 +187,12 @@ function genTempVarExpFromShaderNode(
 
 function codeGenGraph(
   nodeDependList: ShaderNode[],
-  rootOutputName: string): string {
+  rootOutputName: string,
+  preEvaluatedList: Map<ShaderNode, varRecord>
+): {
+    code: string,
+    varList: varRecord[]
+  } {
   const builder = new CodeBuilder()
   builder.reset();
   const varList: varRecord[] = [];
@@ -141,22 +201,28 @@ function codeGenGraph(
     varList.push({
       refedNode: nodeToGen,
       varKey: varName,
-      expression: genTempVarExpFromShaderNode(nodeToGen, varList),
+      expression: genTempVarExpFromShaderNode(nodeToGen, varList, preEvaluatedList),
     })
   })
-  varList.forEach((varRc, index) => {
-    if (index !== varList.length - 1) {
-      if (varRc.refedNode instanceof ShaderFunctionNode) {
-        const varType = getShaderTypeStringFromGLDataType(varRc.refedNode.factory.define.returnType);
-        builder.writeLine(`${varType} ${varRc.varKey} = ${varRc.expression}`)
-      }
-      if (varRc.refedNode instanceof ShaderTextureFetchNode) {
-        const varType = getShaderTypeStringFromGLDataType(varRc.refedNode.returnType);
-        builder.writeLine(`${varType} ${varRc.varKey} = ${varRc.expression}`)
-      }
-    } else {
-      builder.writeLine(`${rootOutputName} = ${varRc.expression}`)
+  varList.forEach(varRc => {
+    if (varRc.refedNode instanceof ShaderInputNode) {
+      return;
     }
+    if (preEvaluatedList.has(varRc.refedNode)) {
+      return;
+    }
+    const varType = getShaderTypeStringFromGLDataType(varRc.refedNode.type);
+    builder.writeLine(`${varType} ${varRc.varKey} = ${varRc.expression};`)
   })
-  return builder.output();
+
+  const selfRecord = varList[varList.length - 1];
+  if (selfRecord.refedNode instanceof ShaderInputNode) {
+    builder.writeLine(`${rootOutputName} = ${selfRecord.refedNode.name};`)
+  } else {
+    builder.writeLine(`${rootOutputName} = ${selfRecord.varKey};`)
+  }
+  return {
+    code: builder.output(),
+    varList
+  };
 }

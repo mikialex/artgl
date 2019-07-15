@@ -45,7 +45,7 @@ export class GLShader {
 }
 
 function logDebugShaderSource(source: string) {
-  console.log(addLineNumbers(source));
+  console.warn(addLineNumbers(source));
 }
 
 function addLineNumbers(str: string) {

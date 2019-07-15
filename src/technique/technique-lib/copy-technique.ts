@@ -1,8 +1,8 @@
-import { Technique } from "../../core/technique";
+import { Technique, Shading } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { GLTextureType } from "../../webgl/uniform/uniform-texture";
-import { attribute, texture } from "../../shader-graph/node-maker";
+import { attribute, texture, vec4, constValue } from "../../shader-graph/node-maker";
 
 // const vertexShaderSource =
 //   `
@@ -19,7 +19,7 @@ import { attribute, texture } from "../../shader-graph/node-maker";
 //     }
 //     `
 
-export class CopyTechnique extends Technique {
+export class CopyShading extends Shading {
   // constructor() {
   //   super({
   //     attributes: [
@@ -40,9 +40,9 @@ export class CopyTechnique extends Technique {
 
   update() {
     this.graph.reset()
-    .setVertexRoot(attribute(
+    .setVertexRoot(vec4(attribute(
       { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-    ))
+    ), constValue(1)))
     .setVary("v_uv",attribute(
       { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
     ))

@@ -1,8 +1,8 @@
-import { Technique } from "../../core/technique";
+import { Technique, Shading } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
-import { attribute, uniform, texture, innerUniform } from "../../shader-graph/node-maker";
+import { attribute, uniform, texture, innerUniform, constValue, vec4 } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
 import { randDir3D } from "../../shader-graph/built-in/rand";
@@ -49,7 +49,7 @@ const newSamplePosition = new ShaderFunction({
 const NDCFromWorldPositionAndVPMatrix = new ShaderFunction({
   source: `
   vec3 depthFromWorldPositionAndVPMatrix(vec3 position, mat4 matrix){
-    vec4 ndc = matrix * newSamplePosition;
+    vec4 ndc = matrix * vec4(position, 1.0);
     ndc = ndc / ndc.w;
     return ndc.xyz;
   }
@@ -62,7 +62,7 @@ const sampleAO = new ShaderFunction({
     if (depth >0.999){
       return vec3(0.5);
     }
-    float rate =  newNDC.z > newDepth ? 0.0 : 1.0;
+    float rate =  depth > newDepth ? 0.0 : 1.0;
     return vec3(rate);
   }
   `
@@ -85,7 +85,7 @@ const tssaoMix = new ShaderFunction({
   `
 })
 
-export class SSAOTechnique extends Technique {
+export class SSAOShading extends Shading {
   // constructor() {
   //   super({
   //     attributes: [
@@ -116,9 +116,10 @@ export class SSAOTechnique extends Technique {
     const VPMatrix = innerUniform(InnerSupportUniform.VPMatrix);
     const depthTex = texture("depthResult");
     this.graph.reset()
-      .setVertexRoot(attribute(
+      .setVertexRoot(
+        vec4(attribute(
         { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-      ))
+      ), constValue(1)))
       .setVary("v_uv", attribute(
         { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
       ))

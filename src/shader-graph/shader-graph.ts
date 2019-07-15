@@ -3,7 +3,7 @@ import { genFragShader, genVertexShader } from "./code-gen";
 import {
   ShaderFunctionNode, ShaderInputNode,
   ShaderAttributeInputNode, ShaderInnerUniformInputNode,
-  ShaderCommonUniformInputNode, ShaderVaryInputNode, ShaderNode
+  ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode, ShaderTextureFetchNode, ShaderTexture
 } from "./shader-node";
 import { Nullable } from "../type";
 
@@ -11,6 +11,9 @@ export class ShaderGraph {
   fragmentRoot: Nullable<ShaderNode>;
   vertexRoot: Nullable<ShaderNode>;
   varyings: Map<string, ShaderNode> = new Map();
+
+  fragmentDecorator: Nullable<ShaderFunctionNode> = null;
+  vertexDecorator: Nullable<ShaderFunctionNode> = null;
 
   setFragmentRoot(root: ShaderNode): ShaderGraph {
     this.fragmentRoot = root;
@@ -31,12 +34,12 @@ export class ShaderGraph {
     return this;
   }
 
-  getVary(key): ShaderNode {
+  getVary(key: string): ShaderVaryInputNode {
     const ret = this.varyings.get(key);
     if (ret === undefined) {
       throw 'cant get vary'
     }
-    return ret;
+    return new ShaderVaryInputNode(key, ret.type);
   }
 
   reset(): ShaderGraph {
@@ -82,7 +85,8 @@ export class ShaderGraph {
   }
 
   collectInputs() {
-    const inputNodes = this.nodes.filter(
+    const nodes = this.nodes;
+    const inputNodes = nodes.filter(
       n => n instanceof ShaderInputNode
     );
 
@@ -112,6 +116,19 @@ export class ShaderGraph {
           mapInner: node.mapInner,
         }
       });
+    
+    const textureSet = new Set<ShaderTexture>();
+    nodes.filter(n => n instanceof ShaderTextureFetchNode)
+      .forEach((node: ShaderTextureFetchNode)  => {
+        textureSet.add(node.source)
+      })
+    const textures = [];
+    textureSet.forEach(st => {
+      textures.push({
+        name:st.name,
+        type:st.type 
+        })
+      })
 
     const varyings = [];
     this.varyings.forEach((node, key) => {
@@ -121,7 +138,7 @@ export class ShaderGraph {
       })
     })
 
-    return { attributes, uniforms, varyings, uniformsIncludes }
+    return { attributes, uniforms, textures, varyings, uniformsIncludes }
   }
 
   compileVertexSource(): string {

@@ -1,13 +1,13 @@
 import ARTGL from '../../src/export';
-import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4, PlaneGeometry, Geometry, NormalTechnique, OBJLoader } from '../../src/artgl';
+import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4, PlaneGeometry, Geometry, OBJLoader, Technique, NormalShading } from '../../src/artgl';
 import { Scene } from '../../src/scene/scene';
 import { SceneNode } from '../../src/scene/scene-node';
 import { RenderGraph } from '../../src/render-graph/render-graph';
 import { DimensionType, PixelFormat } from '../../src/render-graph/interface';
-import { TAATechnique } from '../../src/technique/technique-lib/taa-technique';
-import { SSAOTechnique } from '../../src/technique/technique-lib/ssao-technique';
-import { DepthTechnique } from '../../src/technique/technique-lib/depth-technique';
-import { TSSAOBlendTechnique } from '../../src/technique/technique-lib/blend-technique';
+import { TAAShading } from '../../src/technique/technique-lib/taa-technique';
+import { SSAOShading } from '../../src/technique/technique-lib/ssao-technique';
+import { DepthShading } from '../../src/technique/technique-lib/depth-technique';
+import { TSSAOBlendShading } from '../../src/technique/technique-lib/blend-technique';
 import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
 import hierachyBallBuilder from './scene/hierachy-balls';
 import { createConf } from './conf';
@@ -29,13 +29,13 @@ export class Application {
 
   lightCamera: Camera;
 
-  taaTech: TAATechnique;
+  taaTech: Technique = new Technique(new TAAShading);
   enableTAA = true;
 
   enableTSSAO = true;
-  tssaoTech: SSAOTechnique;
+  tssaoTech: Technique = new Technique(new SSAOShading);
 
-  composeTech: TSSAOBlendTechnique;
+  composeTech: Technique = new Technique(new TSSAOBlendShading);
 
   conf: RenderConfig;
   private tickNum = 0;
@@ -53,13 +53,7 @@ export class Application {
     this.hasInitialized = true;
     this.createScene(this.scene);
 
-    const TAATech = new TAATechnique();
-    const SSAOTech = new SSAOTechnique();
-    const copyTech = new TSSAOBlendTechnique();
-    this.taaTech = TAATech;
-    this.tssaoTech = SSAOTech;
-    this.composeTech = copyTech;
-    const depthTech = new DepthTechnique()
+    const depthTech = new Technique( new DepthShading())
     
     this.graph.setGraph({
       renderTargets: [
@@ -111,16 +105,16 @@ export class Application {
               TAAHistoryOld: this.isEvenTick ? "TAAHistoryA" : "TAAHistoryB",
             }
           },
-          technique: TAATech,
+          technique: this.taaTech,
           source: [RenderGraph.quadSource],
           enableColorClear: false,
           beforePassExecute: () => {
             this.engine.unJit();
-            const VPInv: Matrix4 = TAATech.uniforms.get('VPMatrixInverse').value;
+            const VPInv: Matrix4 = this.taaTech.uniforms.get('VPMatrixInverse').value;
             const VP: Matrix4 = this.engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
             VPInv.getInverse(VP, true);
-            TAATech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
-            TAATech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
+            this.taaTech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
+            this.taaTech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
           },
         },
         {
@@ -131,15 +125,15 @@ export class Application {
               AOAcc: this.isEvenTick ? "SSAOHistoryA" : "SSAOHistoryB",
             }
           },
-          technique: SSAOTech,
+          technique: this.tssaoTech,
           source: [RenderGraph.quadSource],
           enableColorClear: false,
           beforePassExecute: () => {
-            const VPInv: Matrix4 = SSAOTech.uniforms.get('VPMatrixInverse').value;
+            const VPInv: Matrix4 = this.tssaoTech.uniforms.get('VPMatrixInverse').value;
             const VP: Matrix4 = this.engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
             VPInv.getInverse(VP, true);
-            SSAOTech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
-            SSAOTech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
+            this.tssaoTech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
+            this.tssaoTech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
           },
         },
         { // copy to screen
@@ -161,12 +155,12 @@ export class Application {
             return {basic, tssao}
           },
           beforePassExecute: () =>{
-            copyTech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
+            this.composeTech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
           },
           afterPassExecute: () => {
             this.sampleCount++;
           },
-          technique: copyTech,
+          technique: this.composeTech,
           source: [RenderGraph.quadSource],
         },
       ]
@@ -195,8 +189,8 @@ export class Application {
     this.engine.setSize(width, height);
     (this.engine.camera as PerspectiveCamera).aspect = width / height;
 
-    this.taaTech.uniforms.get('screenPixelXStep').setValue(1 / (2 * window.devicePixelRatio * width));
-    this.taaTech.uniforms.get('screenPixelYStep').setValue(1 / (2 * window.devicePixelRatio * height));
+    // this.taaTech.uniforms.get('screenPixelXStep').setValue(1 / (2 * window.devicePixelRatio * width));
+    // this.taaTech.uniforms.get('screenPixelYStep').setValue(1 / (2 * window.devicePixelRatio * height));
   }
   notifyResize() {
     this.onContainerResize();
@@ -262,7 +256,7 @@ export class Application {
     const geo = objLoader.parse(result);
     const mesh = new Mesh();
     mesh.geometry = geo;
-    mesh.technique = new NormalTechnique();
+    mesh.technique = new Technique(new NormalShading());
     this.scene.root.addChild(mesh);
   }
 

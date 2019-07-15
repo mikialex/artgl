@@ -5,18 +5,16 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { TSSAOBlendTechnique } from '../../../src/technique/technique-lib/blend-technique';
-import { SSAOTechnique } from '../../../src/technique/technique-lib/ssao-technique';
-import { TAATechnique } from '../../../src/technique/technique-lib/taa-technique';
+import { TAAShading } from '../../../src/technique/technique-lib/taa-technique';
+import { NormalShading } from '../../../src/artgl';
+import { DepthShading } from '../../../src/technique/technique-lib/depth-technique';
 @Component({
 })
 export default class Debug extends Vue {
   mounted(){
     console.log("debug")
-    const test = new TAATechnique();
-    console.log(test._programConfigCache)
-    console.log(test._programConfigCache.vertexShaderString)
-    console.log(test._programConfigCache.fragmentShaderString)
+    const test = new DepthShading();
+    console.log(test.getProgramConfig());
   }
 }
 </script>

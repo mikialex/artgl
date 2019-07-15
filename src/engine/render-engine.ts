@@ -5,7 +5,7 @@ import { Matrix4 } from "../math/matrix4";
 import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
-import { Technique } from "../core/technique";
+import { Technique, Shading } from "../core/technique";
 import { DrawMode } from "../webgl/const";
 import { Texture } from "../core/texture";
 import { Material } from "../core/material";
@@ -17,9 +17,9 @@ import { UniformProxy } from "./uniform-proxy";
 import { Observable } from "../core/observable";
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
 import { QuadSource } from '../render-graph/quad-source';
-import { CopyTechnique } from '../technique/technique-lib/copy-technique';
+import { CopyShading } from '../technique/technique-lib/copy-technique';
 import { downloadCanvasPNGImage } from "../util/file-io";
-import { NormalTechnique } from "../technique/technique-lib/normal-technique";
+import { NormalShading } from "../technique/technique-lib/normal-technique";
 
 export interface RenderSource{
   resetSource(): void;
@@ -45,7 +45,7 @@ export interface Size{
 }
 
 
-const copyTechnique = new CopyTechnique();
+const copyTechnique = new Technique(new CopyShading());
 const quad = new QuadSource();
 
 export class ARTEngine implements GLReleasable{
@@ -100,7 +100,7 @@ export class ARTEngine implements GLReleasable{
 
 
   public overrideTechnique: Nullable<Technique> = null;
-  public defaultTechnique: Technique = new NormalTechnique();
+  public defaultTechnique: Technique = new Technique(new NormalShading());
 
   ////
 
@@ -214,7 +214,7 @@ export class ARTEngine implements GLReleasable{
     );
 
     this.overrideTechnique = copyTechnique;
-    this.overrideTechnique.getProgram(this).defineFrameBufferTextureDep(
+    this.overrideTechnique.shading.getProgram(this).defineFrameBufferTextureDep(
       framebuffer.name, 'copySource'
     );
     this.render(quad);
@@ -250,7 +250,7 @@ export class ARTEngine implements GLReleasable{
     } else {
       technique = this.defaultTechnique;
     }
-    const program = technique.getProgram(this);
+    const program = technique.shading.getProgram(this);
     this.renderer.useProgram(program);
     this.getGlobalUniform(InnerSupportUniform.MMatrix).setValue(object.worldMatrix);
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
@@ -370,22 +370,22 @@ export class ARTEngine implements GLReleasable{
     const id = texture.glTextureId;
     return this.renderer.getGLTexture(id);
   }
-  private programTechniqueMap: Map<Technique, GLProgram> = new Map();
-  getProgram(technique: Technique): GLProgram {
-    return this.programTechniqueMap.get(technique);
+  private programShadingMap: Map<Shading, GLProgram> = new Map();
+  getProgram(shading: Shading): GLProgram {
+    return this.programShadingMap.get(shading);
   }
 
-  createProgram(technique: Technique): GLProgram  {
-    const program = this.renderer.createProgram(technique.createProgramConfig());
-    this.programTechniqueMap.set(technique, program);
+  createProgram(shading: Shading): GLProgram  {
+    const program = this.renderer.createProgram(shading.getProgramConfig());
+    this.programShadingMap.set(shading, program);
     return program;
   }
 
-  deleteProgram(technique: Technique) {
-    const program = this.programTechniqueMap.get(technique);
+  deleteProgram(shading: Shading) {
+    const program = this.programShadingMap.get(shading);
     if (program !== undefined) {
       program.dispose();
-      this.programTechniqueMap.delete(technique);
+      this.programShadingMap.delete(shading);
     }
   }
 
