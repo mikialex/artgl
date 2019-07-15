@@ -9,19 +9,22 @@ export function genFragShader(graph: ShaderGraph): string {
   const builder = new CodeBuilder()
   builder.reset();
 
-  const nodeDependList = graph.fragmentRoot.generateDependencyOrderList() as ShaderNode[];
-  builder.writeBlockRaw(genShaderFunctionDepend(nodeDependList))
-  builder.emptyLine()
-
   builder.writeLine("void main(){")
   builder.addIndent()
 
   const evaluatedNode = new Map<ShaderNode, varRecord>();
-  builder.writeBlock(codeGenGraph(nodeDependList, "gl_FragColor", evaluatedNode).code)
+  const nodeDependList = graph.fragmentRoot.generateDependencyOrderList() as ShaderNode[];
+  const fragResult = codeGenGraph(nodeDependList, "gl_FragColor", evaluatedNode);
+  builder.writeBlock(fragResult.code)
+  pushListToMap(evaluatedNode, fragResult.varList)
 
   builder.reduceIndent()
   builder.writeLine("}")
-  return builder.output();
+  const mainCode = builder.output();
+  
+  const includedCode = genShaderFunctionDepend(evaluatedNode);
+
+  return includedCode + mainCode
 }
 
 
@@ -29,14 +32,11 @@ export function genVertexShader(graph: ShaderGraph): string {
   const builder = new CodeBuilder()
   builder.reset();
 
-  const nodeDependList = graph.vertexRoot.generateDependencyOrderList() as ShaderNode[];
-  builder.writeBlockRaw(genShaderFunctionDepend(nodeDependList))
-  builder.emptyLine()
-
   builder.writeLine("void main(){")
   builder.addIndent()
 
   const evaluatedNode = new Map<ShaderNode, varRecord>();
+  const nodeDependList = graph.vertexRoot.generateDependencyOrderList() as ShaderNode[];
   const vertexResult = codeGenGraph(nodeDependList, "gl_Position", evaluatedNode)
   pushListToMap(evaluatedNode, vertexResult.varList)
   builder.writeBlock(vertexResult.code)
@@ -52,7 +52,11 @@ export function genVertexShader(graph: ShaderGraph): string {
 
   builder.reduceIndent()
   builder.writeLine("}")
-  return builder.output();
+  const mainCode = builder.output();
+  
+  const includedCode = genShaderFunctionDepend(evaluatedNode);
+
+  return includedCode + mainCode
 }
 
 function pushListToMap(map:Map<ShaderNode, varRecord>, list:varRecord[]) {
@@ -64,10 +68,10 @@ function pushListToMap(map:Map<ShaderNode, varRecord>, list:varRecord[]) {
 }
 
 
-function genShaderFunctionDepend(nodes: ShaderNode[]): string {
+function genShaderFunctionDepend(nodes: Map<ShaderNode, varRecord>): string {
   let functionsStr = "\n";
   const dependFunctions = new Set<ShaderFunction>();
-  nodes.forEach(node => {
+  nodes.forEach((_record, node) => {
     if (node instanceof ShaderFunctionNode) {
       dependFunctions.add(node.factory)
     }
@@ -182,6 +186,9 @@ function codeGenGraph(
   })
   varList.forEach(varRc => {
     if (varRc.refedNode instanceof ShaderInputNode) {
+      return;
+    }
+    if (preEvaluatedList.has(varRc.refedNode)) {
       return;
     }
     const varType = getShaderTypeStringFromGLDataType(varRc.refedNode.returnType);
