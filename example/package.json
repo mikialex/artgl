@@ -2,7 +2,9 @@
   "name": "artgl-test-suit",
   "version": "0.0.1-alpha",
   "description": "automated test and doc system for artgl",
-  "scripts": {},
+  "scripts": {
+    "build": "node ./scripts/index.js"
+  },
   "author": "mikialex",
   "license": "MIT",
   "dependencies": {

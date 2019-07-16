@@ -1,5 +1,4 @@
 var path = require('path');
-var webpack = require('webpack');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 var ROOT_PATH = path.resolve(__dirname);
@@ -28,7 +27,6 @@ module.exports = {
   },
   
   plugins: [
-    new webpack.NamedModulesPlugin(),
     new BundleAnalyzerPlugin({
       openAnalyzer: true,
     }),
