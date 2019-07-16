@@ -42,14 +42,14 @@ export class GLTextureUniform{
   isActive: boolean;
 
 
-  webgltexture: Nullable<WebGLTexture> = null;
+  webglTexture: Nullable<WebGLTexture> = null;
   currentActiveSlot: number;
 
-  useTexture(webgltexture: WebGLTexture): void {
+  useTexture(webglTexture: WebGLTexture): void {
     if (!this.isActive) {
       return;
     }
-    const textureSlot = this.slotManager.updateSlotTexture(webgltexture);
+    const textureSlot = this.slotManager.updateSlotTexture(webglTexture);
     if (this.currentActiveSlot !== textureSlot) {
       this.program.renderer.stat.uniformUpload++;
       this.currentActiveSlot = textureSlot;

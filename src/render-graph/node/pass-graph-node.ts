@@ -8,26 +8,22 @@ import { Nullable } from "../../type";
 export class PassGraphNode extends DAGNode {
   constructor(graph: RenderGraph, define: PassDefine) {
     super();
-    this.graph = graph;
     this.name = define.name;
-    this.define = define;
 
     this.pass = new RenderPass(graph, define);
 
     if (define.inputs !== undefined) {
       this.inputsGetter = define.inputs;
-      this.updateDependNode();
+      this.updateDependNode(graph);
     }
 
   }
-  readonly graph: RenderGraph;
   private inputsGetter: Nullable<() => PassInputMapInfo> = null
   inputs: PassInputMapInfo = {}
   readonly name: string;
-  readonly define: PassDefine;
 
-  updateDependNode() {
-    // disconnect all depends node
+  updateDependNode(graph: RenderGraph) {
+    // disconnect all depends node 
     this.clearAllFrom();
 
     // reval getter
@@ -38,7 +34,7 @@ export class PassGraphNode extends DAGNode {
     // connect new depends node
     Object.keys(inputs).forEach(inputUniformKey => {
       const framebufferName = inputs[inputUniformKey]
-      const renderTargetNode = this.graph.getRenderTargetDependence(framebufferName);
+      const renderTargetNode = graph.getRenderTargetDependence(framebufferName);
       if (renderTargetNode === undefined) {
         throw `render graph updating error, renderTarget depend node ${framebufferName} cant found`;
       }

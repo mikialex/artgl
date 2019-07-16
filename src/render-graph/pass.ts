@@ -9,7 +9,6 @@ import { Nullable } from "../type";
 
 export class RenderPass{
   constructor(graph: RenderGraph, define: PassDefine) {
-    this.graph = graph;
     this.define = define;
     this.name = define.name;
     if (define.technique !== undefined) {
@@ -37,7 +36,6 @@ export class RenderPass{
     })
   }
 
-  private graph: RenderGraph;
   readonly define: PassDefine;
   public name: string;
 
@@ -78,13 +76,13 @@ export class RenderPass{
   }
 
   static screenDebugViewPort = new Vector4(200, 0, 200, 200)
-  execute() {
-    const engine = this.graph.engine;
+  execute(graph: RenderGraph) {
+    const engine = graph.engine;
 
     // setup viewport and render target
     if (this.isOutputScreen) {
       engine.renderer.setRenderTargetScreen();
-      if (this.graph.enableDebuggingView) {
+      if (graph.enableDebuggingView) {
         const debugViewPort = RenderPass.screenDebugViewPort;
         engine.renderer.state.setViewport(
           debugViewPort.x, debugViewPort.y,
@@ -140,7 +138,7 @@ export class RenderPass{
     engine.renderer.state.colorbuffer.resetDefaultClearColor();
 
 
-    if (this.graph.enableDebuggingView && !this.isOutputScreen) {
+    if (graph.enableDebuggingView && !this.isOutputScreen) {
       this.renderDebugResult(engine);
     }
 

@@ -3,9 +3,6 @@ import { PassGraphNode } from '../../../src/render-graph/node/pass-graph-node';
 import { DAGNode } from '../../../src/core/dag-node';
 import { RenderTargetNode } from '../../../src/render-graph/node/render-target-node';
 
-import { ShaderGraph } from '../../../src/shader-graph/shader-graph';
-import { ShaderFunctionNode } from '../../../src/shader-graph/shader-node';
-
 export class GraphView {
   nodes: GraphNodeView[] = [];
   nodeMap: Map<string, GraphNodeView> = new Map();
@@ -38,31 +35,6 @@ export class GraphView {
     return view;
   }
 
-  static createFromShaderGraph(graph: ShaderGraph) {
-    const view = new GraphView();
-    // graph.functionNodes.forEach(node => {
-    //   const nodeView = GraphNodeView.create(node)
-    //   view.nodeMap.set(node.uuid, nodeView)
-    //   view.nodes.push(nodeView);
-    // })
-    // graph.inputNodes.forEach(node => {
-    //   const nodeView = GraphNodeView.create(node)
-    //   view.nodeMap.set(node.uuid, nodeView)
-    //   view.nodes.push(nodeView);
-    // })
-    
-    // view.nodes.forEach(node => {
-    //   node.inputsID.forEach(id => {
-    //     node.inputs.push(view.nodeMap.get(id));
-    //   })
-    // })
-
-    // view.rootNode = view.nodeMap.get(graph.effectRoot.uuid)
-    
-    // view.layout();
-    return view;
-  }
-
   layout() {
     this.nodes.forEach(node => {
       if (node.type === GraphNodeViewType.targetNode) {
@@ -84,17 +56,17 @@ function genGraphLayout(rootNode: GraphNodeView) {
       }
     })
   }
-  function addNode(node: GraphNodeView, horiPosition: number) {
-    let arr = horizonArray[horiPosition];
+  function addNode(node: GraphNodeView, horizonPosition: number) {
+    let arr = horizonArray[horizonPosition];
     if (arr === undefined) {
-      horizonArray[horiPosition] = [];
-      arr = horizonArray[horiPosition];
+      horizonArray[horizonPosition] = [];
+      arr = horizonArray[horizonPosition];
     }
     removeItem(node);
     arr.push(node) 
     
     node.inputs.forEach(input => {
-      addNode(input, horiPosition + 1);
+      addNode(input, horizonPosition + 1);
     })
   }
   addNode(rootNode, 0);
@@ -140,8 +112,8 @@ export class GraphNodeView {
 
     if (node instanceof PassGraphNode) {
       view.name = node.name;
-      if (node.define.inputs !== undefined) {
-        view.inputDefine = Object.keys(node.define.inputs()).map(key => {
+      if (node.inputs !== undefined) {
+        view.inputDefine = Object.keys(node.inputs).map(key => {
           return {
             name: key
           }
@@ -152,14 +124,6 @@ export class GraphNodeView {
     } else if (node instanceof RenderTargetNode) {
       view.name = node.name;
       view.type = GraphNodeViewType.targetNode;
-    } else if (node instanceof ShaderFunctionNode) {
-      // view.name = node.factory.define.name;
-      // view.type = GraphNodeViewType.shaderFuncNode;
-      // view.inputDefine = Object.keys(node.define.input).map(key => {
-      //   return {
-      //     name: key
-      //   }
-      // })
     }
     return view;
   }

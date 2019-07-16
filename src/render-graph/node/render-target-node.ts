@@ -13,7 +13,6 @@ export class RenderTargetNode extends DAGNode{
     super();
     this.name = define.name;
     this.define = define;
-    this.graph = graph;
 
     this.fromGetter = define.from;
 
@@ -39,10 +38,10 @@ export class RenderTargetNode extends DAGNode{
     } else { //  === DimensionType.bindRenderSize
       this.autoWidthRatio = define.format.width !== undefined ? MathUtil.clamp(define.format.width, 0, 1) : 1;
       this.autoHeightRatio = define.format.height !== undefined ? MathUtil.clamp(define.format.height, 0, 1) : 1;
-      width = this.autoWidth;
-      height = this.autoHeight;
-      this.resizeObserver = this.graph.engine.resizeObservable.add(() => {
-        this.framebuffer.resize(this.autoWidth, this.autoHeight);
+      width = Math.max(5, graph.engine.renderer.width * this.autoWidthRatio);
+      height = Math.max(5, graph.engine.renderer.height * this.autoHeightRatio);
+      this.resizeObserver = graph.engine.resizeObservable.add((size: Size) => {
+        this.framebuffer.resize(size.width, size.height);
       })
     }
 
@@ -54,19 +53,12 @@ export class RenderTargetNode extends DAGNode{
   readonly isScreenNode: boolean;
   readonly name: string;
   readonly define: RenderTargetDefine;
-  readonly graph: RenderGraph;
 
   debugViewPort: Vector4 = new Vector4(0, 0, 200, 200);
 
   autoWidthRatio: number = 0;
   autoHeightRatio: number = 0;
   private resizeObserver: Nullable<Observer<Size>> = null;
-  get autoWidth() {
-    return Math.max(5, this.graph.engine.renderer.width * this.autoWidthRatio);
-  }
-  get autoHeight() {
-    return Math.max(5, this.graph.engine.renderer.height * this.autoHeightRatio);
-  }
 
   get width() {
     return this.framebuffer.width
@@ -81,7 +73,7 @@ export class RenderTargetNode extends DAGNode{
   private fromGetter: () => Nullable<string>
   private from: string = null;
 
-  updateDependNode() {
+  updateDependNode(graph: RenderGraph) {
     
     // disconnect depends pass node
     this.clearAllFrom();
@@ -89,15 +81,15 @@ export class RenderTargetNode extends DAGNode{
     this.from = this.fromGetter();
 
     if (this.from !== null) {
-      const passNode = this.graph.getRenderPassDependence(this.from);
+      const passNode = graph.getRenderPassDependence(this.from);
       passNode.connectTo(this);
     }
     
   }
 
-  dispose() {
+  dispose(graph: RenderGraph) {
     if (this.resizeObserver !== null) {
-      this.graph.engine.resizeObservable.remove(this.resizeObserver);
+      graph.engine.resizeObservable.remove(this.resizeObserver);
     }
   }
 }

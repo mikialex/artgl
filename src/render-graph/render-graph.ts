@@ -49,7 +49,7 @@ export class RenderGraph {
    */
   public render() {
     this.passes.forEach(pass => {
-      pass.execute();
+      pass.execute(this);
     });
   }
 
@@ -86,10 +86,10 @@ export class RenderGraph {
     
     //updateNodesConnection
     this.passNodes.forEach(node => {
-      node.updateDependNode();
+      node.updateDependNode(this);
     });
     this.renderTargetNodes.forEach(node => {
-      node.updateDependNode();
+      node.updateDependNode(this);
     });
 
     // update pass queue

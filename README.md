@@ -28,6 +28,18 @@ Performance matters.
 
 ....
 
+## Posts(cn/zh)
+
+[https://mikialex.github.io/2019/03/12/artgl-about/](https://mikialex.github.io/2019/03/12/artgl-about/)
+
+[https://mikialex.github.io/2019/07/16/graph-based-shadersource-management/](https://mikialex.github.io/2019/07/16/graph-based-shadersource-management/)
+
+[https://mikialex.github.io/2019/04/30/wasm-scene/](https://mikialex.github.io/2019/04/30/wasm-scene/)
+
+[https://mikialex.github.io/2019/03/28/wasm-memory-as-data-container/](https://mikialex.github.io/2019/03/28/wasm-memory-as-data-container/)
+
+Some old post maybe not meet the current design, just for reference;
+
 ## Some sample here:
 
 **This may not work yet now, contribution welcomed;**
@@ -67,7 +79,7 @@ const el = canvas;
 const engine = new ARTEngine(canvas);
 const graph = new RenderGraph(this.engine);
 
-// this is not a real example, just demo how it looks
+// this may not a real example, just demo how it looks
 graph.setGraph({
   renderTargets: [
     {
@@ -125,59 +137,72 @@ graph.setGraph({
 
 ```ts
 
-// this is not a real example, just demo how it looks
-const VPMatrix = innerUniform(InnerSupportUniform.VPMatrix);
-const depthTex = texture("depthResult");
-this.graph.reset()
-  .setVertexRoot(attribute(
-    { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-  ))
-  .setVary("v_uv", attribute(
-    { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
-  ))
+// this may not a real example, just demo how it looks
 
-const vUV = this.graph.getVary("v_uv");
-const depth = unPackDepth.make().input("enc", depthTex.fetch(vUV))
+export class TSSAOShading extends Shading {
+  update() {
+    const VPMatrix = innerUniform(InnerSupportUniform.VPMatrix);
+    const sampleCount = uniform("u_sampleCount", GLDataType.float).default(0);
+    const depthTex = texture("depthResult");
+    this.graph.reset()
+      .setVertexRoot(
+        vec4(attribute(
+        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
+      ), constValue(1)))
+      .setVary("v_uv", attribute(
+        { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
+      ))
 
-const worldPosition = getWorldPosition.make()
-  .input("uv", vUV)
-  .input("depth", depth)
-  .input("VPMatrix", VPMatrix)
-  .input("VPMatrixInverse", uniform("VPMatrixInverse", GLDataType.Mat4))
+    const vUV = this.graph.getVary("v_uv");
+    const depth = unPackDepth.make().input("enc", depthTex.fetch(vUV))
 
-const randDir = randDir3D.make()
-  .input("randA", vUV.swizzling("x"))
-  .input("randB", vUV.swizzling("y"))
+    const worldPosition = getWorldPosition.make()
+      .input("uv", vUV)
+      .input("depth", depth)
+      .input("VPMatrix", VPMatrix)
+      .input("VPMatrixInverse", uniform("VPMatrixInverse", GLDataType.Mat4).default(new Matrix4()))
 
-const newPositionRand = newSamplePosition.make()
-  .input("positionOld", worldPosition.swizzling("xyz"))
-  .input("distance", uniform("u_aoRadius", GLDataType.float))
-  .input("dir", randDir)
+    const Random2D1 = rand2DT.make()
+      .input("cood", vUV)
+      .input("t", sampleCount)
+    
+    const Random2D2 = rand.make()
+    .input("n", Random2D1)
+    
+    const randDir = dir3D.make()
+      .input("x", Random2D1)
+      .input("y", Random2D2)
 
-const newDepth = unPackDepth.make()
-  .input("enc",
-    depthTex.fetch(
-      NDCxyToUV.make()
-        .input(
-          "ndc", NDCFromWorldPositionAndVPMatrix.make()
+    const newPositionRand = newSamplePosition.make()
+      .input("positionOld", worldPosition.swizzling("xyz"))
+      .input("distance", uniform("u_aoRadius", GLDataType.float).default(1))
+      .input("dir", randDir)
+
+    const newDepth = unPackDepth.make()
+      .input("enc",
+        depthTex.fetch(
+          NDCxyToUV.make()
             .input(
-              "position", newPositionRand
-            ).input(
-              "matrix", VPMatrix
+              "ndc", NDCFromWorldPositionAndVPMatrix.make()
+                .input(
+                  "position", newPositionRand
+                ).input(
+                  "matrix", VPMatrix
+                )
             )
         )
-    )
-  )
+      )
 
-this.graph.setFragmentRoot(
-  tssaoMix.make()
-    .input("oldColor", texture("AOAcc").fetch(vUV).swizzling("xyz"))
-    .input("newColor",
-      sampleAO.make()
-        .input("depth", depth)
-        .input("newDepth", newDepth)
+    this.graph.setFragmentRoot(
+      tssaoMix.make()
+        .input("oldColor", texture("AOAcc").fetch(vUV).swizzling("xyz"))
+        .input("newColor",
+          sampleAO.make()
+            .input("depth", depth)
+            .input("newDepth", newDepth)
+        )
+        .input("sampleCount", sampleCount)
     )
-    .input("sampleCount", uniform("u_sampleCount", GLDataType.float))
-)
-
+  }
+}
 ```

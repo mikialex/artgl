@@ -41,7 +41,7 @@ export default class ShaderEditor extends Vue {
 
   mounted(){
     ShaderApp.init(this.$el.querySelector("#shader-editor-canvas"));
-    this.graphView = GraphView.createFromShaderGraph(ShaderApp.graph);
+    // this.graphView = GraphView.createFromShaderGraph(ShaderApp.graph);
     console.log(this.graphView)
   }
 

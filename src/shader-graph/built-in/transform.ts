@@ -1,7 +1,7 @@
 import { ShaderFunction } from "../shader-function";
 
 export const MVPTransform = new ShaderFunction({
-  description: 'using camera projection and mm matrix to transform vertices',
+  description: 'Using camera view projection matrix and model matrix to transform vertices',
   source: `
     vec4 VPtransform (mat4 VPMatrix, mat4 MMatrix, vec3 position){
       return VPMatrix * MMatrix * vec4(position, 1.0);
@@ -10,7 +10,9 @@ export const MVPTransform = new ShaderFunction({
 })
 
 export const getWorldPosition = new ShaderFunction({
-  description: 'from the vpmatrix and its inverse, from uv to world position',
+  description:
+    `Transform from the current view projection matrix and its inverse, 
+     and uv coordinates to world position`,
   source:
     `
     vec4 getWorldPosition(
@@ -25,6 +27,8 @@ export const getWorldPosition = new ShaderFunction({
 })
 
 export const NDCxyToUV = new ShaderFunction({
+  description:
+    `Get texture uv lookup position from NDC`,
   source: `
   vec2 NDCTextureLookUp(vec3 ndc){
     return vec2(ndc.x / 2.0 + 0.5, ndc.y / 2.0 + 0.5);
@@ -58,10 +62,10 @@ export const getLastPixelNDC = new ShaderFunction({
 
 export const dir3D = new ShaderFunction({
   source: `
-  vec3 randDir(float randA, float randB){
+  vec3 randDir(float x, float y){
     float PI =  3.14159265; // TODO
-    float lambda = acos(2.0 * randA - 1.0) - PI / 2.0;
-    float phi = 2.0 * PI * randB;
+    float lambda = acos(2.0 * x - 1.0) - PI / 2.0;
+    float phi = 2.0 * PI * y;
     return vec3(
       cos(lambda) * cos(phi),
       cos(lambda) * sin(phi),

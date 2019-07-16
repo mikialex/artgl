@@ -43,9 +43,6 @@ export class Shading {
     engine.deleteProgram(this);
   }
 
-  make() {
-
-  }
 }
 
 export class Technique {
