@@ -230,10 +230,16 @@ export class ShaderSwizzleNode extends ShaderNode {
   constructor(node: ShaderNode, swizzleType: string) {
     super(node.type);
 
+    const swizzledSourceCount = getValueCount(node.type)
+
     const parts = swizzleType.trim().split("");
     if (parts.length > 4) {
       // TODO check more
       throw "swizzle not valid"
+    }
+
+    if (parts.length > swizzledSourceCount) {
+      throw "swizzle not valid, swizzle part exceed swizzledSource"
     }
 
     this.from = node;

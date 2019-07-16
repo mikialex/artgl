@@ -5,9 +5,10 @@ import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 import { attribute, uniform, texture, innerUniform, constValue, vec4 } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
-import { randDir3D } from "../../shader-graph/built-in/rand";
+import { dir3D } from "../../shader-graph/built-in/transform";
 import { getWorldPosition, NDCxyToUV } from "../../shader-graph/built-in/transform";
 import { Matrix4 } from "../../math/index";
+import { rand2DT, rand } from "../../shader-graph/built-in/rand";
 
 const vertexShaderSource =
   `
@@ -85,6 +86,7 @@ const tssaoMix = new ShaderFunction({
   `
 })
 
+
 export class TSSAOShading extends Shading {
   // constructor() {
   //   super({
@@ -114,6 +116,7 @@ export class TSSAOShading extends Shading {
 
   update() {
     const VPMatrix = innerUniform(InnerSupportUniform.VPMatrix);
+    const sampleCount = uniform("u_sampleCount", GLDataType.float).default(0);
     const depthTex = texture("depthResult");
     this.graph.reset()
       .setVertexRoot(
@@ -133,9 +136,16 @@ export class TSSAOShading extends Shading {
       .input("VPMatrix", VPMatrix)
       .input("VPMatrixInverse", uniform("VPMatrixInverse", GLDataType.Mat4).default(new Matrix4()))
 
-    const randDir = randDir3D.make()
-      .input("randA", vUV.swizzling("x"))
-      .input("randB", vUV.swizzling("y"))
+    const Random2D1 = rand2DT.make()
+      .input("cood", vUV)
+      .input("t", sampleCount)
+    
+    const Random2D2 = rand.make()
+    .input("n", Random2D1)
+    
+    const randDir = dir3D.make()
+      .input("randA", Random2D1)
+      .input("randB", Random2D2)
 
     const newPositionRand = newSamplePosition.make()
       .input("positionOld", worldPosition.swizzling("xyz"))
@@ -165,7 +175,7 @@ export class TSSAOShading extends Shading {
             .input("depth", depth)
             .input("newDepth", newDepth)
         )
-        .input("sampleCount", uniform("u_sampleCount", GLDataType.float).default(0))
+        .input("sampleCount", sampleCount)
     )
   }
 

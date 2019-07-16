@@ -52,8 +52,8 @@ export class DAGNode {
     let allDepNodes = this.generateAllDependencyList();
     allDepNodes.forEach(node => {
       node.fulfillList.clear();
-      node.toNodes.forEach((n) => {
-        n.fulfillList.set(node.uuid, false);
+      node.fromNodes.forEach((n) => {
+        node.fulfillList.set(n.uuid, false);
       })
     })
 

@@ -4,17 +4,21 @@ export const rand = new ShaderFunction({
   source: `float rand(float n) {return fract(sin(n) * 43758.5453123);}`
 })
 
-export const randDir3D = new ShaderFunction({
+export const rand2D = new ShaderFunction({
   source: `
-  vec3 randDir(float randA, float randB){
-    float PI =  3.14159265; // TODO
-    float lambda = acos(2.0 * randA - 1.0) - PI / 2.0;
-    float phi = 2.0 * PI * randB;
-    return vec3(
-      cos(lambda) * cos(phi),
-      cos(lambda) * sin(phi),
-      sin(lambda)
-    );
-  }
+  float rand(vec2 cood){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+  `
+})
+
+export const rand2DT = new ShaderFunction({
+  source: `
+  float rand(vec2 cood, float t){
+    vec2 co = cood;
+    co.x = sin(t) + co.x;
+    co.y = cos(t) + co.y;
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
   `
 })

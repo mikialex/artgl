@@ -7,7 +7,7 @@ const tempMatrix = new Matrix4();
 /**
  * Describe a node's local transformation info.
  * Users can set values and, from getter to get cleaned value
- * not need to update manually. ALl calculation is lazy.
+ * not need to update manually. All calculation is lazy.
  * @export
  * @class Transformation
  */

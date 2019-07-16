@@ -55,3 +55,18 @@ export const getLastPixelNDC = new ShaderFunction({
   }
   `
 })
+
+export const dir3D = new ShaderFunction({
+  source: `
+  vec3 randDir(float randA, float randB){
+    float PI =  3.14159265; // TODO
+    float lambda = acos(2.0 * randA - 1.0) - PI / 2.0;
+    float phi = 2.0 * PI * randB;
+    return vec3(
+      cos(lambda) * cos(phi),
+      cos(lambda) * sin(phi),
+      sin(lambda)
+    );
+  }
+  `
+})
