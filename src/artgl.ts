@@ -29,7 +29,7 @@ export { SphereGeometry } from "./geometry/geo-lib/sphere-geometry";
 export { PlaneGeometry } from "./geometry/geo-lib/plane-geometry";
 
 // technique lib
-export { NormalShading } from "./technique/technique-lib/normal-technique";
+export { NormalShading } from "./shading/basic-lib/normal";
 
 // math
 export { Matrix4, Quaternion, Vector3 } from "./math/index";

@@ -1,14 +1,12 @@
 import ARTGL from '../../src/export';
 import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4, PlaneGeometry, Geometry, OBJLoader, Technique, NormalShading } from '../../src/artgl';
 import { Scene } from '../../src/scene/scene';
-import { SceneNode } from '../../src/scene/scene-node';
 import { RenderGraph } from '../../src/render-graph/render-graph';
-import { DimensionType, PixelFormat } from '../../src/render-graph/interface';
-import { TAAShading } from '../../src/technique/technique-lib/taa-technique';
-import { SSAOShading } from '../../src/technique/technique-lib/ssao-technique';
-import { DepthShading } from '../../src/technique/technique-lib/depth-technique';
-import { TSSAOBlendShading } from '../../src/technique/technique-lib/blend-technique';
 import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
+import { TAAShading } from '../../src/shading/pass-lib/taa';
+import { TSSAOBlendShading } from '../../src/shading/pass-lib/tssao-blend';
+import { TSSAOShading } from '../../src/shading/pass-lib/tssao';
+import { DepthShading } from '../../src/shading/pass-lib/depth';
 import hierachyBallBuilder from './scene/hierachy-balls';
 import { createConf } from './conf';
 import { Observable } from '../../src/core/observable';
@@ -33,7 +31,7 @@ export class Application {
   enableTAA = true;
 
   enableTSSAO = true;
-  tssaoTech: Technique = new Technique(new SSAOShading);
+  tssaoTech: Technique = new Technique(new TSSAOShading);
 
   composeTech: Technique = new Technique(new TSSAOBlendShading);
 

@@ -17,9 +17,9 @@ import { UniformProxy } from "./uniform-proxy";
 import { Observable } from "../core/observable";
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
 import { QuadSource } from '../render-graph/quad-source';
-import { CopyShading } from '../technique/technique-lib/copy-technique';
 import { downloadCanvasPNGImage } from "../util/file-io";
-import { NormalShading } from "../technique/technique-lib/normal-technique";
+import { CopyShading } from "../shading/pass-lib/copy";
+import { NormalShading } from "../artgl";
 
 export interface RenderSource{
   resetSource(): void;

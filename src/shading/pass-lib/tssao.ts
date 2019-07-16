@@ -85,7 +85,7 @@ const tssaoMix = new ShaderFunction({
   `
 })
 
-export class SSAOShading extends Shading {
+export class TSSAOShading extends Shading {
   // constructor() {
   //   super({
   //     attributes: [
