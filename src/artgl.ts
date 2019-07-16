@@ -7,13 +7,16 @@ export { GLProgram } from "./webgl/program";
 // artgl engine layer
 export { ARTEngine } from "./engine/render-engine";
 export { InnerSupportUniform } from './webgl/uniform/uniform';
+
 export { RenderObject } from "./core/render-object";
 export { Mesh } from "./object/mesh";
 export { Line } from "./object/line";
 export { Points } from "./object/points";
+
 export { Geometry } from "./core/geometry";
 export { Material, ChannelType } from './core/material';
 export { Technique } from "./core/technique";
+export { Shading } from "./core/technique";
 export { BufferData } from "./core/buffer-data";
 export { Camera } from "./core/camera";
 export { Observable } from "./core/observable";
@@ -27,6 +30,7 @@ export { RenderGraph } from './render-graph/render-graph';
 
 // shader graph
 export { ShaderGraph } from './shader-graph/shader-graph';
+export * from './shader-graph/node-maker';
 
 // geometry lib
 export { SphereGeometry } from "./geometry/geo-lib/sphere-geometry";

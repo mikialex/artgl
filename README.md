@@ -28,6 +28,15 @@ Performance matters.
 
 ....
 
+## Sub projects
+
+This repo also contains sub projects: example/ and viewer/
+
+[example readme(cn/zh)](./example/README.md)
+
+[viewer readme](./viewer/README.md)
+
+
 ## Posts(cn/zh)
 
 [https://mikialex.github.io/2019/03/12/artgl-about/](https://mikialex.github.io/2019/03/12/artgl-about/)
@@ -106,7 +115,7 @@ graph.setGraph({
       technique: depthTech,
       source: [this.scene],
     },
-    { // mix new render and old samples
+    { // mix new results with old samples
       name: "TAA",
       inputs: () => {
         return {

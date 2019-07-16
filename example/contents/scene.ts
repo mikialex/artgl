@@ -1,23 +1,30 @@
 import * as ARTGL from '../../src/artgl'
 
-//==
-// # 基本使用
-// 
-// 在一个3d场景中，绘制一个简单的立方体
-//==
+export default async function () {
 
-//==>
 
-let canv = document.querySelector('canvas');
+  //==
+  // # 基本使用
+  // 
+  // 在一个3d场景中，绘制一个简单的立方体
+  //==
 
-const engine = new ARTGL.ARTEngine(canv);
 
-const scene = new ARTGL.Scene();
+  //==>
 
-let testMesh = new ARTGL.Mesh();
+  let canv = document.querySelector('canvas');
 
-scene.root.addChild(testMesh);
+  const engine = new ARTGL.ARTEngine(canv);
 
-engine.render(scene);
+  const scene = new ARTGL.Scene();
 
-//==<
+  let testMesh = new ARTGL.Mesh();
+
+  scene.root.addChild(testMesh);
+
+  engine.render(scene);
+
+  //==<
+
+
+}
