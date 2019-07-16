@@ -12,7 +12,7 @@ export class GLFrameAttachedTexture{
   }
   gl: WebGLRenderingContext;
   framebuffer: GLFramebuffer;
-  gltexture: WebGLTexture;
+  glTexture: WebGLTexture;
   textureStoreId: string;
   attachPoint: number;
 
@@ -21,11 +21,11 @@ export class GLFrameAttachedTexture{
     const framebuffer = this.framebuffer;
     this.textureStoreId = framebuffer.renderer.textureManger.
       createTextureForRenderTarget(framebuffer.width, framebuffer.height);
-    this.gltexture = framebuffer.renderer.textureManger.getGLTexture(this.textureStoreId);
+    this.glTexture = framebuffer.renderer.textureManger.getGLTexture(this.textureStoreId);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.webglFrameBuffer);
     const attachmentPoint = GLAttachmentPoints[this.attachPoint];
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, this.gltexture, 0);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, this.glTexture, 0);
   }
 
   updateSize() {
@@ -36,7 +36,7 @@ export class GLFrameAttachedTexture{
   disposeTexture() {
     this.framebuffer.renderer.textureManger.deleteGLTexture(this.textureStoreId);
     this.textureStoreId = undefined;
-    this.gltexture = undefined;
+    this.glTexture = undefined;
   }
 
   dispose() {
@@ -82,7 +82,7 @@ export class GLFramebuffer{
   createGLFramebuffer() {
     const buffer = this.gl.createFramebuffer();
     if (buffer === null) {
-      throw 'webgl framgbuffer create failed'
+      throw 'webgl framebuffer create failed'
     }
     return buffer;
   }
@@ -146,7 +146,7 @@ export class GLFramebuffer{
 
   // read pixel info from this framebuffer
   readPixels(x:number, y:number, width: number, height: number) {
-    
+    // TODO
   }
 
   dispose() {

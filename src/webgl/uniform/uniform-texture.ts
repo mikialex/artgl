@@ -2,6 +2,7 @@ import { GLProgram } from "../program";
 import { Nullable } from "../../type";
 import { GLTextureSlot } from "../states/gl-texture-slot";
 import { ChannelType } from "../../core/material";
+import { GLRenderer } from '../gl-renderer';
 
 export enum GLTextureType{
   texture2D,
@@ -21,9 +22,9 @@ export interface TextureDescriptor {
  */
 export class GLTextureUniform{
   constructor(program: GLProgram, descriptor: TextureDescriptor) {
-    this.program = program;
+    this.renderer = program.renderer;
     this.slotManager = program.renderer.state.textureSlot;
-    this.gl = program.getRenderer().gl;
+    this.gl = program.renderer.gl;
     this.name = descriptor.name
     this.channel = descriptor.channelType;
     const glProgram = program.getProgram();
@@ -36,8 +37,7 @@ export class GLTextureUniform{
   channel: ChannelType;
   private gl: WebGLRenderingContext;
   private slotManager: GLTextureSlot;
-  private program: GLProgram;
-  readonly descriptor: TextureDescriptor;
+  private renderer: GLRenderer;
   private location: WebGLUniformLocation;
   isActive: boolean;
 
@@ -51,7 +51,7 @@ export class GLTextureUniform{
     }
     const textureSlot = this.slotManager.updateSlotTexture(webglTexture);
     if (this.currentActiveSlot !== textureSlot) {
-      this.program.renderer.stat.uniformUpload++;
+      this.renderer.stat.uniformUpload++;
       this.currentActiveSlot = textureSlot;
       this.gl.uniform1i(this.location, textureSlot);
     }

@@ -1,13 +1,13 @@
 import { GLProgram } from "../program";
-import { findUniformSetter, findUniformFlattener, findUniformDiffer, findUniformCopyer } from "./uniform-util";
+import { findUniformSetter, findUniformFlattener, findUniformDiffer, findUniformCopier } from "./uniform-util";
 import { GLDataType } from "../shader-util";
 import { Matrix4 } from "../../math/matrix4";
-import { GLRenderer } from "../gl-renderer";
+import { GLRenderer } from '../gl-renderer';
 
 export type uniformUploadType = number | Float32Array | number[]
 export type flattenerType= (value: any, receiveData: uniformUploadType) => uniformUploadType;
 export type setterType= (gl: WebGLRenderingContext, location: WebGLUniformLocation, data: uniformUploadType) => void
-export type copyerType = (newValue: uniformUploadType, target: uniformUploadType) => uniformUploadType;
+export type copierType = (newValue: uniformUploadType, target: uniformUploadType) => uniformUploadType;
 export type differType= (newValue: uniformUploadType, oldValue: uniformUploadType) => boolean;
 
 export const enum InnerSupportUniform{
@@ -40,7 +40,7 @@ export interface UniformDescriptor {
   default?: any,
   flattener?: flattenerType
   setter?: setterType,
-  copyer?: copyerType,
+  copier?: copierType,
   differ?: differType
   _innerGlobalUniform?: InnerSupportUniform
 }
@@ -51,11 +51,11 @@ export function createUniform(program: GLProgram, descriptor: UniformDescriptor)
 }
 
 export function getInnerUniformDescriptor(des: InnerUniformMapDescriptor): UniformDescriptor {
-  const temdescriptor = InnerUniformMap.get(des.mapInner);
+  const tempDescriptor = InnerUniformMap.get(des.mapInner);
   const descriptor = {
     name: des.name,
-    type: temdescriptor.type,
-    default: temdescriptor.default, // TODO default seems not useful
+    type: tempDescriptor.type,
+    default: tempDescriptor.default, // TODO default seems not useful
     _innerGlobalUniform: des.mapInner
   }
   return descriptor;
@@ -63,9 +63,9 @@ export function getInnerUniformDescriptor(des: InnerUniformMapDescriptor): Unifo
 
 export class GLUniform{
   constructor(program: GLProgram, descriptor: UniformDescriptor) {
-    this.program = program;
     this.name = descriptor.name;
-    this.gl = program.getRenderer().gl;
+    this.renderer = program.renderer;
+    this.gl = program.renderer.gl;
     const glProgram = program.getProgram();
     const location = this.gl.getUniformLocation(glProgram, descriptor.name);
     this.isActive = location !== null;
@@ -80,16 +80,16 @@ export class GLUniform{
     this.differ = descriptor.differ !== undefined ?
     descriptor.differ : findUniformDiffer(descriptor.type);
   
-    this.copyer = descriptor.copyer !== undefined ?
-    descriptor.copyer : findUniformCopyer(descriptor.type);
+    this.copier = descriptor.copier !== undefined ?
+    descriptor.copier : findUniformCopier(descriptor.type);
 
     this.innerGlobal = descriptor._innerGlobalUniform;
   }
   name: string;
   private gl: WebGLRenderingContext;
   private programChangeId: number = -1;
-  program: GLProgram;
-  descriptor: UniformDescriptor;
+  private renderer: GLRenderer;
+  
   private location: WebGLUniformLocation;
   innerGlobal?: InnerSupportUniform; 
   value: any;
@@ -98,7 +98,7 @@ export class GLUniform{
   private setter: setterType;
   private flattener: flattenerType
   private differ: differType;
-  private copyer: copyerType;
+  private copier: copierType;
   private isActive: boolean;
 
   set(value: any): void {
@@ -110,25 +110,25 @@ export class GLUniform{
     if (this.lastReceiveData === undefined) { // this uniform never upload
       this.lastReceiveData = this.flattener(value, this.lastReceiveData);
       this.setter(this.gl, this.location, this.receiveData);
-      this.program.renderer.stat.uniformUpload++;
+      this.renderer.stat.uniformUpload++;
       return;
     }
 
-    let programRefreshed = false;
-    if (this.programChangeId !== this.program.renderer._programChangeId) {
-      programRefreshed = true;
-      this.programChangeId = this.program.renderer._programChangeId;
+    let programSwitched = false;
+    if (this.programChangeId !== this.renderer._programChangeId) {
+      programSwitched = true;
+      this.programChangeId = this.renderer._programChangeId;
     }
 
-    if (this.program.renderer.enableUniformDiff && !programRefreshed) {
+    if (this.renderer.enableUniformDiff && !programSwitched) {
       if (this.differ(this.receiveData, this.lastReceiveData)) {
         this.setter(this.gl, this.location, this.receiveData);
-        this.program.renderer.stat.uniformUpload++;
-        this.lastReceiveData = this.copyer(this.receiveData, this.lastReceiveData);
+        this.renderer.stat.uniformUpload++;
+        this.lastReceiveData = this.copier(this.receiveData, this.lastReceiveData);
       }
     } else {
       this.setter(this.gl, this.location, this.receiveData);
-      this.program.renderer.stat.uniformUpload++;
+      this.renderer.stat.uniformUpload++;
     }
   }
 

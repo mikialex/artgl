@@ -70,7 +70,7 @@ export class GLRenderer implements GLReleasable{
   _programChangeId: number = 0;
 
   // resource managers
-  readonly programManager = new GLProgramManager(this);
+  readonly programManager = new GLProgramManager();
   readonly textureManger = new GLTextureManager(this);
   readonly attributeBufferManager = new GLAttributeBufferDataManager(this);
   readonly vaoManager: GLVAOManager;
@@ -149,6 +149,7 @@ export class GLRenderer implements GLReleasable{
     this.programManager.releaseGL();
     this.textureManger.releaseGL();
     this.framebufferManager.releaseGL();
+    this.vaoManager.releaseGL();
   }
 
 }

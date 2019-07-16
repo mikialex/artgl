@@ -1,19 +1,18 @@
-import ARTGL from '../../src/export';
-import { ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController, Matrix4, PlaneGeometry, Geometry, OBJLoader, Technique, NormalShading } from '../../src/artgl';
-import { Scene } from '../../src/scene/scene';
-import { RenderGraph } from '../../src/render-graph/render-graph';
-import { InnerSupportUniform } from '../../src/webgl/uniform/uniform';
-import { TAAShading } from '../../src/shading/pass-lib/taa';
-import { TSSAOBlendShading } from '../../src/shading/pass-lib/tssao-blend';
-import { TSSAOShading } from '../../src/shading/pass-lib/tssao';
-import { DepthShading } from '../../src/shading/pass-lib/depth';
-import hierachyBallBuilder from './scene/hierachy-balls';
-import { createConf } from './conf';
-import { Observable } from '../../src/core/observable';
-import { RenderConfig } from './components/conf/interface';
-import { Camera } from '../../src/core/camera';
+import {
+  ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController,
+  Matrix4, OBJLoader, Technique, NormalShading, Scene, RenderGraph,
+  InnerSupportUniform, Camera, Observable
+} from '../../src/artgl';
 
-export const STATICSERVER = "http://localhost:3000/"
+import {
+  TAAShading, TSSAOBlendShading, TSSAOShading, DepthShading
+} from '../../src/shading/pass-lib/exports';
+
+import hierarchyBallBuilder from './scene/hierarchy-balls';
+import { createConf } from './conf';
+import { RenderConfig } from './components/conf/interface';
+
+export const STATIC_SERVER = "http://localhost:3000/"
 
 export class Application {
   graph: RenderGraph;
@@ -51,8 +50,8 @@ export class Application {
     this.hasInitialized = true;
     this.createScene(this.scene);
 
-    const depthTech = new Technique( new DepthShading())
-    
+    const depthTech = new Technique(new DepthShading())
+
     this.graph.setGraph({
       renderTargets: [
         {
@@ -76,12 +75,12 @@ export class Application {
           from: () => this.isEvenTick ? 'TAA' : null,
         },
         {
-          name: 'SSAOHistoryA',
-          from: () => this.isEvenTick ? null : 'SSAO',
+          name: 'TSSAOHistoryA',
+          from: () => this.isEvenTick ? null : 'TSSAO',
         },
         {
-          name: 'SSAOHistoryB',
-          from: () => this.isEvenTick ? 'SSAO' : null,
+          name: 'TSSAOHistoryB',
+          from: () => this.isEvenTick ? 'TSSAO' : null,
         },
       ],
       passes: [
@@ -116,11 +115,11 @@ export class Application {
           },
         },
         {
-          name: "SSAO",
+          name: "TSSAO",
           inputs: () => {
             return {
               depthResult: "depthResult",
-              AOAcc: this.isEvenTick ? "SSAOHistoryA" : "SSAOHistoryB",
+              AOAcc: this.isEvenTick ? "TSSAOHistoryA" : "TSSAOHistoryB",
             }
           },
           technique: this.tssaoTech,
@@ -145,14 +144,14 @@ export class Application {
             } else {
               basic = "sceneResult"
             }
-            if (this.enableTSSAO){
-              tssao = this.isEvenTick ? "SSAOHistoryB" : "SSAOHistoryA"
-            }else{
+            if (this.enableTSSAO) {
+              tssao = this.isEvenTick ? "TSSAOHistoryB" : "TSSAOHistoryA"
+            } else {
               tssao = "sceneResult" // TODO consider design a way to bind default empty source? or recompile shader?
             }
-            return {basic, tssao}
+            return { basic, tssao }
           },
-          beforePassExecute: () =>{
+          beforePassExecute: () => {
             this.composeTech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
           },
           afterPassExecute: () => {
@@ -212,8 +211,8 @@ export class Application {
     }
 
     // if (this.sampleCount <= 100) {
-      this.graph.update();
-      this.graph.render();
+    this.graph.update();
+    this.graph.render();
     // }
 
     this.afterRender.notifyObservers(this.engine);
@@ -242,14 +241,14 @@ export class Application {
   }
 
   createScene(scene: Scene): Scene {
-    hierachyBallBuilder(scene.root);
+    hierarchyBallBuilder(scene.root);
     // this.loadOBJFromURL();
     return scene;
   }
 
   async loadOBJFromURL() {
     const objLoader = new OBJLoader();
-    const response = await fetch(STATICSERVER + 'obj/chair.obj');
+    const response = await fetch(STATIC_SERVER + 'obj/chair.obj');
     const result = await response.text();
     const geo = objLoader.parse(result);
     const mesh = new Mesh();

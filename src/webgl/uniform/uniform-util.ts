@@ -87,7 +87,7 @@ export function findUniformDiffer(type: GLDataType) {
   }
 }
 
-export function findUniformCopyer(type: GLDataType) {
+export function findUniformCopier(type: GLDataType) {
   switch (type) {
     case GLDataType.float: return copyFloat; // FLOAT
     case GLDataType.Mat4: return copyArray // _MAT4

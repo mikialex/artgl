@@ -38,7 +38,7 @@ export class GLColorBuffer{
     }
   }
 
-  // TODO premultimlyed alpha
+  // TODO premultiplied alpha
   currentClearColor: Vector4 = new Vector4();
   setClearColor(newColor: Vector4, premultipliedAlpha?: boolean) {
     if (!newColor.equals(this.currentClearColor)) {

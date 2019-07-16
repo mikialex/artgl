@@ -1,10 +1,12 @@
 
+
 // low level gl layer
 export { GLRenderer } from "./webgl/gl-renderer";
 export { GLProgram } from "./webgl/program";
 
 // artgl engine layer
 export { ARTEngine } from "./engine/render-engine";
+export { InnerSupportUniform } from './webgl/uniform/uniform';
 export { RenderObject } from "./core/render-object";
 export { Mesh } from "./object/mesh";
 export { Line } from "./object/line";
@@ -13,6 +15,8 @@ export { Geometry } from "./core/geometry";
 export { Material, ChannelType } from './core/material';
 export { Technique } from "./core/technique";
 export { BufferData } from "./core/buffer-data";
+export { Camera } from "./core/camera";
+export { Observable } from "./core/observable";
 
 // scene
 export { Scene } from "./scene/scene";

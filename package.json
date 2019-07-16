@@ -1,14 +1,14 @@
 {
   "name": "artgl",
   "version": "0.0.1-alpha",
-  "description": "webgl renderer",
-  "main": "src/artigl.js",
+  "description": "WebGL rendering framework",
+  "main": "src/artgl.js",
   "types": "src/artgl.d.ts",
   "scripts": {
     "package": "npx webpack --config webpack.config.prod.js",
     "buildsrc": "npx tsc --build",
     "build": "node ./script/build.js",
-		"test": "jest"
+    "test": "jest"
   },
   "author": "mikialex",
   "license": "MIT",

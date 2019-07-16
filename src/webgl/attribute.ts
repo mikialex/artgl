@@ -17,20 +17,15 @@ export interface AttributeDescriptor {
 
 export class GLAttribute {
   constructor(program: GLProgram, descriptor: AttributeDescriptor) {
-    this.descriptor = descriptor;
     this.name = descriptor.name;
-    this.program = program;
-    this.gl = program.getRenderer().gl;
-    const prog = this.program.getProgram();
-    this.location = this.gl.getAttribLocation(prog, descriptor.name);
+    this.gl = program.renderer.gl;
+    this.location = this.gl.getAttribLocation(program.getProgram(), descriptor.name);
     this.type = descriptor.type;
     this.isActive = this.location !== -1;
   }
   readonly name: string;
   readonly gl: WebGLRenderingContext;
-  readonly program: GLProgram;
-  readonly location: number; // need location type ?
-  readonly descriptor: AttributeDescriptor;
+  readonly location: number;
   readonly type: GLDataType;
   readonly count: number = 0;
   readonly isActive: boolean;
@@ -41,7 +36,7 @@ export class GLAttribute {
     }
     const gl = this.gl;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.vertexAttribPointer(this.location, getGLDataTypeStride(this.descriptor.type), gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(this.location, getGLDataTypeStride(this.type), gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(this.location);
   }
 

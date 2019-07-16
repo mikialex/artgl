@@ -13,7 +13,7 @@ interface textureBindInfo {
  * @export
  * @class GLTextureSlot
  */
-export class GLTextureSlot{
+export class GLTextureSlot {
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
     this.gl = renderer.gl;
@@ -28,27 +28,27 @@ export class GLTextureSlot{
   private currentBindTextures: textureBindInfo[] = [];
 
   activeTexture(slot: number) {
-    if ( this.currentTextureSlot !== slot ) {
+    if (this.currentTextureSlot !== slot) {
       this.gl.activeTexture(slot);
-			this.currentTextureSlot = slot;
-		}
+      this.currentTextureSlot = slot;
+    }
   }
 
-  bindTexture(webglType: GLTextureTypeRaw, webglTexture: WebGLTexture ) {
-		if ( this.currentTextureSlot === null ) {
-			this.activeTexture(this.gl.TEXTURE0);
-		}
-		let boundTexture = this.currentBindTextures[ this.currentTextureSlot ];
-		if ( boundTexture === undefined ) {
-			boundTexture = { type: undefined, texture: undefined };
+  bindTexture(webglType: GLTextureTypeRaw, webglTexture: WebGLTexture) {
+    if (this.currentTextureSlot === null) {
+      this.activeTexture(this.gl.TEXTURE0);
+    }
+    let boundTexture = this.currentBindTextures[this.currentTextureSlot];
+    if (boundTexture === undefined) {
+      boundTexture = { type: undefined, texture: undefined };
       this.currentBindTextures[this.currentTextureSlot] = boundTexture;
-		}
-		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
-			this.gl.bindTexture( webglType, webglTexture);
-			boundTexture.type = webglType;
-			boundTexture.texture = webglTexture;
-		}
-	}
+    }
+    if (boundTexture.type !== webglType || boundTexture.texture !== webglTexture) {
+      this.gl.bindTexture(webglType, webglTexture);
+      boundTexture.type = webglType;
+      boundTexture.texture = webglTexture;
+    }
+  }
 
   private slotIndex = 0;
 
@@ -63,7 +63,7 @@ export class GLTextureSlot{
     }
     this.slotIndex++;
     return slot;
-  }  
+  }
 
   updateSlotTexture(webglTexture: WebGLTexture): number {
     const textureSlotToUpdate = this.findSlot(webglTexture);
@@ -74,9 +74,9 @@ export class GLTextureSlot{
   }
 }
 
-const textureSlotMap:number[] = [];
-function generateTextureSlotMap(maxTexureSlotSupport:number, gl: WebGLRenderingContext) {
-  for (let i = 0; i < maxTexureSlotSupport; i++) {
+const textureSlotMap: number[] = [];
+function generateTextureSlotMap(maxTextureSlotSupport: number, gl: WebGLRenderingContext) {
+  for (let i = 0; i < maxTextureSlotSupport; i++) {
     const name = `TEXTURE${i}`;
     textureSlotMap[i] = gl[name];
   }

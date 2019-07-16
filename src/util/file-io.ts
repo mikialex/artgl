@@ -1,8 +1,6 @@
-export function downloadStringAsFile(content: string){
-
-}
 
 // this is not working when preserveDrawingBuffer set false
+// TODO use read framebuffer
 export function downloadCanvasPNGImage(canvas: HTMLCanvasElement, name: string) {
   const link = document.createElement('a');
   link.setAttribute('download', name + '.png');

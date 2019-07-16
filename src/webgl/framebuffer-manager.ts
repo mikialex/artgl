@@ -34,11 +34,11 @@ export class GLFrameBufferManager implements GLReleasable{
   }
 
   getFramebufferTexture(framebufferName: string): WebGLTexture{
-    const frambuffer = this.framebuffers.get(framebufferName);
-    if (frambuffer === undefined) {
-      throw `cant find frambuffer ${framebufferName}`
+    const framebuffer = this.framebuffers.get(framebufferName);
+    if (framebuffer === undefined) {
+      throw `cant find framebuffer ${framebufferName}`
     }
-    return frambuffer.textureAttachedSlot[0].gltexture;
+    return framebuffer.textureAttachedSlot[0].glTexture;
   }
 
   releaseGL() {

@@ -32,8 +32,8 @@ interface WebGLTextureWithVersionIDWrap{
 }
 
 /**
- * responsible for webgltexture resource allocation and deallocation
- * outside request create webgltexture from given source or description
+ * responsible for webgl texture resource allocation and reallocation
+ * outside request create webgl texture from given source or description
  * 
  * @export
  * @class GLTextureManager

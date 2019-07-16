@@ -3,10 +3,7 @@ import { GLProgram } from "./program";
 import { GLReleasable } from '../type';
 
 export class GLProgramManager implements GLReleasable {
-  constructor(renderer: GLRenderer) {
-    this.renderer = renderer;
-  }
-  private renderer: GLRenderer;
+  
   private programs: Map<string, GLProgram> = new Map();
 
   addNewProgram(program: GLProgram) {
