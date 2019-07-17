@@ -12,9 +12,9 @@ export default async function () {
 
   //==>
 
-  let canv = document.querySelector('canvas');
+  let canvas = document.querySelector('canvas');
 
-  const engine = new ARTGL.ARTEngine(canv);
+  const engine = new ARTGL.ARTEngine(canvas);
 
   const scene = new ARTGL.Scene();
 

@@ -32,9 +32,14 @@ export { RenderGraph } from './render-graph/render-graph';
 export { ShaderGraph } from './shader-graph/shader-graph';
 export * from './shader-graph/node-maker';
 
+// shading lib
+export * from './shading/basic-lib/exports';
+export * from './shading/pass-lib/exports';
+
 // geometry lib
 export { SphereGeometry } from "./geometry/geo-lib/sphere-geometry";
 export { PlaneGeometry } from "./geometry/geo-lib/plane-geometry";
+export { CubeGeometry } from "./geometry/geo-lib/cube-geometry";
 
 // technique lib
 export { NormalShading } from "./shading/basic-lib/normal";

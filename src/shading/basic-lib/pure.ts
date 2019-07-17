@@ -3,18 +3,9 @@ import { GLDataType } from "../../webgl/shader-util";
 import { AttributeUsage } from "../../webgl/attribute";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 import { MVPTransform } from "../../shader-graph/built-in/transform";
-import { innerUniform, attribute } from "../../shader-graph/node-maker";
-import { ShaderFunction } from "../../shader-graph/shader-function";
+import { innerUniform, attribute, uniform } from "../../shader-graph/node-maker";
 
-
-const normalShading = new ShaderFunction({
-  source:
-    `vec4 normalShading(vec3 color){
-      return vec4(color * 0.5 + 0.5, 1.0);
-    }`
-})
-
-export class NormalShading extends Shading {
+export class PureShading extends Shading {
 
   update() {
     this.graph.reset()
@@ -26,11 +17,9 @@ export class NormalShading extends Shading {
             { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
           ))
       )
-      .setVary("color", attribute(
-        { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal }
-      ))
+      .setVary("color", uniform("baseColor", GLDataType.floatVec4))
       .setFragmentRoot(
-        normalShading.make().input("color", this.graph.getVary("color"))
+        this.graph.getVary("color")
       )
 
   }

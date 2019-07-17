@@ -1,4 +1,7 @@
-import { ARTEngine, PerspectiveCamera, TestTechnique, Mesh, Interactor, OrbitController } from "../../src/artgl";
+import {
+  ARTEngine, PerspectiveCamera, Mesh, Interactor,
+  OrbitController, Technique, NormalShading
+} from "../../src/artgl";
 
 import { loadObjFile } from "../../src/loader/obj-loader";
 
@@ -6,7 +9,7 @@ let mesh: Mesh;
 
 async function loadObj() {
   const geometry = await loadObjFile();
-  const testTech = new TestTechnique();
+  const testTech = new Technique(new NormalShading());
   mesh = new Mesh();
   mesh.geometry = geometry;
   mesh.technique = testTech;
@@ -14,12 +17,12 @@ async function loadObj() {
 
 export default function() {
   (window as any).load = loadObj;
-  let canv = document.querySelector('canvas') as HTMLCanvasElement; 
-  const engine = new ARTEngine(canv);
+  let canvas = document.querySelector('canvas') as HTMLCanvasElement; 
+  const engine = new ARTEngine(canvas);
 
-  const myInteractor = new Interactor(canv);
-  const myOrbitControler = new OrbitController(engine.camera as PerspectiveCamera);
-  myOrbitControler.registerInteractor(myInteractor);
+  const myInteractor = new Interactor(canvas);
+  const myOrbitController = new OrbitController(engine.camera as PerspectiveCamera);
+  myOrbitController.registerInteractor(myInteractor);
 
   let active = false;
   document.body.addEventListener('mouseenter', () => {
@@ -30,7 +33,7 @@ export default function() {
   })
 
   function render() {
-    myOrbitControler.update();
+    myOrbitController.update();
     if (mesh !== undefined) {
       engine.renderObject(mesh);
     }
