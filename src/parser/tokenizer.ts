@@ -1,40 +1,7 @@
-import { DAGNode } from "../render-graph/dag/dag-node";
+import { GLSLTokenType, GLSLToken } from "./tokenizer/token";
 
-interface Token{
-  startLine: number,
-  startCol: number,
-  endLine: number,
-  endCol: number,
-  value: string,
-  type: TokenType
-}
 
-enum TokenType{
-  NORMAL = 'normal',      // <-- never emitted
-  TOKEN = 'token',         // <-- never emitted
-  BLOCK_COMMENT= 'block comment',
-  LINE_COMMENT = 'line comment',
-  PREPROCESSOR = 'preporcessor',
-  OPERATOR = 'operator',
-  INTEGER = 'integer',
-  FLOAT = 'float',
-  IDENT = 'ident',
-  BUILTIN = 'inner func',
-  KEYWORD = 'keyworld',
-  WHITESPACE = 'space',
-  EOF = 'eof',
-  HEX = 'hex number',
-}
-
-type StateMoveFunction =  (nextChar: string) => boolean; 
-
-class StateNode extends DAGNode {
-  defineMoveCondition(condition: StateMoveFunction, nextNode: StateNode) {
-    
-  }
-}
-
-class GLSLTokenizer{
+export class GLSLTokenizerDemo{
   tokens: [];
   input: string;
   peek: number;
@@ -42,7 +9,7 @@ class GLSLTokenizer{
 
   currentLine: number;
   currentCol: number;
-  currentMode: TokenType;
+  currentMode: GLSLTokenType;
 
   reset() {
     this.tokens = [];
@@ -52,14 +19,14 @@ class GLSLTokenizer{
   
     this.currentLine= 0;
     this.currentCol = 0;
-    this.currentMode = TokenType.NORMAL;
+    this.currentMode = GLSLTokenType.NORMAL;
   }
 
   readToken() {
 
   }
 
-  tokenize(input: string): Token[] {
+  tokenize(input: string): GLSLToken[] {
     this.reset();
     this.input = input;
     return this.tokens.slice();
