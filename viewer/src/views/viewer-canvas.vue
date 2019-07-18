@@ -26,17 +26,17 @@ import GraphViewer from '../components/graph-viewer/graph-viewer.vue';
   }
 })
 export default class ViewerCanvas extends Vue {
-  isRuning:boolean = GLApp.active;
+  isRuning:boolean = GLApp.framer.active;
   graphView: GraphView = null;
 
   inspectGraph(){
-    this.graphView = GraphView.create(GLApp.graph);
-    GLApp.graph.enableDebuggingView = true;
+    this.graphView = GraphView.create(GLApp.pipeline.graph);
+    GLApp.pipeline.graph.enableDebuggingView = true;
   }
 
   closeGraphInspector(){
     this.graphView = null;
-    GLApp.graph.enableDebuggingView = false;
+    GLApp.pipeline.graph.enableDebuggingView = false;
   }
 
   run(){

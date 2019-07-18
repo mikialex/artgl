@@ -136,7 +136,7 @@ export default class GraphViewer extends Vue {
   }
 
   actualSize(node: GraphNodeView){
-    const targetNode = GLApp.graph.getNodeByID(node.uuid);
+    const targetNode = GLApp.pipeline.graph.getNodeByID(node.uuid);
     node.width = targetNode.width / window.devicePixelRatio / 2;
     node.height =  targetNode.height / window.devicePixelRatio / 2;
     this.updateViewport(node);
@@ -157,8 +157,8 @@ export default class GraphViewer extends Vue {
       node.height
     );
     viewport.multiplyScalar(window.devicePixelRatio);
-    if(GLApp.graph){ // TODO
-      GLApp.graph.updateRenderTargetDebugView(node.uuid, viewport);
+    if(GLApp.pipeline.graph){ // TODO
+      GLApp.pipeline.graph.updateRenderTargetDebugView(node.uuid, viewport);
     }
   }
 

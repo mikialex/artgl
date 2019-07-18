@@ -6,6 +6,7 @@ export { GLProgram } from "./webgl/program";
 
 // artgl engine layer
 export { ARTEngine } from "./engine/render-engine";
+export { Framer } from "./engine/framer";
 export { InnerSupportUniform } from './webgl/uniform/uniform';
 
 export { RenderObject } from "./core/render-object";

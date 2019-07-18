@@ -8,14 +8,10 @@ import { Nullable } from "../type";
  * @class Framer
  */
 export class Framer{
-  constructor() {
-    
-  }
-
-  // frame controls
+  
   private userRenderFrame: Nullable<FrameRequestCallback> = null;
   setFrame(frame: FrameRequestCallback) {
-    this.renderFrame = frame;
+    this.userRenderFrame = frame;
   }
 
   private renderFrame: FrameRequestCallback = (time) => {
@@ -24,21 +20,25 @@ export class Framer{
       this.userRenderFrame(time);
     }
     this.frameEnd();
-    if (this.isAutoRenderActive) {
-      window.requestAnimationFrame(this.renderFrame);
+    if (this.active) {
+      this.tickId = window.requestAnimationFrame(this.renderFrame);
     }
   }
   
-  isAutoRenderActive = false;
-  tickId?: number;
+  active = false;
+  private tickId?: number;
 
   run() {
-    this.isAutoRenderActive = true;
+    this.active = true;
     this.tickId = window.requestAnimationFrame(this.renderFrame);
   }
 
+  step() {
+    
+  }
+
   stop() {
-    this.isAutoRenderActive = false;
+    this.active = false;
     if (this.tickId !== undefined) {
       window.cancelAnimationFrame(this.tickId);
     }
@@ -50,4 +50,5 @@ export class Framer{
   private frameEnd() {
     
   }
+  
 }

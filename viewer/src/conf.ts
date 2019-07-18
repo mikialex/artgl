@@ -71,9 +71,9 @@ export function createConf(app: Application): RenderConfig {
             value: [
               {
                 name: 'enable',
-                value: app.enableTAA,
+                value: app.pipeline.enableTAA,
                 onChange: (value: boolean) => {
-                  app.enableTAA = value;
+                  app.pipeline.enableTAA = value;
                   if (!value) {
                     app.sampleCount = 0;
                   }
@@ -86,21 +86,21 @@ export function createConf(app: Application): RenderConfig {
             value: [
               {
                 name: 'enable',
-                value: app.enableTSSAO,
+                value: app.pipeline.enableTSSAO,
                 onChange: (value: boolean) => {
-                  app.enableTSSAO = value;
+                  app.pipeline.enableTSSAO = value;
                   if (!value) {
-                    app.composeTech.uniforms.get('u_tssaoComposeRate').setValue(0);
+                    app.pipeline.composeTech.uniforms.get('u_tssaoComposeRate').setValue(0);
                   } else {
-                    app.composeTech.uniforms.get('u_tssaoComposeRate').setValue(1.0);
+                    app.pipeline.composeTech.uniforms.get('u_tssaoComposeRate').setValue(1.0);
                   }
                 },
               },
               {
                 name: 'composeRate',
-                value: app.composeTech.uniforms.get('u_tssaoComposeRate').value,
+                value: app.pipeline.composeTech.uniforms.get('u_tssaoComposeRate').value,
                 onChange: (value: number) => {
-                  app.composeTech.uniforms.get('u_tssaoComposeRate').setValue(value);
+                  app.pipeline.composeTech.uniforms.get('u_tssaoComposeRate').setValue(value);
                 },
                 editors: [
                   {
@@ -113,9 +113,9 @@ export function createConf(app: Application): RenderConfig {
               },
               {
                 name: 'composeThreshold',
-                value: app.composeTech.uniforms.get('u_tssaoComposeThreshold').value,
+                value: app.pipeline.composeTech.uniforms.get('u_tssaoComposeThreshold').value,
                 onChange: (value: number) => {
-                  app.composeTech.uniforms.get('u_tssaoComposeThreshold').setValue(value);
+                  app.pipeline.composeTech.uniforms.get('u_tssaoComposeThreshold').setValue(value);
                 },
                 editors: [
                   {
@@ -128,9 +128,9 @@ export function createConf(app: Application): RenderConfig {
               },
               {
                 name: 'radius',
-                value: app.tssaoTech.uniforms.get('u_aoRadius').value,
+                value: app.pipeline.tssaoTech.uniforms.get('u_aoRadius').value,
                 onChange: (value: number) => {
-                  app.tssaoTech.uniforms.get('u_aoRadius').setValue(value);
+                  app.pipeline.tssaoTech.uniforms.get('u_aoRadius').setValue(value);
                   app.sampleCount = 0;
                 },
                 editors: [
@@ -144,9 +144,9 @@ export function createConf(app: Application): RenderConfig {
               },
               {
                 name: 'sample_count_to_show',
-                value: app.composeTech.uniforms.get('u_tssaoShowThreshold').value,
+                value: app.pipeline.composeTech.uniforms.get('u_tssaoShowThreshold').value,
                 onChange: (value: number) => {
-                  app.composeTech.uniforms.get('u_tssaoShowThreshold').setValue(value);
+                  app.pipeline.composeTech.uniforms.get('u_tssaoShowThreshold').setValue(value);
                 },
                 editors: [
                   {
