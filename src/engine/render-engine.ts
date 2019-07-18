@@ -297,6 +297,21 @@ export class ARTEngine implements GLReleasable{
   }
 
   private connectGeometry(geometry: Geometry, program: GLProgram) {
+
+    // check index buffer and update program.indexUINT
+    if (program.useIndexDraw) {
+      if (geometry.indexBuffer === null) {
+        throw 'indexBuffer not found for index draw'
+      }
+      const geometryIndexBuffer = geometry.indexBuffer;
+      if (geometryIndexBuffer.data instanceof Uint32Array) {
+        program.indexUINT = true;
+      } else {
+        program.indexUINT = false;
+      }
+    }
+
+    // vao check
     let vaoUnbindCallback;
     if (this._vaoEnabled) {
       const vaoManager = this.renderer.vaoManager;
@@ -310,6 +325,7 @@ export class ARTEngine implements GLReleasable{
       }
     }
 
+    // no vao procedure
     program.forAttributes(att => {
       // TODO should not by name but by attributeUsage
       const bufferData = geometry.bufferDatum[att.name];
@@ -325,15 +341,7 @@ export class ARTEngine implements GLReleasable{
     })
 
     if (program.useIndexDraw) {
-      if (geometry.indexBuffer === null) {
-        throw 'indexBuffer not found for index draw'
-      }
       const geometryIndexBuffer = geometry.indexBuffer;
-      if (geometryIndexBuffer.data instanceof Uint32Array) {
-        program.indexUINT = true;
-      } else {
-        program.indexUINT = false;
-      }
       let glBuffer = this.getGLAttributeBuffer(geometryIndexBuffer);
       if (glBuffer === undefined) {
         glBuffer = this.createOrUpdateAttributeBuffer(geometryIndexBuffer, true);
@@ -341,6 +349,8 @@ export class ARTEngine implements GLReleasable{
       program.useIndexBuffer(glBuffer);
     }
 
+
+    // create vao
     if (this._vaoEnabled) {
       if (vaoUnbindCallback) {
         vaoUnbindCallback.unbind();
