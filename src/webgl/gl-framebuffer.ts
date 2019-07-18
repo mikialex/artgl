@@ -1,19 +1,23 @@
 import { GLRenderer } from "./gl-renderer";
 import { Vector4 } from "../math/vector4";
+import { Nullable } from "../type";
+import { PixelFormat } from "./const";
 
 
 
-export class GLFrameAttachedTexture{
-  constructor(gl:WebGLRenderingContext, framebuffer: GLFramebuffer, attachPoint:number) {
+export class GLFrameAttachedTexture {
+  constructor(gl: WebGLRenderingContext, framebuffer: GLFramebuffer, attachPoint: number) {
     this.framebuffer = framebuffer;
     this.attachPoint = attachPoint;
     this.gl = gl;
     this.init();
   }
   gl: WebGLRenderingContext;
+
   framebuffer: GLFramebuffer;
   glTexture: WebGLTexture;
   textureStoreId: string;
+
   attachPoint: number;
 
   init() {
@@ -54,8 +58,10 @@ function loadGLAttachmentPoints(gl: WebGLRenderingContext) {
   }
 }
 
-export class GLFramebuffer{
-  constructor(renderer: GLRenderer,name: string, width:number, height:number) {
+export type FramebufferReadBufferType = Uint8Array | Uint16Array | Float32Array;
+
+export class GLFramebuffer {
+  constructor(renderer: GLRenderer, name: string, width: number, height: number) {
     this.name = name;
     this.renderer = renderer;
     this.gl = renderer.gl;
@@ -72,13 +78,13 @@ export class GLFramebuffer{
   height: number;
 
   enableDepth: boolean = true;
-  webglDepthBuffer: WebGLRenderbuffer;
+  webglDepthBuffer: Nullable<WebGLRenderbuffer> = null;
   webglFrameBuffer: WebGLFramebuffer;
 
   textureAttachedSlot: GLFrameAttachedTexture[] = [];
 
   debuggingViewport: Vector4 = new Vector4(0, 0, 200, 200);
-  
+
   createGLFramebuffer() {
     const buffer = this.gl.createFramebuffer();
     if (buffer === null) {
@@ -95,24 +101,27 @@ export class GLFramebuffer{
     return buffer;
   }
 
-  resize(width:number, height:number) {
-    if (this.width !== width || this.height !== height) {
-      this.width = width;
-      this.height = height;
+  resize(width: number, height: number) {
 
-      this.gl.deleteFramebuffer(this.webglFrameBuffer);
-      this.webglFrameBuffer = this.createGLFramebuffer();
-      
-      this.textureAttachedSlot.forEach(text => {
-        if (text) {
-          text.updateSize();
-        }
-      })
-
-      this.disposeAttachedDepthBuffer();
-      this.createAttachDepthBuffer();
-
+    if (this.width === width && this.height === height) {
+      return;
     }
+
+    this.gl.deleteFramebuffer(this.webglFrameBuffer);
+    this.webglFrameBuffer = this.createGLFramebuffer();
+
+    this.textureAttachedSlot.forEach(text => {
+      if (text) {
+        text.updateSize();
+      }
+    })
+
+    this.disposeAttachedDepthBuffer();
+    this.createAttachDepthBuffer();
+
+    this.width = width;
+    this.height = height;
+
   }
 
   createAttachTexture(attachPoint: number) {
@@ -125,6 +134,9 @@ export class GLFramebuffer{
   }
 
   createAttachDepthBuffer() {
+    if (this.webglDepthBuffer !== null) {
+      return
+    }
     const gl = this.gl;
     const depthBuffer = this.createGLRenderbuffer();
     this.webglDepthBuffer = depthBuffer;
@@ -138,6 +150,7 @@ export class GLFramebuffer{
 
   disposeAttachedDepthBuffer() {
     this.gl.deleteRenderbuffer(this.webglDepthBuffer);
+    this.webglDepthBuffer = null;
   }
 
   attachTexture(texture: GLFrameAttachedTexture, attachPoint: number) {
@@ -145,8 +158,11 @@ export class GLFramebuffer{
   }
 
   // read pixel info from this framebuffer
-  readPixels(x:number, y:number, width: number, height: number) {
+  // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels
+  readPixels(x: number, y: number, width: number, height: number, readBuffer: FramebufferReadBufferType) {
     // TODO
+    const gl = this.gl;
+    // gl.readPixels(x, y, width, height, PixelFormat.RGBAFormat, type, readBuffer); 
   }
 
   dispose() {

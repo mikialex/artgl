@@ -3,6 +3,11 @@ import { GLExtList } from "./gl-info";
 import { GLReleasable } from "../type";
 import { Geometry } from "../core/geometry";
 
+export interface VAOCreateCallback{
+  vao: any,
+  unbind: () => void
+}
+
 export class GLVAOManager implements GLReleasable{
   readonly gl: WebGLRenderingContext;
   readonly renderer: GLRenderer;
@@ -21,7 +26,7 @@ export class GLVAOManager implements GLReleasable{
     return this.vaos.get(geometry);
   }
 
-  createVAO(geometry: Geometry) {
+  createVAO(geometry: Geometry): VAOCreateCallback {
     const vao = this.vaoExt.createVertexArrayOES(); 
     this.vaoExt.bindVertexArrayOES(vao);
     this.vaos.set(geometry, vao);

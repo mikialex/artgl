@@ -20,6 +20,7 @@ import { QuadSource } from '../render-graph/quad-source';
 import { downloadCanvasPNGImage } from "../util/file-io";
 import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
+import { VAOCreateCallback } from "../webgl/vao";
 
 export interface RenderSource{
   resetSource(): void;
@@ -312,7 +313,7 @@ export class ARTEngine implements GLReleasable{
     }
 
     // vao check
-    let vaoUnbindCallback;
+    let vaoUnbindCallback: VAOCreateCallback;
     if (this._vaoEnabled) {
       const vaoManager = this.renderer.vaoManager;
       const webglVAO = vaoManager.getVAO(geometry)

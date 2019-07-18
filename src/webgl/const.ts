@@ -1,4 +1,4 @@
-export const enum DrawMode{
+export const enum DrawMode {
   TRIANGLES = 4,
   LINES = 1,
   POINTS = 0
@@ -52,7 +52,7 @@ export enum TextureWrap {
   mirroredRepeat = 0x8370
 }
 
-  
+
 export var FrontFaceDirectionCW = 0;
 export var FrontFaceDirectionCCW = 1;
 export var BasicShadowMap = 0;
@@ -129,13 +129,23 @@ export var UnsignedShort5551Type = 1018;
 export var UnsignedShort565Type = 1019;
 export var UnsignedInt248Type = 1020;
 
-export var AlphaFormat = 1021;
-export var RGBFormat = 1022;
-export var RGBAFormat = 1023;
+export enum PixelFormat {
+  AlphaFormat = 1021,
+  RGBFormat = 1022,
+  RGBAFormat = 1023,
+}
+
+export enum PixelDataType {
+  UNSIGNED_BYTE,
+  UNSIGNED_SHORT_5_6_5,
+  UNSIGNED_SHORT_4_4_4_4,
+  UNSIGNED_SHORT_5_5_5_1,
+  FLOAT,
+}
 
 export var LuminanceFormat = 1024;
 export var LuminanceAlphaFormat = 1025;
-export var RGBEFormat = RGBAFormat;
+// export var RGBEFormat = RGBAFormat;
 export var DepthFormat = 1026;
 export var DepthStencilFormat = 1027;
 export var RGB_S3TC_DXT1_Format = 2001;
