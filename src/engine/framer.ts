@@ -34,7 +34,9 @@ export class Framer{
   }
 
   step() {
-    
+    if (!this.active) {
+      this.renderFrame(performance.now());
+    }
   }
 
   stop() {

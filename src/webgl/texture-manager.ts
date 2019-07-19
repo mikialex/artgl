@@ -26,6 +26,8 @@ const DefaultTextureDescriptor = {
   tWrap: TextureWrap.clampToEdge,
 }
 
+const defaultRenderTargetTextureDescriptor = DefaultTextureDescriptor;
+
 interface WebGLTextureWithVersionIDWrap{
   version: number;
   texture: WebGLTexture;
@@ -48,7 +50,7 @@ export class GLTextureManager implements GLReleasable{
 
   init() {
     const gl = this.renderer.gl;
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true as any);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
   }
 
   getGLTexture(storeId: string) {
@@ -66,50 +68,35 @@ export class GLTextureManager implements GLReleasable{
       config = DefaultTextureDescriptor;
     }
     const gl = this.renderer.gl;
-    const texture = this.createTexture(config);
+    const glTexture = this.createWebGLTexture(config);
+    gl.bindTexture(gl.TEXTURE_2D, glTexture);
   
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     const id = generateUUID();
-    this.textures.set(id, texture);
+    this.textures.set(id, glTexture);
     return id;
   }
 
   createTextureForRenderTarget(width: number, height: number): string {
-    
     const gl = this.renderer.gl;
+    const glTexture = this.createWebGLTexture(defaultRenderTargetTextureDescriptor)
 
-    const texture = gl.createTexture();
-    if (texture === null) {
-      throw 'webgl texture create fail';
-    }
-    this.fillRenderTarget(texture, width, height);
-    const id = generateUUID();
-    this.textures.set(id, texture);
-    return id;
-  }
-  
-  // updateRenderTargetSize
-  fillRenderTarget(glTexture: WebGLTexture, width: number, height: number) {
-    const gl = this.renderer.gl;
     gl.bindTexture(gl.TEXTURE_2D, glTexture);
-
     const internalFormat = gl.RGBA;
     const border = 0;
     const format = gl.RGBA;
     const type = gl.UNSIGNED_BYTE;
     const data = null;
-    // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D
     gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat,
       width, height, border,
       format, type, data);
 
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    return glTexture;
+    const id = generateUUID();
+    this.textures.set(id, glTexture);
+    return id;
   }
-
-  private createTexture(config: TextureDescriptor): WebGLTexture {
+  
+  private createWebGLTexture(config: TextureDescriptor): WebGLTexture {
     const gl = this.renderer.gl;
     const texture = gl.createTexture();
     if (texture === null) {

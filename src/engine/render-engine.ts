@@ -276,7 +276,7 @@ export class ARTEngine implements GLReleasable{
         }
         const texture = material.getChannelTexture(tex.channel);
         if (texture.glTextureId === undefined) {
-          texture.glTextureId = this.renderer.textureManger.createTextureFromImageElement(texture.image);
+          texture.upload(this);
           glTexture = this.renderer.textureManger.getGLTexture(texture.glTextureId);
         }
       } 

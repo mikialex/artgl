@@ -2,6 +2,7 @@ import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
 import { Technique } from "../core/technique";
 import { RenderSource } from "../engine/render-engine";
+import { PixelFormat } from "../webgl/const";
 export interface GraphDefine {
   passes: PassDefine[],
   renderTargets: RenderTargetDefine[];
@@ -24,12 +25,6 @@ export interface PassDefine {
   clearColor?: Vector4,
   afterPassExecute?: () => any,
   beforePassExecute?: () => any,
-}
-
-
-export enum PixelFormat {
-  depth,
-  rgba
 }
 
 export enum DimensionType {

@@ -1,11 +1,12 @@
 import { DAGNode } from "../../core/dag-node";
-import { RenderTargetDefine, DimensionType, PixelFormat } from "../interface";
+import { RenderTargetDefine, DimensionType } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { GLFramebuffer } from "../../webgl/gl-framebuffer";
 import { MathUtil } from '../../math/util'
 import { ARTEngine } from "../../engine/render-engine";
 import { Nullable } from "../../type";
 import { Vector4 } from '../../math/vector4';
+import { PixelFormat } from "../../webgl/const";
 
 export class RenderTargetNode extends DAGNode{
   constructor(define: RenderTargetDefine) {
@@ -23,7 +24,7 @@ export class RenderTargetNode extends DAGNode{
     // set a default format config
     if (define.format === undefined) {
       define.format = {
-        pixelFormat: PixelFormat.rgba,
+        pixelFormat: PixelFormat.RGBAFormat,
         dimensionType: DimensionType.bindRenderSize,
       }
     }
