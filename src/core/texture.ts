@@ -10,18 +10,24 @@ import { GraphicResourceReleasable } from "../type";
  */
 export abstract class Texture implements GraphicResourceReleasable {
 
-  updateVersionId: number = 0;
+  private needUpdate: boolean = true;
 
   format: PixelFormat
 
   setNeedUpdate() {
-    this.updateVersionId++;
+    this.needUpdate = true;
   }
 
   getGLTexture(engine: ARTEngine): WebGLTexture {
     const glTexture = engine.renderer.textureManger.getGLTexture(this)
     if (glTexture === undefined) {
-      return this.upload
+      this.needUpdate = false;
+      return this.upload(engine);
+    }
+    if (this.needUpdate) {
+      this.needUpdate = false;
+      this.releaseGraphics(engine);
+      return this.upload(engine);
     }
   }
 
@@ -35,7 +41,10 @@ export abstract class Texture implements GraphicResourceReleasable {
 export class DataTexture extends Texture {
   data?: Uint8ClampedArray;
 
+  format = PixelFormat.RGBAFormat;
+
   upload(engine: ARTEngine): WebGLTexture {
+    // TODO
     throw new Error("Method not implemented.");
   }
 }
@@ -43,6 +52,8 @@ export class DataTexture extends Texture {
 export class HTMLImageTexture extends Texture{
   
   image: HTMLImageElement;
+
+  format = PixelFormat.RGBAFormat;
 
   upload(engine: ARTEngine) {
     return engine.renderer.textureManger.createTextureFromImageElement(this);

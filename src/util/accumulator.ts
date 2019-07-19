@@ -1,6 +1,6 @@
 export class Accumulator {
   constructor(size?: number) {
-    this.size = size || 10;
+    this.size = size === undefined ? 10: size;
     this.reset();
   }
   private size = 10;
@@ -8,41 +8,42 @@ export class Accumulator {
   private records: number[] = [];
 
   private all = 0;
-  private average = 0;
+
+  get average() {
+    if (this.count >= this.size) {
+      return this.all / this.size;
+    } else {
+      return this.all / this.count;
+    }
+  }
+
+  get last() {
+    return  Math.max(0, this.count - this.size) % this.size;
+  }
 
   push(record: number) {
     this.count++;
 
     const current = this.count % this.size;
-    const last = Math.max(0, this.count - 10) % this.size;
 
-    this.all -= this.records[last];
+    this.all -= this.records[this.last];
     this.all += record;
     this.records[current] = record;
-
-    if (this.count >= this.size) {
-      this.average = this.all / this.size;
-    } else {
-      this.average = this.all / this.count;
-    }
 
   }
 
   reset() {
     this.count = 0;
+    this.all = 0;
     this.records = [];
     for (let i = 0; i < this.size; i++) {
       this.records.push(0);
     }
   }
 
-  resetSize(size: number) {
+  resetWithNewSize(size: number) {
     this.size = size;
     this.reset();
-  }
-
-  getAverage() {
-    return this.average;
   }
 
 }
