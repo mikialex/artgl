@@ -25,7 +25,7 @@ export class Application {
   initialize(canvas: HTMLCanvasElement) {
     this.el = canvas;
     this.engine = new ARTEngine(canvas);
-    this.pipeline = new RenderPipeline(this.engine);
+    this.pipeline = new RenderPipeline();
     this.pipeline.build(this.engine, this.scene);
     this.engine.camera.transform.position.set(20, 10, 10)
     this.interactor = new Interactor(canvas);

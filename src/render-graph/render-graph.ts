@@ -14,10 +14,6 @@ export class RenderGraph {
   static screenRoot: string = 'artgl-rendergraph-screen-rt';
   static quadSource = new QuadSource();
 
-  constructor(engine: ARTEngine) {
-    this.engine = engine;
-  }
-  engine: ARTEngine;
 
   private passes: RenderPass[] = [];
 
@@ -47,9 +43,9 @@ export class RenderGraph {
    *
    * @memberof RenderGraph
    */
-  public render() {
+  public render(engine: ARTEngine) {
     this.passes.forEach(pass => {
-      pass.execute(this);
+      pass.execute(engine, this);
     });
   }
 
@@ -74,7 +70,6 @@ export class RenderGraph {
     this.reset();
     this.allocateRenderTargetNodes(graphDefine.renderTargets);
     this.constructPassGraph(graphDefine.passes);
-    this.update();
   }
 
   /**
@@ -82,7 +77,7 @@ export class RenderGraph {
    *
    * @memberof RenderGraph
    */
-  update() {
+  update(engine: ARTEngine) {
     
     //updateNodesConnection
     this.passNodes.forEach(node => {
@@ -96,8 +91,13 @@ export class RenderGraph {
     const nodeQueue = this.screenNode.generateDependencyOrderList() as RenderGraphNode[];
     this.passes = [];
     nodeQueue.forEach(node => {
+      if (node instanceof RenderTargetNode) {
+        node.updateSize(engine);
+      }
+    })
+    nodeQueue.forEach(node => {
       if (node instanceof PassGraphNode) {
-        node.updatePass(nodeQueue);
+        node.updatePass(engine, nodeQueue);
         this.passes.push(node.pass);
       }
     })
@@ -136,7 +136,7 @@ export class RenderGraph {
       if (this.renderTargetNodes.has(define.name)) {
         throw 'render graph build error, duplicate texture key name found '
       }
-      const renderTargetNode = new RenderTargetNode(this, define);
+      const renderTargetNode = new RenderTargetNode(define);
       if (define.name === RenderGraph.screenRoot) {
         if (this.screenNode !== undefined) {
           throw "duplicate screen root node"
@@ -151,7 +151,7 @@ export class RenderGraph {
     }
   }
 
-  updateRenderTargetDebugView(nodeId: string, viewPort: Vector4) {
+  updateRenderTargetDebugView(engine: ARTEngine, nodeId: string, viewPort: Vector4) {
     if (this.screenNode.uuid === nodeId) {
       RenderPass.screenDebugViewPort.copy(viewPort);
       return
@@ -159,7 +159,7 @@ export class RenderGraph {
 
     this.renderTargetNodes.forEach(node => {
       if (node.uuid === nodeId) {
-        node.framebuffer.debuggingViewport.copy(viewPort);
+        node.getOrCreateFrameBuffer(engine).debuggingViewport.copy(viewPort);
       }
     })
   }

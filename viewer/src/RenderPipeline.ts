@@ -4,11 +4,8 @@ import {
 } from "../../src/artgl";
 
 export class RenderPipeline{
-  constructor(engine: ARTEngine) {
-    this.graph = new RenderGraph(engine);
-  }
 
-  graph: RenderGraph
+  graph: RenderGraph = new RenderGraph();
 
   enableTAA = true;
   taaTech: Technique = new Technique(new TAAShading());
@@ -26,10 +23,6 @@ export class RenderPipeline{
     return this.tickNum % 2 === 0;
   }
 
-  init(engine: ARTEngine) {
-    this.graph = new RenderGraph(engine);
-  }
-
   render(engine: ARTEngine, scene: Scene) {
     this.tickNum++;
 
@@ -43,8 +36,8 @@ export class RenderPipeline{
     }
 
     // if (this.sampleCount <= 100) {
-    this.graph.update();
-    this.graph.render();
+    this.graph.update(engine);
+    this.graph.render(engine);
     // }
   }
 

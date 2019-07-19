@@ -4,6 +4,7 @@ import { RenderGraph, RenderGraphNode } from "../render-graph";
 import { RenderPass } from "../pass";
 import { RenderTargetNode } from './render-target-node';
 import { Nullable } from "../../type";
+import { ARTEngine } from "../../engine/render-engine";
 
 export class PassGraphNode extends DAGNode {
   constructor(graph: RenderGraph, define: PassDefine) {
@@ -42,7 +43,7 @@ export class PassGraphNode extends DAGNode {
     })
   }
 
-  updatePass(activeNodes: RenderGraphNode[]) {
+  updatePass(engine: ARTEngine, activeNodes: RenderGraphNode[]) {
     this.pass.updateInputTargets(this.inputs);
     let foundedNode = null;
     if (this.toNodes.size === 0) {
@@ -59,7 +60,7 @@ new found target pass: ${activeNodes[i].name};
               `
             }
             foundedNode = node
-            this.pass.setOutPutTarget(node);
+            this.pass.setOutPutTarget(engine, node);
           }
         }
       }

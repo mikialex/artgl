@@ -51,12 +51,12 @@ export class RenderPass{
   // key: uniformName ;   value: inputFramebufferName
   private inputTarget: Map<string, string> = new Map();
   private outputTarget: GLFramebuffer
-  setOutPutTarget(renderTargetNode: RenderTargetNode) {
+  setOutPutTarget(engine: ARTEngine, renderTargetNode: RenderTargetNode) {
     if (renderTargetNode.name === RenderGraph.screenRoot) {
       this.outputTarget = undefined;
       this.isOutputScreen = true;
     } else {
-      this.outputTarget = renderTargetNode.framebuffer;
+      this.outputTarget = renderTargetNode.getOrCreateFrameBuffer(engine);
       this.isOutputScreen = false;
     }
   }
@@ -76,8 +76,7 @@ export class RenderPass{
   }
 
   static screenDebugViewPort = new Vector4(200, 0, 200, 200)
-  execute(graph: RenderGraph) {
-    const engine = graph.engine;
+  execute(engine: ARTEngine, graph: RenderGraph) {
 
     // setup viewport and render target
     if (this.isOutputScreen) {

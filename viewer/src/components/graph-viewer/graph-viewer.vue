@@ -158,7 +158,8 @@ export default class GraphViewer extends Vue {
     );
     viewport.multiplyScalar(window.devicePixelRatio);
     if(GLApp.pipeline.graph){ // TODO
-      GLApp.pipeline.graph.updateRenderTargetDebugView(node.uuid, viewport);
+      const engine = GLApp.engine;
+      GLApp.pipeline.graph.updateRenderTargetDebugView(engine, node.uuid, viewport);
     }
   }
 

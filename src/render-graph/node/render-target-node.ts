@@ -3,13 +3,12 @@ import { RenderTargetDefine, DimensionType, PixelFormat } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { GLFramebuffer } from "../../webgl/gl-framebuffer";
 import { MathUtil } from '../../math/util'
-import { Observer } from "../../core/observable";
-import { Size } from "../../engine/render-engine";
+import { ARTEngine } from "../../engine/render-engine";
 import { Nullable } from "../../type";
 import { Vector4 } from '../../math/vector4';
 
 export class RenderTargetNode extends DAGNode{
-  constructor(graph: RenderGraph, define: RenderTargetDefine) {
+  constructor(define: RenderTargetDefine) {
     super();
     this.name = define.name;
     this.define = define;
@@ -29,25 +28,11 @@ export class RenderTargetNode extends DAGNode{
       }
     }
 
-    let width: number;
-    let height: number;
-    // decide initial size and create resize observer
-    if (define.format.dimensionType === DimensionType.fixed) {
-      width = define.format.width !== undefined ? define.format.width : graph.engine.renderer.width;
-      height = define.format.height !== undefined ? define.format.height : graph.engine.renderer.height;
-    } else { //  === DimensionType.bindRenderSize
+    if (define.format.dimensionType === DimensionType.bindRenderSize) {
       this.autoWidthRatio = define.format.width !== undefined ? MathUtil.clamp(define.format.width, 0, 1) : 1;
       this.autoHeightRatio = define.format.height !== undefined ? MathUtil.clamp(define.format.height, 0, 1) : 1;
-      width = Math.max(5, graph.engine.renderer.width * this.autoWidthRatio);
-      height = Math.max(5, graph.engine.renderer.height * this.autoHeightRatio);
-      this.resizeObserver = graph.engine.resizeObservable.add((size: Size) => {
-        this.framebuffer.resize(size.width, size.height);
-      })
     }
-
-    const enableDepth = define.format.disableDepthBuffer !== undefined ? define.format.disableDepthBuffer : true;
-    this.framebuffer = graph.engine.renderer.framebufferManager.createFrameBuffer(
-      this.name, width, height, enableDepth);
+    this.enableDepth = define.format.disableDepthBuffer !== undefined ? define.format.disableDepthBuffer : true;
     
   }
   readonly isScreenNode: boolean;
@@ -58,20 +43,46 @@ export class RenderTargetNode extends DAGNode{
 
   autoWidthRatio: number = 0;
   autoHeightRatio: number = 0;
-  private resizeObserver: Nullable<Observer<Size>> = null;
+  enableDepth: boolean = true;
 
-  get width() {
-    return this.framebuffer.width
-  }
+  widthAbs: number = 0;
+  heightAbs: number = 0;
 
-  get height() {
-    return this.framebuffer.height
-  }
-
-  framebuffer: GLFramebuffer;
+  // framebuffer: GLFramebuffer;
 
   private fromGetter: () => Nullable<string>
   private from: string = null;
+
+  getOrCreateFrameBuffer(engine: ARTEngine): GLFramebuffer {
+    const f = engine.renderer.framebufferManager.getFramebuffer(this.name);
+    if (f) {
+      return f
+    } else {
+      return engine.renderer.framebufferManager.createFrameBuffer(
+        this.name, this.widthAbs, this.heightAbs, this.enableDepth);
+    }
+  }
+
+  updateSize(engine: ARTEngine) {
+    if (this.isScreenNode) {
+      return;
+    }
+    const define = this.define;
+    let width: number;
+    let height: number;
+    // decide initial size and create resize observer
+    if (define.format.dimensionType === DimensionType.fixed) {
+      width = define.format.width !== undefined ? define.format.width : engine.renderer.width;
+      height = define.format.height !== undefined ? define.format.height : engine.renderer.height;
+    } else { //  === DimensionType.bindRenderSize
+      width = Math.max(5, engine.renderer.width * this.autoWidthRatio);
+      height = Math.max(5, engine.renderer.height * this.autoHeightRatio);
+    }
+    this.widthAbs = Math.max(5, width);
+    this.heightAbs = Math.max(5, height);
+    
+    this.getOrCreateFrameBuffer(engine).resize(width, height);
+  }
 
   updateDependNode(graph: RenderGraph) {
     
@@ -87,9 +98,4 @@ export class RenderTargetNode extends DAGNode{
     
   }
 
-  dispose(graph: RenderGraph) {
-    if (this.resizeObserver !== null) {
-      graph.engine.resizeObservable.remove(this.resizeObserver);
-    }
-  }
 }
