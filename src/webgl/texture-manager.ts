@@ -4,14 +4,6 @@ import { Texture, HTMLImageTexture } from "../core/texture";
 import { GLReleasable } from '../type';
 import { FramebufferAttachTexture } from "./gl-framebuffer";
 
-enum TextureFormat {
-  RGBA,
-  RGB,
-  LUMINANCE_ALPHA,
-  LUMINANCE,
-  ALPHA
-}
-
 interface TextureDescriptor {
   minFilter: TextureFilter;
   maxFilter: TextureFilter;
@@ -28,10 +20,6 @@ const DefaultTextureDescriptor = {
 
 const defaultRenderTargetTextureDescriptor = DefaultTextureDescriptor;
 
-interface WebGLTextureWithVersionIDWrap{
-  version: number;
-  texture: WebGLTexture;
-}
 
 /**
  * responsible for webgl texture resource allocation and reallocation

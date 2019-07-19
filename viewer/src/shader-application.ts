@@ -1,6 +1,6 @@
 
 import {
-  ARTEngine, Technique, Mesh, Interactor, OrbitController,
+  RenderEngine, Technique, Mesh, Interactor, OrbitController,
   ShaderGraph,PerspectiveCamera, Scene, NormalShading, SphereGeometry
 } from '../../src/artgl';
 
@@ -17,12 +17,12 @@ export class ShaderApplication {
   interactor: Interactor;
   orbitController: OrbitController;
 
-  engine: ARTEngine;
+  engine: RenderEngine;
 
 
   init(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-    this.engine = new ARTEngine(canvas);
+    this.engine = new RenderEngine(canvas);
     this.engine.camera.transform.position.set(20, 10, 10)
     this.interactor = new Interactor(canvas);
     this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);

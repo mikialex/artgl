@@ -85,7 +85,7 @@ mesh.shadingParam.set("opacity", 0.5);
 ```ts
 
 const el = canvas;
-const engine = new ARTEngine(canvas);
+const engine = new RenderEngine(canvas);
 const graph = new RenderGraph(this.engine);
 
 // this may not a real example, just demo how it looks

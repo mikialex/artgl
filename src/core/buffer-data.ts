@@ -1,4 +1,4 @@
-import { ARTEngine } from "../engine/render-engine";
+import { RenderEngine } from "../engine/render-engine";
 
 export type BufferDataType = Float32Array | Uint16Array | Uint32Array;
 
@@ -43,7 +43,7 @@ export class BufferData{
     this.count = this.data.length / this.stride;
   }
 
-  getGLAttribute(engine: ARTEngine): WebGLBuffer {
+  getGLAttribute(engine: RenderEngine): WebGLBuffer {
     return engine.getGLAttributeBuffer(this);
   }
 

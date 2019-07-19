@@ -6,7 +6,7 @@ import { GLUniform, UniformDescriptor, getInnerUniformDescriptor, InnerUniformMa
 import { AttributeDescriptor, GLAttribute, AttributeUsage } from "./attribute";
 import { Nullable } from "../type";
 import { GLTextureUniform, TextureDescriptor } from "./uniform/uniform-texture";
-import { ARTEngine } from "../engine/render-engine";
+import { RenderEngine } from "../engine/render-engine";
 
 export interface VaryingDescriptor {
   name: string,
@@ -197,7 +197,7 @@ export class GLProgram{
     this.uniforms[name].set(data);
   }
 
-  updateInnerGlobalUniforms(engine: ARTEngine) {
+  updateInnerGlobalUniforms(engine: RenderEngine) {
     this.globalUniforms.forEach(uni => {
       uni.set(engine.getGlobalUniform(uni.innerGlobal as InnerSupportUniform).value)
     })

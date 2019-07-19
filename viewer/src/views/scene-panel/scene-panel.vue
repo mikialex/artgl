@@ -55,7 +55,7 @@ import ObjectPanel from "../object-panel/object-panel.vue";
 import { GLApp } from "../../application";
 import NodeView from "./scene-node-view.vue";
 import { Observer } from "../../../../src/core/observable";
-import { ARTEngine } from "../../../../src/artgl";
+import { RenderEngine } from "../../../../src/artgl";
 
 @Component({
   components: {
@@ -68,7 +68,7 @@ import { ARTEngine } from "../../../../src/artgl";
 export default class ScenePanel extends Vue {
   sceneView: SceneView = null;
   renderView: RenderView = null;
-  afterObs:Observer<ARTEngine>
+  afterObs:Observer<RenderEngine>
 
   nav = ['hierarchy', 'technique','geometry','material'];
   currentNav = 'hierarchy'
@@ -79,7 +79,7 @@ export default class ScenePanel extends Vue {
     if(this.afterObs){
       GLApp.afterRender.remove(this.afterObs);
     }
-    this.afterObs = GLApp.afterRender.add((engine:ARTEngine)=>{
+    this.afterObs = GLApp.afterRender.add((engine:RenderEngine)=>{
       this.renderView.updateFrameInfo(engine);
     });
   }

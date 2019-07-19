@@ -1,5 +1,5 @@
 import { GLRenderer } from './webgl/gl-renderer';
-import { ARTEngine } from './engine/render-engine';
+import { RenderEngine } from './engine/render-engine';
 
 export type Nullable<T> = T | null;
 
@@ -10,5 +10,5 @@ export interface GLReleasable {
 }
 
 export interface GraphicResourceReleasable{
-  releaseGraphics(engine: ARTEngine): void;
+  releaseGraphics(engine: RenderEngine): void;
 }

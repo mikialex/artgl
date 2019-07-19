@@ -1,6 +1,6 @@
 import { SceneNode } from "../scene/scene-node";
 import { Matrix4 } from "../math/index";
-import { ARTEngine, Size } from '../engine/render-engine';
+import { RenderEngine, Size } from '../engine/render-engine';
 import { Observer } from './observable';
 import { Nullable } from '../type';
 
@@ -27,7 +27,7 @@ export class Camera extends SceneNode{
   }
 
   private renderSizeObserver: Nullable<Observer<Size>> = null;
-  bindEngineRenderSize(engine: ARTEngine) {
+  bindEngineRenderSize(engine: RenderEngine) {
     if (this.renderSizeObserver !== null) {
       engine.resizeObservable.remove(this.renderSizeObserver);
     }

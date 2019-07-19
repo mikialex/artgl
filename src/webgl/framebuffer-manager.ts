@@ -1,7 +1,7 @@
 import { GLFramebuffer } from "./gl-framebuffer";
 import { GLRenderer } from "./gl-renderer";
 import { GLReleasable } from '../type';
-import { ARTEngine } from "../engine/render-engine";
+import { RenderEngine } from "../engine/render-engine";
 
 export class GLFrameBufferManager implements GLReleasable{
   constructor(renderer: GLRenderer) {
@@ -13,7 +13,7 @@ export class GLFrameBufferManager implements GLReleasable{
 
   private framebuffers: Map<string, GLFramebuffer> = new Map();
 
-  createFrameBuffer(engine: ARTEngine, name: string, width: number, height: number, enableDepth: boolean): GLFramebuffer{
+  createFrameBuffer(engine: RenderEngine, name: string, width: number, height: number, enableDepth: boolean): GLFramebuffer{
     if (this.framebuffers.has(name)) {
       throw 'duplicate framebuffer key name';
     }

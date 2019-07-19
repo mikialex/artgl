@@ -40,16 +40,16 @@ Object.keys(shaderStringMap).forEach(key => {
   reverseShaderStringMap[shaderStringMap[key]] = key
 })
 
-const shaderAttributStringInfo: { [index: string]: { type: GLDataType, stride: number, default: any} } = {
+const shaderAttributeStringInfo: { [index: string]: { type: GLDataType, stride: number, default: any} } = {
   'float': { type: GLDataType.float, stride: 1, default: 0 },
   'vec2': { type: GLDataType.floatVec2, stride: 2, default: new Vector2() },
   'vec3': { type: GLDataType.floatVec3, stride: 3, default: new Vector3() },
   'vec4': { type: GLDataType.floatVec4, stride: 4, default: new Vector4() },
 }
-let reverseShaderAttributStringInfo: { [index: number]: { name: string, stride: number , default: any} } = {};
-Object.keys(shaderAttributStringInfo).forEach(key => {
-  reverseShaderAttributStringInfo[shaderAttributStringInfo[key].type] =
-    { name: key, stride: shaderAttributStringInfo[key].stride , default: shaderAttributStringInfo[key].default}
+let reverseShaderAttributeStringInfo: { [index: number]: { name: string, stride: number , default: any} } = {};
+Object.keys(shaderAttributeStringInfo).forEach(key => {
+  reverseShaderAttributeStringInfo[shaderAttributeStringInfo[key].type] =
+    { name: key, stride: shaderAttributeStringInfo[key].stride , default: shaderAttributeStringInfo[key].default}
 })
 
 export function getShaderTypeStringFromGLDataType(type: GLDataType) {
@@ -57,11 +57,11 @@ export function getShaderTypeStringFromGLDataType(type: GLDataType) {
 }
 
 export function getGLDataTypeStride(type: GLDataType) {
-  return reverseShaderAttributStringInfo[type].stride;
+  return reverseShaderAttributeStringInfo[type].stride;
 }
 
 export function getGLDataTypeDefaultDefaultValue(type: GLDataType) {
-  const value = reverseShaderAttributStringInfo[type].default;
+  const value = reverseShaderAttributeStringInfo[type].default;
   try {
     const clonedValue = value.clone();
     return clonedValue;
@@ -70,8 +70,8 @@ export function getGLDataTypeDefaultDefaultValue(type: GLDataType) {
   }
 }
 
-function AttrivbuteGLDataType2ShaderString(type: GLDataType) {
-  return reverseShaderAttributStringInfo[type].name;
+function AttributeGLDataType2ShaderString(type: GLDataType) {
+  return reverseShaderAttributeStringInfo[type].name;
 }
 
 
@@ -107,7 +107,7 @@ function generateAttributeString(config: GLProgramConfig): string {
   let text = '';
   if (config.attributes !== undefined) {
     config.attributes.forEach(att => {
-      const type = AttrivbuteGLDataType2ShaderString(att.type);
+      const type = AttributeGLDataType2ShaderString(att.type);
       text = text + 'attribute ' + type + ' ' + att.name + ';\n';
     })
   }

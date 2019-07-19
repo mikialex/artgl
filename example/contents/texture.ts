@@ -1,6 +1,6 @@
 import { loadImageFromURL } from '../../src/util/file-io';
 import {
-  ARTEngine, SphereGeometry, Technique, Mesh, Material,
+  RenderEngine, SphereGeometry, Technique, Mesh, Material,
   ChannelType, Interactor, OrbitController, PerspectiveCamera,
   NormalShading
 } from '../../src/artgl';
@@ -8,7 +8,7 @@ import { Texture } from '../../src/core/texture';
 
 export default async function() {
   let canvas = document.querySelector('canvas') as HTMLCanvasElement;
-  const engine = new ARTEngine(canvas);
+  const engine = new RenderEngine(canvas);
 
   const img = await loadImageFromURL('/static/world.jpg');
   const texture = new Texture();

@@ -1,5 +1,5 @@
 import {
-  ARTEngine, Mesh, PerspectiveCamera, Interactor, OrbitController,
+  RenderEngine, Mesh, PerspectiveCamera, Interactor, OrbitController,
   OBJLoader, Technique, NormalShading, Scene, Observable, Framer
 } from '../../src/artgl';
 
@@ -12,7 +12,7 @@ export const STATIC_SERVER = "http://localhost:3000/"
 
 export class Application {
   pipeline: RenderPipeline;
-  engine: ARTEngine;
+  engine: RenderEngine;
   framer: Framer = new Framer();
   el: HTMLCanvasElement;
   hasInitialized: boolean = false;
@@ -24,7 +24,7 @@ export class Application {
 
   initialize(canvas: HTMLCanvasElement) {
     this.el = canvas;
-    this.engine = new ARTEngine(canvas);
+    this.engine = new RenderEngine(canvas);
     this.pipeline = new RenderPipeline();
     this.pipeline.build(this.engine, this.scene);
     this.engine.camera.transform.position.set(20, 10, 10)
@@ -63,8 +63,8 @@ export class Application {
   }
 
   sampleCount = 0;
-  beforeRender: Observable<ARTEngine> = new Observable();
-  afterRender: Observable<ARTEngine> = new Observable();
+  beforeRender: Observable<RenderEngine> = new Observable();
+  afterRender: Observable<RenderEngine> = new Observable();
   render = () => {
     this.beforeRender.notifyObservers(this.engine);
     this.orbitController.update();
@@ -74,6 +74,13 @@ export class Application {
     this.afterRender.notifyObservers(this.engine);
     this.engine.renderer.stat.reset();
 
+  }
+
+  pickColor(x: number, y: number) {
+    const f = this.engine.renderer.framebufferManager.getFramebuffer("sceneResult");
+    const result = new Uint8Array(10);
+    f.readPixels(x, y, 1, 1, result);
+    console.log(`${result[0]}`)
   }
 
   run() {

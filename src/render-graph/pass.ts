@@ -1,5 +1,5 @@
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
-import { ARTEngine } from "../engine/render-engine";
+import { RenderEngine } from "../engine/render-engine";
 import { Technique } from "../core/technique";
 import { RenderGraph } from "./render-graph";
 import { PassDefine, PassInputMapInfo } from "./interface";
@@ -51,7 +51,7 @@ export class RenderPass{
   // key: uniformName ;   value: inputFramebufferName
   private inputTarget: Map<string, string> = new Map();
   private outputTarget: GLFramebuffer
-  setOutPutTarget(engine: ARTEngine, renderTargetNode: RenderTargetNode) {
+  setOutPutTarget(engine: RenderEngine, renderTargetNode: RenderTargetNode) {
     if (renderTargetNode.name === RenderGraph.screenRoot) {
       this.outputTarget = undefined;
       this.isOutputScreen = true;
@@ -62,7 +62,7 @@ export class RenderPass{
   }
   private isOutputScreen: boolean = true;
 
-  renderDebugResult(engine: ARTEngine) {
+  renderDebugResult(engine: RenderEngine) {
     engine.renderDebugFrameBuffer(this.outputTarget)
     // this will cause no use draw TODO
     this.inputTarget.forEach((inputFramebufferName, uniformName) => {
@@ -71,12 +71,12 @@ export class RenderPass{
     })
   }
 
-  renderDebugFramebuffer(engine: ARTEngine, framebuffer: GLFramebuffer) {
+  renderDebugFramebuffer(engine: RenderEngine, framebuffer: GLFramebuffer) {
     engine.renderer.setRenderTargetScreen();
   }
 
   static screenDebugViewPort = new Vector4(200, 0, 200, 200)
-  execute(engine: ARTEngine, graph: RenderGraph) {
+  execute(engine: RenderEngine, graph: RenderGraph) {
 
     // setup viewport and render target
     if (this.isOutputScreen) {

@@ -5,7 +5,7 @@ import * as ARTGL from '../../src/artgl'
 //==>
 
 let canvas = document.querySelector('canvas');
-const engine = new ARTGL.ARTEngine(canvas);
+const engine = new ARTGL.RenderEngine(canvas);
 const scene = new ARTGL.Scene();
 
 const geometry = new ARTGL.CubeGeometry();

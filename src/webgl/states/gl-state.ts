@@ -66,13 +66,6 @@ export class GLState{
 		this.currentCullFace = cullFace;
   }
   
-  currentRenderTarget: WebGLFramebuffer
-  public setRenderTarget(framebuffer: WebGLFramebuffer) {
-    if (this.currentRenderTarget !== framebuffer) {
-      this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, framebuffer);
-    }
-  }
-
 }
 
 

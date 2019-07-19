@@ -1,7 +1,10 @@
 import { DAGNode } from "../core/dag-node";
 import { ShaderFunction } from "./shader-function";
 import { GLDataType } from "../webgl/shader-util";
-import { InnerSupportUniform, UniformDescriptor, InnerUniformMapDescriptor, InnerUniformMap } from "../webgl/uniform/uniform";
+import {
+  InnerSupportUniform, UniformDescriptor,
+  InnerUniformMapDescriptor, InnerUniformMap
+} from "../webgl/uniform/uniform";
 import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
 import { Vector2 } from "../math/vector2";
 import { Vector3 } from "../math/index";

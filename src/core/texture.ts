@@ -1,6 +1,19 @@
-import { ARTEngine } from "../engine/render-engine";
-import { PixelFormat } from "../webgl/const";
+import { RenderEngine } from "../engine/render-engine";
 import { GraphicResourceReleasable } from "../type";
+
+export enum PixelFormat {
+  AlphaFormat = 1021,
+  RGBFormat = 1022,
+  RGBAFormat = 1023,
+}
+
+export enum PixelDataType {
+  UNSIGNED_BYTE,
+  UNSIGNED_SHORT_5_6_5,
+  UNSIGNED_SHORT_4_4_4_4,
+  UNSIGNED_SHORT_5_5_5_1,
+  FLOAT,
+}
 
 /**
  * texture container for bitmap render data
@@ -12,13 +25,14 @@ export abstract class Texture implements GraphicResourceReleasable {
 
   private needUpdate: boolean = true;
 
-  format: PixelFormat
+  format: PixelFormat = PixelFormat.RGBAFormat
+  dataType: PixelDataType = PixelDataType.UNSIGNED_BYTE
 
   setNeedUpdate() {
     this.needUpdate = true;
   }
 
-  getGLTexture(engine: ARTEngine): WebGLTexture {
+  getGLTexture(engine: RenderEngine): WebGLTexture {
     const glTexture = engine.renderer.textureManger.getGLTexture(this)
     if (glTexture === undefined) {
       this.needUpdate = false;
@@ -31,19 +45,17 @@ export abstract class Texture implements GraphicResourceReleasable {
     }
   }
 
-  releaseGraphics(engine: ARTEngine) {
+  releaseGraphics(engine: RenderEngine) {
     engine.renderer.textureManger.deleteGLTexture(this);
   }
 
-  abstract upload(engine: ARTEngine): WebGLTexture;
+  abstract upload(engine: RenderEngine): WebGLTexture;
 }
 
 export class DataTexture extends Texture {
   data?: Uint8ClampedArray;
 
-  format = PixelFormat.RGBAFormat;
-
-  upload(engine: ARTEngine): WebGLTexture {
+  upload(engine: RenderEngine): WebGLTexture {
     // TODO
     throw new Error("Method not implemented.");
   }
@@ -53,9 +65,7 @@ export class HTMLImageTexture extends Texture{
   
   image: HTMLImageElement;
 
-  format = PixelFormat.RGBAFormat;
-
-  upload(engine: ARTEngine) {
+  upload(engine: RenderEngine) {
     return engine.renderer.textureManger.createTextureFromImageElement(this);
   }
 }

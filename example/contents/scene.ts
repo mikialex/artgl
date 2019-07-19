@@ -14,7 +14,7 @@ export default async function () {
 
   let canvas = document.querySelector('canvas');
 
-  const engine = new ARTGL.ARTEngine(canvas);
+  const engine = new ARTGL.RenderEngine(canvas);
 
   const scene = new ARTGL.Scene();
 

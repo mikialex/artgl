@@ -1,6 +1,6 @@
 import { generateUUID } from "../math/index";
 import { GLProgramConfig, GLProgram } from "../webgl/program";
-import { ARTEngine } from "../engine/render-engine";
+import { RenderEngine } from "../engine/render-engine";
 import { UniformProxy } from "../engine/uniform-proxy";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { Nullable } from '../type';
@@ -28,7 +28,7 @@ export class Shading {
     return this.programConfigCache;
   }
 
-  getProgram(engine: ARTEngine): GLProgram {
+  getProgram(engine: RenderEngine): GLProgram {
     if (this.needRebuildShader) {
       this.disposeProgram(engine);
     }
@@ -39,7 +39,7 @@ export class Shading {
     return program;
   }
 
-  disposeProgram(engine: ARTEngine): void {
+  disposeProgram(engine: RenderEngine): void {
     engine.deleteProgram(this);
   }
 
@@ -92,7 +92,7 @@ export class Technique {
 //     throw "technique not impl"
 //   }
 
-//   getProgram(engine: ARTEngine): GLProgram {
+//   getProgram(engine: RenderEngine): GLProgram {
 //     if (this.needRebuildShader) {
 //       this.disposeProgram(engine);
 //       this.update();
@@ -115,7 +115,7 @@ export class Technique {
 //     return config;
 //   }
 
-//   disposeProgram(engine: ARTEngine): void {
+//   disposeProgram(engine: RenderEngine): void {
 //     engine.deleteProgram(this);
 //   }
 

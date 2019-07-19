@@ -1,10 +1,11 @@
 import { PassDefine, GraphDefine, RenderTargetDefine } from "./interface";
 import { PassGraphNode } from "./node/pass-graph-node";
 import { RenderTargetNode } from "./node/render-target-node";
-import { ARTEngine } from "../engine/render-engine";
+import { RenderEngine } from "../engine/render-engine";
 import { QuadSource } from './quad-source';
 import { Vector4 } from "../math/vector4";
 import { RenderPass } from "./pass";
+import { GLFramebuffer } from "../webgl/gl-framebuffer";
 
 
 export type RenderGraphNode = PassGraphNode | RenderTargetNode;
@@ -43,7 +44,7 @@ export class RenderGraph {
    *
    * @memberof RenderGraph
    */
-  public render(engine: ARTEngine) {
+  public render(engine: RenderEngine) {
     this.passes.forEach(pass => {
       pass.execute(engine, this);
     });
@@ -77,7 +78,7 @@ export class RenderGraph {
    *
    * @memberof RenderGraph
    */
-  update(engine: ARTEngine) {
+  update(engine: RenderEngine) {
     
     //updateNodesConnection
     this.passNodes.forEach(node => {
@@ -151,7 +152,7 @@ export class RenderGraph {
     }
   }
 
-  updateRenderTargetDebugView(engine: ARTEngine, nodeId: string, viewPort: Vector4) {
+  updateRenderTargetDebugView(engine: RenderEngine, nodeId: string, viewPort: Vector4) {
     if (this.screenNode.uuid === nodeId) {
       RenderPass.screenDebugViewPort.copy(viewPort);
       return

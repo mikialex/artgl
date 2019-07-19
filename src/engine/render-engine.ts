@@ -49,7 +49,7 @@ export interface Size{
 const copyTechnique = new Technique(new CopyShading());
 const quad = new QuadSource();
 
-export class ARTEngine implements GLReleasable{
+export class RenderEngine implements GLReleasable{
   constructor(el?: HTMLCanvasElement, ctxOptions?: any) {
     this.renderer = new GLRenderer(el, ctxOptions);
     // if we have a element param, use it as the default camera's param for convenience
@@ -140,7 +140,7 @@ export class ARTEngine implements GLReleasable{
    * call this to update engine layer camera related render info
    * such as matrix global uniform.
    *
-   * @memberof ARTEngine
+   * @memberof RenderEngine
    */
   connectCamera() {
     let needUpdateVP = false;
@@ -236,7 +236,7 @@ export class ARTEngine implements GLReleasable{
    *
    * @private
    * @type {Map<InnerSupportUniform, UniformProxy>}
-   * @memberof ARTEngine
+   * @memberof RenderEngine
    */
   private globalUniforms: Map<InnerSupportUniform, UniformProxy> = new Map();
   getGlobalUniform(uniform: InnerSupportUniform): UniformProxy {

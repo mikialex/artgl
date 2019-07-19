@@ -3,7 +3,7 @@ import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
 import { PixelFormat } from "./const";
 import { Texture } from "../core/texture";
-import { ARTEngine } from "../engine/render-engine";
+import { RenderEngine } from "../engine/render-engine";
 
 
 
@@ -11,17 +11,18 @@ export class FramebufferAttachTexture extends Texture {
   width: number = 5;
   height: number = 5;
 
-  upload(engine: ARTEngine): WebGLTexture {
+  upload(engine: RenderEngine): WebGLTexture {
     return engine.renderer.textureManger.createTextureForRenderTarget(this);
   }
 
-  attach(engine: ARTEngine, framebuffer: GLFramebuffer, attachPoint: number) {
+  attach(engine: RenderEngine, framebuffer: GLFramebuffer, attachPoint: number) {
+    engine.renderer.setRenderTarget(framebuffer);
+
     const gl = framebuffer.gl;
     this.width = framebuffer.width;
     this.height = framebuffer.height;
     this.releaseGraphics(engine);
     const glTexture = this.upload(engine);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.webglFrameBuffer);
     const attachmentPoint = GLAttachmentPoints[attachPoint];
     gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, glTexture, 0);
   }
@@ -80,11 +81,13 @@ export class GLFramebuffer {
     return buffer;
   }
 
-  resize(engine: ARTEngine, width: number, height: number) {
+  resize(engine: RenderEngine, width: number, height: number) {
 
     if (this.width === width && this.height === height) {
       return;
     }
+
+    this.renderer.setRenderTarget(this);
 
     this.width = width;
     this.height = height;
@@ -103,7 +106,7 @@ export class GLFramebuffer {
 
   }
 
-  createAttachTexture(engine: ARTEngine,attachPoint: number) {
+  createAttachTexture(engine: RenderEngine,attachPoint: number) {
     if (this.textureAttachedSlot[attachPoint] !== undefined) {
       throw 'framebuffer has attached texture'
     }
@@ -114,6 +117,8 @@ export class GLFramebuffer {
   }
 
   createAttachDepthBuffer() {
+    this.renderer.setRenderTarget(this);
+
     if (this.webglDepthBuffer !== null) {
       return
     }
@@ -124,7 +129,6 @@ export class GLFramebuffer {
     gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width, this.height);
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.webglFrameBuffer);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
   }
 
@@ -142,7 +146,14 @@ export class GLFramebuffer {
   readPixels(x: number, y: number, width: number, height: number, readBuffer: FramebufferReadBufferType) {
     // TODO
     const gl = this.gl;
-    // gl.readPixels(x, y, width, height, PixelFormat.RGBAFormat, type, readBuffer); 
+    this.renderer.setRenderTarget(this);
+    if (x < 0 || y < 0 || x > (this.width - width) || y > (this.height - height)) {
+      throw "read area exceed frameSize"
+    }
+    if (readBuffer.length < width * height) {
+      throw "readBuffer size not sufficient"
+    }
+    gl.readPixels(x, y, width, height, PixelFormat.RGBA, gl.UNSIGNED_BYTE, readBuffer); 
   }
 
   dispose() {

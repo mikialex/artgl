@@ -129,17 +129,19 @@ export var UnsignedShort5551Type = 1018;
 export var UnsignedShort565Type = 1019;
 export var UnsignedInt248Type = 1020;
 
+// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Pixel_formats
 export enum PixelFormat {
-  AlphaFormat = 1021,
-  RGBFormat = 1022,
-  RGBAFormat = 1023,
+  Alpha = 0x1906,
+  RGB = 0x1907,
+  RGBA = 0x1908,
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Pixel_types
 export enum PixelDataType {
-  UNSIGNED_BYTE,
-  UNSIGNED_SHORT_5_6_5,
-  UNSIGNED_SHORT_4_4_4_4,
-  UNSIGNED_SHORT_5_5_5_1,
+  UNSIGNED_BYTE = 0x1401,
+  UNSIGNED_SHORT_5_6_5 = 0x8033,
+  UNSIGNED_SHORT_4_4_4_4 = 0x8034,
+  UNSIGNED_SHORT_5_5_5_1 = 0x8363,
   FLOAT,
 }
 

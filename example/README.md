@@ -38,9 +38,9 @@ markdown 代码块：
 
 //==>
 
-let canv = document.querySelector('canvas');
+let canvas = document.querySelector('canvas');
 
-const engine = new ARTGL.ARTEngine(canv);
+const engine = new ARTGL.RenderEngine(canvas);
 
 const scene = new ARTGL.Scene();
 

@@ -1,4 +1,4 @@
-import { ARTEngine } from '../../../src/artgl';
+import { RenderEngine } from '../../../src/artgl';
 
 export class RenderView{
   compiledPrograms: number;
@@ -6,7 +6,7 @@ export class RenderView{
   uniformUpload: number;
   drawcall: number;
 
-  static create(engine: ARTEngine) {
+  static create(engine: RenderEngine) {
     const renderer = engine.renderer;
     const view = new RenderView;
     view.compiledPrograms = renderer.programManager.compiledProgramsCount;
@@ -14,7 +14,7 @@ export class RenderView{
     return view;
   }
 
-  updateFrameInfo(engine: ARTEngine) {
+  updateFrameInfo(engine: RenderEngine) {
     this.programSwitchCount = engine.renderer.stat.programSwitch;
     this.uniformUpload = engine.renderer.stat.uniformUpload;
     this.drawcall = engine.renderer.stat.drawcall;

@@ -1,5 +1,5 @@
 import {
-  ARTEngine, PerspectiveCamera, Mesh, Interactor,
+  RenderEngine, PerspectiveCamera, Mesh, Interactor,
   OrbitController, Technique, NormalShading
 } from "../../src/artgl";
 
@@ -18,7 +18,7 @@ async function loadObj() {
 export default function() {
   (window as any).load = loadObj;
   let canvas = document.querySelector('canvas') as HTMLCanvasElement; 
-  const engine = new ARTEngine(canvas);
+  const engine = new RenderEngine(canvas);
 
   const myInteractor = new Interactor(canvas);
   const myOrbitController = new OrbitController(engine.camera as PerspectiveCamera);

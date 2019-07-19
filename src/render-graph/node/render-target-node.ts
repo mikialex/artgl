@@ -3,7 +3,7 @@ import { RenderTargetDefine, DimensionType } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { GLFramebuffer } from "../../webgl/gl-framebuffer";
 import { MathUtil } from '../../math/util'
-import { ARTEngine } from "../../engine/render-engine";
+import { RenderEngine } from "../../engine/render-engine";
 import { Nullable } from "../../type";
 import { Vector4 } from '../../math/vector4';
 import { PixelFormat } from "../../webgl/const";
@@ -24,7 +24,7 @@ export class RenderTargetNode extends DAGNode{
     // set a default format config
     if (define.format === undefined) {
       define.format = {
-        pixelFormat: PixelFormat.RGBAFormat,
+        pixelFormat: PixelFormat.RGBA,
         dimensionType: DimensionType.bindRenderSize,
       }
     }
@@ -54,7 +54,7 @@ export class RenderTargetNode extends DAGNode{
   private fromGetter: () => Nullable<string>
   private from: string = null;
 
-  getOrCreateFrameBuffer(engine: ARTEngine): GLFramebuffer {
+  getOrCreateFrameBuffer(engine: RenderEngine): GLFramebuffer {
     const f = engine.renderer.framebufferManager.getFramebuffer(this.name);
     if (f) {
       return f
@@ -64,7 +64,7 @@ export class RenderTargetNode extends DAGNode{
     }
   }
 
-  updateSize(engine: ARTEngine) {
+  updateSize(engine: RenderEngine) {
     if (this.isScreenNode) {
       return;
     }

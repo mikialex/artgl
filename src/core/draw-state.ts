@@ -1,4 +1,7 @@
-import { DepthFunction, BlendingMode, CullSide, BlendEquation, SrcAlphaFactor, OneMinusSrcAlphaFactor } from "../webgl/const";
+import {
+  DepthFunction, BlendingMode, CullSide,
+  BlendEquation, SrcAlphaFactor, OneMinusSrcAlphaFactor
+} from "../webgl/const";
 
 
 export class DrawState {
@@ -18,10 +21,6 @@ export class DrawState {
   depthTest = true;
   depthWrite = true;
 
-  clippingPlanes = null;
-  clipIntersection = false;
-  clipShadows = false;
-
   colorWrite = true;
 
   polygonOffset = false;
@@ -33,5 +32,4 @@ export class DrawState {
   alphaTest = 0;
   premultipliedAlpha = false;
 
-  needsUpdate = true;
 }

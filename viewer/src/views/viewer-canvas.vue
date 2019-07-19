@@ -1,6 +1,8 @@
 <template>
   <div class="canvas-wrap">
-    <canvas id="viewer-canvas"></canvas>
+    <canvas id="viewer-canvas"
+    @click ="pick"
+    ></canvas>
     <div v-if="!isRuning" class="stop-notation"> STOPPED </div>
     <GraphViewer v-if="graphView" :graphview="graphView"/>
     <div class="command-bar">
@@ -28,6 +30,12 @@ import GraphViewer from '../components/graph-viewer/graph-viewer.vue';
 export default class ViewerCanvas extends Vue {
   isRuning:boolean = GLApp.framer.active;
   graphView: GraphView = null;
+
+  pick(e:MouseEvent) {
+    // console.log(e.offsetX)
+    const canvas = this.$el.querySelector("canvas")
+    GLApp.pickColor(e.offsetX, canvas.clientHeight - e.offsetY)
+  }
 
   inspectGraph(){
     this.graphView = GraphView.create(GLApp.pipeline.graph);

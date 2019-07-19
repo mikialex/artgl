@@ -1,6 +1,6 @@
 import {
   RenderGraph, Technique, TAAShading,
-  TSSAOShading, TSSAOBlendShading, Matrix4, InnerSupportUniform, DepthShading, Scene, ARTEngine
+  TSSAOShading, TSSAOBlendShading, Matrix4, InnerSupportUniform, DepthShading, Scene, RenderEngine
 } from "../../src/artgl";
 
 export class RenderPipeline{
@@ -23,7 +23,7 @@ export class RenderPipeline{
     return this.tickNum % 2 === 0;
   }
 
-  render(engine: ARTEngine, scene: Scene) {
+  render(engine: RenderEngine, scene: Scene) {
     this.tickNum++;
 
     engine.connectCamera();
@@ -41,7 +41,7 @@ export class RenderPipeline{
     // }
   }
 
-  build(engine: ARTEngine, scene: Scene) {
+  build(engine: RenderEngine, scene: Scene) {
     this.graph.setGraph({
       renderTargets: [
         {
