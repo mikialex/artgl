@@ -60,7 +60,7 @@ export class RenderTargetNode extends DAGNode{
       return f
     } else {
       return engine.renderer.framebufferManager.createFrameBuffer(
-        this.name, this.widthAbs, this.heightAbs, this.enableDepth);
+        engine, this.name, this.widthAbs, this.heightAbs, this.enableDepth);
     }
   }
 
@@ -82,7 +82,7 @@ export class RenderTargetNode extends DAGNode{
     this.widthAbs = Math.max(5, width);
     this.heightAbs = Math.max(5, height);
     
-    this.getOrCreateFrameBuffer(engine).resize(width, height);
+    this.getOrCreateFrameBuffer(engine).resize(engine, width, height);
   }
 
   updateDependNode(graph: RenderGraph) {

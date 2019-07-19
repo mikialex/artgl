@@ -2,51 +2,30 @@ import { GLRenderer } from "./gl-renderer";
 import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
 import { PixelFormat } from "./const";
+import { Texture } from "../core/texture";
+import { ARTEngine } from "../engine/render-engine";
 
 
 
-export class GLFrameAttachedTexture {
-  constructor(gl: WebGLRenderingContext, framebuffer: GLFramebuffer, attachPoint: number) {
-    this.framebuffer = framebuffer;
-    this.attachPoint = attachPoint;
-    this.gl = gl;
-    this.init();
+export class FramebufferAttachTexture extends Texture {
+  width: number = 5;
+  height: number = 5;
+
+  upload(engine: ARTEngine): WebGLTexture {
+    return engine.renderer.textureManger.createTextureForRenderTarget(this);
   }
-  gl: WebGLRenderingContext;
 
-  framebuffer: GLFramebuffer;
-  glTexture: WebGLTexture;
-  textureStoreId: string;
-
-  attachPoint: number;
-
-  init() {
-    const gl = this.gl;
-    const framebuffer = this.framebuffer;
-    this.textureStoreId = framebuffer.renderer.textureManger.
-      createTextureForRenderTarget(framebuffer.width, framebuffer.height);
-    this.glTexture = framebuffer.renderer.textureManger.getGLTexture(this.textureStoreId);
-
+  attach(engine: ARTEngine, framebuffer: GLFramebuffer, attachPoint: number) {
+    const gl = framebuffer.gl;
+    this.width = framebuffer.width;
+    this.height = framebuffer.height;
+    this.releaseGraphics(engine);
+    const glTexture = this.upload(engine);
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer.webglFrameBuffer);
-    const attachmentPoint = GLAttachmentPoints[this.attachPoint];
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, this.glTexture, 0);
+    const attachmentPoint = GLAttachmentPoints[attachPoint];
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, glTexture, 0);
   }
 
-  updateSize() {
-    this.disposeTexture();
-    this.init();
-  }
-
-  disposeTexture() {
-    this.framebuffer.renderer.textureManger.deleteGLTexture(this.textureStoreId);
-    this.textureStoreId = undefined;
-    this.glTexture = undefined;
-  }
-
-  dispose() {
-    this.disposeTexture();
-    this.framebuffer = undefined;
-  }
 }
 
 const GLAttachmentPoints = [];
@@ -81,7 +60,7 @@ export class GLFramebuffer {
   webglDepthBuffer: Nullable<WebGLRenderbuffer> = null;
   webglFrameBuffer: WebGLFramebuffer;
 
-  textureAttachedSlot: GLFrameAttachedTexture[] = [];
+  textureAttachedSlot: FramebufferAttachTexture[] = [];
 
   debuggingViewport: Vector4 = new Vector4(0, 0, 200, 200);
 
@@ -101,34 +80,35 @@ export class GLFramebuffer {
     return buffer;
   }
 
-  resize(width: number, height: number) {
+  resize(engine: ARTEngine, width: number, height: number) {
 
     if (this.width === width && this.height === height) {
       return;
     }
 
+    this.width = width;
+    this.height = height;
+
     this.gl.deleteFramebuffer(this.webglFrameBuffer);
     this.webglFrameBuffer = this.createGLFramebuffer();
 
-    this.textureAttachedSlot.forEach(text => {
+    this.textureAttachedSlot.forEach((text, index) => {
       if (text) {
-        text.updateSize();
+        text.attach(engine, this, index);
       }
     })
 
     this.disposeAttachedDepthBuffer();
     this.createAttachDepthBuffer();
 
-    this.width = width;
-    this.height = height;
-
   }
 
-  createAttachTexture(attachPoint: number) {
+  createAttachTexture(engine: ARTEngine,attachPoint: number) {
     if (this.textureAttachedSlot[attachPoint] !== undefined) {
       throw 'framebuffer has attached texture'
     }
-    const attachTexture = new GLFrameAttachedTexture(this.gl, this, attachPoint);
+    const attachTexture = new FramebufferAttachTexture();
+    attachTexture.attach(engine, this, attachPoint);
     this.textureAttachedSlot[attachPoint] = attachTexture;
 
   }
@@ -153,7 +133,7 @@ export class GLFramebuffer {
     this.webglDepthBuffer = null;
   }
 
-  attachTexture(texture: GLFrameAttachedTexture, attachPoint: number) {
+  attachTexture(texture: FramebufferAttachTexture, attachPoint: number) {
     // TODO
   }
 
@@ -166,11 +146,7 @@ export class GLFramebuffer {
   }
 
   dispose() {
-    this.textureAttachedSlot.forEach(text => {
-      if (text) {
-        text.dispose();
-      }
-    })
+    this.textureAttachedSlot = [];
     this.disposeAttachedDepthBuffer();
     this.gl.deleteFramebuffer(this.webglFrameBuffer);
     this.webglFrameBuffer = null;

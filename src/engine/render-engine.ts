@@ -269,18 +269,16 @@ export class ARTEngine implements GLReleasable{
     program.forTextures((tex: GLTextureUniform) => {
       let glTexture: WebGLTexture | undefined;
 
-      // acquire texture from material or framebuffer
+      // acquire texture from material
       if (material !== undefined) {
         if (tex.channel === undefined) {
           throw 'use texture in material / use material to render should set texture uniform channel type'
         }
         const texture = material.getChannelTexture(tex.channel);
-        if (texture.glTextureId === undefined) {
-          texture.upload(this);
-          glTexture = this.renderer.textureManger.getGLTexture(texture.glTextureId);
-        }
+        glTexture = texture.getGLTexture(this);
       } 
 
+      // acquire texture from framebuffer
       if (glTexture === undefined) {
         const framebufferName = program.framebufferTextureMap[tex.name];
         if (framebufferName === undefined) {
@@ -377,10 +375,6 @@ export class ARTEngine implements GLReleasable{
 
 
   //  GL resource acquisition
-  getGLTexture(texture: Texture): WebGLTexture {
-    const id = texture.glTextureId;
-    return this.renderer.getGLTexture(id);
-  }
   private programShadingMap: Map<Shading, GLProgram> = new Map();
   getProgram(shading: Shading): GLProgram {
     return this.programShadingMap.get(shading);

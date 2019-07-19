@@ -95,10 +95,6 @@ export class GLRenderer implements GLReleasable{
     }
   }
 
-  getGLTexture(storeId: string) {
-    return this.textureManger.getGLTexture(storeId);
-  }
-
   render(mode: DrawMode, useIndex: boolean) {
     if (this.activeProgram === null) {
       throw 'renderer hasn\'t active program'

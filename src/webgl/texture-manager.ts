@@ -1,8 +1,8 @@
 import { GLRenderer } from "./gl-renderer";
-import { generateUUID } from "../math/uuid";
 import { TextureFilter, TextureWrap } from "./const";
-import { Texture } from "../core/texture";
+import { Texture, HTMLImageTexture } from "../core/texture";
 import { GLReleasable } from '../type';
+import { FramebufferAttachTexture } from "./gl-framebuffer";
 
 enum TextureFormat {
   RGBA,
@@ -45,7 +45,7 @@ export class GLTextureManager implements GLReleasable{
     this.renderer = renderer;
   }
   readonly renderer: GLRenderer;
-  private textures: Map<string, WebGLTexture>  = new Map();
+  private textures: Map<Texture, WebGLTexture>  = new Map();
   // private textures: Map<Texture, WebGLTextureWithVersionIDWrap> = new Map();
 
   init() {
@@ -53,31 +53,27 @@ export class GLTextureManager implements GLReleasable{
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
   }
 
-  getGLTexture(storeId: string) {
-    return this.textures.get(storeId);
+  getGLTexture(texture: Texture) {
+    return this.textures.get(texture);
   }
 
-  deleteGLTexture(storeId: string) {
-    const texture = this.getGLTexture(storeId);
-    this.renderer.gl.deleteTexture(texture);
-    this.textures.delete(storeId);
+  deleteGLTexture(texture: Texture) {
+    const glTexture = this.getGLTexture(texture);
+    this.renderer.gl.deleteTexture(glTexture);
+    this.textures.delete(texture);
   }
 
-  createTextureFromImageElement(image: HTMLImageElement, config?: TextureDescriptor): string {
-    if (config === undefined) {
-      config = DefaultTextureDescriptor;
-    }
+  createTextureFromImageElement(texture: HTMLImageTexture) {
     const gl = this.renderer.gl;
-    const glTexture = this.createWebGLTexture(config);
+    const glTexture = this.createWebGLTexture(DefaultTextureDescriptor);
     gl.bindTexture(gl.TEXTURE_2D, glTexture);
   
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-    const id = generateUUID();
-    this.textures.set(id, glTexture);
-    return id;
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
+    this.textures.set(texture, glTexture);
+    return glTexture;
   }
 
-  createTextureForRenderTarget(width: number, height: number): string {
+  createTextureForRenderTarget(texture: FramebufferAttachTexture) {
     const gl = this.renderer.gl;
     const glTexture = this.createWebGLTexture(defaultRenderTargetTextureDescriptor)
 
@@ -88,12 +84,12 @@ export class GLTextureManager implements GLReleasable{
     const type = gl.UNSIGNED_BYTE;
     const data = null;
     gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat,
-      width, height, border,
+      texture.width, texture.height, border,
       format, type, data);
+    
+    this.textures.set(texture, glTexture);
 
-    const id = generateUUID();
-    this.textures.set(id, glTexture);
-    return id;
+    return glTexture;
   }
   
   private createWebGLTexture(config: TextureDescriptor): WebGLTexture {
