@@ -43,6 +43,10 @@ export class Shading {
     engine.deleteProgram(this);
   }
 
+  decorate(shading: Shading): Shading{
+    return new Shading()
+  }
+
 }
 
 export class Technique {
@@ -59,64 +63,3 @@ export class Technique {
     }
   }
 }
-
-/**
- * Technique defined how to draw a things typically, one technique is corespondent to a gl program.
- * Program's shader and infos are defined in technique config.
- * Technique config is wrap a program config that the engine will use this to tell the
- *  under layer gl renderer to create and compiled shader.
- */
-// export class TechniqueOld{
-//   constructor() {
-//     this.update();
-//     this.needRebuildShader = false;
-//     this.createProgramConfig();
-//     this.graph.compile();
-//   }
-//   graph: ShaderGraph = new ShaderGraph();
-//   needRebuildShader: boolean = true;
-//   _programConfigCache: GLProgramConfig;
-
-//   name: string = "no named technique";
-//   uuid: string = generateUUID();
-//   _techniqueId: string;
-
-//   isTransparent = false;
-
-//   uniforms: Map<string, UniformProxy> = new Map();
-
-//   /**
-//    * impl this to build your shader source
-//    */
-//   update() {
-//     throw "technique not impl"
-//   }
-
-//   getProgram(engine: RenderEngine): GLProgram {
-//     if (this.needRebuildShader) {
-//       this.disposeProgram(engine);
-//       this.update();
-//       this.needRebuildShader = false;
-//     }
-//     let program = engine.getProgram(this);
-//     if (program === undefined) {
-//       program = engine.createProgram(this);
-//     }
-//     return program;
-//   }
-
-//   createProgramConfig(): GLProgramConfig{
-//     const config = this.graph.compile();
-//     this.uniforms.clear();
-//     config.uniforms.forEach(uniform => {
-//       this.uniforms.set(uniform.name, new UniformProxy(uniform.default));
-//     })
-//     this._programConfigCache = config;
-//     return config;
-//   }
-
-//   disposeProgram(engine: RenderEngine): void {
-//     engine.deleteProgram(this);
-//   }
-
-// }

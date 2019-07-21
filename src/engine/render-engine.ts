@@ -7,7 +7,6 @@ import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
 import { Technique, Shading } from "../core/technique";
 import { DrawMode } from "../webgl/const";
-import { Texture } from "../core/texture";
 import { Material } from "../core/material";
 import { GLTextureUniform } from "../webgl/uniform/uniform-texture";
 import { PerspectiveCamera } from "../camera/perspective-camera";
@@ -21,7 +20,6 @@ import { downloadCanvasPNGImage } from "../util/file-io";
 import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/vao";
-import { DrawState } from "../core/draw-state";
 
 export interface RenderSource{
   resetSource(): void;
