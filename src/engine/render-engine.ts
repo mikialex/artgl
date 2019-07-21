@@ -21,6 +21,7 @@ import { downloadCanvasPNGImage } from "../util/file-io";
 import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/vao";
+import { DrawState } from "../core/draw-state";
 
 export interface RenderSource{
   resetSource(): void;
@@ -201,6 +202,8 @@ export class RenderEngine implements GLReleasable{
     this.connectGeometry(object.geometry, program);
 
     this.connectRange(object.range, program, object.geometry)
+
+    object.state.syncGL(this.renderer)
 
     // render
     this.renderer.render(DrawMode.TRIANGLES, program.useIndexDraw);

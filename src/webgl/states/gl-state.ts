@@ -5,7 +5,7 @@ import { GLColorBuffer } from "./gl-color-buffer";
 import { GLDepthBuffer } from "./gl-depth-buffer";
 import { GLTextureSlot } from "./gl-texture-slot";
 
-export class GLState{
+export class GLState {
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
     this.gl = renderer.gl;
@@ -26,7 +26,7 @@ export class GLState{
 
   // specifies the affine transformation of x and y 
   // from normalized device coordinates to window coordinates.
-  public setViewport(x: number, y: number, width: number, height: number) {
+  setViewport(x: number, y: number, width: number, height: number) {
     this.newViewport.set(x, y, width, height);
     if (!this.newViewport.equals(this.currentViewport)) {
       this.gl.viewport(x, y, width, height);
@@ -34,11 +34,11 @@ export class GLState{
     }
   }
 
-  public setFullScreenViewPort() {
-    this.setViewport(0,0,this.renderer.width, this.renderer.height);
+  setFullScreenViewPort() {
+    this.setViewport(0, 0, this.renderer.width, this.renderer.height);
   }
 
-  public setScissor(x: number, y: number, width: number, height: number) {
+  setScissor(x: number, y: number, width: number, height: number) {
     this.newScissor.set(x, y, width, height);
     if (!this.newScissor.equals(this.currentScissor)) {
       this.gl.viewport(x, y, width, height);
@@ -47,25 +47,42 @@ export class GLState{
   }
 
   currentCullFace: CullSide = CullSide.CullFaceNone;
-  public setCullFace(cullFace: CullSide) {
+  setCullFace(cullFace: CullSide) {
     const gl = this.gl;
-		if ( cullFace !== CullSide.CullFaceNone ) {
-			gl.enable( gl.CULL_FACE );
-			if ( cullFace !== this.currentCullFace ) {
-				if ( cullFace === CullSide.CullFaceBack ) {
-					gl.cullFace( gl.BACK );
-				} else if ( cullFace === CullSide.CullFaceFront ) {
-					gl.cullFace( gl.FRONT );
-				} else {
-					gl.cullFace( gl.FRONT_AND_BACK );
-				}
-			}
-		} else {
-			gl.disable( gl.CULL_FACE );
-		}
-		this.currentCullFace = cullFace;
+    if (cullFace !== CullSide.CullFaceNone) {
+      gl.enable(gl.CULL_FACE);
+      if (cullFace !== this.currentCullFace) {
+        if (cullFace === CullSide.CullFaceBack) {
+          gl.cullFace(gl.BACK);
+        } else if (cullFace === CullSide.CullFaceFront) {
+          gl.cullFace(gl.FRONT);
+        } else {
+          gl.cullFace(gl.FRONT_AND_BACK);
+        }
+      }
+    } else {
+      gl.disable(gl.CULL_FACE);
+    }
+    this.currentCullFace = cullFace;
   }
-  
+
+  currentPolygonOffsetFactor: number = 0;
+  currentPolygonOffsetUnits: number = 0;
+
+  setPolygonOffset(polygonOffsetEnable: boolean, factor: number, units: number) {
+    const gl = this.gl;
+    if (polygonOffsetEnable) {
+      gl.enable(gl.POLYGON_OFFSET_FILL);
+      if (this.currentPolygonOffsetFactor !== factor || this.currentPolygonOffsetUnits !== units) {
+        gl.polygonOffset(factor, units);
+        this.currentPolygonOffsetFactor = factor;
+        this.currentPolygonOffsetUnits = units;
+      }
+    } else {
+      gl.disable(gl.POLYGON_OFFSET_FILL);
+    }
+  }
+
 }
 
 

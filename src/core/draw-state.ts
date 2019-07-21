@@ -2,6 +2,7 @@ import {
   DepthFunction, BlendingMode, CullSide,
   BlendEquation, SrcAlphaFactor, OneMinusSrcAlphaFactor
 } from "../webgl/const";
+import { GLRenderer } from "../webgl/gl-renderer";
 
 
 export class DrawState {
@@ -12,7 +13,7 @@ export class DrawState {
 
   blendSrc = SrcAlphaFactor;
   blendDst = OneMinusSrcAlphaFactor;
-  blendEquation = BlendEquation.AddEquation;
+  blendEquation = BlendEquation.FUNC_ADD;
   blendSrcAlpha = null;
   blendDstAlpha = null;
   blendEquationAlpha = null;
@@ -32,4 +33,8 @@ export class DrawState {
   alphaTest = 0;
   premultipliedAlpha = false;
 
+  syncGL(renderer: GLRenderer) {
+    // renderer.state.
+    // TODO
+  }
 }

@@ -8,7 +8,7 @@ export class Mesh extends RenderObject
   constructor() {
     super();
 
-    this.drawType = DrawMode.TRIANGLES;
+    this.drawMode = DrawMode.TRIANGLES;
     this.primitiveType = PrimitiveType.triangle;
   }
 

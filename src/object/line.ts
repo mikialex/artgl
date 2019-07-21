@@ -4,7 +4,7 @@ import { DrawMode } from "../webgl/const";
 export class Line extends RenderObject{
   constructor() {
     super();
-    this.drawType = DrawMode.LINES;
+    this.drawMode = DrawMode.LINES;
   }
 
 }

@@ -60,11 +60,11 @@ export class RenderObject extends SceneNode {
   geometry?: Geometry;
   technique?: Technique;
   range?: RenderRange;
-  state?: DrawState;
+  state: DrawState =  new DrawState();
 
   // sometimes something draw as mesh(tri), but act like line, like fatLine 
-  // so, drawType and primitiveType is different things 
-  drawType: DrawMode = DrawMode.TRIANGLES;
+  // so, drawMode and primitiveType is different things 
+  drawMode: DrawMode = DrawMode.TRIANGLES;
   primitiveType: PrimitiveType = PrimitiveType.triangle;
 
   foreachPrimitive(_visitor: PrimitiveVisitor) { throw "not implement" }

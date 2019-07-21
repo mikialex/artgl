@@ -1,7 +1,13 @@
+
+// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Rendering_primitives
 export const enum DrawMode {
-  TRIANGLES = 4,
-  LINES = 1,
-  POINTS = 0
+  POINTS = 0x0000,
+  LINES = 0x0001,
+  LINES_LOOP = 0x0002,
+  LINES_STRIP = 0x0002,
+  TRIANGLES = 0x0004,
+  TRIANGLE_STRIP = 0x0005,
+  TRIANGLE_FAN = 0x0006,
 }
 
 export const enum CullSide {
@@ -67,14 +73,34 @@ export var NoColors = 0;
 export var FaceColors = 1;
 export var VertexColors = 2;
 
+// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Blending_equations
 export const enum BlendEquation {
-  AddEquation = 100,
-  SubtractEquation = 101,
-  ReverseSubtractEquation = 102,
-  MinEquation = 103,
-  MaxEquation = 104,
+  FUNC_ADD = 0x8006,
+  FUNC_SUBTRACT = 0x800A,
+  FUNC_REVERSE_SUBTRACT = 0x800B,
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Blending_modes
+export const enum BlendMode {
+  ZERO = 0,
+  ONE = 1,
+  SRC_COLOR = 0x0300,
+  ONE_MINUS_SRC_COLOR = 0x0301,
+  SRC_ALPHA = 0x0302,
+  ONE_MINUS_SRC_ALPHA = 0x0303,
+  DST_ALPHA= 0x0304,
+  ONE_MINUS_DST_ALPHA= 0x0305,
+  DST_COLOR= 0x0306,
+  ONE_MINUS_DST_COLOR= 0x0307,
+  SRC_ALPHA_SATURATE = 0x0308,
+  CONSTANT_COLOR = 0x8001,
+  ONE_MINUS_CONSTANT_COLOR = 0x8002,
+  CONSTANT_ALPHA = 0x8003,
+  ONE_MINUS_CONSTANT_ALPHA = 0x8004,
+}
+
+// MinEquation = 103,
+// MaxEquation = 104,
 
 
 export var ZeroFactor = 200;
@@ -88,6 +114,8 @@ export var OneMinusDstAlphaFactor = 207;
 export var DstColorFactor = 208;
 export var OneMinusDstColorFactor = 209;
 export var SrcAlphaSaturateFactor = 210;
+
+
 
 export var MultiplyOperation = 0;
 export var MixOperation = 1;
