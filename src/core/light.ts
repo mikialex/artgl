@@ -1,34 +1,68 @@
 import { SceneNode } from "../scene/scene-node";
 import { Vector3 } from '../math/vector3';
-import { Shading } from "./technique";
+import { ShaderGraph, ShaderGraphDecorator } from "../shader-graph/shader-graph";
+import { ShaderFunction } from "../shader-graph/shader-function";
+import { uniform } from "../shader-graph/node-maker";
+import { GLDataType } from "../webgl/shader-util";
 
 
-export class Light extends SceneNode{
-  lightShading: Shading;
-  
+export class Light extends SceneNode {
+  shader: ShaderGraphDecorator
 }
 
-export class PointLightShading extends Shading {
-  constructor() {
-    super();
+
+const pointLightShading = new ShaderFunction({
+  source:
+    `
+    vec4 pointLight(
+      vec3 fragPosition,
+      vec3 FragNormal,
+      vec3 lightPosition, 
+      vec3 position, 
+      float radius ){
+        return vec4(1.0);
+    }
+  `
+})
+
+const AddCompose = new ShaderFunction({
+  source: `
+  vec4 add(
+    vec4 base,
+    vec4 light){
+      return base + light;
+  }
+  `
+});
+
+export class PointLightDecorator extends ShaderGraphDecorator{
+  decorate(decorated: ShaderGraph) {
+    decorated.setFragmentRoot(
+      AddCompose.make()
+      .input("base", decorated.getFragRoot())
+      .input("light", pointLightShading.make()
+        .input("fragPosition", decorated.getVary("position"))
+        .input("FragNormal", decorated.getVary("normal"))
+        .input("lightPosition", uniform("lightPosition", GLDataType.floatVec3))
+        .input("color", uniform("color", GLDataType.floatVec3))
+        .input("radius", uniform("radius", GLDataType.float))))
   }
 }
 
-export class PointLight extends Light{
-  lightShading: PointLightShading;
-
-  color: Vector3
+export class PointLight extends Light {
+  decorator = new PointLightDecorator();
   
-}
-
-export class DirectionalLightShading extends Shading {
-  direction: Vector3
   color: Vector3
+  position: Vector3
+  radius: Vector3
 }
 
-export class DirectionalLight extends Light{
-  lightShading: DirectionalLightShading;
 
-  direction: Vector3
-  color: Vector3
-}
+// export class DirectionalLight extends Light {
+//   update() {
+
+//   }
+
+//   direction: Vector3
+//   color: Vector3
+// }

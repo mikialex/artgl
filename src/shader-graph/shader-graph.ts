@@ -1,19 +1,24 @@
 import { GLProgramConfig } from "../webgl/program";
 import { genFragShader, genVertexShader } from "./code-gen";
 import {
-  ShaderFunctionNode, ShaderInputNode,
+  ShaderInputNode, ShaderTexture,
   ShaderAttributeInputNode, ShaderInnerUniformInputNode,
-  ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode, ShaderTextureFetchNode, ShaderTexture
+  ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode, ShaderTextureFetchNode
 } from "./shader-node";
 import { Nullable } from "../type";
+
+export class ShaderGraphDecorator {
+  decoratedGraph: ShaderGraph
+
+  decorate(graph: ShaderGraph) {
+    
+  }
+}
 
 export class ShaderGraph {
   fragmentRoot: Nullable<ShaderNode>;
   vertexRoot: Nullable<ShaderNode>;
   varyings: Map<string, ShaderNode> = new Map();
-
-  fragmentDecorator: Nullable<ShaderFunctionNode> = null;
-  vertexDecorator: Nullable<ShaderFunctionNode> = null;
 
   setFragmentRoot(root: ShaderNode): ShaderGraph {
     this.fragmentRoot = root;
@@ -32,6 +37,10 @@ export class ShaderGraph {
     }
     this.varyings.set(key, root);
     return this;
+  }
+
+  getFragRoot(): ShaderNode {
+    return this.fragmentRoot;
   }
 
   getVary(key: string): ShaderVaryInputNode {

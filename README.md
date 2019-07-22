@@ -75,8 +75,8 @@ const basicShade = new MeshBasicShading()
 const shading = basicShade.decorate(lightShade);
 
 mesh.shading = shading;
-mesh.shadingParam = shade.make();
-mesh.shadingParam.set("opacity", 0.5);
+mesh.technique = shade.make();
+mesh.technique.set("opacity", 0.5);
 
 
 ```
