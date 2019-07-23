@@ -4,6 +4,7 @@ import { RenderEngine } from "../engine/render-engine";
 import { UniformProxy } from "../engine/uniform-proxy";
 import { ShaderGraph, ShaderGraphDecorator } from "../shader-graph/shader-graph";
 import { Nullable } from '../type';
+import { Observable } from "./observable";
 
 
 export class Shading {
@@ -22,6 +23,8 @@ export class Shading {
     throw "Shading not impl"
   }
 
+
+  afterShaderCompiled: Observable<GLProgramConfig> = new Observable();
   build() {
     this.update();
     this.decorator.forEach(deco => {
@@ -32,7 +35,8 @@ export class Shading {
   getProgramConfig() {
   if (this.needRebuildShader) {
       this.build();
-      this.programConfigCache = this.graph.compile();
+    this.programConfigCache = this.graph.compile();
+    this.afterShaderCompiled.notifyObservers(this.programConfigCache)
       this.needRebuildShader = false;
     }
     return this.programConfigCache;

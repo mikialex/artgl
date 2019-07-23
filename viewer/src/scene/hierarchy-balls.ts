@@ -11,6 +11,10 @@ export default function (root:SceneNode) {
   let normal = new ARTGL.NormalShading();
   normal.decorate(light.decorator);
 
+  normal.afterShaderCompiled.add((config) => {
+    console.log(config);
+  })
+
   const planeMesh = new ARTGL.Mesh();
   planeMesh.geometry = testPlane;
   planeMesh.technique = new Technique(normal);

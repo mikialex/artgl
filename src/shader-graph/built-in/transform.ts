@@ -3,7 +3,7 @@ import { ShaderFunction } from "../shader-function";
 export const DivW = new ShaderFunction({
   source: `
     vec3 DivW ( vec4 position){
-      return position.xyz/ position.w;
+      return position.xyz / position.w;
     }
   `
 })
