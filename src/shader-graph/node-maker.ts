@@ -1,8 +1,9 @@
-import { AttributeDescriptor } from "../webgl/attribute";
+import { AttributeDescriptor, AttributeUsage } from "../webgl/attribute";
 import { ShaderAttributeInputNode, ShaderCommonUniformInputNode, ShaderInnerUniformInputNode, ShaderTexture, ShaderNode, ShaderConstType, ShaderConstNode, ShaderCombineNode } from "./shader-node";
 import { GLDataType } from "../webgl/shader-util";
 import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
 import { GLTextureType } from "../webgl/uniform/uniform-texture";
+import { MVPTransform } from "./built-in/transform";
 
 // TODO simplify it
 export function attribute(att: AttributeDescriptor) {
@@ -45,4 +46,22 @@ export function vec4(...args: ShaderNode[] ) {
 
 export function constValue(value: any){
   return new ShaderConstNode(value);
+}
+
+export function MVPWorld() {
+  return MVPTransform.make()
+  .input("VPMatrix", innerUniform(InnerSupportUniform.VPMatrix))
+  .input("MMatrix", innerUniform(InnerSupportUniform.MMatrix))
+  .input("position", attribute(
+    { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
+  ))
+}
+
+export function screenQuad() {
+  return vec4(
+    attribute(
+    { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
+    ),
+    constValue(1)
+  )
 }

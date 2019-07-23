@@ -2,15 +2,9 @@ import { CopyShading } from "../copy";
 import { TSSAOShading } from "../tssao";
 import { TSSAOBlendShading } from "../tssao-blend";
 import { TAAShading } from "../taa";
-import { DepthShading } from "../depth";
 
 test('copy shader build no error', () => {
   const shading = new CopyShading();
-  shading.getProgramConfig();
-});
-
-test('depth shader build no error', () => {
-  const shading = new DepthShading();
   shading.getProgramConfig();
 });
 

@@ -6,7 +6,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import { NormalShading } from '../../../src/artgl';
-import { DepthShading } from '../../../src/shading/pass-lib/depth';
+import { DepthShading } from '../../../src/shading/basic-lib/depth';
 @Component({
 })
 export default class Debug extends Vue {

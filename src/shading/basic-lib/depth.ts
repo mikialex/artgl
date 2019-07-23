@@ -1,9 +1,5 @@
 import { Shading } from "../../core/technique";
-import { GLDataType } from "../../webgl/shader-util";
-import { AttributeUsage } from "../../webgl/attribute";
-import { InnerSupportUniform } from "../../webgl/uniform/uniform";
-import { MVPTransform } from "../../shader-graph/built-in/transform";
-import { innerUniform, attribute } from "../../shader-graph/node-maker";
+import { MVPWorld } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { depthPack } from "../../shader-graph/built-in/depth-pack";
 
@@ -21,12 +17,7 @@ export class DepthShading extends Shading {
   name = "drawDepth"
 
   update() {
-    const worldPosition = MVPTransform.make()
-      .input("VPMatrix", innerUniform(InnerSupportUniform.VPMatrix))
-      .input("MMatrix", innerUniform(InnerSupportUniform.MMatrix))
-      .input("position", attribute(
-        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-      ))
+    const worldPosition = MVPWorld()
 
     this.graph.reset()
       .setVertexRoot(worldPosition)

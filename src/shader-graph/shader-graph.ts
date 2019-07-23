@@ -6,6 +6,9 @@ import {
   ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode, ShaderTextureFetchNode
 } from "./shader-node";
 import { Nullable } from "../type";
+import { attribute } from "./node-maker";
+import { GLDataType } from "../webgl/shader-util";
+import { AttributeUsage } from "../webgl/attribute";
 
 export class ShaderGraphDecorator {
   decoratedGraph: ShaderGraph
@@ -14,6 +17,10 @@ export class ShaderGraphDecorator {
     
   }
 }
+
+export const UvFragVary = "v_uv"
+export const NormalFragVary = "v_normal"
+export const WorldPositionFragVary = "v_position"
 
 export class ShaderGraph {
   fragmentRoot: Nullable<ShaderNode>;
@@ -27,8 +34,23 @@ export class ShaderGraph {
 
   setVertexRoot(root: ShaderNode): ShaderGraph {
     this.vertexRoot = root;
+    this.setVary(WorldPositionFragVary, root);
     return this;
   }
+
+  declareFragNormal(): ShaderGraph{
+    return this.setVary(NormalFragVary, attribute(
+      { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal }
+    ))
+  }
+  
+  declareFragUV(): ShaderGraph {
+    return this.setVary(UvFragVary, attribute(
+      { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
+    ))
+  }
+
+
 
   setVary(key: string, root: ShaderNode): ShaderGraph {
     const ret = this.varyings.get(key);

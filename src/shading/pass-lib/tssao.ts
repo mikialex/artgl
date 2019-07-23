@@ -1,14 +1,14 @@
 import { Shading } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
-import { AttributeUsage } from "../../webgl/attribute";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
-import { attribute, uniform, texture, innerUniform, constValue, vec4 } from "../../shader-graph/node-maker";
+import { uniform, texture, innerUniform, screenQuad } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
 import { dir3D } from "../../shader-graph/built-in/transform";
 import { getWorldPosition, NDCxyToUV } from "../../shader-graph/built-in/transform";
 import { Matrix4 } from "../../math/index";
 import { rand2DT, rand } from "../../shader-graph/built-in/rand";
+import { UvFragVary } from '../../shader-graph/shader-graph';
 
 const newSamplePosition = new ShaderFunction({
   source: `
@@ -54,15 +54,10 @@ export class TSSAOShading extends Shading {
     const sampleCount = uniform("u_sampleCount", GLDataType.float).default(0);
     const depthTex = texture("depthResult");
     this.graph.reset()
-      .setVertexRoot(
-        vec4(attribute(
-        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-      ), constValue(1)))
-      .setVary("v_uv", attribute(
-        { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
-      ))
+      .setVertexRoot(screenQuad())
+      .declareFragUV()
 
-    const vUV = this.graph.getVary("v_uv");
+    const vUV = this.graph.getVary(UvFragVary);
     const depth = unPackDepth.make().input("enc", depthTex.fetch(vUV))
 
     const worldPosition = getWorldPosition.make()

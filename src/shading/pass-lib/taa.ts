@@ -1,12 +1,12 @@
 import { Shading } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
-import { AttributeUsage } from "../../webgl/attribute";
 import { Matrix4 } from "../../math/matrix4";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 import { ShaderFunction } from "../../shader-graph/shader-function";
-import { attribute, texture, uniform, innerUniform, vec4, constValue } from "../../shader-graph/node-maker";
+import { texture, uniform, innerUniform, screenQuad } from "../../shader-graph/node-maker";
 import { NDCxyToUV, getLastPixelNDC, UVDepthToNDC } from "../../shader-graph/built-in/transform";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
+import { UvFragVary } from '../../shader-graph/shader-graph';
 
 const TAAMix = new ShaderFunction({
   source:
@@ -34,14 +34,10 @@ export class TAAShading extends Shading {
 
   update() {
     this.graph.reset()
-      .setVertexRoot(vec4(attribute(
-        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-      ), constValue(1)))
-      .setVary("v_uv", attribute(
-        { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
-      ))
+      .setVertexRoot(screenQuad())
+      .declareFragUV()
 
-    const vUV = this.graph.getVary("v_uv");
+    const vUV = this.graph.getVary(UvFragVary);
     const depth = unPackDepth.make().input("enc", texture("depthResult").fetch(vUV))
 
     const colorOld = texture("TAAHistoryOld").fetch(
@@ -50,7 +46,7 @@ export class TAAShading extends Shading {
           .input("ndc",
             UVDepthToNDC.make()
               .input("depth", depth)
-              .input("uv", this.graph.getVary("v_uv"))
+              .input("uv", this.graph.getVary(UvFragVary))
           )
           .input("VPMatrixInverse", uniform("VPMatrixInverse", GLDataType.Mat4).default(new Matrix4()))
           .input("LastVPMatrix", innerUniform(InnerSupportUniform.LastVPMatrix))

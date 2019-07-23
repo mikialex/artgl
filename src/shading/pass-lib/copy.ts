@@ -1,21 +1,15 @@
 import { Shading } from "../../core/technique";
-import { GLDataType } from "../../webgl/shader-util";
-import { AttributeUsage } from "../../webgl/attribute";
-import { attribute, texture, vec4, constValue } from "../../shader-graph/node-maker";
+import { texture, screenQuad } from "../../shader-graph/node-maker";
+import { UvFragVary } from '../../shader-graph/shader-graph';
 
 export class CopyShading extends Shading {
 
   update() {
     this.graph.reset()
-      .setVertexRoot(vec4(attribute(
-        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-      ), constValue(1)))
-      .setVary("v_uv", attribute(
-        { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
-      ))
+      .setVertexRoot(screenQuad())
+      .declareFragUV()
       .setFragmentRoot(
-        texture("copySource")
-          .fetch(this.graph.getVary("v_uv"))
+        texture("copySource").fetch(this.graph.getVary(UvFragVary))
       )
 
   }

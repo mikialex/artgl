@@ -1,8 +1,8 @@
 import { Shading } from "../../core/technique";
 import { GLDataType } from "../../webgl/shader-util";
-import { AttributeUsage } from "../../webgl/attribute";
 import { ShaderFunction } from "../../shader-graph/shader-function";
-import { texture, uniform, attribute, vec4, constValue } from "../../shader-graph/node-maker";
+import { texture, uniform, screenQuad } from "../../shader-graph/node-maker";
+import { UvFragVary } from '../../shader-graph/shader-graph';
 
 
 const tssaoBlend = new ShaderFunction({
@@ -26,16 +26,12 @@ export class TSSAOBlendShading extends Shading {
 
   update() {
     this.graph.reset()
-      .setVertexRoot(vec4(attribute(
-        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-      ), constValue(1)))
-      .setVary("v_uv", attribute(
-        { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
-      ))
+      .setVertexRoot(screenQuad())
+      .declareFragUV()
       .setFragmentRoot(
         tssaoBlend.make()
-          .input("color", texture("basic").fetch(this.graph.getVary('v_uv')).swizzling("xyz"))
-          .input("aoColor", texture("tssao").fetch(this.graph.getVary('v_uv')).swizzling("xyz"))
+          .input("color", texture("basic").fetch(this.graph.getVary(UvFragVary)).swizzling("xyz"))
+          .input("aoColor", texture("tssao").fetch(this.graph.getVary(UvFragVary)).swizzling("xyz"))
           .input('sampleCount', uniform("u_sampleCount", GLDataType.float).default(0))
           .input('tssaoComposeRate', uniform("u_tssaoComposeRate", GLDataType.float).default(1))
           .input('tssaoShowThreshold', uniform("u_tssaoShowThreshold", GLDataType.float).default(200))
