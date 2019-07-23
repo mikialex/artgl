@@ -1,5 +1,13 @@
 import { ShaderFunction } from "../shader-function";
 
+export const DivW = new ShaderFunction({
+  source: `
+    vec3 DivW ( vec4 position){
+      return position.xyz/ position.w;
+    }
+  `
+})
+
 export const MVPTransform = new ShaderFunction({
   description: 'Using camera view projection matrix and model matrix to transform vertices',
   source: `

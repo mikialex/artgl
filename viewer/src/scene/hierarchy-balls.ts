@@ -6,10 +6,10 @@ import { PointLight } from '../../../src/core/light';
 export default function (root:SceneNode) {
   let testGeo = new ARTGL.SphereGeometry(1, 40, 40);
   let testPlane = new ARTGL.PlaneGeometry(10, 10, 10, 10);
-  // const light = new PointLight();
+  const light = new PointLight();
   
   let normal = new ARTGL.NormalShading();
-  // normal.decorate(light.decorator);
+  normal.decorate(light.decorator);
 
   const planeMesh = new ARTGL.Mesh();
   planeMesh.geometry = testPlane;

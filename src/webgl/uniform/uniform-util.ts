@@ -5,14 +5,14 @@ import { Vector4 } from "../../math/vector4";
 
 export function findUniformSetter(type: GLDataType) {
   switch (type) {
-    case GLDataType.float: return setValue1f; // FLOAT
-    // case 0x8b50: return setValue2fv; // _VEC2
-    // case 0x8b51: return setValue3fv; // _VEC3
-    // case 0x8b52: return setValue4fv; // _VEC4
+    case GLDataType.float: return setValue1f;
+    case GLDataType.floatVec2: return setValue2fv;
+    case GLDataType.floatVec3: return setValue3fv;
+    case GLDataType.floatVec4: return setValue4fv;
 
-    // case 0x8b5a: return setValue2fm; // _MAT2
-    // case 0x8b5b: return setValue3fm; // _MAT3
-    case GLDataType.Mat4: return setValueM4a; // _MAT4
+    case GLDataType.Mat2: return setValue2m;
+    case GLDataType.Mat3: return setValue3m;
+    case GLDataType.Mat4: return setValue4m;
 
     // case 0x8b5e: case 0x8d66: return setValueT1; // SAMPLER_2D, SAMPLER_EXTERNAL_OES
     // case 0x8b60: return setValueT6; // SAMPLER_CUBE
@@ -22,35 +22,21 @@ export function findUniformSetter(type: GLDataType) {
     // case 0x8b54: case 0x8b58: return setValue3iv; // _VEC3
     // case 0x8b55: case 0x8b59: return setValue4iv; // _VEC4
   }
+  throw 'uniform setter not found'
 }
 
 function setValue1f(gl: WebGLRenderingContext, location: any, v: number) { gl.uniform1f(location, v) }
+function setValue2fv(gl: WebGLRenderingContext, location: any, v: Float32Array) { gl.uniform2fv(location, v) }
+function setValue3fv(gl: WebGLRenderingContext, location: any, v: Float32Array) { gl.uniform3fv(location, v) }
+function setValue4fv(gl: WebGLRenderingContext, location: any, v: Float32Array) { gl.uniform4fv(location, v) }
+
 function setValue1i(gl: WebGLRenderingContext, location: any, v: number) { gl.uniform1i(location, v) }
-// // Array of vectors 
-// function setValueV2a(gl, v) {
-//   gl.uniform2fv(this.addr, flatten(v, this.size, 2));
-// }
 
-// function setValueV3a(gl, v) {
-//   gl.uniform3fv(this.addr, flatten(v, this.size, 3));
-// }
+function setValue2m(gl: WebGLRenderingContext, location: any, v: Float32Array) { gl.uniformMatrix4fv(location, false, v) }
+function setValue3m(gl: WebGLRenderingContext, location: any, v: Float32Array) { gl.uniformMatrix4fv(location, false, v) }
+function setValue4m(gl: WebGLRenderingContext, location: any, v: Float32Array) { gl.uniformMatrix4fv(location, false, v) }
 
-// function setValueV4a(gl, v) {
-//   gl.uniform4fv(this.addr, flatten(v, this.size, 4));
-// }
-
-
-// function setValueM2a(gl, v) {
-//   gl.uniformMatrix2fv(this.addr, false, flatten(v, this.size, 4));
-// }
-
-// function setValueM3a(gl, v) {
-//   gl.uniformMatrix3fv(this.addr, false, flatten(v, this.size, 9));
-// }
-
-function setValueM4a(gl: WebGLRenderingContext, location: any, v: any) { gl.uniformMatrix4fv(location, false, v) }
-
-function differFloat(newVal: number, oldVal: number) {
+function differNumber(newVal: number, oldVal: number) {
   return newVal !== oldVal;
 }
 function differArray(newVal: number[], oldVal: number[]) {
@@ -65,9 +51,10 @@ function differArray(newVal: number[], oldVal: number[]) {
   return false;
 }
 
-function copyFloat(newVal: number, target: number) {
+function copyNumber(newVal: number, _target: number) {
   return newVal;
 }
+
 function copyArray(newVal: number[], target: number[]) {
   let targetReal = target;
   if (target === undefined || newVal.length !== target.length) {
@@ -81,25 +68,27 @@ function copyArray(newVal: number[], target: number[]) {
 
 
 export function findUniformDiffer(type: GLDataType) {
-  switch (type) {
-    case GLDataType.float: return differFloat; // FLOAT
-    case GLDataType.Mat4: return differArray // _MAT4
+  if (type === GLDataType.float || type === GLDataType.int) {
+    return differNumber
+  } else {
+    return differArray
   }
 }
 
 export function findUniformCopier(type: GLDataType) {
-  switch (type) {
-    case GLDataType.float: return copyFloat; // FLOAT
-    case GLDataType.Mat4: return copyArray // _MAT4
+  if (type === GLDataType.float || type === GLDataType.int) {
+    return copyNumber
+  } else {
+    return copyArray
   }
 }
 
 export function findUniformFlattener(type: GLDataType) {
   switch (type) {
-    case GLDataType.float: return flattenFloat; // FLOAT
-    case GLDataType.floatVec2: return Vector2.flatten; // _VEC2
-    case GLDataType.floatVec3: return Vector3.flatten; // _VEC3
-    case GLDataType.floatVec4: return Vector4.flatten; // _VEC4
+    case GLDataType.float: return (v: number) => v;
+    case GLDataType.floatVec2: return Vector2.flatten;
+    case GLDataType.floatVec3: return Vector3.flatten;
+    case GLDataType.floatVec4: return Vector4.flatten;
 
     case GLDataType.Mat2: throw 'not support yet'; // _MAT2
     case GLDataType.Mat3: throw 'not support yet' // _MAT3
@@ -113,22 +102,6 @@ export function findUniformFlattener(type: GLDataType) {
     // case 0x8b54: case 0x8b58: return setValue3iv; // _VEC3
     // case 0x8b55: case 0x8b59: return setValue4iv; // _VEC4
   }
-  throw 'uniform falttener not found'
-}
-
-function flattenFloat(v: number) {
-  return v;
-}
-
-function flattenVector2(v: Vector2) {
-
-}
-
-function flattenVector3(v: Vector3) {
-
-}
-
-function flattenVector4(v: Vector4) {
-
+  throw 'uniform flattener not found'
 }
 

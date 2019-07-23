@@ -9,6 +9,7 @@ import { Nullable } from "../type";
 import { attribute } from "./node-maker";
 import { GLDataType } from "../webgl/shader-util";
 import { AttributeUsage } from "../webgl/attribute";
+import { DivW } from "./built-in/transform";
 
 export class ShaderGraphDecorator {
   decoratedGraph: ShaderGraph
@@ -34,7 +35,7 @@ export class ShaderGraph {
 
   setVertexRoot(root: ShaderNode): ShaderGraph {
     this.vertexRoot = root;
-    this.setVary(WorldPositionFragVary, root);
+    this.setVary(WorldPositionFragVary, DivW.make().input("position", root));
     return this;
   }
 

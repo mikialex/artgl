@@ -1,6 +1,6 @@
 import { SceneNode } from "../scene/scene-node";
 import { Vector3 } from '../math/vector3';
-import { ShaderGraph, ShaderGraphDecorator } from "../shader-graph/shader-graph";
+import { ShaderGraph, ShaderGraphDecorator, NormalFragVary, WorldPositionFragVary } from "../shader-graph/shader-graph";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { uniform } from "../shader-graph/node-maker";
 import { GLDataType } from "../webgl/shader-util";
@@ -18,9 +18,9 @@ const pointLightShading = new ShaderFunction({
       vec3 fragPosition,
       vec3 FragNormal,
       vec3 lightPosition, 
-      vec3 position, 
+      vec3 color,
       float radius ){
-        return vec4(1.0);
+        return vec4(0.3);
     }
   `
 })
@@ -35,23 +35,24 @@ const AddCompose = new ShaderFunction({
   `
 });
 
-export class PointLightDecorator extends ShaderGraphDecorator{
+export class PointLightDecorator extends ShaderGraphDecorator {
   decorate(decorated: ShaderGraph) {
-    decorated.setFragmentRoot(
-      AddCompose.make()
-      .input("base", decorated.getFragRoot())
-      .input("light", pointLightShading.make()
-        .input("fragPosition", decorated.getVary("position"))
-        .input("FragNormal", decorated.getVary("normal"))
-        .input("lightPosition", uniform("lightPosition", GLDataType.floatVec3))
-        .input("color", uniform("color", GLDataType.floatVec3))
-        .input("radius", uniform("radius", GLDataType.float))))
+    decorated
+      .setFragmentRoot(
+        AddCompose.make()
+          .input("base", decorated.getFragRoot())
+          .input("light", pointLightShading.make()
+            .input("fragPosition", decorated.getVary(WorldPositionFragVary))
+            .input("FragNormal", decorated.getVary(NormalFragVary))
+            .input("lightPosition", uniform("lightPosition", GLDataType.floatVec3).default(new Vector3()))
+            .input("color", uniform("lightColor", GLDataType.floatVec3).default(new Vector3(1, 1, 1)))
+            .input("radius", uniform("lightRadius", GLDataType.float).default(1))))
   }
 }
 
 export class PointLight extends Light {
   decorator = new PointLightDecorator();
-  
+
   color: Vector3
   position: Vector3
   radius: Vector3

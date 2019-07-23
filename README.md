@@ -72,7 +72,7 @@ mesh.material = new Material();
 mesh.material.channel(Channel.Diffuse).load("../diff.png");
 
 const basicShade = new MeshBasicShading()
-const shading = basicShade.decorate(lightShade);
+const shading = basicShade.decorate(light.decorator);
 
 mesh.shading = shading;
 mesh.technique = shade.make();

@@ -3,7 +3,11 @@ import { ShaderFunction } from "./shader-function";
 import { getShaderTypeStringFromGLDataType } from "../webgl/shader-util";
 import { findFirst } from "../util/array";
 import { CodeBuilder } from "./util/code-builder";
-import { ShaderFunctionNode, ShaderNode, ShaderInputNode, ShaderTextureFetchNode, ShaderCombineNode, ShaderConstNode, ShaderSwizzleNode } from "./shader-node";
+import {
+  ShaderFunctionNode, ShaderNode, ShaderInputNode, ShaderTextureFetchNode,
+  ShaderCombineNode, ShaderConstNode, ShaderSwizzleNode
+} from "./shader-node";
+
 
 export function genFragShader(graph: ShaderGraph): string {
   const builder = new CodeBuilder()
@@ -143,6 +147,9 @@ function genTempVarExpFromShaderNode(
     let functionInputs = "";
     Object.keys(functionDefine.inputs).forEach((key, index) => {
       const nodeDepend = node.inputMap.get(key) as ShaderNode;
+      if (nodeDepend === undefined) {
+        throw `we have a shader function node but the input <${key}> has no input node`
+      }
       functionInputs += getParamKeyFromVarList(nodeDepend);
       if (index !== Object.keys(functionDefine.inputs).length - 1) {
         functionInputs += ", "
