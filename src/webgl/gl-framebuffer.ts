@@ -87,13 +87,13 @@ export class GLFramebuffer {
       return;
     }
 
-    this.renderer.setRenderTarget(this);
-
     this.width = width;
     this.height = height;
 
     this.gl.deleteFramebuffer(this.webglFrameBuffer);
     this.webglFrameBuffer = this.createGLFramebuffer();
+
+    this.renderer.setRenderTarget(this);
 
     this.textureAttachedSlot.forEach((text, index) => {
       if (text) {
