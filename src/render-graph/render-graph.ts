@@ -5,7 +5,6 @@ import { RenderEngine } from "../engine/render-engine";
 import { QuadSource } from './quad-source';
 import { Vector4 } from "../math/vector4";
 import { RenderPass } from "./pass";
-import { GLFramebuffer } from "../webgl/gl-framebuffer";
 
 
 export type RenderGraphNode = PassGraphNode | RenderTargetNode;
@@ -160,7 +159,7 @@ export class RenderGraph {
 
     this.renderTargetNodes.forEach(node => {
       if (node.uuid === nodeId) {
-        node.getOrCreateFrameBuffer(engine).debuggingViewport.copy(viewPort);
+        node.debugViewPort.copy(viewPort);
       }
     })
   }

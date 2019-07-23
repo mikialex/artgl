@@ -11,7 +11,7 @@ export class PassGraphNode extends DAGNode {
     super();
     this.name = define.name;
 
-    this.pass = new RenderPass(graph, define);
+    this.pass = new RenderPass(define);
 
     if (define.inputs !== undefined) {
       this.inputsGetter = define.inputs;

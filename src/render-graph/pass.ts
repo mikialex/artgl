@@ -8,7 +8,7 @@ import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
 
 export class RenderPass{
-  constructor(graph: RenderGraph, define: PassDefine) {
+  constructor(define: PassDefine) {
     this.define = define;
     this.name = define.name;
     if (define.technique !== undefined) {
@@ -51,6 +51,8 @@ export class RenderPass{
   // key: uniformName ;   value: inputFramebufferName
   private inputTarget: Map<string, string> = new Map();
   private outputTarget: GLFramebuffer
+
+
   setOutPutTarget(engine: RenderEngine, renderTargetNode: RenderTargetNode) {
     if (renderTargetNode.name === RenderGraph.screenRoot) {
       this.outputTarget = undefined;
@@ -62,18 +64,16 @@ export class RenderPass{
   }
   private isOutputScreen: boolean = true;
 
-  renderDebugResult(engine: RenderEngine) {
-    engine.renderDebugFrameBuffer(this.outputTarget)
-    // this will cause no use draw TODO
-    this.inputTarget.forEach((inputFramebufferName, uniformName) => {
+  renderDebugResult(engine: RenderEngine, graph: RenderGraph) {
+    const debugOutputViewport = graph.renderTargetNodes.get(this.outputTarget.name).debugViewPort;
+    engine.renderFrameBuffer(this.outputTarget, debugOutputViewport)
+    // this will cause no use draw TODO optimize
+    this.inputTarget.forEach((inputFramebufferName, _uniformName) => {
       const framebuffer = engine.renderer.framebufferManager.getFramebuffer(inputFramebufferName);
-      engine.renderDebugFrameBuffer(framebuffer)
+      const debugInputViewport = graph.renderTargetNodes.get(framebuffer.name).debugViewPort;
+      engine.renderFrameBuffer(framebuffer, debugInputViewport)
     })
-  }
-
-  renderDebugFramebuffer(engine: RenderEngine, framebuffer: GLFramebuffer) {
-    engine.renderer.setRenderTargetScreen();
-  }
+  } 
 
   static screenDebugViewPort = new Vector4(200, 0, 200, 200)
   execute(engine: RenderEngine, graph: RenderGraph) {
@@ -138,7 +138,7 @@ export class RenderPass{
 
 
     if (graph.enableDebuggingView && !this.isOutputScreen) {
-      this.renderDebugResult(engine);
+      this.renderDebugResult(engine, graph);
     }
 
   }

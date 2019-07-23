@@ -1,5 +1,4 @@
 import { GLRenderer } from "./gl-renderer";
-import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
 import { PixelFormat } from "./const";
 import { Texture } from "../core/texture";
@@ -62,8 +61,6 @@ export class GLFramebuffer {
   webglFrameBuffer: WebGLFramebuffer;
 
   textureAttachedSlot: FramebufferAttachTexture[] = [];
-
-  debuggingViewport: Vector4 = new Vector4(0, 0, 200, 200);
 
   createGLFramebuffer() {
     const buffer = this.gl.createFramebuffer();

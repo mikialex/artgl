@@ -20,6 +20,7 @@ import { downloadCanvasPNGImage } from "../util/file-io";
 import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/vao";
+import { Vector4 } from "../math/vector4";
 
 export interface RenderSource{
   resetSource(): void;
@@ -207,9 +208,8 @@ export class RenderEngine implements GLReleasable{
     this.renderer.render(DrawMode.TRIANGLES, program.useIndexDraw);
   }
 
-  renderDebugFrameBuffer(framebuffer: GLFramebuffer) {
+  renderFrameBuffer(framebuffer: GLFramebuffer, debugViewPort: Vector4) {
     this.renderer.setRenderTargetScreen();
-    const debugViewPort = framebuffer.debuggingViewport;
     this.renderer.state.setViewport(
       debugViewPort.x, debugViewPort.y,
       debugViewPort.z, debugViewPort.w
