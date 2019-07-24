@@ -258,6 +258,7 @@ export class RenderEngine implements GLReleasable{
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
     technique.uniforms.forEach((uni, key) => {
       // if (uni._needUpdate) {
+      // TODO optimize
         program.setUniform(key, uni.value);
         uni.resetUpdate();
       // }
