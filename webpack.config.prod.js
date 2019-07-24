@@ -1,11 +1,13 @@
-var path = require('path');
+const path = require('path');
+
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-var ROOT_PATH = path.resolve(__dirname);
-var APP_PATH = path.resolve(ROOT_PATH, 'src');
-var BUILD_PATH = path.resolve(ROOT_PATH, 'package');
+const ROOT_PATH = path.resolve(__dirname);
+const APP_PATH = path.resolve(ROOT_PATH, 'src');
+const BUILD_PATH = path.resolve(ROOT_PATH, 'package');
 
 module.exports = {
+  mode: "production",
   entry: {
     app: path.resolve(APP_PATH, 'export.ts'),
   },
@@ -27,8 +29,9 @@ module.exports = {
   },
   
   plugins: [
-    new BundleAnalyzerPlugin({
-      openAnalyzer: true,
-    }),
+    // before use this, mode should change to develop.
+    // new BundleAnalyzerPlugin({
+    //   openAnalyzer: true,
+    // }),
   ]
 };
