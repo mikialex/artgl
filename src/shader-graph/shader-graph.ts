@@ -1,9 +1,10 @@
 import { GLProgramConfig } from "../webgl/program";
 import { genFragShader, genVertexShader } from "./code-gen";
 import {
-  ShaderInputNode, ShaderTexture,
+  ShaderInputNode, ShaderTexture, ShaderFunctionNode, 
   ShaderAttributeInputNode, ShaderInnerUniformInputNode,
-  ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode, ShaderTextureFetchNode
+  ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode,
+  ShaderTextureFetchNode
 } from "./shader-node";
 import { Nullable } from "../type";
 import { attribute } from "./node-maker";
@@ -15,13 +16,14 @@ export class ShaderGraphDecorator {
   decoratedGraph: ShaderGraph
 
   decorate(graph: ShaderGraph) {
-    
+    throw "ShaderGraphDecorator not implement"
   }
 }
 
 export const UvFragVary = "v_uv"
 export const NormalFragVary = "v_normal"
-export const WorldPositionFragVary = "v_position"
+export const NDCPositionFragVary = "v_position_ndc"
+export const WorldPositionFragVary = "v_position_world"
 
 export class ShaderGraph {
   fragmentRoot: Nullable<ShaderNode>;
@@ -35,7 +37,17 @@ export class ShaderGraph {
 
   setVertexRoot(root: ShaderNode): ShaderGraph {
     this.vertexRoot = root;
-    this.setVary(WorldPositionFragVary, DivW.make().input("position", root));
+    // this for:  if user use node maker MVPWorld, it can auto gen world position vary for convenient
+    if (root instanceof ShaderFunctionNode && root.factory.define.name === "VPTransform") {
+      const next = root.inputMap.get("position")
+      if (next === undefined) {
+        throw `we have a shader function node but the input <position> has no input node`
+      }
+      if (next instanceof ShaderFunctionNode && next.factory.define.name === "MTransform") {
+        this.setVary(WorldPositionFragVary, next.swizzling("xyz"));
+      }
+    }
+    this.setVary(NDCPositionFragVary, DivW.make().input("position", root));
     return this;
   }
 

@@ -3,7 +3,7 @@ import { ShaderAttributeInputNode, ShaderCommonUniformInputNode, ShaderInnerUnif
 import { GLDataType } from "../webgl/shader-util";
 import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
 import { GLTextureType } from "../webgl/uniform/uniform-texture";
-import { MVPTransform } from "./built-in/transform";
+import { MVPTransform, VPTransform, MTransform } from "./built-in/transform";
 
 // TODO simplify it
 export function attribute(att: AttributeDescriptor) {
@@ -49,12 +49,23 @@ export function constValue(value: any){
 }
 
 export function MVPWorld() {
-  return MVPTransform.make()
+
+  return VPTransform.make()
   .input("VPMatrix", innerUniform(InnerSupportUniform.VPMatrix))
-  .input("MMatrix", innerUniform(InnerSupportUniform.MMatrix))
-  .input("position", attribute(
-    { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-  ))
+    .input("position",
+      MTransform.make()
+      .input('MMatrix', innerUniform(InnerSupportUniform.MMatrix))
+      .input('position', attribute(
+        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
+      ))
+    )
+
+  // return MVPTransform.make()
+  // .input("VPMatrix", innerUniform(InnerSupportUniform.VPMatrix))
+  // .input("MMatrix", innerUniform(InnerSupportUniform.MMatrix))
+  // .input("position", attribute(
+  //   { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
+  // ))
 }
 
 export function screenQuad() {

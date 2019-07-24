@@ -20,7 +20,7 @@ const pointLightShading = new ShaderFunction({
       vec3 lightPosition, 
       vec3 color,
       float radius ){
-        if(length(fragPosition - lightPosition) < 1.3){
+        if(length(fragPosition - lightPosition) < radius){
           return vec4(color, 0.0);
         }
         return vec4(0.0);
@@ -49,7 +49,7 @@ export class PointLightDecorator extends ShaderGraphDecorator {
             .input("FragNormal", decorated.getVary(NormalFragVary))
             .input("lightPosition", uniform("lightPosition", GLDataType.floatVec3).default(new Vector3()))
             .input("color", uniform("lightColor", GLDataType.floatVec3).default(new Vector3(1, 1, 1)))
-            .input("radius", uniform("lightRadius", GLDataType.float).default(1))))
+            .input("radius", uniform("lightRadius", GLDataType.float).default(3))))
   }
 }
 

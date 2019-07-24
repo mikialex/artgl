@@ -8,10 +8,26 @@ export const DivW = new ShaderFunction({
   `
 })
 
+export const MTransform = new ShaderFunction({
+  source: `
+    vec4 MTransform (mat4 MMatrix, vec3 position){
+      return MMatrix * vec4(position, 1.0);
+    }
+  `
+})
+
+export const VPTransform = new ShaderFunction({
+  source: `
+    vec4 VPTransform (mat4 VPMatrix, vec4 position){
+      return VPMatrix * position;
+    }
+  `
+})
+
 export const MVPTransform = new ShaderFunction({
   description: 'Using camera view projection matrix and model matrix to transform vertices',
   source: `
-    vec4 VPtransform (mat4 VPMatrix, mat4 MMatrix, vec3 position){
+    vec4 VPTransform (mat4 VPMatrix, mat4 MMatrix, vec3 position){
       return VPMatrix * MMatrix * vec4(position, 1.0);
     }
   `,
