@@ -1,65 +1,89 @@
-import { Parjs } from '../../../node_modules/parjs/index'; // idont know why
+import { ShaderFunctionDefine, ShaderFunctionParsedDefine } from "../shader-function";
 import { GLDataType } from "../../webgl/shader-util";
-import { ShaderFunctionParsedDefine, ShaderFunctionDefine } from '../shader-function';
 
-export const floatType = Parjs.string("float").map(_value => GLDataType.float);
-export const Vec2Type = Parjs.string("vec2").map(_value => GLDataType.floatVec2);
-export const Vec3Type = Parjs.string("vec3").map(_value => GLDataType.floatVec3);
-export const Vec4Type = Parjs.string("vec4").map(_value => GLDataType.floatVec4);
-export const Mat2Type = Parjs.string("mat2").map(_value => GLDataType.Mat2);
-export const Mat3Type = Parjs.string("mat3").map(_value => GLDataType.Mat3);
-export const Mat4Type = Parjs.string("mat4").map(_value => GLDataType.Mat4);
-
-export const dataType = floatType.or(Vec2Type).or(Vec3Type).or(Vec4Type).or(Mat2Type).or(Mat3Type).or(Mat4Type)
-
-const extendLetter =  Parjs.letter.or("_")
-export const varName = extendLetter.then(Parjs.digit.or(extendLetter).many()).str;
-
-export const oneParam = Parjs.seq(Parjs.whitespaces.q, dataType, Parjs.spaces1.q, varName, Parjs.whitespaces.q).map(
-  value => {
-    return {
-      name: value[1],
-      type: value[0]
-    }
-  }
-)
-
-export const paramList = oneParam.manySepBy(",").between("(", ")");
-// const paramList = oneParam.manySepBy(",").maybe(Parjs.string(",").q).then(Parjs.whitespaces.q);
-// const paramList = Parjs.whitespaces.maybe(oneParam).manySepBy(",")
-
-const functionBody = Parjs.string("{").q.then(Parjs.anyChar.manyTill(Parjs.string("}#"))).map(
-  value => value.join("")
-)
-
-export const functionp = Parjs.seq(
-  Parjs.whitespaces.q,
-  dataType,
-  Parjs.spaces1.q,
-  varName,
-  Parjs.whitespaces.q,
-  paramList,
-  Parjs.whitespaces.q,
-  functionBody,
-  Parjs.whitespaces.q,
-);
-
-export function parseShaderFunctionMetaInfo(input: ShaderFunctionDefine): ShaderFunctionParsedDefine {
+export function parseShaderFunctionMetaInfo(input: ShaderFunctionDefine)
+  : ShaderFunctionParsedDefine {
   try {
-    const s = input.source.trim() + "#"
-    const result = functionp.parse(s).value
-    const inputMap = {};
-    result[2].forEach(item => {
-      inputMap[item.name] = item.type;
-    });
+    const [head, body] = splitStrUntilChar(input.source, '{')
+    const [funcHead, funcParam] = splitStrUntilChar(head, '(')
+    const { name, returnType } = getFuncHead(funcHead)
+    const inputs = getParamList(funcParam)
+    const source = getFuncBody(body)
     return {
-      name: result[1],
+      name,
       description: input.description,
-      source: result[3],
-      inputs: inputMap,
-      returnType: result[0],
+      source,
+      inputs,
+      returnType,
     }
   } catch (error) {
     throw "shader function parsed error"
   }
+}
+
+export function splitStrUntilChar(str: string, char: string) {
+  for (let i = 0; i < str.length; i++) {
+    const c = str[i];
+    if (c === char) {
+      return [str.substr(0, i), str.substr(i)];
+    }
+  }
+  throw "split error"
+}
+
+export function getDataType(input: string): GLDataType {
+  switch (input.trim()) {
+    case "float": return GLDataType.float
+    case "vec2": return GLDataType.floatVec2
+    case "vec3": return GLDataType.floatVec3
+    case "vec4": return GLDataType.floatVec4
+    case "mat2": return GLDataType.Mat2
+    case "mat3": return GLDataType.Mat3
+    case "mat4": return GLDataType.Mat4
+
+    default: throw 'parse error'
+  }
+}
+
+export function getOneParam(input: string) {
+  const split = input.trim().split(' ').filter(char => char !== "");
+  return {
+    name: split[1].trim(),
+    type: getDataType(split[0])
+  }
+}
+
+export function getParamList(input: string) {
+  const para = input.trim();
+  if (para[para.length - 1] !== ')' || para[0] !== '(') {
+    throw 'err'
+  }
+
+  const unbrace = para.substring(1, para.length - 1)
+
+  const split = unbrace.split(',').filter(char => char.trim() !== "");
+  const result = {};
+  split.forEach(item => {
+    const { name, type } = getOneParam(item)
+    result[name] = type
+  })
+  return result;
+}
+
+
+export function getFuncBody(input: string) {
+  const para = input.trim();
+  if (para[para.length - 1] !== '}' || para[0] !== '{') {
+    throw 'err'
+  }
+  return para.substring(1, para.length - 1);
+}
+
+function getFuncHead(input: string) {
+  const split = input.split(' ').filter(char => char.trim() !== "");
+  return {
+    name: split[1].trim(),
+    returnType: getDataType(split[0])
+  }
+
 }
