@@ -18,7 +18,7 @@ export function generateNormalFromPosition(vertices: Float32Array): Float32Array
       v3.set(vertices[i + 6], vertices[i + 7], vertices[i + 8]);
       v12.copy(v2).sub(v1);
       v13.copy(v3).sub(v1);
-      n.crossVectors(v13, v12);
+      n.crossVectors(v12, v13);
       n.normalize();
       normals[i + 0] = n.x;
       normals[i + 1] = n.y;

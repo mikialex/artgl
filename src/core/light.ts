@@ -20,8 +20,9 @@ const pointLightShading = new ShaderFunction({
       vec3 lightPosition, 
       vec3 color,
       float radius ){
-        if(length(fragPosition - lightPosition) < radius){
-          return vec4(color, 0.0);
+        float distance = length(fragPosition - lightPosition);
+        if( distance < radius){
+          return vec4(color * (1.0 - distance / radius), 0.0);
         }
         return vec4(0.0);
     }
