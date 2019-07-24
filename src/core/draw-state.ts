@@ -6,11 +6,9 @@ import { GLRenderer } from "../webgl/gl-renderer";
 
 
 export class DrawState {
-  blending = BlendingMode.NormalBlending;
   cullSide = CullSide.CullFaceBack;
 
-  transparent = false;
-
+  blending = BlendingMode.NormalBlending;
   blendSrc = SrcAlphaFactor;
   blendDst = OneMinusSrcAlphaFactor;
   blendEquation = BlendEquation.FUNC_ADD;
@@ -22,19 +20,38 @@ export class DrawState {
   depthTest = true;
   depthWrite = true;
 
-  colorWrite = true;
+  colorWriteR = true;
+  colorWriteG = true;
+  colorWriteB = true;
+  colorWriteA = true;
 
   polygonOffset = false;
   polygonOffsetFactor = 0;
   polygonOffsetUnits = 0;
 
-  dithering = false;
-
   alphaTest = 0;
   premultipliedAlpha = false;
 
   syncGL(renderer: GLRenderer) {
-    // renderer.state.
-    // TODO
+    renderer.state.setCullFace(this.cullSide);
+
+    const depthBuffer = renderer.state.depthbuffer;
+    depthBuffer.enableTest = this.depthTest
+    depthBuffer.setFunc(this.depthFunc)
+    depthBuffer.setMask(this.depthWrite)
+
+    const colorBuffer = renderer.state.colorbuffer;
+    colorBuffer.setColorMask(
+      this.colorWriteR, this.colorWriteG,
+      this.colorWriteB, this.colorWriteA,
+    );
+
+    renderer.state.setPolygonOffset(
+      this.polygonOffset,
+      this.polygonOffsetFactor,
+      this.polygonOffsetUnits
+    )
+
+    // TODO blending staff
   }
 }

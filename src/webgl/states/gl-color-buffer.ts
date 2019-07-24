@@ -8,7 +8,7 @@ export class GLColorBuffer{
     this.resetDefaultClearColor();
   }
 
-  readonly gl: WebGLRenderingContext;
+  private gl: WebGLRenderingContext;
 
   redMaskEnabled: boolean = false;
   greenMaskEnabled: boolean = false;

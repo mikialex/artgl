@@ -11,7 +11,6 @@ export class UniformProxy{
   }
 
   _value: any;
-  // _needUpdate is ignored by global uniform uploading
   _needUpdate: boolean = true;
 
   setValue(val: any) {

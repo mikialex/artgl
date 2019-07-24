@@ -23,6 +23,9 @@ export class GLDepthBuffer {
       }
     }
   }
+  get enableTest() {
+    return this._enableTest;
+  }
 
   clear() {
     this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
