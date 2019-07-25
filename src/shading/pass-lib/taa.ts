@@ -1,4 +1,4 @@
-import { Shading } from "../../core/technique";
+import { Shading } from "../../core/shading";
 import { GLDataType } from "../../webgl/shader-util";
 import { Matrix4 } from "../../math/matrix4";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";

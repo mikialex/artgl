@@ -1,10 +1,8 @@
 
 import {
-  RenderEngine, Technique, Mesh, Interactor, OrbitController,
+  RenderEngine, Technique, Mesh, Interactor, OrbitController, Shading,
   ShaderGraph,PerspectiveCamera, Scene, NormalShading, SphereGeometry
 } from '../../src/artgl';
-
-import { Shading } from '../../src/core/technique';
 
 export class ShaderApplication {
 

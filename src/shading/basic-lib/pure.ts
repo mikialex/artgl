@@ -1,4 +1,4 @@
-import { Shading } from "../../core/technique";
+import { Shading } from "../../core/shading";
 import { GLDataType } from "../../webgl/shader-util";
 import { uniform, MVPWorld } from "../../shader-graph/node-maker";
 

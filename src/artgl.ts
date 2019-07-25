@@ -17,7 +17,7 @@ export { Points } from "./object/points";
 export { Geometry } from "./core/geometry";
 export { Material, ChannelType } from './core/material';
 export { Technique } from "./core/technique";
-export { Shading } from "./core/technique";
+export { Shading } from "./core/shading";
 export { BufferData } from "./core/buffer-data";
 export { Camera } from "./core/camera";
 export { Observable } from "./core/observable";

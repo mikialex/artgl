@@ -1,4 +1,4 @@
-import { Shading } from "../../core/technique";
+import { Shading } from "../../core/shading";
 import { MVPWorld } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { NormalFragVary } from "../../shader-graph/shader-graph";

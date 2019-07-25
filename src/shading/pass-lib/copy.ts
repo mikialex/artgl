@@ -1,4 +1,4 @@
-import { Shading } from "../../core/technique";
+import { Shading } from "../../core/shading";
 import { texture, screenQuad } from "../../shader-graph/node-maker";
 import { UvFragVary } from '../../shader-graph/shader-graph';
 

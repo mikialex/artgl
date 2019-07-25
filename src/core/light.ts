@@ -4,10 +4,11 @@ import { ShaderGraph, NormalFragVary, WorldPositionFragVary } from "../shader-gr
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { uniform } from "../shader-graph/node-maker";
 import { GLDataType } from "../webgl/shader-util";
-import { DecoratorShading, UniformGroup } from "./technique";
+import { UniformGroup } from "./technique";
+import { DecoratorShading } from "./shading";
 
 export class Light extends SceneNode {
-  shader: DecoratorShading
+  decorator: DecoratorShading
 
   uniforms: UniformGroup = new Map();
 }

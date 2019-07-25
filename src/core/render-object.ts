@@ -1,5 +1,5 @@
 import { Geometry } from "./geometry";
-import { Technique, Shading } from "./technique";
+import { Technique } from "./technique";
 import { SceneNode } from "../scene/scene-node";
 import { Material } from "./material";
 import { DrawMode } from "../webgl/const";

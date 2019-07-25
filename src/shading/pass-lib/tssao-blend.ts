@@ -1,4 +1,4 @@
-import { Shading } from "../../core/technique";
+import { Shading } from "../../core/shading";
 import { GLDataType } from "../../webgl/shader-util";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { texture, uniform, screenQuad } from "../../shader-graph/node-maker";

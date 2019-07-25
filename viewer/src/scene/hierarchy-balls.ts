@@ -1,21 +1,24 @@
 import { SceneNode } from '../../../src/scene/scene-node';
 import ARTGL from '../../../src/export';
-import { Technique } from '../../../src/artgl';
+import {
+  Technique, SphereGeometry, PlaneGeometry,
+  NormalShading, Mesh
+} from '../../../src/artgl';
 import { PointLight } from '../../../src/core/light';
 
 export default function (root:SceneNode) {
-  let testGeo = new ARTGL.SphereGeometry(1, 40, 40);
-  let testPlane = new ARTGL.PlaneGeometry(10, 10, 10, 10);
+  let testGeo = new SphereGeometry(1, 40, 40);
+  let testPlane = new PlaneGeometry(10, 10, 10, 10);
   const light = new PointLight();
   
-  let normal = new ARTGL.NormalShading();
+  let normal = new NormalShading();
   normal.decorate(light.decorator);
 
   normal.afterShaderCompiled.add((config) => {
     console.log(config);
   })
 
-  const planeMesh = new ARTGL.Mesh();
+  const planeMesh = new Mesh();
   planeMesh.geometry = testPlane;
   planeMesh.technique = new Technique(normal);
   root.addChild(planeMesh);
@@ -28,7 +31,7 @@ export default function (root:SceneNode) {
       node2.transform.position.y = j;
       node.addChild(node2);
       for (let k = 0; k < 5; k++) {
-        const testMesh = new ARTGL.Mesh();
+        const testMesh = new Mesh();
         testMesh.geometry = testGeo;
         
         // this mesh receive that light

@@ -5,7 +5,7 @@ import { Matrix4 } from "../math/matrix4";
 import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
-import { Technique, Shading } from "../core/technique";
+import { Technique } from "../core/technique";
 import { DrawMode } from "../webgl/const";
 import { Material } from "../core/material";
 import { GLTextureUniform } from "../webgl/uniform/uniform-texture";
@@ -21,6 +21,7 @@ import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/vao";
 import { Vector4 } from "../math/vector4";
+import { Shading } from "../core/shading";
 
 export interface RenderSource{
   resetSource(): void;
