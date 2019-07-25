@@ -14,7 +14,7 @@ const normalShading = new ShaderFunction({
 export class NormalShading implements ShaderUniformProvider {
 
   decorate(graph: ShaderGraph): void {
-    graph.reset()
+    graph
       .setVertexRoot(MVPWorld())
       .declareFragNormal()
       .setFragmentRoot(

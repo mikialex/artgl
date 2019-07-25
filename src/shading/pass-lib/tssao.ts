@@ -1,4 +1,4 @@
-import { Shading, ShaderUniformProvider } from "../../core/shading";
+import { ShaderUniformProvider } from "../../core/shading";
 import { GLDataType } from "../../webgl/shader-util";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 import { uniform, texture, innerUniform, screenQuad } from "../../shader-graph/node-maker";
@@ -56,7 +56,7 @@ export class TSSAOShading implements ShaderUniformProvider {
     const VPMatrix = innerUniform(InnerSupportUniform.VPMatrix);
     const sampleCount = uniform("u_sampleCount", GLDataType.float).default(0);
     const depthTex = texture("depthResult");
-    graph.reset()
+    graph
       .setVertexRoot(screenQuad())
       .declareFragUV()
 

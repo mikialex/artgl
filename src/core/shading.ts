@@ -15,7 +15,7 @@ export interface ShaderUniformProvider{
   */
   decorate(graph: ShaderGraph): void;
 
-  uniforms: Map<string, UniformProxy>;
+  uniforms: Map<string, any>;
 }
 
 export class Shading {

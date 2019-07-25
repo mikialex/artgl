@@ -37,7 +37,7 @@ export class TAAShading implements ShaderUniformProvider {
 
 
   decorate(graph: ShaderGraph) {
-    graph.reset()
+    graph
       .setVertexRoot(screenQuad())
       .declareFragUV()
 

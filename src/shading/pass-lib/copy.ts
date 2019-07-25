@@ -7,7 +7,7 @@ export class CopyShading implements ShaderUniformProvider {
   providerName: "CopyShading"
 
   decorate(graph: ShaderGraph) {
-    graph.reset()
+    graph
       .setVertexRoot(screenQuad())
       .declareFragUV()
       .setFragmentRoot(

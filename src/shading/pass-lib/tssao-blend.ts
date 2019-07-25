@@ -22,12 +22,36 @@ const tssaoBlend = new ShaderFunction({
   `
 })
 
+
+function MapUniform<T>(remapName: string) {
+  return (target: ShaderUniformProvider, key: string) => {
+    let val: T = target[key];
+    const getter = () => {
+      return val;
+    };
+    const setter = (value: T) => {
+      target.uniforms.set(remapName, value);
+      val = value;
+    };
+
+    Object.defineProperty(target, key, {
+      get: getter,
+      set: setter,
+      enumerable: true,
+      configurable: true,
+    });
+  };
+}
+
 export class TSSAOBlendShading implements ShaderUniformProvider {
   providerName: "TSSAOBlendShading"
   uniforms = new Map()
 
+  @MapUniform("u_sampleCount")
+  sampleCount: number = 0;
+
   decorate(graph: ShaderGraph) {
-    graph.reset()
+    graph
       .setVertexRoot(screenQuad())
       .declareFragUV()
       .setFragmentRoot(
