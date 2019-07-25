@@ -12,13 +12,6 @@ import { GLDataType } from "../webgl/shader-util";
 import { AttributeUsage } from "../webgl/attribute";
 import { DivW } from "./built-in/transform";
 
-export class ShaderGraphDecorator {
-  decoratedGraph: ShaderGraph
-
-  decorate(graph: ShaderGraph) {
-    throw "ShaderGraphDecorator not implement"
-  }
-}
 
 export const UvFragVary = "v_uv"
 export const NormalFragVary = "v_normal"

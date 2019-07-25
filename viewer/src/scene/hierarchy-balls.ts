@@ -30,7 +30,10 @@ export default function (root:SceneNode) {
       for (let k = 0; k < 5; k++) {
         const testMesh = new ARTGL.Mesh();
         testMesh.geometry = testGeo;
-        testMesh.technique = new Technique(normal);
+        
+        // this mesh receive that light
+        testMesh.technique = new Technique(normal).apply(light);
+
         testMesh.transform.position.z = k;
         testMesh.transform.scale.set(0.3, 0.3, 0.3);
         node2.addChild(testMesh);

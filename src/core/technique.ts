@@ -2,9 +2,23 @@ import { generateUUID } from "../math/index";
 import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { RenderEngine } from "../engine/render-engine";
 import { UniformProxy } from "../engine/uniform-proxy";
-import { ShaderGraph, ShaderGraphDecorator } from "../shader-graph/shader-graph";
+import { ShaderGraph } from "../shader-graph/shader-graph";
 import { Nullable } from '../type';
 import { Observable } from "./observable";
+import { Light } from "./light";
+
+export class DecoratorShading {
+  name: string
+  decoratedGraph: ShaderGraph
+
+  /**
+   * impl this to decorate your shader source
+   */
+  decorate(graph: ShaderGraph) {
+    throw "ShaderGraphDecorator not implement"
+  }
+}
+
 
 
 export class Shading {
@@ -14,7 +28,7 @@ export class Shading {
   programConfigCache: Nullable<GLProgramConfig> = null;
   needRebuildShader: boolean = true;
 
-  private decorator: ShaderGraphDecorator[] = [];
+  private decorator: DecoratorShading[] = [];
 
   /**
    * impl this to build your shader source
@@ -57,16 +71,19 @@ export class Shading {
     engine.deleteProgram(this);
   }
 
-  decorate(deco: ShaderGraphDecorator): Shading{
+  decorate(deco: DecoratorShading): Shading{
     this.decorator.push(deco);
     return this;
   }
 
 }
 
+export type UniformGroup = Map<string, UniformProxy>
+
 export class Technique {
   shading: Shading
-  uniforms: Map<string, UniformProxy> = new Map();
+  uniforms: UniformGroup = new Map();
+  decoratedUniforms: Map<string, UniformGroup[]> = new Map();
   constructor(shading: Shading) {
     this.shading = shading;
     const config = this.shading.getProgramConfig(); 
@@ -77,4 +94,19 @@ export class Technique {
       })
     }
   }
+
+  apply(light: Light): Technique {
+    const name = light.shader.name;
+    const uni = this.decoratedUniforms.get(name);
+    if (uni === undefined) {
+      throw "this technique is not decorated by Light: <name>, decorate before use it"
+    }
+    if (uni.length > 0) {
+      throw 'light list is not support yet'
+    }
+    uni.push(light.uniforms)
+    return this;
+  }
+
+
 }

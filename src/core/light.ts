@@ -1,13 +1,15 @@
 import { SceneNode } from "../scene/scene-node";
 import { Vector3 } from '../math/vector3';
-import { ShaderGraph, ShaderGraphDecorator, NormalFragVary, WorldPositionFragVary } from "../shader-graph/shader-graph";
+import { ShaderGraph, NormalFragVary, WorldPositionFragVary } from "../shader-graph/shader-graph";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { uniform } from "../shader-graph/node-maker";
 import { GLDataType } from "../webgl/shader-util";
-
+import { DecoratorShading, UniformGroup } from "./technique";
 
 export class Light extends SceneNode {
-  shader: ShaderGraphDecorator
+  shader: DecoratorShading
+
+  uniforms: UniformGroup = new Map();
 }
 
 
@@ -39,7 +41,8 @@ const AddCompose = new ShaderFunction({
   `
 });
 
-export class PointLightDecorator extends ShaderGraphDecorator {
+export class PointLightDecorator extends DecoratorShading {
+  name = "pointLight"
   decorate(decorated: ShaderGraph) {
     decorated
       .setFragmentRoot(
