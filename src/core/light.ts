@@ -4,11 +4,10 @@ import { ShaderGraph, NormalFragVary, WorldPositionFragVary } from "../shader-gr
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { uniform } from "../shader-graph/node-maker";
 import { GLDataType } from "../webgl/shader-util";
-import { UniformGroup } from "./technique";
 import { ShaderUniformProvider } from "./shading";
 
 export class Light extends SceneNode{
-  uniforms: UniformGroup = new Map();
+  
 }
 
 
@@ -41,6 +40,8 @@ const AddCompose = new ShaderFunction({
 });
 
 export class PointLight extends Light implements ShaderUniformProvider  {
+
+  uniforms= new Map()
 
   providerName = "pointLight"
 

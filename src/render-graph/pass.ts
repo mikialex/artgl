@@ -1,22 +1,22 @@
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { RenderEngine } from "../engine/render-engine";
-import { Technique } from "../core/technique";
 import { RenderGraph } from "./render-graph";
 import { PassDefine, PassInputMapInfo } from "./interface";
 import { RenderTargetNode } from "./node/render-target-node";
 import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
+import { Shading } from "../core/shading";
 
 export class RenderPass{
   constructor(define: PassDefine) {
     this.define = define;
     this.name = define.name;
-    if (define.technique !== undefined) {
-      const overrideTechnique = define.technique;
-      if (overrideTechnique === undefined) {
-        throw `technique '${define.technique}' not defined`
+    if (define.shading !== undefined) {
+      const overrideShading = define.shading;
+      if (overrideShading === undefined) {
+        throw `technique '${define.shading}' not defined`
       }
-      this.overrideTechnique = overrideTechnique;
+      this.overrideShading = overrideShading;
     }
 
     this.clearColor = define.clearColor;
@@ -46,7 +46,7 @@ export class RenderPass{
   private afterPassExecute?: () => any;
   private beforePassExecute?: () => any;
   
-  private overrideTechnique: Nullable<Technique> = null;
+  private overrideShading: Nullable<Shading> = null;
 
   // key: uniformName ;   value: inputFramebufferName
   private inputTarget: Map<string, string> = new Map();
@@ -97,10 +97,10 @@ export class RenderPass{
     }
   
     // input binding 
-    if (this.overrideTechnique !== null) {
-      engine.overrideTechnique = this.overrideTechnique;
+    if (this.overrideShading !== null) {
+      engine.overrideShading = this.overrideShading;
       this.inputTarget.forEach((inputFramebufferName, uniformName) => {
-        (engine.overrideTechnique as Technique).shading.getProgram(engine).defineFrameBufferTextureDep(
+        (engine.overrideShading as Shading).getProgram(engine).defineFrameBufferTextureDep(
           inputFramebufferName, uniformName
         );
       })
@@ -133,7 +133,7 @@ export class RenderPass{
       this.afterPassExecute();
     }
 
-    engine.overrideTechnique = null;
+    engine.overrideShading = null;
     engine.renderer.state.colorbuffer.resetDefaultClearColor();
 
 

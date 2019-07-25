@@ -1,12 +1,12 @@
 import { Geometry } from "./geometry";
-import { Technique } from "./technique";
 import { SceneNode } from "../scene/scene-node";
 import { Material } from "./material";
 import { DrawMode } from "../webgl/const";
 import { DrawState } from "./draw-state";
 import { Face3 } from "../math/entity/face3";
 import { Line3 } from "../math/entity/line3";
-import { Vector3 } from "../artgl";
+import { Vector3 } from "../math";
+import { Shading } from "./shading";
 
 export class RenderRange {
   constructor(start?: number, count?: number) {
@@ -58,7 +58,7 @@ export class RenderObject extends SceneNode {
 
   material?: Material;
   geometry?: Geometry;
-  technique?: Technique;
+  shading?: Shading;
   range?: RenderRange;
   state: DrawState =  new DrawState();
 

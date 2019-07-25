@@ -22,26 +22,21 @@ export class Shading {
   uuid = generateUUID();
   graph: ShaderGraph = new ShaderGraph();
 
-  baseProgramInputsCache: Nullable<any> = null
   programConfigCache: Nullable<GLProgramConfig> = null;
   needRebuildShader: boolean = true;
 
   uniformProvider: ShaderUniformProvider[] = [];
 
-  /**
-   * impl this to build your shader source
-   */
-  update() {
-    throw "Shading not impl"
+  decorate(deco: ShaderUniformProvider): Shading {
+    this.uniformProvider.push(deco);
+    return this;
   }
-
 
   afterShaderCompiled: Observable<GLProgramConfig> = new Observable();
   build() {
-    this.update();
-    this.baseProgramInputsCache = this.graph.collectInputs();
-    this.uniformProvider.forEach(deco => {
-      deco.decorate(this.graph);
+    this.graph.reset()
+    this.uniformProvider.forEach(provider => {
+      provider.decorate(this.graph);
     })
   }
 
@@ -68,11 +63,6 @@ export class Shading {
 
   disposeProgram(engine: RenderEngine): void {
     engine.deleteProgram(this);
-  }
-
-  decorate(deco: ShaderUniformProvider): Shading{
-    this.uniformProvider.push(deco);
-    return this;
   }
 
 }

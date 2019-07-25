@@ -1,6 +1,6 @@
 import {
-  Technique, SphereGeometry, PlaneGeometry,
-  NormalShading, Mesh, SceneNode
+  SphereGeometry, PlaneGeometry,
+  NormalShading, Mesh, SceneNode, Shading
 } from '../../../src/artgl';
 import { PointLight } from '../../../src/core/light';
 
@@ -9,16 +9,17 @@ export default function (root:SceneNode) {
   let testPlane = new PlaneGeometry(10, 10, 10, 10);
   const light = new PointLight();
   
-  let normal = new NormalShading();
-  normal.decorate(light);
+  let shading = new Shading()
+    .decorate(new NormalShading())
+    .decorate(light);
 
-  normal.afterShaderCompiled.add((config) => {
+  shading.afterShaderCompiled.add((config) => {
     console.log(config);
   })
 
   const planeMesh = new Mesh();
   planeMesh.geometry = testPlane;
-  planeMesh.technique = new Technique(normal);
+  planeMesh.shading = shading;
   root.addChild(planeMesh);
   for (let i = 0; i < 5; i++) {
     const node = new SceneNode();
@@ -33,7 +34,7 @@ export default function (root:SceneNode) {
         testMesh.geometry = testGeo;
         
         // this mesh receive that light
-        testMesh.technique = new Technique(normal).apply(light);
+        testMesh.shading = shading;
 
         testMesh.transform.position.z = k;
         testMesh.transform.scale.set(0.3, 0.3, 0.3);

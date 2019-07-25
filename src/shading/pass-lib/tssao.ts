@@ -1,4 +1,4 @@
-import { Shading } from "../../core/shading";
+import { Shading, ShaderUniformProvider } from "../../core/shading";
 import { GLDataType } from "../../webgl/shader-util";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 import { uniform, texture, innerUniform, screenQuad } from "../../shader-graph/node-maker";
@@ -8,7 +8,7 @@ import { dir3D } from "../../shader-graph/built-in/transform";
 import { getWorldPosition, NDCxyToUV } from "../../shader-graph/built-in/transform";
 import { Matrix4 } from "../../math/index";
 import { rand2DT, rand } from "../../shader-graph/built-in/rand";
-import { UvFragVary } from '../../shader-graph/shader-graph';
+import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
 
 const newSamplePosition = new ShaderFunction({
   source: `
@@ -48,16 +48,19 @@ const tssaoMix = new ShaderFunction({
   `
 })
 
-export class TSSAOShading extends Shading {
-  update() {
+export class TSSAOShading implements ShaderUniformProvider {
+  providerName: "TSSAOShading"
+  uniforms = new Map()
+
+  decorate(graph: ShaderGraph) {
     const VPMatrix = innerUniform(InnerSupportUniform.VPMatrix);
     const sampleCount = uniform("u_sampleCount", GLDataType.float).default(0);
     const depthTex = texture("depthResult");
-    this.graph.reset()
+    graph.reset()
       .setVertexRoot(screenQuad())
       .declareFragUV()
 
-    const vUV = this.graph.getVary(UvFragVary);
+    const vUV = graph.getVary(UvFragVary);
     const depth = unPackDepth.make().input("enc", depthTex.fetch(vUV))
 
     const worldPosition = getWorldPosition.make()
@@ -97,7 +100,7 @@ export class TSSAOShading extends Shading {
         )
       )
 
-    this.graph.setFragmentRoot(
+    graph.setFragmentRoot(
       tssaoMix.make()
         .input("oldColor", texture("AOAcc").fetch(vUV).swizzling("xyz"))
         .input("newColor",

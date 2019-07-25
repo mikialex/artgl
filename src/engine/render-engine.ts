@@ -5,7 +5,6 @@ import { Matrix4 } from "../math/matrix4";
 import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
-import { Technique } from "../core/technique";
 import { DrawMode } from "../webgl/const";
 import { Material } from "../core/material";
 import { GLTextureUniform } from "../webgl/uniform/uniform-texture";
@@ -47,7 +46,7 @@ export interface Size{
 }
 
 
-const copyTechnique = new Technique(new CopyShading());
+const copyShading = new Shading().decorate(new CopyShading());
 const quad = new QuadSource();
 
 export class RenderEngine implements GLReleasable{
@@ -101,8 +100,8 @@ export class RenderEngine implements GLReleasable{
   }
 
 
-  public overrideTechnique: Nullable<Technique> = null;
-  public defaultTechnique: Technique = new Technique(new NormalShading());
+  public overrideShading: Nullable<Shading> = null;
+  public defaultTechnique: Shading = new Shading().decorate(new NormalShading());
 
   ////
 
@@ -193,7 +192,7 @@ export class RenderEngine implements GLReleasable{
   renderObject(object: RenderObject) {
 
     // prepare technique
-    const program = this.connectTechnique(object);
+    const program = this.connectShading(object);
 
     // prepare material
     this.connectMaterial(object.material, program);
@@ -216,12 +215,12 @@ export class RenderEngine implements GLReleasable{
       debugViewPort.z, debugViewPort.w
     );
 
-    this.overrideTechnique = copyTechnique;
-    this.overrideTechnique.shading.getProgram(this).defineFrameBufferTextureDep(
+    this.overrideShading = copyShading;
+    this.overrideShading.getProgram(this).defineFrameBufferTextureDep(
       framebuffer.name, 'copySource'
     );
     this.render(quad);
-    this.overrideTechnique = null;
+    this.overrideShading = null;
   }
   ////
 
@@ -248,20 +247,20 @@ export class RenderEngine implements GLReleasable{
   private lastProgramRendered: GLProgram;
 
 
-  private connectTechnique(object: RenderObject): GLProgram {
+  private connectShading(object: RenderObject): GLProgram {
 
-    // get technique, check override, default situation
-    let technique: Technique;
-    if (this.overrideTechnique !== null) {
-      technique = this.overrideTechnique;
-    } else if (object.technique !== undefined) {
-      technique = object.technique;
+    // // get shading, check override, default situation
+    let shading: Shading;
+    if (this.overrideShading !== null) {
+      shading = this.overrideShading;
+    } else if (object.shading !== undefined) {
+      shading = object.shading;
     } else {
-      technique = this.defaultTechnique;
+      shading = this.defaultTechnique;
     }
 
     // get program, refresh provider cache if changed
-    const program = technique.shading.getProgram(this);
+    const program = shading.getProgram(this);
     if (this.lastProgramRendered !== program) {
       this.lastUploadedShaderUniformProvider.clear();
     }
@@ -271,7 +270,6 @@ export class RenderEngine implements GLReleasable{
     this.getGlobalUniform(InnerSupportUniform.MMatrix).setValue(object.worldMatrix);
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
 
-    const shading = technique.shading;
     shading.uniformProvider.forEach(provider => {
       if (this.lastUploadedShaderUniformProvider.has(provider)) {
         // if we found this uniform provider has updated before, we can skip!
@@ -283,9 +281,6 @@ export class RenderEngine implements GLReleasable{
       this.lastUploadedShaderUniformProvider.add(provider);
     })
 
-    technique.uniforms.forEach((uni, key) => {
-        program.setUniform(key, uni.value);
-    })
     return program;
   }
 

@@ -1,8 +1,8 @@
 import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
-import { Technique } from "../core/technique";
 import { RenderSource } from "../engine/render-engine";
 import { PixelFormat } from "../webgl/const";
+import { Shading } from "../core/shading";
 export interface GraphDefine {
   passes: PassDefine[],
   renderTargets: RenderTargetDefine[];
@@ -19,7 +19,7 @@ export interface PassDefine {
   filter?: () => boolean,
   sorter?: () => number,
   states?: stateType[],
-  technique?: Technique,
+  shading?: Shading,
   enableColorClear?:boolean,
   enableDepthClear?:boolean,
   clearColor?: Vector4,
