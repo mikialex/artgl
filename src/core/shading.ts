@@ -5,20 +5,18 @@ import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { Observable } from "./observable";
 import { RenderEngine } from "../engine/render-engine";
+import { UniformProxy } from "../engine/uniform-proxy";
 
-export class DecoratorShading {
-  name: string
-  decoratedGraph: ShaderGraph
+export interface ShaderUniformProvider{
+  providerName: string;
 
   /**
-   * impl this to decorate your shader source
-   */
-  decorate(graph: ShaderGraph) {
-    throw "ShaderGraphDecorator not implement"
-  }
+  * impl this to decorate your shader source, add uniform input
+  */
+  decorate(graph: ShaderGraph): void;
+
+  uniforms: Map<string, UniformProxy>;
 }
-
-
 
 export class Shading {
   uuid = generateUUID();
@@ -28,7 +26,7 @@ export class Shading {
   programConfigCache: Nullable<GLProgramConfig> = null;
   needRebuildShader: boolean = true;
 
-  private decorator: DecoratorShading[] = [];
+  uniformProvider: ShaderUniformProvider[] = [];
 
   /**
    * impl this to build your shader source
@@ -42,7 +40,7 @@ export class Shading {
   build() {
     this.update();
     this.baseProgramInputsCache = this.graph.collectInputs();
-    this.decorator.forEach(deco => {
+    this.uniformProvider.forEach(deco => {
       deco.decorate(this.graph);
     })
   }
@@ -72,8 +70,8 @@ export class Shading {
     engine.deleteProgram(this);
   }
 
-  decorate(deco: DecoratorShading): Shading{
-    this.decorator.push(deco);
+  decorate(deco: ShaderUniformProvider): Shading{
+    this.uniformProvider.push(deco);
     return this;
   }
 

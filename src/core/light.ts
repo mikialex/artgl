@@ -5,11 +5,9 @@ import { ShaderFunction } from "../shader-graph/shader-function";
 import { uniform } from "../shader-graph/node-maker";
 import { GLDataType } from "../webgl/shader-util";
 import { UniformGroup } from "./technique";
-import { DecoratorShading } from "./shading";
+import { ShaderUniformProvider } from "./shading";
 
-export class Light extends SceneNode {
-  decorator: DecoratorShading
-
+export class Light extends SceneNode{
   uniforms: UniformGroup = new Map();
 }
 
@@ -42,8 +40,10 @@ const AddCompose = new ShaderFunction({
   `
 });
 
-export class PointLightDecorator extends DecoratorShading {
-  name = "pointLight"
+export class PointLight extends Light implements ShaderUniformProvider  {
+
+  providerName = "pointLight"
+
   decorate(decorated: ShaderGraph) {
     decorated
       .setFragmentRoot(
@@ -56,10 +56,6 @@ export class PointLightDecorator extends DecoratorShading {
             .input("color", uniform("lightColor", GLDataType.floatVec3).default(new Vector3(1, 1, 1)))
             .input("radius", uniform("lightRadius", GLDataType.float).default(3))))
   }
-}
-
-export class PointLight extends Light {
-  decorator = new PointLightDecorator();
 
   color: Vector3
   position: Vector3

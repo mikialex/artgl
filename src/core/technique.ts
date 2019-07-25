@@ -21,16 +21,16 @@ export class Technique {
   }
 
   apply(light: Light): Technique {
-    const name = light.decorator.name;
-    const uni = this.decoratedUniforms.get(name);
-    // TODO
-    // if (uni === undefined) {
-    //   throw "this technique is not decorated by Light: <name>, decorate before use it"
-    // }
-    // if (uni.length > 0) {
-    //   throw 'light list is not support yet'
-    // }
-    // uni.push(light.uniforms)
+    // const name = light.decorator.name;
+    // const uni = this.decoratedUniforms.get(name);
+    // // TODO
+    // // if (uni === undefined) {
+    // //   throw "this technique is not decorated by Light: <name>, decorate before use it"
+    // // }
+    // // if (uni.length > 0) {
+    // //   throw 'light list is not support yet'
+    // // }
+    // // uni.push(light.uniforms)
     return this;
   }
 

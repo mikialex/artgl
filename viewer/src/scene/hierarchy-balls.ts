@@ -1,8 +1,6 @@
-import { SceneNode } from '../../../src/scene/scene-node';
-import ARTGL from '../../../src/export';
 import {
   Technique, SphereGeometry, PlaneGeometry,
-  NormalShading, Mesh
+  NormalShading, Mesh, SceneNode
 } from '../../../src/artgl';
 import { PointLight } from '../../../src/core/light';
 
@@ -12,7 +10,7 @@ export default function (root:SceneNode) {
   const light = new PointLight();
   
   let normal = new NormalShading();
-  normal.decorate(light.decorator);
+  normal.decorate(light);
 
   normal.afterShaderCompiled.add((config) => {
     console.log(config);

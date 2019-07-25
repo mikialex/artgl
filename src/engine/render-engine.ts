@@ -21,7 +21,7 @@ import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/vao";
 import { Vector4 } from "../math/vector4";
-import { Shading } from "../core/shading";
+import { Shading, ShaderUniformProvider } from "../core/shading";
 
 export interface RenderSource{
   resetSource(): void;
@@ -231,7 +231,6 @@ export class RenderEngine implements GLReleasable{
   //// low level resource binding
 
   /**
-   *
    * GlobalUniforms is store useful inner support uniforms
    * Engine will update these values and auto bind them to
    * program that you will draw as needed
@@ -244,7 +243,14 @@ export class RenderEngine implements GLReleasable{
   getGlobalUniform(uniform: InnerSupportUniform): UniformProxy {
     return this.globalUniforms.get(uniform) as UniformProxy 
   }
+
+  private lastUploadedShaderUniformProvider: Set<ShaderUniformProvider> = new Set();
+  private lastProgramRendered: GLProgram;
+
+
   private connectTechnique(object: RenderObject): GLProgram {
+
+    // get technique, check override, default situation
     let technique: Technique;
     if (this.overrideTechnique !== null) {
       technique = this.overrideTechnique;
@@ -253,16 +259,32 @@ export class RenderEngine implements GLReleasable{
     } else {
       technique = this.defaultTechnique;
     }
+
+    // get program, refresh provider cache if changed
     const program = technique.shading.getProgram(this);
+    if (this.lastProgramRendered !== program) {
+      this.lastUploadedShaderUniformProvider.clear();
+    }
+
     this.renderer.useProgram(program);
+
     this.getGlobalUniform(InnerSupportUniform.MMatrix).setValue(object.worldMatrix);
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
-    technique.uniforms.forEach((uni, key) => {
-      // if (uni._needUpdate) {
-      // TODO optimize
+
+    const shading = technique.shading;
+    shading.uniformProvider.forEach(provider => {
+      if (this.lastUploadedShaderUniformProvider.has(provider)) {
+        // if we found this uniform provider has updated before, we can skip!
+        return;
+      }
+      provider.uniforms.forEach((uni, key) => {
         program.setUniform(key, uni.value);
-        uni.resetUpdate();
-      // }
+      })
+      this.lastUploadedShaderUniformProvider.add(provider);
+    })
+
+    technique.uniforms.forEach((uni, key) => {
+        program.setUniform(key, uni.value);
     })
     return program;
   }
