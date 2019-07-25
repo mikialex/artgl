@@ -5,7 +5,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    
+    showConfigPanel: true,
+    showScenePanel: true
   },
   mutations: {
 

@@ -12,6 +12,8 @@
       <button @click="screenshot" v-if="!isRuning" disabled>download screenshot</button>
       <button @click="inspectGraph" v-if="!graphView">inspectGraph</button>
       <button @click="closeGraphInspector" v-if="graphView">closeGraphViewer</button>
+      <button @click="showScenePanel">show scene panel</button>
+      <button @click="showConfigPanel">show config panel</button>
     </div>
   </div>
 </template>
@@ -30,6 +32,20 @@ import GraphViewer from '../components/graph-viewer/graph-viewer.vue';
 export default class ViewerCanvas extends Vue {
   isRuning:boolean = GLApp.framer.active;
   graphView: GraphView = null;
+  $store: any;
+
+  async showScenePanel(){
+    this.$store.state.showScenePanel = true;
+    await this.$nextTick()
+    GLApp.notifyResize();
+  }
+
+  async showConfigPanel(){
+    this.$store.state.showConfigPanel = true;
+    await this.$nextTick()
+    GLApp.notifyResize();
+  }
+
 
   pick(e:MouseEvent) {
     // console.log(e.offsetX)
@@ -71,7 +87,8 @@ export default class ViewerCanvas extends Vue {
 
 <style lang="scss" scoped>
 .canvas-wrap{
-  width: calc(100vw - 600px);
+  // width: calc(100vw - 600px);
+  flex-grow: 1;
   border: 1px solid #ddd;
   position: relative;
 }

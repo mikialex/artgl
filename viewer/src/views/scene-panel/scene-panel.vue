@@ -3,6 +3,7 @@
     <ObjectPanel v-if="!true"/>
     <div class="panel-title">Scene explorer
       <button @click="sync">sync</button>
+      <button @click="hide">hide</button>
     </div>
     <nav class="scene-nav">
       <div v-for="navitem in nav" :key="navitem"
@@ -72,6 +73,7 @@ export default class ScenePanel extends Vue {
 
   nav = ['hierarchy', 'technique','geometry','material'];
   currentNav = 'hierarchy'
+  $store: any;
 
   sync() {
     this.sceneView = SceneView.create(GLApp.scene);
@@ -82,6 +84,12 @@ export default class ScenePanel extends Vue {
     this.afterObs = GLApp.afterRender.add((engine:RenderEngine)=>{
       this.renderView.updateFrameInfo(engine);
     });
+  }
+
+  async hide(){
+    this.$store.state.showScenePanel = false;
+    await this.$nextTick()
+    GLApp.notifyResize();
   }
 
   beforeDestroy(){

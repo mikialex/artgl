@@ -10,8 +10,8 @@ export class Technique {
   decoratedUniforms: Map<string, UniformGroup[]> = new Map();
   constructor(shading: Shading) {
     this.shading = shading;
-    this.shading.getProgramConfig(); 
-    const inputs = this.shading.baseProgramInputsCache;
+    const inputs = this.shading.getProgramConfig(); 
+    // const inputs = this.shading.baseProgramInputsCache;
     this.uniforms = new Map();
     if (inputs.uniforms !== undefined) {
       inputs.uniforms.forEach(uni => {

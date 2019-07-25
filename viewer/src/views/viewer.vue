@@ -1,8 +1,10 @@
 <template>
   <div class="viewer">
-    <ScenePanel />
+    <ScenePanel v-if="this.$store.state.showScenePanel"/>
     <ViewerCanvas />
-    <ConfigPanel :appConfig="appConf"/>
+    <ConfigPanel 
+     v-if="this.$store.state.showConfigPanel"
+    :appConfig="appConf"/>
   </div>
 </template>
 
