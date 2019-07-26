@@ -7,6 +7,7 @@
       </div> -->
       <router-link active-class="current" to="/viewer">Viewer</router-link>
       <router-link active-class="current" to="/shader">Shader Graph</router-link>
+      <router-link active-class="current" to="/examples">Examples</router-link>
       <!-- <router-link to="/about">RenderGraph</router-link> -->
     </div>
   </div>

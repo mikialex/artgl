@@ -1,31 +1,40 @@
 import * as ARTGL from '../../src/artgl'
+import { TestBridge } from './test-bridge';
 
+export default async function test(testBridge: TestBridge) {
 
+  //==>
 
-//==>
+  let canvas = document.querySelector('canvas');
+  const engine = new ARTGL.RenderEngine(canvas);
+  const scene = new ARTGL.Scene();
 
-let canvas = document.querySelector('canvas');
-const engine = new ARTGL.RenderEngine(canvas);
-const scene = new ARTGL.Scene();
+  const geometry = new ARTGL.SphereGeometry();
 
-const geometry = new ARTGL.CubeGeometry();
-const shading = new ARTGL.NormalShading();
+  const mesh = new ARTGL.Mesh();
+  const line = new ARTGL.Line();
+  const points = new ARTGL.Points();
 
-const mesh = new ARTGL.Mesh();
-const line = new ARTGL.Line();
-const points = new ARTGL.Points();
+  mesh.geometry = geometry;
+  line.geometry = geometry;
+  points.geometry = geometry;
 
-mesh.technique = new ARTGL.Technique(shading);
-line.technique = new ARTGL.Technique(shading);
-points.technique = new ARTGL.Technique(shading);
+  line.transform.position.x = -10;
+  points.transform.position.x = 10;
 
-mesh.geometry = geometry;
-line.geometry = geometry;
-points.geometry =geometry;
+  scene.root.addChild(mesh);
+  scene.root.addChild(line);
+  scene.root.addChild(points);
 
-line.transform.position.x = -10;
-points.transform.position.x = 10;
+  engine.camera.transform.position.set(10, 10, 10);
+  engine.connectCamera();
 
-engine.render(scene);
+  engine.renderer.state.colorbuffer.setClearColor(new ARTGL.Vector4(0.9, 0.9, 0.9, 1.0))
+  engine.renderer.state.colorbuffer.clear()
+  engine.render(scene);
 
-//==<
+  //==<
+
+  // await testBridge.screenShot();
+  // await testBridge.testOver();
+}

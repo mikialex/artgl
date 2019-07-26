@@ -4,6 +4,8 @@ import Home from './views/home.vue'
 import Viewer from './views/viewer.vue'
 import ShaderEditor from './views/shader-editor.vue'
 import Debug from './views/debug.vue'
+import ExampleView from './views/example/example-page.vue'
+import ExampleItemView from './views/example/example-item-page.vue'
 
 Vue.use(Router)
 
@@ -28,6 +30,16 @@ export default new Router({
       path: '/shader',
       name: 'shader-editor',
       component: ShaderEditor
+    },
+    {
+      path: '/examples',
+      name: 'examples',
+      component: ExampleView
+    },
+    {
+      path: '/example/:name',
+      name: 'example',
+      component: ExampleItemView
     },
     {
       path: '/about',

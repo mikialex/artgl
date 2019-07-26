@@ -45,7 +45,7 @@ export { CubeGeometry } from "./geometry/geo-lib/cube-geometry";
 export { NormalShading } from "./shading/basic-lib/normal";
 
 // math
-export { Matrix4, Quaternion, Vector3 } from "./math/index";
+export * from "./math/index";
 
 // camera
 export { PerspectiveCamera } from "./camera/perspective-camera";

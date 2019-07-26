@@ -1,4 +1,5 @@
 export { Vector3 } from './vector3';
+export { Vector4 } from './vector4';
 export { Matrix4 } from "./matrix4";
 export { Euler } from "./euler";
 export { Quaternion } from './quaternion';
