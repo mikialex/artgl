@@ -17,7 +17,7 @@ export interface ShaderUniformProvider{
   * impl this to decorate your shader source, add uniform input
   */
   decorate(graph: ShaderGraph): void;
-
+  hasAnyUniformChanged: boolean;
   uniforms: Map<string, any>;
 }
 
@@ -74,12 +74,20 @@ export class Shading {
 
 export function MapUniform<T>(remapName: string) {
   return (target: BaseEffectShading<T>, key: string) => {
+    if (target.uniforms === undefined) {
+      target.uniforms = new Map();
+    }
+    if (target.propertyUniformNameMap === undefined) {
+      target.propertyUniformNameMap = new Map();
+    }
+
     let val: T = target[key];
     const getter = () => {
       return val;
     };
     const setter = (value: T) => {
       target.uniforms.set(remapName, value);
+      target.hasAnyUniformChanged = true;
       val = value;
     };
 
@@ -95,11 +103,21 @@ export function MapUniform<T>(remapName: string) {
 }
 
 export abstract class BaseEffectShading<T> implements ShaderUniformProvider{
+  constructor() {
+    // need check if has initialized by decorator
+    if (this.uniforms === undefined) {
+      this.uniforms = new Map();
+    }
+    if (this.propertyUniformNameMap === undefined) {
+      this.propertyUniformNameMap = new Map();
+    }
+  }
 
   abstract decorate(graph: ShaderGraph): void;
 
-  propertyUniformNameMap: Map<string, string> = new Map();
-  uniforms: Map<string, any> = new Map();
+  hasAnyUniformChanged: boolean = true;
+  propertyUniformNameMap: Map<string, string>;
+  uniforms: Map<string, any>;
 
   getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
     const uniformName = this.propertyUniformNameMap.get(name as string);

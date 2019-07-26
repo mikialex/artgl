@@ -29,8 +29,7 @@ export class Camera extends SceneNode implements ShaderUniformProvider {
     
   }
 
-
-  providerName: string = "camera"
+  hasAnyUniformChanged: boolean = false;
 
   decorate(graph: ShaderGraph): void {
     throw new Error("Method not implemented.");

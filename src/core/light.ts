@@ -40,10 +40,9 @@ const AddCompose = new ShaderFunction({
 });
 
 export class PointLight extends Light implements ShaderUniformProvider  {
+  hasAnyUniformChanged: boolean = false;
 
   uniforms= new Map()
-
-  providerName = "pointLight"
 
   decorate(decorated: ShaderGraph) {
     decorated
