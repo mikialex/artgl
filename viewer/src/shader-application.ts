@@ -1,6 +1,6 @@
 
 import {
-  RenderEngine, Technique, Mesh, Interactor, OrbitController, Shading,
+  RenderEngine, Mesh, Interactor, OrbitController, Shading,
   ShaderGraph,PerspectiveCamera, Scene, NormalShading, SphereGeometry
 } from '../../src/artgl';
 
@@ -25,7 +25,7 @@ export class ShaderApplication {
     this.interactor = new Interactor(canvas);
     this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);
     this.orbitController.registerInteractor(this.interactor);
-    this.shader = new NormalShading();
+    this.shader = new Shading().decorate(new NormalShading());
     this.loadScene();
     this.tick();
     this.start();
@@ -47,7 +47,7 @@ export class ShaderApplication {
     let testGeo = new SphereGeometry(1, 40, 40);
     const mesh = new Mesh();
     mesh.geometry = testGeo;
-    mesh.technique = new Technique(this.shader);
+    mesh.shading = this.shader;
     this.mesh = mesh;
     this.scene.root.addChild(mesh);
   }

@@ -1,16 +1,16 @@
-import { Shading } from "../../core/shading";
+import { BaseEffectShading } from "../../core/shading";
 import { texture, screenQuad } from "../../shader-graph/node-maker";
-import { UvFragVary } from '../../shader-graph/shader-graph';
+import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
 
-export class CopyShading extends Shading {
+export class CopyShading extends BaseEffectShading<CopyShading> {
 
-  update() {
-    this.graph.reset()
+  decorate(graph: ShaderGraph) {
+    graph
       .setVertexRoot(screenQuad())
       .declareFragUV()
       .setFragmentRoot(
-        texture("copySource").fetch(this.graph.getVary(UvFragVary))
+        texture("copySource").fetch(graph.getVary(UvFragVary))
       )
-
   }
+
 }

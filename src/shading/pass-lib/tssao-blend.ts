@@ -1,9 +1,7 @@
-import { Shading } from "../../core/shading";
-import { GLDataType } from "../../webgl/shader-util";
+import { BaseEffectShading, MapUniform } from "../../core/shading";
 import { ShaderFunction } from "../../shader-graph/shader-function";
-import { texture, uniform, screenQuad } from "../../shader-graph/node-maker";
-import { UvFragVary } from '../../shader-graph/shader-graph';
-
+import { texture, screenQuad } from "../../shader-graph/node-maker";
+import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
 
 const tssaoBlend = new ShaderFunction({
   source: `
@@ -22,20 +20,32 @@ const tssaoBlend = new ShaderFunction({
   `
 })
 
-export class TSSAOBlendShading extends Shading {
+export class TSSAOBlendShading extends BaseEffectShading<TSSAOBlendShading> {
 
-  update() {
-    this.graph.reset()
+  @MapUniform("u_sampleCount")
+  sampleCount: number = 0;
+
+  @MapUniform("u_tssaoComposeRate")
+  tssaoComposeRate: number = 1;
+
+  @MapUniform("u_tssaoShowThreshold")
+  tssaoShowThreshold: number = 200;
+
+  @MapUniform("u_tssaoComposeThreshold")
+  tssaoComposeThreshold: number = 0.5;
+
+  decorate(graph: ShaderGraph) {
+    graph
       .setVertexRoot(screenQuad())
       .declareFragUV()
       .setFragmentRoot(
         tssaoBlend.make()
-          .input("color", texture("basic").fetch(this.graph.getVary(UvFragVary)).swizzling("xyz"))
-          .input("aoColor", texture("tssao").fetch(this.graph.getVary(UvFragVary)).swizzling("xyz"))
-          .input('sampleCount', uniform("u_sampleCount", GLDataType.float).default(0))
-          .input('tssaoComposeRate', uniform("u_tssaoComposeRate", GLDataType.float).default(1))
-          .input('tssaoShowThreshold', uniform("u_tssaoShowThreshold", GLDataType.float).default(200))
-          .input('tssaoComposeThreshold', uniform("u_tssaoComposeThreshold", GLDataType.float).default(0.5))
+          .input("color", texture("basic").fetch(graph.getVary(UvFragVary)).swizzling("xyz"))
+          .input("aoColor", texture("tssao").fetch(graph.getVary(UvFragVary)).swizzling("xyz"))
+          .input('sampleCount', this.getPropertyUniform('sampleCount'))
+          .input('tssaoComposeRate', this.getPropertyUniform('tssaoComposeRate'))
+          .input('tssaoShowThreshold', this.getPropertyUniform('tssaoShowThreshold'))
+          .input('tssaoComposeThreshold', this.getPropertyUniform('tssaoComposeThreshold'))
       )
   }
 

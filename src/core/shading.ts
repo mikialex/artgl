@@ -1,49 +1,46 @@
 
-import { generateUUID } from "../math";
+import { generateUUID, Vector3, Matrix4 } from "../math";
 import { Nullable } from "../type";
 import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { Observable } from "./observable";
 import { RenderEngine } from "../engine/render-engine";
+import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
+import { GLDataType } from '../webgl/shader-util';
+import { Vector2 } from '../math/vector2';
+import { Vector4 } from '../math/vector4';
+import { uniform, uniformFromValue } from '../shader-graph/node-maker';
 
-export class DecoratorShading {
-  name: string
-  decoratedGraph: ShaderGraph
+export interface ShaderUniformProvider{
 
   /**
-   * impl this to decorate your shader source
-   */
-  decorate(graph: ShaderGraph) {
-    throw "ShaderGraphDecorator not implement"
-  }
+  * impl this to decorate your shader source, add uniform input
+  */
+  decorate(graph: ShaderGraph): void;
+  hasAnyUniformChanged: boolean;
+  uniforms: Map<string, any>;
+  propertyUniformNameMap: Map<string, string>;
 }
-
-
 
 export class Shading {
   uuid = generateUUID();
   graph: ShaderGraph = new ShaderGraph();
 
-  baseProgramInputsCache: Nullable<any> = null
   programConfigCache: Nullable<GLProgramConfig> = null;
   needRebuildShader: boolean = true;
 
-  private decorator: DecoratorShading[] = [];
+  uniformProvider: ShaderUniformProvider[] = [];
 
-  /**
-   * impl this to build your shader source
-   */
-  update() {
-    throw "Shading not impl"
+  decorate(deco: ShaderUniformProvider): Shading {
+    this.uniformProvider.push(deco);
+    return this;
   }
-
 
   afterShaderCompiled: Observable<GLProgramConfig> = new Observable();
   build() {
-    this.update();
-    this.baseProgramInputsCache = this.graph.collectInputs();
-    this.decorator.forEach(deco => {
-      deco.decorate(this.graph);
+    this.graph.reset()
+    this.uniformProvider.forEach(provider => {
+      provider.decorate(this.graph);
     })
   }
 
@@ -72,9 +69,115 @@ export class Shading {
     engine.deleteProgram(this);
   }
 
-  decorate(deco: DecoratorShading): Shading{
-    this.decorator.push(deco);
-    return this;
+}
+
+
+
+export function MapUniform(remapName: string) {
+  return (target: ShaderUniformProvider, key: string) => {
+    if (target.uniforms === undefined) {
+      target.uniforms = new Map();
+    }
+    if (target.propertyUniformNameMap === undefined) {
+      target.propertyUniformNameMap = new Map();
+    }
+
+    let val = target[key];
+    const getter = () => {
+      return val;
+    };
+    const setter = (value) => {
+      target.uniforms.set(remapName, value);
+      target.hasAnyUniformChanged = true;
+      val = value;
+    };
+
+    target.propertyUniformNameMap.set(key, remapName);
+
+    Object.defineProperty(target, key, {
+      get: getter,
+      set: setter,
+      enumerable: true,
+      configurable: true,
+    });
+  };
+}
+
+export abstract class BaseEffectShading<T> implements ShaderUniformProvider{
+  constructor() {
+    // need check if has initialized by decorator
+    if (this.uniforms === undefined) {
+      this.uniforms = new Map();
+    }
+    if (this.propertyUniformNameMap === undefined) {
+      this.propertyUniformNameMap = new Map();
+    }
   }
 
+  abstract decorate(graph: ShaderGraph): void;
+
+  hasAnyUniformChanged: boolean = true;
+  propertyUniformNameMap: Map<string, string>;
+  uniforms: Map<string, any>;
+
+  getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
+    const uniformName = this.propertyUniformNameMap.get(name as string);
+    const value = this[name as string];
+    if (value === undefined) {
+      throw "uniform value not given"
+    }
+    return uniformFromValue(uniformName, value);
+  }
 }
+
+
+// type Constructor<T = SceneNode> = new (...args: any[]) => T;
+// type ConstructorTypeOf<T> = new (...args:any[]) => T;
+
+// export function ShaderUniformSceneNodeProvidable<T extends Constructor>(_target: T)
+//   : ConstructorTypeOf<SceneNode & BaseEffectShading<T>>
+// {
+//   return class <K> extends SceneNode implements ShaderUniformProvider{
+//     constructor() {
+//       super();
+//       // need check if has initialized by decorator
+//       if (this.uniforms === undefined) {
+//         this.uniforms = new Map();
+//       }
+//       if (this.propertyUniformNameMap === undefined) {
+//         this.propertyUniformNameMap = new Map();
+//       }
+//     }
+    
+//     decorate(_graph: ShaderGraph): void {
+//       throw new Error("Method not implemented.");
+//     }
+
+//     hasAnyUniformChanged: boolean;
+
+//     propertyUniformNameMap: Map<string, string>;
+
+//     uniforms: Map<string, any>;
+
+//     getPropertyUniform(name: keyof K): ShaderCommonUniformInputNode {
+//       const uniformName = this.propertyUniformNameMap.get(name as string);
+//       const value = this[name as string];
+//       if (value === undefined) {
+//         throw "uniform value not given"
+//       }
+//       if (typeof value === "number") {
+//         return uniform(uniformName, GLDataType.float).default(value);
+//       } else if (value instanceof Vector2) {
+//         return uniform(uniformName, GLDataType.floatVec2).default(value);
+//       } else if (value instanceof Vector3) {
+//         return uniform(uniformName, GLDataType.floatVec3).default(value);
+//       } else if (value instanceof Vector4) {
+//         return uniform(uniformName, GLDataType.floatVec4).default(value);
+//       } else if (value instanceof Matrix4) {
+//         return uniform(uniformName, GLDataType.Mat4).default(value);
+//       } else {
+//         throw "un support uniform value"
+//       }
+//     }
+//   };
+// }

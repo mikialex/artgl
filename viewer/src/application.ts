@@ -1,6 +1,6 @@
 import {
   RenderEngine, Mesh, PerspectiveCamera, Interactor, OrbitController,
-  OBJLoader, Technique, NormalShading, Scene, Observable, Framer
+  OBJLoader, NormalShading, Scene, Observable, Framer
 } from '../../src/artgl';
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
@@ -110,7 +110,6 @@ export class Application {
     const geo = objLoader.parse(result);
     const mesh = new Mesh();
     mesh.geometry = geo;
-    mesh.technique = new Technique(new NormalShading());
     this.scene.root.addChild(mesh);
   }
 

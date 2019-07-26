@@ -12,7 +12,7 @@ export default class Debug extends Vue {
   mounted(){
     console.log("debug")
     const test = new DepthShading();
-    console.log(test.getProgramConfig());
+    // console.log(test.getProgramConfig());
   }
 }
 </script>

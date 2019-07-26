@@ -1,7 +1,7 @@
 import { Vector3 } from '../../../src/math';
 import { SceneNode } from '../../../src/scene/scene-node';
 import { Scene } from '../../../src/scene/scene';
-import { Mesh, OBJLoader, NormalShading, Geometry, Material, Technique } from '../../../src/artgl';
+import { Mesh, OBJLoader, NormalShading, Geometry, Material, Shading } from '../../../src/artgl';
 import { loadStringFromFile } from '../../../src/util/file-io';
 
  
@@ -119,7 +119,7 @@ export class SceneView{
     const geo = objLoader.parse(objstr);
     const mesh = new Mesh();
     mesh.geometry = geo;
-    mesh.technique = new Technique(new NormalShading());
+    mesh.shading = new Shading().decorate(new NormalShading());
     node.addChild(mesh);
   }
 }

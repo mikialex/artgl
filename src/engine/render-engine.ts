@@ -5,7 +5,6 @@ import { Matrix4 } from "../math/matrix4";
 import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
-import { Technique } from "../core/technique";
 import { DrawMode } from "../webgl/const";
 import { Material } from "../core/material";
 import { GLTextureUniform } from "../webgl/uniform/uniform-texture";
@@ -21,7 +20,7 @@ import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/vao";
 import { Vector4 } from "../math/vector4";
-import { Shading } from "../core/shading";
+import { Shading, ShaderUniformProvider } from "../core/shading";
 
 export interface RenderSource{
   resetSource(): void;
@@ -47,7 +46,7 @@ export interface Size{
 }
 
 
-const copyTechnique = new Technique(new CopyShading());
+const copyShading = new Shading().decorate(new CopyShading());
 const quad = new QuadSource();
 
 export class RenderEngine implements GLReleasable{
@@ -101,8 +100,8 @@ export class RenderEngine implements GLReleasable{
   }
 
 
-  public overrideTechnique: Nullable<Technique> = null;
-  public defaultTechnique: Technique = new Technique(new NormalShading());
+  public overrideShading: Nullable<Shading> = null;
+  public defaultTechnique: Shading = new Shading().decorate(new NormalShading());
 
   ////
 
@@ -193,7 +192,7 @@ export class RenderEngine implements GLReleasable{
   renderObject(object: RenderObject) {
 
     // prepare technique
-    const program = this.connectTechnique(object);
+    const program = this.connectShading(object);
 
     // prepare material
     this.connectMaterial(object.material, program);
@@ -216,12 +215,12 @@ export class RenderEngine implements GLReleasable{
       debugViewPort.z, debugViewPort.w
     );
 
-    this.overrideTechnique = copyTechnique;
-    this.overrideTechnique.shading.getProgram(this).defineFrameBufferTextureDep(
+    this.overrideShading = copyShading;
+    this.overrideShading.getProgram(this).defineFrameBufferTextureDep(
       framebuffer.name, 'copySource'
     );
     this.render(quad);
-    this.overrideTechnique = null;
+    this.overrideShading = null;
   }
   ////
 
@@ -231,7 +230,6 @@ export class RenderEngine implements GLReleasable{
   //// low level resource binding
 
   /**
-   *
    * GlobalUniforms is store useful inner support uniforms
    * Engine will update these values and auto bind them to
    * program that you will draw as needed
@@ -244,26 +242,48 @@ export class RenderEngine implements GLReleasable{
   getGlobalUniform(uniform: InnerSupportUniform): UniformProxy {
     return this.globalUniforms.get(uniform) as UniformProxy 
   }
-  private connectTechnique(object: RenderObject): GLProgram {
-    let technique: Technique;
-    if (this.overrideTechnique !== null) {
-      technique = this.overrideTechnique;
-    } else if (object.technique !== undefined) {
-      technique = object.technique;
+
+  private lastUploadedShaderUniformProvider: Set<ShaderUniformProvider> = new Set();
+  private lastProgramRendered: GLProgram;
+
+
+  private connectShading(object: RenderObject): GLProgram {
+
+    // // get shading, check override, default situation
+    let shading: Shading;
+    if (this.overrideShading !== null) {
+      shading = this.overrideShading;
+    } else if (object.shading !== undefined) {
+      shading = object.shading;
     } else {
-      technique = this.defaultTechnique;
+      shading = this.defaultTechnique;
     }
-    const program = technique.shading.getProgram(this);
+
+    // get program, refresh provider cache if changed
+    const program = shading.getProgram(this);
+    if (this.lastProgramRendered !== program) {
+      this.lastUploadedShaderUniformProvider.clear();
+    }
+
     this.renderer.useProgram(program);
+
     this.getGlobalUniform(InnerSupportUniform.MMatrix).setValue(object.worldMatrix);
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
-    technique.uniforms.forEach((uni, key) => {
-      // if (uni._needUpdate) {
-      // TODO optimize
-        program.setUniform(key, uni.value);
-        uni.resetUpdate();
-      // }
+
+    shading.uniformProvider.forEach(provider => {
+      if (this.lastUploadedShaderUniformProvider.has(provider)
+        && !provider.hasAnyUniformChanged 
+      ) {
+        // if we found this uniform provider has updated before and not changed, we can skip!
+        return;
+      }
+      provider.uniforms.forEach((value, key) => {
+        program.setUniform(key, value);
+      })
+      provider.hasAnyUniformChanged = false;
+      this.lastUploadedShaderUniformProvider.add(provider);
     })
+
     return program;
   }
 

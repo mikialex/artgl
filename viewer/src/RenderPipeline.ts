@@ -1,6 +1,7 @@
 import {
-  RenderGraph, Technique, TAAShading,
-  TSSAOShading, TSSAOBlendShading, Matrix4, InnerSupportUniform, DepthShading, Scene, RenderEngine
+  RenderGraph, TAAShading,
+  TSSAOShading, TSSAOBlendShading, Matrix4,
+  InnerSupportUniform, DepthShading, Scene, RenderEngine, Shading
 } from "../../src/artgl";
 
 export class RenderPipeline{
@@ -8,13 +9,16 @@ export class RenderPipeline{
   graph: RenderGraph = new RenderGraph();
 
   enableTAA = true;
-  taaTech: Technique = new Technique(new TAAShading());
+  taaShading = new TAAShading()
+  taaShader: Shading = new Shading().decorate(this.taaShading);
 
   enableTSSAO = true;
-  tssaoTech: Technique = new Technique(new TSSAOShading());
+  tssaoShading = new TSSAOShading();
+  tssaoShader: Shading = new Shading().decorate(this.tssaoShading);
 
-  composeTech: Technique = new Technique(new TSSAOBlendShading());
-  depthTech = new Technique(new DepthShading());
+  composeShading = new TSSAOBlendShading()
+  composeShader: Shading = new Shading().decorate(this.composeShading);
+  depthShader = new Shading().decorate(new DepthShading());
 
   sampleCount: number = 0;
 
@@ -80,7 +84,7 @@ export class RenderPipeline{
         },
         { // depth
           name: "Depth",
-          technique: this.depthTech,
+          shading: this.depthShader,
           source: [scene],
         },
         { // mix new render and old samples
@@ -92,16 +96,14 @@ export class RenderPipeline{
               TAAHistoryOld: this.isEvenTick ? "TAAHistoryA" : "TAAHistoryB",
             }
           },
-          technique: this.taaTech,
+          shading: this.taaShader,
           source: [RenderGraph.quadSource],
           enableColorClear: false,
           beforePassExecute: () => {
             engine.unJit();
-            const VPInv: Matrix4 = this.taaTech.uniforms.get('VPMatrixInverse').value;
             const VP: Matrix4 = engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
-            VPInv.getInverse(VP, true);
-            this.taaTech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
-            this.taaTech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
+            this.taaShading.VPMatrixInverse = this.taaShading.VPMatrixInverse.getInverse(VP, true); // TODO maybe add watch
+            this.taaShading.sampleCount = this.sampleCount;
           },
         },
         {
@@ -112,15 +114,13 @@ export class RenderPipeline{
               AOAcc: this.isEvenTick ? "TSSAOHistoryA" : "TSSAOHistoryB",
             }
           },
-          technique: this.tssaoTech,
+          shading: this.tssaoShader,
           source: [RenderGraph.quadSource],
           enableColorClear: false,
           beforePassExecute: () => {
-            const VPInv: Matrix4 = this.tssaoTech.uniforms.get('VPMatrixInverse').value;
             const VP: Matrix4 = engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
-            VPInv.getInverse(VP, true);
-            this.tssaoTech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
-            this.tssaoTech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
+            this.tssaoShading.VPMatrixInverse = this.tssaoShading.VPMatrixInverse.getInverse(VP, true);
+            this.tssaoShading.sampleCount = this.sampleCount;
           },
         },
         { // copy to screen
@@ -142,12 +142,12 @@ export class RenderPipeline{
             return { basic, tssao }
           },
           beforePassExecute: () => {
-            this.composeTech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
+            this.composeShading.sampleCount = this.sampleCount;
           },
           afterPassExecute: () => {
-            this.sampleCount++;
+            this.sampleCount++;``
           },
-          technique: this.composeTech,
+          shading: this.composeShader,
           source: [RenderGraph.quadSource],
         },
       ]

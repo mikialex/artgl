@@ -1,14 +1,13 @@
-import { Shading } from "../../core/shading";
-import { GLDataType } from "../../webgl/shader-util";
+import { MapUniform, BaseEffectShading } from "../../core/shading";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
-import { uniform, texture, innerUniform, screenQuad } from "../../shader-graph/node-maker";
+import { texture, innerUniform, screenQuad } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
 import { dir3D } from "../../shader-graph/built-in/transform";
 import { getWorldPosition, NDCxyToUV } from "../../shader-graph/built-in/transform";
 import { Matrix4 } from "../../math/index";
 import { rand2DT, rand } from "../../shader-graph/built-in/rand";
-import { UvFragVary } from '../../shader-graph/shader-graph';
+import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
 
 const newSamplePosition = new ShaderFunction({
   source: `
@@ -48,23 +47,33 @@ const tssaoMix = new ShaderFunction({
   `
 })
 
-export class TSSAOShading extends Shading {
-  update() {
+export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
+  
+  @MapUniform("u_sampleCount")
+  sampleCount: number = 0;
+
+  @MapUniform("VPMatrixInverse")
+  VPMatrixInverse: Matrix4 = new Matrix4()
+
+  @MapUniform("u_aoRadius")
+  aoRadius: number = 1
+
+  decorate(graph: ShaderGraph) {
     const VPMatrix = innerUniform(InnerSupportUniform.VPMatrix);
-    const sampleCount = uniform("u_sampleCount", GLDataType.float).default(0);
+    const sampleCount = this.getPropertyUniform("sampleCount");
     const depthTex = texture("depthResult");
-    this.graph.reset()
+    graph
       .setVertexRoot(screenQuad())
       .declareFragUV()
 
-    const vUV = this.graph.getVary(UvFragVary);
+    const vUV = graph.getVary(UvFragVary);
     const depth = unPackDepth.make().input("enc", depthTex.fetch(vUV))
 
     const worldPosition = getWorldPosition.make()
       .input("uv", vUV)
       .input("depth", depth)
       .input("VPMatrix", VPMatrix)
-      .input("VPMatrixInverse", uniform("VPMatrixInverse", GLDataType.Mat4).default(new Matrix4()))
+      .input("VPMatrixInverse", this.getPropertyUniform("VPMatrixInverse"))
 
     const Random2D1 = rand2DT.make()
       .input("cood", vUV)
@@ -79,7 +88,7 @@ export class TSSAOShading extends Shading {
 
     const newPositionRand = newSamplePosition.make()
       .input("positionOld", worldPosition.swizzling("xyz"))
-      .input("distance", uniform("u_aoRadius", GLDataType.float).default(1))
+      .input("distance", this.getPropertyUniform("aoRadius"))
       .input("dir", randDir)
 
     const newDepth = unPackDepth.make()
@@ -97,7 +106,7 @@ export class TSSAOShading extends Shading {
         )
       )
 
-    this.graph.setFragmentRoot(
+    graph.setFragmentRoot(
       tssaoMix.make()
         .input("oldColor", texture("AOAcc").fetch(vUV).swizzling("xyz"))
         .input("newColor",

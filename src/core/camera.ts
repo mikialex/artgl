@@ -3,6 +3,9 @@ import { Matrix4 } from "../math/index";
 import { RenderEngine, Size } from '../engine/render-engine';
 import { Observer } from './observable';
 import { Nullable } from '../type';
+import { ShaderUniformProvider } from "./shading";
+import { ShaderGraph } from "../shader-graph/shader-graph";
+import { UniformProxy } from "../engine/uniform-proxy";
 
 /**
  * Camera is abstraction of a params set to a projection matrix.
@@ -14,7 +17,7 @@ import { Nullable } from '../type';
  * @class Camera
  * @extends {SceneNode}
  */
-export class Camera extends SceneNode{
+export class Camera extends SceneNode {
   constructor() {
     super();
   }

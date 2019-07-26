@@ -125,6 +125,7 @@ function svf(value: number) {
 }
 
 export type ShaderConstType = number | Vector2 | Vector3 | Vector4;
+
 export class ShaderConstNode extends ShaderNode {
   constructor(value: ShaderConstType) {
     if (typeof value === "number") {
