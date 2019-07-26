@@ -9,7 +9,7 @@ import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
 import { GLDataType } from '../webgl/shader-util';
 import { Vector2 } from '../math/vector2';
 import { Vector4 } from '../math/vector4';
-import { uniform } from '../shader-graph/node-maker';
+import { uniform, uniformFromValue } from '../shader-graph/node-maker';
 
 export interface ShaderUniformProvider{
 
@@ -19,6 +19,7 @@ export interface ShaderUniformProvider{
   decorate(graph: ShaderGraph): void;
   hasAnyUniformChanged: boolean;
   uniforms: Map<string, any>;
+  propertyUniformNameMap: Map<string, string>;
 }
 
 export class Shading {
@@ -72,8 +73,8 @@ export class Shading {
 
 
 
-export function MapUniform<T>(remapName: string) {
-  return (target: BaseEffectShading<T>, key: string) => {
+export function MapUniform(remapName: string) {
+  return (target: ShaderUniformProvider, key: string) => {
     if (target.uniforms === undefined) {
       target.uniforms = new Map();
     }
@@ -81,11 +82,11 @@ export function MapUniform<T>(remapName: string) {
       target.propertyUniformNameMap = new Map();
     }
 
-    let val: T = target[key];
+    let val = target[key];
     const getter = () => {
       return val;
     };
-    const setter = (value: T) => {
+    const setter = (value) => {
       target.uniforms.set(remapName, value);
       target.hasAnyUniformChanged = true;
       val = value;
@@ -125,18 +126,58 @@ export abstract class BaseEffectShading<T> implements ShaderUniformProvider{
     if (value === undefined) {
       throw "uniform value not given"
     }
-    if (typeof value === "number") {
-      return uniform(uniformName, GLDataType.float).default(value);
-    } else if (value instanceof Vector2) {
-      return uniform(uniformName, GLDataType.floatVec2).default(value);
-    } else if (value instanceof Vector3) {
-      return uniform(uniformName, GLDataType.floatVec3).default(value);
-    } else if (value instanceof Vector4) {
-      return uniform(uniformName, GLDataType.floatVec4).default(value);
-    } else if (value instanceof Matrix4) {
-      return uniform(uniformName, GLDataType.Mat4).default(value);
-    } else {
-      throw "un support uniform value"
-    }
+    return uniformFromValue(uniformName, value);
   }
 }
+
+
+// type Constructor<T = SceneNode> = new (...args: any[]) => T;
+// type ConstructorTypeOf<T> = new (...args:any[]) => T;
+
+// export function ShaderUniformSceneNodeProvidable<T extends Constructor>(_target: T)
+//   : ConstructorTypeOf<SceneNode & BaseEffectShading<T>>
+// {
+//   return class <K> extends SceneNode implements ShaderUniformProvider{
+//     constructor() {
+//       super();
+//       // need check if has initialized by decorator
+//       if (this.uniforms === undefined) {
+//         this.uniforms = new Map();
+//       }
+//       if (this.propertyUniformNameMap === undefined) {
+//         this.propertyUniformNameMap = new Map();
+//       }
+//     }
+    
+//     decorate(_graph: ShaderGraph): void {
+//       throw new Error("Method not implemented.");
+//     }
+
+//     hasAnyUniformChanged: boolean;
+
+//     propertyUniformNameMap: Map<string, string>;
+
+//     uniforms: Map<string, any>;
+
+//     getPropertyUniform(name: keyof K): ShaderCommonUniformInputNode {
+//       const uniformName = this.propertyUniformNameMap.get(name as string);
+//       const value = this[name as string];
+//       if (value === undefined) {
+//         throw "uniform value not given"
+//       }
+//       if (typeof value === "number") {
+//         return uniform(uniformName, GLDataType.float).default(value);
+//       } else if (value instanceof Vector2) {
+//         return uniform(uniformName, GLDataType.floatVec2).default(value);
+//       } else if (value instanceof Vector3) {
+//         return uniform(uniformName, GLDataType.floatVec3).default(value);
+//       } else if (value instanceof Vector4) {
+//         return uniform(uniformName, GLDataType.floatVec4).default(value);
+//       } else if (value instanceof Matrix4) {
+//         return uniform(uniformName, GLDataType.Mat4).default(value);
+//       } else {
+//         throw "un support uniform value"
+//       }
+//     }
+//   };
+// }

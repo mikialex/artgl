@@ -1,11 +1,7 @@
 import { SceneNode } from "./scene-node";
 import { RenderObject } from "../core/render-object";
-import { Light } from "../core/light";
-import { Camera } from "../core/camera";
-import { Nullable } from "../type";
 import { RenderSource } from "../engine/render-engine";
 import { RenderList } from "../engine/render-list";
-import { Mesh } from "../object/mesh";
 import { GeometryLoader } from "../core/loader";
 
 /**

@@ -271,8 +271,10 @@ export class RenderEngine implements GLReleasable{
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
 
     shading.uniformProvider.forEach(provider => {
-      if (this.lastUploadedShaderUniformProvider.has(provider)) {
-        // if we found this uniform provider has updated before, we can skip!
+      if (this.lastUploadedShaderUniformProvider.has(provider)
+        && !provider.hasAnyUniformChanged 
+      ) {
+        // if we found this uniform provider has updated before and not changed, we can skip!
         return;
       }
       provider.uniforms.forEach((value, key) => {

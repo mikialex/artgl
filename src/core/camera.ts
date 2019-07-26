@@ -17,7 +17,7 @@ import { UniformProxy } from "../engine/uniform-proxy";
  * @class Camera
  * @extends {SceneNode}
  */
-export class Camera extends SceneNode implements ShaderUniformProvider {
+export class Camera extends SceneNode {
   constructor() {
     super();
   }
@@ -28,14 +28,6 @@ export class Camera extends SceneNode implements ShaderUniformProvider {
   onRenderResize(newSize: Size) {
     
   }
-
-  hasAnyUniformChanged: boolean = false;
-
-  decorate(graph: ShaderGraph): void {
-    throw new Error("Method not implemented.");
-  }
-
-  uniforms: Map<string, UniformProxy> = new Map();
 
   private renderSizeObserver: Nullable<Observer<Size>> = null;
   bindEngineRenderSize(engine: RenderEngine) {

@@ -3,7 +3,10 @@ import { ShaderAttributeInputNode, ShaderCommonUniformInputNode, ShaderInnerUnif
 import { GLDataType } from "../webgl/shader-util";
 import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
 import { GLTextureType } from "../webgl/uniform/uniform-texture";
-import { MVPTransform, VPTransform, MTransform } from "./built-in/transform";
+import { VPTransform, MTransform } from "./built-in/transform";
+import { Vector2 } from "../math/vector2";
+import { Vector3, Matrix4 } from "../math";
+import { Vector4 } from "../math/vector4";
 
 // TODO simplify it
 export function attribute(att: AttributeDescriptor) {
@@ -19,6 +22,22 @@ export function uniform(name: string, type: GLDataType) {
   return new ShaderCommonUniformInputNode({
     name, type
   })
+}
+
+export function uniformFromValue(name: string, value: any) {
+  if (typeof value === "number") {
+    return uniform(name, GLDataType.float).default(value);
+  } else if (value instanceof Vector2) {
+    return uniform(name, GLDataType.floatVec2).default(value);
+  } else if (value instanceof Vector3) {
+    return uniform(name, GLDataType.floatVec3).default(value);
+  } else if (value instanceof Vector4) {
+    return uniform(name, GLDataType.floatVec4).default(value);
+  } else if (value instanceof Matrix4) {
+    return uniform(name, GLDataType.Mat4).default(value);
+  } else {
+    throw "un support uniform value"
+  }
 }
 
 export function innerUniform(type: InnerSupportUniform) {
