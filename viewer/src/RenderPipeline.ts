@@ -101,11 +101,9 @@ export class RenderPipeline{
           enableColorClear: false,
           beforePassExecute: () => {
             engine.unJit();
-            const VPInv: Matrix4 = this.taaShading.uniforms.get('VPMatrixInverse').value;
             const VP: Matrix4 = engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
-            VPInv.getInverse(VP, true);
-            this.taaShading.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
-            this.taaShading.uniforms.get('u_sampleCount').setValue(this.sampleCount);
+            this.taaShading.VPMatrixInverse = this.taaShading.VPMatrixInverse.getInverse(VP, true); // TODO maybe add watch
+            this.taaShading.sampleCount = this.sampleCount;
           },
         },
         {
@@ -120,11 +118,9 @@ export class RenderPipeline{
           source: [RenderGraph.quadSource],
           enableColorClear: false,
           beforePassExecute: () => {
-            const VPInv: Matrix4 = this.tssaoShading.uniforms.get('VPMatrixInverse').value;
             const VP: Matrix4 = engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
-            VPInv.getInverse(VP, true);
-            this.tssaoShading.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
-            this.tssaoShading.uniforms.get('u_sampleCount').setValue(this.sampleCount);
+            this.tssaoShading.VPMatrixInverse = this.tssaoShading.VPMatrixInverse.getInverse(VP, true);
+            this.tssaoShading.sampleCount = this.sampleCount;
           },
         },
         { // copy to screen
@@ -146,10 +142,10 @@ export class RenderPipeline{
             return { basic, tssao }
           },
           beforePassExecute: () => {
-            this.composeShading.uniforms.get('u_sampleCount').setValue(this.sampleCount);
+            this.composeShading.sampleCount = this.sampleCount;
           },
           afterPassExecute: () => {
-            this.sampleCount++;
+            this.sampleCount++;``
           },
           shading: this.composeShader,
           source: [RenderGraph.quadSource],

@@ -1,13 +1,7 @@
-import { ShaderUniformProvider } from "../../core/shading";
-import { GLDataType } from "../../webgl/shader-util";
+import { BaseEffectShading, MapUniform } from "../../core/shading";
 import { ShaderFunction } from "../../shader-graph/shader-function";
-import { texture, uniform, screenQuad } from "../../shader-graph/node-maker";
+import { texture, screenQuad } from "../../shader-graph/node-maker";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
-import { ShaderCommonUniformInputNode } from '../../shader-graph/shader-node';
-import { Vector2 } from '../../math/vector2';
-import { Vector3, Matrix4 } from '../../math';
-import { Vector4 } from '../../math/vector4';
-
 
 const tssaoBlend = new ShaderFunction({
   source: `
@@ -26,62 +20,7 @@ const tssaoBlend = new ShaderFunction({
   `
 })
 
-
-function MapUniform<T>(remapName: string) {
-  return (target: BaseEffectShading<T>, key: string) => {
-    let val: T = target[key];
-    const getter = () => {
-      return val;
-    };
-    const setter = (value: T) => {
-      target.uniforms.set(remapName, value);
-      val = value;
-    };
-
-    target.propertyUniformNameMap.set(key, remapName);
-
-    Object.defineProperty(target, key, {
-      get: getter,
-      set: setter,
-      enumerable: true,
-      configurable: true,
-    });
-  };
-}
-
-abstract class BaseEffectShading<T> implements ShaderUniformProvider{
-
-  providerName: string;
-
-  abstract decorate(graph: ShaderGraph): void;
-
-  propertyUniformNameMap: Map<string, string> = new Map();
-  uniforms: Map<string, any> = new Map();
-
-  getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
-    const uniformName = this.propertyUniformNameMap.get(name as string);
-    const value = this[name as string];
-    if (value === undefined) {
-      throw "uniform value not given"
-    }
-    if (typeof value === "number") {
-      return uniform(uniformName, GLDataType.float).default(value);
-    } else if (value instanceof Vector2) {
-      return uniform(uniformName, GLDataType.floatVec2).default(value);
-    } else if (value instanceof Vector3) {
-      return uniform(uniformName, GLDataType.floatVec3).default(value);
-    } else if (value instanceof Vector4) {
-      return uniform(uniformName, GLDataType.floatVec4).default(value);
-    } else if (value instanceof Matrix4) {
-      return uniform(uniformName, GLDataType.Mat4).default(value);
-    } else {
-      throw "un support uniform value"
-    }
-  }
-}
-
 export class TSSAOBlendShading extends BaseEffectShading<TSSAOBlendShading> {
-  providerName: "TSSAOBlendShading"
 
   @MapUniform("u_sampleCount")
   sampleCount: number = 0;

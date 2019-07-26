@@ -1,10 +1,8 @@
-import { ShaderUniformProvider } from "../../core/shading";
+import { BaseEffectShading } from "../../core/shading";
 import { texture, screenQuad } from "../../shader-graph/node-maker";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
 
-export class CopyShading implements ShaderUniformProvider {
-
-  providerName: "CopyShading"
+export class CopyShading extends BaseEffectShading<CopyShading> {
 
   decorate(graph: ShaderGraph) {
     graph
@@ -15,5 +13,4 @@ export class CopyShading implements ShaderUniformProvider {
       )
   }
 
-  uniforms = new Map()
 }

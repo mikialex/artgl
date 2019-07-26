@@ -1,9 +1,8 @@
-import { ShaderUniformProvider } from "../../core/shading";
-import { GLDataType } from "../../webgl/shader-util";
+import { BaseEffectShading, MapUniform } from "../../core/shading";
 import { Matrix4 } from "../../math/matrix4";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 import { ShaderFunction } from "../../shader-graph/shader-function";
-import { texture, uniform, innerUniform, screenQuad } from "../../shader-graph/node-maker";
+import { texture, innerUniform, screenQuad } from "../../shader-graph/node-maker";
 import { NDCxyToUV, getLastPixelNDC, UVDepthToNDC } from "../../shader-graph/built-in/transform";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
@@ -30,11 +29,13 @@ const TAAMix = new ShaderFunction({
     `
 })
 
-export class TAAShading implements ShaderUniformProvider {
+export class TAAShading extends BaseEffectShading<TAAShading> {
 
-  providerName: "TAAShading"
-  uniforms = new Map()
+  @MapUniform("VPMatrixInverse")
+  VPMatrixInverse: Matrix4 = new Matrix4()
 
+  @MapUniform("u_sampleCount")
+  sampleCount: number = 0;
 
   decorate(graph: ShaderGraph) {
     graph
@@ -52,7 +53,7 @@ export class TAAShading implements ShaderUniformProvider {
               .input("depth", depth)
               .input("uv", graph.getVary(UvFragVary))
           )
-          .input("VPMatrixInverse", uniform("VPMatrixInverse", GLDataType.Mat4).default(new Matrix4()))
+          .input("VPMatrixInverse", this.getPropertyUniform("VPMatrixInverse"))
           .input("LastVPMatrix", innerUniform(InnerSupportUniform.LastVPMatrix))
       )
     )
@@ -61,7 +62,7 @@ export class TAAShading implements ShaderUniformProvider {
       TAAMix.make()
         .input("oldColor", colorOld.swizzling("xyz"))
         .input("newColor", texture("sceneResult").fetch(vUV).swizzling("xyz"))
-        .input("sampleCount", uniform("u_sampleCount", GLDataType.float).default(0))
+        .input("sampleCount", this.getPropertyUniform("sampleCount"))
     )
 
   }

@@ -1,7 +1,8 @@
-import { ShaderUniformProvider } from "../../core/shading";
+import { BaseEffectShading } from "../../core/shading";
 import { MVPWorld } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { NormalFragVary, ShaderGraph } from "../../shader-graph/shader-graph";
+import { DepthShading } from './depth';
 
 
 const normalShading = new ShaderFunction({
@@ -11,7 +12,7 @@ const normalShading = new ShaderFunction({
     }`
 })
 
-export class NormalShading implements ShaderUniformProvider {
+export class NormalShading extends BaseEffectShading<DepthShading> {
 
   decorate(graph: ShaderGraph): void {
     graph
@@ -21,9 +22,5 @@ export class NormalShading implements ShaderUniformProvider {
         normalShading.make().input("normal", graph.getVary(NormalFragVary))
       )
   }
-
-  uniforms = new Map();
-
-  providerName = "NormalShading"
 
 }

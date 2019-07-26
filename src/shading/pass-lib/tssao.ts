@@ -1,7 +1,6 @@
-import { ShaderUniformProvider } from "../../core/shading";
-import { GLDataType } from "../../webgl/shader-util";
+import { MapUniform, BaseEffectShading } from "../../core/shading";
 import { InnerSupportUniform } from "../../webgl/uniform/uniform";
-import { uniform, texture, innerUniform, screenQuad } from "../../shader-graph/node-maker";
+import { texture, innerUniform, screenQuad } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
 import { dir3D } from "../../shader-graph/built-in/transform";
@@ -48,13 +47,20 @@ const tssaoMix = new ShaderFunction({
   `
 })
 
-export class TSSAOShading implements ShaderUniformProvider {
-  providerName: "TSSAOShading"
-  uniforms = new Map()
+export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
+  
+  @MapUniform("u_sampleCount")
+  sampleCount: number = 0;
+
+  @MapUniform("VPMatrixInverse")
+  VPMatrixInverse: Matrix4 = new Matrix4()
+
+  @MapUniform("u_aoRadius")
+  aoRadius: number = 1
 
   decorate(graph: ShaderGraph) {
     const VPMatrix = innerUniform(InnerSupportUniform.VPMatrix);
-    const sampleCount = uniform("u_sampleCount", GLDataType.float).default(0);
+    const sampleCount = this.getPropertyUniform("sampleCount");
     const depthTex = texture("depthResult");
     graph
       .setVertexRoot(screenQuad())
@@ -67,7 +73,7 @@ export class TSSAOShading implements ShaderUniformProvider {
       .input("uv", vUV)
       .input("depth", depth)
       .input("VPMatrix", VPMatrix)
-      .input("VPMatrixInverse", uniform("VPMatrixInverse", GLDataType.Mat4).default(new Matrix4()))
+      .input("VPMatrixInverse", this.getPropertyUniform("VPMatrixInverse"))
 
     const Random2D1 = rand2DT.make()
       .input("cood", vUV)
@@ -82,7 +88,7 @@ export class TSSAOShading implements ShaderUniformProvider {
 
     const newPositionRand = newSamplePosition.make()
       .input("positionOld", worldPosition.swizzling("xyz"))
-      .input("distance", uniform("u_aoRadius", GLDataType.float).default(1))
+      .input("distance", this.getPropertyUniform("aoRadius"))
       .input("dir", randDir)
 
     const newDepth = unPackDepth.make()

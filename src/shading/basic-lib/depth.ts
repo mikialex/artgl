@@ -1,4 +1,4 @@
-import { ShaderUniformProvider } from "../../core/shading";
+import { BaseEffectShading } from "../../core/shading";
 import { MVPWorld } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { depthPack } from "../../shader-graph/built-in/depth-pack";
@@ -14,7 +14,7 @@ const depthV = new ShaderFunction(
     `}
 )
 
-export class DepthShading implements ShaderUniformProvider {
+export class DepthShading extends BaseEffectShading<DepthShading> {
 
   decorate(graph: ShaderGraph): void {
     const worldPosition = MVPWorld()
@@ -24,9 +24,5 @@ export class DepthShading implements ShaderUniformProvider {
         depthPack.make().input("frag_depth", graph.getVary("depth"))
       )
   }
-
-  uniforms = new Map();
-
-  providerName = "drawDepth"
 
 }
