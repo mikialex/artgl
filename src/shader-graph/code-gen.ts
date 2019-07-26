@@ -44,6 +44,7 @@ export function genVertexShader(graph: ShaderGraph): string {
   const vertexResult = codeGenGraph(nodeDependList, "gl_Position", evaluatedNode)
   pushListToMap(evaluatedNode, vertexResult.varList)
   builder.writeBlock(vertexResult.code)
+  builder.writeLine("gl_PointSize = 5.0;") // TODO
   builder.emptyLine()
 
   graph.varyings.forEach((varyNode, key) => {

@@ -44,8 +44,8 @@ export default class ConfigPanel extends Vue {
 <style lang="scss" scoped>
 
 canvas{
-  width: 500px;
-  height: 400px;
+  width: 800px;
+  height: 600px;
   border: 1px solid #aaa;
 }
 </style>

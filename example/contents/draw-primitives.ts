@@ -1,5 +1,6 @@
 import * as ARTGL from '../../src/artgl'
 import { TestBridge } from './test-bridge';
+import { Vector3 } from '../../src/artgl';
 
 export default async function test(testBridge: TestBridge) {
 
@@ -19,14 +20,17 @@ export default async function test(testBridge: TestBridge) {
   line.geometry = geometry;
   points.geometry = geometry;
 
-  line.transform.position.x = -10;
-  points.transform.position.x = 10;
+  line.transform.position.x = -5;
+  points.transform.position.x = 5;
 
   scene.root.addChild(mesh);
   scene.root.addChild(line);
   scene.root.addChild(points);
 
-  engine.camera.transform.position.set(10, 10, 10);
+  const camera = engine.camera as ARTGL.PerspectiveCamera;
+  camera.transform.position.set(0, 0, 15);
+  camera.lookAt(new Vector3(0,0,0))
+
   engine.connectCamera();
 
   engine.renderer.state.colorbuffer.setClearColor(new ARTGL.Vector4(0.9, 0.9, 0.9, 1.0))

@@ -45,7 +45,7 @@ export class Application {
     this.engine = null;
     this.pipeline = null;
     this.framer.stop();
-    this.framer = null;
+    this.framer.setFrame(null);
     this.el = null;
   }
 
