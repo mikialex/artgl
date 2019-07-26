@@ -3,9 +3,7 @@ module.exports = {
   verbose: true,
   preset: 'ts-jest',
   testEnvironment: 'node',
-  modulePaths: [
-    "<rootDir>/src/"
-  ],
+  roots: ["<rootDir>/src/"],
   collectCoverage: true,
   coverageReporters: [
     "html"
