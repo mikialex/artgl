@@ -44,8 +44,7 @@ export default async function test(testBridge: TestBridge) {
 
   //==<
 
-  // await testBridge.screenShot();
-  // await testBridge.testOver();
+  await testBridge.screenShotCompareElement(canvas, "test");
 
 
   const interactor = new ARTGL.Interactor(canvas);

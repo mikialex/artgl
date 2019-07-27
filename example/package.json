@@ -8,6 +8,9 @@
   "author": "mikialex",
   "license": "MIT",
   "dependencies": {
-    "puppeteer": "^1.18.1"
+    "puppeteer": "^1.18.1",
+    "static-server": "^2.2.1",
+    "ts-loader": "^6.0.4",
+    "webpack": "^4.38.0"
   }
 }

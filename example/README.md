@@ -6,7 +6,7 @@
 
 ## 执行自动化测试的流程
 
-contents 目录下每一个 ts 文件， 默认导出一个 async function， 这个 function 中完成相关功能测试，function运行结束后，一般会留下能让用户继续进行交互的 demo 继续运行。
+contents 目录下每一个 ts 文件， 默认导出一个 async function， 这个 function 中完成相关功能测试，function执行结束后，一般会留下能让用户继续进行交互的 demo 继续运行。function 接受 一个 testBridge 的参数， 由测试框架负责提供，此对象实现 bridge 接口，测试逻辑可以调用上面的方法和测试框架通信，或者提交渲染循环逻辑，以支持测试完成后，依然可以提供一个可交互的demo。
 
 第一步：测试系统会收集这些测试文件，自动生成一个汇集这些 function 的 ts 入口文件，并且以此文件进行 webpack 打包。 生成的js package 会注入到 template 目录下的 html中。 
 
@@ -15,6 +15,8 @@ contents 目录下每一个 ts 文件， 默认导出一个 async function， �
 第三步： foreach 测试 function， 启动一个 puppeteer headless 浏览器，执行测试function，完成基本的测试。
 
 第四步： 生成相应的测试报告。
+
+contents下的测试，可以在viewer的 example中直接浏览和调试。
 
 ## 如何编写带有 markdown 注释的ts文件
 
