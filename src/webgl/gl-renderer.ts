@@ -60,7 +60,7 @@ export class GLRenderer implements GLReleasable{
     this._height = height;
     this.el.width = this._width;
     this.el.height = this._height;
-    this.state.setViewport(0, 0, width * this.devicePixelRatio, height * this.devicePixelRatio);
+    this.state.setViewport(0, 0, width, height);
     return isChanged;
   }
 

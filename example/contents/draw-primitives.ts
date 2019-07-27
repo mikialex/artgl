@@ -8,6 +8,7 @@ export default async function test(testBridge: TestBridge) {
 
   let canvas = document.querySelector('canvas');
   const engine = new ARTGL.RenderEngine(canvas);
+
   const scene = new ARTGL.Scene();
 
   const geometry = new ARTGL.SphereGeometry();
@@ -31,14 +32,28 @@ export default async function test(testBridge: TestBridge) {
   camera.transform.position.set(0, 0, 15);
   camera.lookAt(new Vector3(0,0,0))
 
-  engine.connectCamera();
+  function draw() {
+    engine.connectCamera();
+    engine.renderer.state.colorbuffer.setClearColor(new ARTGL.Vector4(0.9, 0.9, 0.9, 1.0))
+    engine.renderer.state.colorbuffer.clear()
+    engine.render(scene);
+  }
 
-  engine.renderer.state.colorbuffer.setClearColor(new ARTGL.Vector4(0.9, 0.9, 0.9, 1.0))
-  engine.renderer.state.colorbuffer.clear()
-  engine.render(scene);
+  draw();
+
 
   //==<
 
   // await testBridge.screenShot();
   // await testBridge.testOver();
+
+
+  const interactor = new ARTGL.Interactor(canvas);
+  const orbitController = new ARTGL.OrbitController(camera as ARTGL.PerspectiveCamera);
+  orbitController.registerInteractor(interactor);
+
+  testBridge.framer.setFrame(() => {
+    orbitController.update();
+    draw();
+  })
 }
