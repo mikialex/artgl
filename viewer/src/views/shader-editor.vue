@@ -1,13 +1,23 @@
 <template>
   <div class="shader-graph">
     <div class="editor">
-      <GraphViewer v-if="graphView" :graphview="graphView"/>
+      <div>
+        <button @click="addUniform">uniform</button>
+        <button>attribute</button>
+      </div>
+      <DAGNodeView
+      v-for="node in nodes"
+      :key="node.uuid"
+      :node ="node"
+      >
+        test
+      </DAGNodeView>
     </div>
 
     <div class="viewer">
       <h1>viewer</h1>
       <button v-if="showCode" @click="showCode = false">canvas</button>
-      <button v-else  @click="codeGen">codegen result</button>
+      <button v-else  @click="codeGen">view generated code </button>
       <button @click="updateTechnique">updateTechnique</button>
       <div v-show="showCode" class="code-result">
         <pre>{{codeGenResult}}</pre>
@@ -24,31 +34,39 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import GraphViewer from '../components/graph-viewer/graph-viewer.vue';
-import { GraphView } from '../model/graph-view';
 import {ShaderApp} from '../shader-application';
-import { injectFragmentShaderHeaders } from '../../../src/webgl/shader-util';
+import { injectFragmentShaderHeaders, GLDataType } from '../../../src/webgl/shader-util';
+import { ShaderGraph, uniform } from '../../../src/artgl';
+import DAGNodeView from '../components/graph/dag-node.vue';
+import { ShaderNode } from '../../../src/shader-graph/shader-node';
 
 @Component({
   components:{
-    GraphViewer
+    DAGNodeView
   }
 })
 export default class ShaderEditor extends Vue {
   showCode:boolean = false;
-  graphView: GraphView = null;
+  graph: ShaderGraph = null;
   codeGenResult: string = "";
+
+  nodes: ShaderNode[] = [];
 
   mounted(){
     ShaderApp.init(this.$el.querySelector("#shader-editor-canvas"));
+    this.graph = ShaderApp.shader.graph;
     // this.graphView = GraphView.createFromShaderGraph(ShaderApp.graph);
-    console.log(this.graphView)
+    console.log(this.graph)
   }
 
   codeGen(){
     this.showCode = true;
     // const result = ShaderApp.graph.compile();
     // this.codeGenResult = injectFragmentShaderHeaders(result, result.fragmentShaderString);
+  }
+
+  addUniform(){
+    this.nodes.push(uniform("unnamed", GLDataType.float))
   }
 
   updateTechnique(){
