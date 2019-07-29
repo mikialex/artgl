@@ -3,13 +3,26 @@
     <canvas id="viewer-canvas"
     @click ="pick"
     ></canvas>
-    <div v-if="!isRuning" class="stop-notation"> STOPPED </div>
-    <GraphViewer v-if="graphView" :graphview="graphView"/>
+    <div v-if="!isRunning" class="stop-notation"> STOPPED </div>
+
+    <GraphView v-if="graphView" :board="board">
+      <DAGNodeView
+        v-for="nodeView in nodes"
+        :key="nodeView.node.uuid"
+        :node="nodeView.node"
+        :layout="nodeView.layout"
+        :boardInfo="board"
+        @updateViewport="updateViewport(nodeView)"
+      >
+        
+      </DAGNodeView>
+    </GraphView>
+
     <div class="command-bar">
-      <button @click="run" v-if="!isRuning">run</button>
-      <button @click="stop" v-if="isRuning">stop</button>
-      <button @click="step" v-if="!isRuning">step next frame</button>
-      <button @click="screenshot" v-if="!isRuning" disabled>download screenshot</button>
+      <button @click="run" v-if="!isRunning">run</button>
+      <button @click="stop" v-if="isRunning">stop</button>
+      <button @click="step" v-if="!isRunning">step next frame</button>
+      <button @click="screenshot" v-if="!isRunning" disabled>download screenshot</button>
       <button @click="inspectGraph" v-if="!graphView">inspectGraph</button>
       <button @click="closeGraphInspector" v-if="graphView">closeGraphViewer</button>
       <button @click="showScenePanel">show scene panel</button>
@@ -21,17 +34,16 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import {GLApp} from '../application';
-import { GraphView } from '../model/graph-view';
-import GraphViewer from '../components/graph-viewer/graph-viewer.vue';
+import GraphView from '../components/graph/graph-viewer.vue';
+import { GraphBoardInfo, ViewNode } from '../model/graph-view';
 
 @Component({
   components:{
-    GraphViewer
+    GraphView
   }
 })
 export default class ViewerCanvas extends Vue {
-  isRuning:boolean = GLApp.framer.active;
-  graphView: GraphView = null;
+  isRunning:boolean = GLApp.framer.active;
   $store: any;
 
   async showScenePanel(){
@@ -53,24 +65,75 @@ export default class ViewerCanvas extends Vue {
     GLApp.pickColor(e.offsetX, canvas.clientHeight - e.offsetY)
   }
 
+
+  board: GraphBoardInfo = {
+    width: 0,
+    height: 0,
+    transformX: 0,
+    transformY: 0
+  };
+
+  get nodes(){
+    return GLApp.pipeline.graph.nodes
+  }
+
+//  actualSize(node: GraphNodeView){
+//     const targetNode = GLApp.pipeline.graph.getNodeByID(node.uuid);
+//     node.width = targetNode.width / window.devicePixelRatio / 2;
+//     node.height =  targetNode.height / window.devicePixelRatio / 2;
+//     this.updateViewport(node);
+//   }
+
+//   defaultSize(node: GraphNodeView){
+//     node.width = GraphView.targetNodeDefaultSize;
+//     node.height = GraphView.targetNodeDefaultSize;
+//     this.updateViewport(node);
+//   }
+
+//   updateViewport(node: GraphNodeView){
+//     const viewport = new Vector4();
+//     viewport.set(
+//       node.positionX + this.board.transformX,
+//       this.board.height - node.positionY - node.height - this.board.transformY,
+//       node.width,
+//       node.height
+//     );
+//     viewport.multiplyScalar(window.devicePixelRatio);
+//     if(GLApp.pipeline.graph){ // TODO
+//       const engine = GLApp.engine;
+//       GLApp.pipeline.graph.updateRenderTargetDebugView(engine, node.uuid, viewport);
+//     }
+//   }
+
+//   updateAllViewports(){
+//     this.graphview.nodes.forEach(node =>{
+//       this.updateViewport(node)
+//     })
+//   }
+
+//   layout(){
+//     this.graphview.layout()
+//     this.updateAllViewports();
+//   }
+
   inspectGraph(){
-    this.graphView = GraphView.create(GLApp.pipeline.graph);
+    // this.graphView = GraphView.create(GLApp.pipeline.graph);
     GLApp.pipeline.graph.enableDebuggingView = true;
   }
 
   closeGraphInspector(){
-    this.graphView = null;
+    // this.graphView = null;
     GLApp.pipeline.graph.enableDebuggingView = false;
   }
 
   run(){
     GLApp.run();
-    this.isRuning = true;
+    this.isRunning = true;
   }
 
   stop(){
     GLApp.stop();
-    this.isRuning = false;
+    this.isRunning = false;
   }
 
   step(){

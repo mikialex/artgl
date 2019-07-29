@@ -18,147 +18,196 @@ export interface NodeLayout{
   height: number,
 }
 
-export class GraphView {
-  nodes: GraphNodeView[] = [];
-  nodeMap: Map<string, GraphNodeView> = new Map();
-  rootNode: GraphNodeView
-
-  static targetNodeDefaultSize = 200;
-  static create(graph: RenderGraph) {
-    const view = new GraphView;
-    graph.passNodes.forEach(node => {
-      const nodeView = GraphNodeView.create(node)
-      view.nodeMap.set(node.uuid, nodeView)
-      view.nodes.push(nodeView);
-    })
-    graph.renderTargetNodes.forEach(node => {
-      const nodeView = GraphNodeView.create(node)
-      view.nodeMap.set(node.uuid, nodeView)
-      view.nodes.push(nodeView);
-    })
-
-    view.nodes.forEach(node => {
-      node.inputsID.forEach(id => {
-        node.inputs.push(view.nodeMap.get(id));
-      })
-    })
-    view.rootNode = view.nodeMap.get(graph.getRootScreenTargetNode().uuid)
-    if (!view.rootNode) {
-      throw "cant find root";
-    }
-    view.layout();
-    return view;
-  }
-
-  layout() {
-    this.nodes.forEach(node => {
-      if (node.type === GraphNodeViewType.targetNode) {
-        node.width = GraphView.targetNodeDefaultSize;
-        node.height = GraphView.targetNodeDefaultSize;
-      }
-    })
-    genGraphLayout(this.rootNode)
-  }
+export interface ViewNode {
+  node: DAGNode;
+  layout: NodeLayout;
 }
 
-function genGraphLayout(rootNode: GraphNodeView) {
-  const horizonArray = [];
-  function removeItem(node: GraphNodeView){
-    horizonArray.forEach((row: GraphNodeView[])=> {
+
+export function layoutGraph(
+  rootNode: DAGNode,
+  layoutNodeMap: { [index: string]: NodeLayout },
+  gridSize = 300
+) {
+
+  const horizonArray: Array<Array<DAGNode>> = [];
+  function removeItem(node: DAGNode) {
+    horizonArray.forEach((row: DAGNode[]) => {
       const index = row.indexOf(node);
       if (index !== -1) {
         row.splice(index, 1)
       }
     })
   }
-  function addNode(node: GraphNodeView, horizonPosition: number) {
+  function addNode(node: DAGNode, horizonPosition: number) {
     let arr = horizonArray[horizonPosition];
     if (arr === undefined) {
       horizonArray[horizonPosition] = [];
       arr = horizonArray[horizonPosition];
     }
     removeItem(node);
-    arr.push(node) 
-    
-    node.inputs.forEach(input => {
+    arr.push(node)
+
+    node.fromNodes.forEach(input => {
       addNode(input, horizonPosition + 1);
     })
   }
   addNode(rootNode, 0);
-  const gridSize = 300;
   horizonArray.reverse().forEach((row, indexRow) => {
-    row.forEach((item: GraphNodeView, indexY: number) => {
-      item.positionX = indexRow * gridSize;
-      item.positionY = indexY * gridSize
+    row.forEach((item, indexY) => {
+
+      const layout = layoutNodeMap[item.uuid]
+      if (layout === undefined) {
+        throw 'cant find nodes layout'
+      }
+
+      layout.absX = indexRow * gridSize;
+      layout.absY = indexY * gridSize
     })
   })
 }
 
-export enum GraphNodeViewType{
-  passNode,
-  targetNode,
-  shaderFuncNode
-}
+// export class GraphView {
+//   nodes: GraphNodeView[] = [];
+//   nodeMap: Map<string, GraphNodeView> = new Map();
+//   rootNode: GraphNodeView
 
-interface GraphNodeInputDefineView{
-  name: string
-}
+//   static targetNodeDefaultSize = 200;
+//   static create(graph: RenderGraph) {
+//     const view = new GraphView;
+//     graph.passNodes.forEach(node => {
+//       const nodeView = GraphNodeView.create(node)
+//       view.nodeMap.set(node.uuid, nodeView)
+//       view.nodes.push(nodeView);
+//     })
+//     graph.renderTargetNodes.forEach(node => {
+//       const nodeView = GraphNodeView.create(node)
+//       view.nodeMap.set(node.uuid, nodeView)
+//       view.nodes.push(nodeView);
+//     })
 
-export class GraphNodeView {
-  name: string;
-  uuid: string;
-  width: number = 200;
-  height: number = 200;
-  positionX: number = 0;
-  positionY: number = 0;
-  inputsID: string[] = [];
-  inputs: GraphNodeView[] = [];
+//     view.nodes.forEach(node => {
+//       node.inputsID.forEach(id => {
+//         node.inputs.push(view.nodeMap.get(id));
+//       })
+//     })
+//     view.rootNode = view.nodeMap.get(graph.getRootScreenTargetNode().uuid)
+//     if (!view.rootNode) {
+//       throw "cant find root";
+//     }
+//     view.layout();
+//     return view;
+//   }
 
-  inputDefine: GraphNodeInputDefineView[] = [];
-  type: GraphNodeViewType;
+//   layout() {
+//     this.nodes.forEach(node => {
+//       if (node.type === GraphNodeViewType.targetNode) {
+//         node.width = GraphView.targetNodeDefaultSize;
+//         node.height = GraphView.targetNodeDefaultSize;
+//       }
+//     })
+//     genGraphLayout(this.rootNode)
+//   }
+// }
 
-  static create(node: DAGNode) {
-    const view = new GraphNodeView();
-    view.uuid = node.uuid;
-    view.inputsID = [];
-    node.fromNodes.forEach(node => {
-      view.inputsID.push(node.uuid);
-    })
+// function genGraphLayout(rootNode: GraphNodeView) {
+//   const horizonArray = [];
+//   function removeItem(node: GraphNodeView){
+//     horizonArray.forEach((row: GraphNodeView[])=> {
+//       const index = row.indexOf(node);
+//       if (index !== -1) {
+//         row.splice(index, 1)
+//       }
+//     })
+//   }
+//   function addNode(node: GraphNodeView, horizonPosition: number) {
+//     let arr = horizonArray[horizonPosition];
+//     if (arr === undefined) {
+//       horizonArray[horizonPosition] = [];
+//       arr = horizonArray[horizonPosition];
+//     }
+//     removeItem(node);
+//     arr.push(node) 
+    
+//     node.inputs.forEach(input => {
+//       addNode(input, horizonPosition + 1);
+//     })
+//   }
+//   addNode(rootNode, 0);
+//   const gridSize = 300;
+//   horizonArray.reverse().forEach((row, indexRow) => {
+//     row.forEach((item: GraphNodeView, indexY: number) => {
+//       item.positionX = indexRow * gridSize;
+//       item.positionY = indexY * gridSize
+//     })
+//   })
+// }
 
-    if (node instanceof PassGraphNode) {
-      view.name = node.name;
-      if (node.inputs !== undefined) {
-        view.inputDefine = Object.keys(node.inputs).map(key => {
-          return {
-            name: key
-          }
-        })
-      }
-      view.height = 20 + view.inputDefine.length * 20;
-      view.type = GraphNodeViewType.passNode;
-    } else if (node instanceof RenderTargetNode) {
-      view.name = node.name;
-      view.type = GraphNodeViewType.targetNode;
-    }
-    return view;
-  }
+// export enum GraphNodeViewType{
+//   passNode,
+//   targetNode,
+//   shaderFuncNode
+// }
 
-  getConnectionLines(graph: GraphView, boardInfo) {
-    return this.inputsID.map((id, index) => {
-      const inputNode = graph.nodeMap.get(id);
-      return {
-        id: this.uuid + inputNode.uuid,
-        line: createConnectionSVGLine(
-          inputNode.positionX + inputNode.width + boardInfo.transformX,
-          inputNode.positionY + inputNode.height / 2 + boardInfo.transformY,
-          this.positionX + boardInfo.transformX,
-          this.positionY + boardInfo.transformY + index * 20 + 20
-        )
-      }
-    })
-  }
+// interface GraphNodeInputDefineView{
+//   name: string
+// }
 
-}
+// export class GraphNodeView {
+//   name: string;
+//   uuid: string;
+//   width: number = 200;
+//   height: number = 200;
+//   positionX: number = 0;
+//   positionY: number = 0;
+//   inputsID: string[] = [];
+//   inputs: GraphNodeView[] = [];
+
+//   inputDefine: GraphNodeInputDefineView[] = [];
+//   type: GraphNodeViewType;
+
+//   static create(node: DAGNode) {
+//     const view = new GraphNodeView();
+//     view.uuid = node.uuid;
+//     view.inputsID = [];
+//     node.fromNodes.forEach(node => {
+//       view.inputsID.push(node.uuid);
+//     })
+
+//     if (node instanceof PassGraphNode) {
+//       view.name = node.name;
+//       if (node.inputs !== undefined) {
+//         view.inputDefine = Object.keys(node.inputs).map(key => {
+//           return {
+//             name: key
+//           }
+//         })
+//       }
+//       view.height = 20 + view.inputDefine.length * 20;
+//       view.type = GraphNodeViewType.passNode;
+//     } else if (node instanceof RenderTargetNode) {
+//       view.name = node.name;
+//       view.type = GraphNodeViewType.targetNode;
+//     }
+//     return view;
+//   }
+
+//   getConnectionLines(graph: GraphView, boardInfo) {
+//     return this.inputsID.map((id, index) => {
+//       const inputNode = graph.nodeMap.get(id);
+//       return {
+//         id: this.uuid + inputNode.uuid,
+//         line: createConnectionSVGLine(
+//           inputNode.positionX + inputNode.width + boardInfo.transformX,
+//           inputNode.positionY + inputNode.height / 2 + boardInfo.transformY,
+//           this.positionX + boardInfo.transformX,
+//           this.positionY + boardInfo.transformY + index * 20 + 20
+//         )
+//       }
+//     })
+//   }
+
+// }
 
 
 function createConnectionSVGLine(

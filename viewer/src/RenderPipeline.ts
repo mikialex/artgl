@@ -3,10 +3,12 @@ import {
   TSSAOShading, TSSAOBlendShading, Matrix4,
   InnerSupportUniform, DepthShading, Scene, RenderEngine, Shading
 } from "../../src/artgl";
+import { EffectComposer } from '../../src/render-graph/render-graph';
 
 export class RenderPipeline{
 
   graph: RenderGraph = new RenderGraph();
+  composer: EffectComposer = new EffectComposer();
 
   enableTAA = true;
   taaShading = new TAAShading()
@@ -40,13 +42,15 @@ export class RenderPipeline{
     }
 
     // if (this.sampleCount <= 100) {
-    this.graph.update(engine);
-    this.graph.render(engine);
+    this.graph.update(engine, this.composer);
+    this.composer.render(engine, this.graph);
     // }
   }
 
   build(engine: RenderEngine, scene: Scene) {
-    this.graph.setGraph({
+    this.graph.defineGraph(
+      this.composer,
+      {
       renderTargets: [
         {
           name: RenderGraph.screenRoot,

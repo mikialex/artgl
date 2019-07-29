@@ -1,6 +1,7 @@
 <template>
-  <div class="dag-node"
-   :style="{
+  <div
+    class="dag-node"
+    :style="{
     left: viewPositionX,
     top: viewPositionY,
     width: viewWidth,
@@ -12,7 +13,7 @@
       @mousedown="startDrag"
       :style="{cursor: this.isDragging? 'grabbing': ''}"
     >
-      <span>{{node.uuid}}</span>
+      <span>{{node.uuid.slice(0,4)}}</span>
     </div>
 
     <div class="input-info">
@@ -42,7 +43,6 @@ export default class DAGNodeView extends Vue {
   })
   layout: NodeLayout;
 
-  
   @Prop({
     required: true
   })
@@ -78,8 +78,8 @@ export default class DAGNodeView extends Vue {
   screenOriginY = 0;
   startDrag(e: MouseEvent) {
     this.isDragging = true;
-    this.originX =this.layout.absX
-    this.originY =this.layout.absY
+    this.originX = this.layout.absX;
+    this.originY = this.layout.absY;
     this.screenOriginX = e.screenX;
     this.screenOriginY = e.screenY;
     window.addEventListener("mousemove", this.dragging);
@@ -90,9 +90,11 @@ export default class DAGNodeView extends Vue {
   }
 
   dragging(e: MouseEvent) {
-    this.layout.absX = this.originX + e.screenX - this.screenOriginX - this.boardInfo.transformX;
-    this.layout.absY = this.originY + e.screenY - this.screenOriginY - this.boardInfo.transformY;
-    // this.updateViewPortToGraph();
+    this.layout.absX =
+      this.originX + e.screenX - this.screenOriginX - this.boardInfo.transformX;
+    this.layout.absY =
+      this.originY + e.screenY - this.screenOriginY - this.boardInfo.transformY;
+    this.$emit("updateViewport");
   }
 }
 </script>
@@ -104,7 +106,16 @@ export default class DAGNodeView extends Vue {
   border: 1px solid #aaa;
   position: absolute;
   font-size: 12px;
+  user-select: none;
 }
 
+.node-title {
+  background: #fff;
+  height: 20px;
+  display: flex;
+  cursor: grab;
+  justify-content: center;
+  border-bottom: 1px solid #ddd;
+}
 </style>
 

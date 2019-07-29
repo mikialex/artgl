@@ -13,6 +13,7 @@
           :node="nodeView.node"
           :layout="nodeView.layout"
           :boardInfo="board"
+          @updateViewport="updateViewport(nodeView)"
         >
           
         </DAGNodeView>
@@ -45,12 +46,7 @@ import { ShaderGraph, uniform, DAGNode } from "../../../src/artgl";
 import DAGNodeView from "../components/graph/dag-node.vue";
 import GraphView from "../components/graph/graph-viewer.vue";
 import { ShaderNode } from "../../../src/shader-graph/shader-node";
-import { GraphBoardInfo, NodeLayout } from "../model/graph-view";
-
-interface ViewNode {
-  node: DAGNode;
-  layout: NodeLayout;
-}
+import { GraphBoardInfo, NodeLayout, ViewNode } from "../model/graph-view";
 
 @Component({
   components: {
@@ -85,6 +81,10 @@ export default class ShaderEditor extends Vue {
   }
 
   layout() {}
+
+  updateViewport(view: ViewNode){
+    console.log('upd')
+  }
 
   codeGen() {
     this.showCode = true;

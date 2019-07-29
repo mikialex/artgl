@@ -9,13 +9,47 @@ import { RenderPass } from "./pass";
 
 export type RenderGraphNode = PassGraphNode | RenderTargetNode;
 
+export class EffectComposer {
+
+  private passes: RenderPass[] = [];
+  private nodeMap: Map<PassGraphNode, RenderPass> = new Map();
+
+  render(engine: RenderEngine, graph: RenderGraph) {
+    this.passes.forEach(pass => {
+      pass.execute(engine, graph);
+    });
+  }
+
+  reset() {
+    this.passes = [];
+  }
+
+  addPass(pass: RenderPass) {
+    this.passes.push(pass);
+  }
+
+  registerNode(node: PassGraphNode, define: PassDefine ) {
+    const pass = new RenderPass(define)
+    this.nodeMap.set(node, pass);
+  }
+
+  clear() {
+    this.passes = [];
+    this.nodeMap.clear();
+  }
+
+  getPass(node: PassGraphNode): RenderPass {
+    return this.nodeMap.get(node);
+  }
+
+}
+
+
+
 export class RenderGraph {
 
   static screenRoot: string = 'artgl-rendergraph-screen-rt';
   static quadSource = new QuadSource();
-
-
-  private passes: RenderPass[] = [];
 
   enableDebuggingView: boolean = false;
 
@@ -23,30 +57,15 @@ export class RenderGraph {
   renderTargetNodes: Map<string, RenderTargetNode> = new Map();
   passNodes: Map<string, PassGraphNode> = new Map();
 
-  getNodeByID(id: string) {
-    let n;
-    this.renderTargetNodes.forEach(node => {
-      if (node.uuid === id) {
-        n = node;
-      }
-    })
+  get nodes() {
+    const nodes = [];
     this.passNodes.forEach(node => {
-      if (node.uuid === id) {
-        n = node;
-      }
+      nodes.push(node);
     })
-    return n;
-  }
-
-  /**
-   * Render a frame by this graph
-   *
-   * @memberof RenderGraph
-   */
-  public render(engine: RenderEngine) {
-    this.passes.forEach(pass => {
-      pass.execute(engine, this);
-    });
+    this.renderTargetNodes.forEach(node => {
+      nodes.push(node);
+    })
+    return nodes;
   }
 
   /**
@@ -54,10 +73,9 @@ export class RenderGraph {
    *
    * @memberof RenderGraph
    */
-  public reset() {
+  reset() {
     this.renderTargetNodes.clear();
     this.passNodes.clear();
-    this.passes = [];
   }
 
   /**
@@ -66,10 +84,10 @@ export class RenderGraph {
    * @param {GraphDefine} graphDefine
    * @memberof RenderGraph
    */
-  public setGraph(graphDefine: GraphDefine): void {
+  defineGraph(composer: EffectComposer, graphDefine: GraphDefine): void {
     this.reset();
     this.allocateRenderTargetNodes(graphDefine.renderTargets);
-    this.constructPassGraph(graphDefine.passes);
+    this.constructPassGraph(graphDefine.passes, composer);
   }
 
   /**
@@ -77,7 +95,7 @@ export class RenderGraph {
    *
    * @memberof RenderGraph
    */
-  update(engine: RenderEngine) {
+  update(engine: RenderEngine, composer: EffectComposer) {
     
     //updateNodesConnection
     this.passNodes.forEach(node => {
@@ -89,7 +107,7 @@ export class RenderGraph {
 
     // update pass queue
     const nodeQueue = this.screenNode.generateDependencyOrderList() as RenderGraphNode[];
-    this.passes = [];
+    composer.reset();
     nodeQueue.forEach(node => {
       if (node instanceof RenderTargetNode) {
         node.updateSize(engine);
@@ -97,16 +115,22 @@ export class RenderGraph {
     })
     nodeQueue.forEach(node => {
       if (node instanceof PassGraphNode) {
-        node.updatePass(engine, nodeQueue);
-        this.passes.push(node.pass);
+        const pass = composer.getPass(node);
+        if (pass === undefined) {
+          throw "err" // TODO
+        }
+        node.updatePass(engine, pass, nodeQueue);
+        composer.addPass(pass);
       }
     })
   }
 
-  private constructPassGraph(passesDefine: PassDefine[]) {
+  private constructPassGraph(passesDefine: PassDefine[], composer: EffectComposer) {
     passesDefine.forEach(define => {
       if (!this.passNodes.has(define.name)) {
-        this.passNodes.set(define.name, new PassGraphNode(this, define));
+        const node = new PassGraphNode(this, define);
+        this.passNodes.set(define.name, node);
+        composer.registerNode(node, define);
       } else {
         throw 'duplicate pass define found'
       }
