@@ -1,7 +1,7 @@
 
 import {
   RenderEngine, Mesh, Interactor, OrbitController, Shading,
-  ShaderGraph,PerspectiveCamera, Scene, NormalShading, SphereGeometry
+  ShaderGraph, PerspectiveCamera, Scene, NormalShading, SphereGeometry
 } from '../../src/artgl';
 
 export class ShaderApplication {

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <TopNav/>
+    <TopNav v-if="showTopNav"/>
     <router-view/>
   </div>
 </template>
@@ -15,18 +15,26 @@ import TopNav from './components/nav/top-nav.vue';
   },
 })
 export default class ViewerApp extends Vue {
+  $route: any;
 
+get showTopNav(){
+  return this.$route.name !=='home'
+}
 }
 </script>
 
 
 <style lang="scss">
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: 'Fira Code', 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   overflow: hidden;
+}
+
+button, a {
+  font-family: 'Fira Code', 'Avenir', Helvetica, Arial, sans-serif;
 }
 
 /* width */

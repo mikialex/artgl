@@ -1,5 +1,6 @@
 <template>
   <div>
+    {{node.name}}
     <button @click="actualSize">actual size</button>
     <button @click="defaultSize">default size</button>
   </div>
@@ -18,16 +19,6 @@ export default class RenderTargetNodeView extends Vue {
     required: true
   })
   node: DAGNode;
-
-  @Prop({
-    required: true
-  })
-  layout: NodeLayout;
-
-  @Prop({
-    required: true
-  })
-  boardInfo: GraphBoardInfo;
 
   actualSize() {
     // this.$emit("actualSize", this.view);

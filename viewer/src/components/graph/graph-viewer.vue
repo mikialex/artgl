@@ -1,6 +1,6 @@
 <template>
   <div class="graph-viewer" tabindex="-1">
-    <div class="graph-wrap" :style="{
+    <div :style="{
           transform
         }">
       <slot></slot>
@@ -58,66 +58,26 @@ export default class GraphViewer extends Vue {
     this.$emit("updateAllViewport");
   }
 
-  // actualSize(node: GraphNodeView){
-  //   const targetNode = GLApp.pipeline.graph.getNodeByID(node.uuid);
-  //   node.width = targetNode.width / window.devicePixelRatio / 2;
-  //   node.height =  targetNode.height / window.devicePixelRatio / 2;
-  //   this.updateViewport(node);
-  // }
+  mounted() {
+    this.updateBoard();
+    window.addEventListener("resize", this.updateBoard)
+  }
 
-  // defaultSize(node: GraphNodeView){
-  //   node.width = GraphView.targetNodeDefaultSize;
-  //   node.height = GraphView.targetNodeDefaultSize;
-  //   this.updateViewport(node);
-  // }
+  beforeDestroy(){
+    window.removeEventListener("resize", this.updateBoard)
+  }
 
-  // updateViewport(node: GraphNodeView){
-  //   const viewport = new Vector4();
-  //   viewport.set(
-  //     node.positionX + this.board.transformX,
-  //     this.board.height - node.positionY - node.height - this.board.transformY,
-  //     node.width,
-  //     node.height
-  //   );
-  //   viewport.multiplyScalar(window.devicePixelRatio);
-  //   if(GLApp.pipeline.graph){ // TODO
-  //     const engine = GLApp.engine;
-  //     GLApp.pipeline.graph.updateRenderTargetDebugView(engine, node.uuid, viewport);
-  //   }
-  // }
-
-  // updateAllViewports(){
-  //   this.graphview.nodes.forEach(node =>{
-  //     this.updateViewport(node)
-  //   })
-  // }
-
-  // layout(){
-  //   this.graphview.layout()
-  //   this.updateAllViewports();
-  // }
-
-  // mounted() {
-  //   this.updateBoard();
-  //   window.addEventListener("resize", this.updateBoard)
-  // }
-
-  // beforeDestroy(){
-  //   window.removeEventListener("resize", this.updateBoard)
-  // }
-
-  updateBoard(){
+  updateBoard() {
     this.board.width = this.$el.clientWidth;
     this.board.height = this.$el.clientHeight;
-    // this.updateAllViewports();
+    this.$emit("updateAllViewport");
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .graph-viewer {
-  // pointer-events: none;
-  // position: absolute;
+  pointer-events: none;
   top: 0px;
   left: 0px;
   width: 100%;
@@ -132,10 +92,6 @@ export default class GraphViewer extends Vue {
   width: 100%;
   height: calc(100% - 40px);
   z-index: -10;
-}
-
-.graph-wrap {
-  // position: relative;
 }
 
 .mask {

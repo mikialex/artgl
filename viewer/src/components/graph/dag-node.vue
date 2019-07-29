@@ -5,7 +5,6 @@
     left: viewPositionX,
     top: viewPositionY,
     width: viewWidth,
-    height: viewHeight,
    }"
   >
     <div
@@ -13,12 +12,12 @@
       @mousedown="startDrag"
       :style="{cursor: this.isDragging? 'grabbing': ''}"
     >
-      <span>{{node.uuid.slice(0,4)}}</span>
+      <span>{{node.constructor.name}}: {{node.uuid.slice(0,4)}}</span>
     </div>
 
-    <div class="input-info">
+    <!-- <div class="input-info">
       <div v-for="fromNode in inputs" :key="fromNode.uuid">{{node.uuid}}</div>
-    </div>
+    </div> -->
 
     <slot></slot>
   </div>
@@ -101,12 +100,11 @@ export default class DAGNodeView extends Vue {
 
 <style lang="scss" scoped>
 .dag-node {
-  width: 100px;
-  height: 50px;
   border: 1px solid #aaa;
   position: absolute;
   font-size: 12px;
   user-select: none;
+  pointer-events: auto;
 }
 
 .node-title {

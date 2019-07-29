@@ -1,10 +1,13 @@
 <template>
   <div class="home-page">
     <div>
-      <!-- <h1>ARTGL</h1> -->
       <img src="../assets/artgl.svg" alt="">
-      <h2>a state of art <br> webgl framework</h2>
     </div>
+    <ul>
+      <router-link active-class="current" to="/viewer">Scene Viewer</router-link>
+      <router-link active-class="current" to="/shader">Shader Composer</router-link>
+      <router-link active-class="current" to="/examples">Simple Examples</router-link>
+    </ul>
   </div>
 </template>
 
@@ -13,23 +16,31 @@
   width: 100vw;
   height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-h1 {
-  font-size: 100px;
-  text-align: center;
-  margin: 10px;
-}
-
 img{
-  width: 400px;
+  width: 600px;
+  opacity: 0.3;
 }
 
-h2 {
-  margin-top:-90px;
-  margin-left:20px;
-  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+ul{
+  margin-top:20px;
+  >a{
+    font-size: 25px;
+    text-decoration: none;
+    padding: 20px;
+    color: rgb(61, 61, 61);
+    font-weight: bold;
+    transition: 200ms;
+
+    &:hover{
+      color: rgb(0, 0, 0);
+      background: rgb(243, 243, 243)
+    }
+  }
 }
+
 </style>

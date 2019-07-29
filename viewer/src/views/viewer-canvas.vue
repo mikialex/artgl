@@ -15,7 +15,12 @@
           :layout="nodeView.layout"
           :boardInfo="board"
           @updateViewport="updateViewport(nodeView)"
-        ></DAGNodeView>
+        >
+          <RenderTargetNodeView
+            v-if="isRenderTargetNode(nodeView.node)"
+            :node="nodeView.node"
+          />
+        </DAGNodeView>
       </GraphView>
     </div>
 
@@ -37,12 +42,15 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { GLApp } from "../application";
 import GraphView from "../components/graph/graph-viewer.vue";
 import DAGNodeView from "../components/graph/dag-node.vue";
+import RenderTargetNodeView from "../components/graph/nodes/render-target-node.vue";
 import { GraphBoardInfo, ViewNode, layoutGraph } from "../model/graph-view";
+import { RenderTargetNode } from "../../../src/render-graph/node/render-target-node";
 
 @Component({
   components: {
     GraphView,
-    DAGNodeView
+    DAGNodeView,
+    RenderTargetNodeView
   }
 })
 export default class ViewerCanvas extends Vue {
@@ -121,6 +129,10 @@ export default class ViewerCanvas extends Vue {
     layoutGraph(GLApp.pipeline.graph.screenNode, map);
   }
 
+  isRenderTargetNode(node){
+    return node instanceof RenderTargetNode
+  }
+
   inspectGraph() {
     // this.graphView = GraphView.create(GLApp.pipeline.graph);
     GLApp.pipeline.graph.enableDebuggingView = true;
@@ -131,8 +143,8 @@ export default class ViewerCanvas extends Vue {
         layout: {
           absX: 0,
           absY: 0,
-          width: 100,
-          height: 100
+          width: 200,
+          height: 200
         }
       };
     });

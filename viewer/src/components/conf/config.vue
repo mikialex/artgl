@@ -1,25 +1,22 @@
 <template>
   <div class="conf">
-    <Folder :config="config"/>
+    <Folder :config="config" />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import Folder from './folder.vue';
+import { Component, Prop, Vue } from "vue-property-decorator";
+import Folder from "./folder.vue";
 @Component({
-  components: {Folder}
+  components: { Folder }
 })
 export default class ConfigPanel extends Vue {
-
   @Prop() config: any;
 }
-
-
 </script>
 
 <style lang="scss" scoped>
-.conf{
+.conf {
   font-size: 12px;
   width: 300px;
 }

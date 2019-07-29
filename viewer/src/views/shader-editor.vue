@@ -14,9 +14,7 @@
           :layout="nodeView.layout"
           :boardInfo="board"
           @updateViewport="updateViewport(nodeView)"
-        >
-          
-        </DAGNodeView>
+        ></DAGNodeView>
       </GraphView>
     </div>
 
@@ -82,8 +80,8 @@ export default class ShaderEditor extends Vue {
 
   layout() {}
 
-  updateViewport(view: ViewNode){
-    console.log('upd')
+  updateViewport(view: ViewNode) {
+    console.log("upd");
   }
 
   codeGen() {
