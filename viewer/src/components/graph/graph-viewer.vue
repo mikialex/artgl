@@ -121,7 +121,7 @@ export default class GraphViewer extends Vue {
   top: 0px;
   left: 0px;
   width: 100%;
-  height: calc(100% - 40px);
+  height: 100%;
   overflow: hidden;
 }
 

@@ -91,9 +91,9 @@ export default class DAGNodeView extends Vue {
 
   dragging(e: MouseEvent) {
     this.layout.absX =
-      this.originX + e.screenX - this.screenOriginX - this.boardInfo.transformX;
+      this.originX + e.screenX - this.screenOriginX;
     this.layout.absY =
-      this.originY + e.screenY - this.screenOriginY - this.boardInfo.transformY;
+      this.originY + e.screenY - this.screenOriginY;
     this.$emit("updateViewport");
   }
 }

@@ -53,7 +53,7 @@ export class RenderGraph {
 
   enableDebuggingView: boolean = false;
 
-  private screenNode: RenderTargetNode;
+  screenNode: RenderTargetNode;
   renderTargetNodes: Map<string, RenderTargetNode> = new Map();
   passNodes: Map<string, PassGraphNode> = new Map();
 
