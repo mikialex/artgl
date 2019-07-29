@@ -1,16 +1,22 @@
 <template>
-  <div class="shader-node">
+  <div class="dag-node"
+   :style="{
+    left: viewPositionX,
+    top: viewPositionY,
+    width: viewWidth,
+    height: viewHeight,
+   }"
+  >
     <div
       class="node-title"
       @mousedown="startDrag"
       :style="{cursor: this.isDragging? 'grabbing': ''}"
-      :class="{'canteval-node':!node.cashadowl}"
     >
       <span>{{node.uuid}}</span>
     </div>
 
     <div class="input-info">
-      <div v-for="fromNode in results" :key="fromNode.uuid">{{node.uuid}}</div>
+      <div v-for="fromNode in inputs" :key="fromNode.uuid">{{node.uuid}}</div>
     </div>
 
     <slot></slot>
@@ -20,7 +26,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { ShaderGraph, ShaderNode, DAGNode } from "../../../../src/artgl";
-import { NodeLayout } from "../../model/graph-view";
+import { NodeLayout, GraphBoardInfo } from "../../model/graph-view";
 
 @Component({
   components: {}
@@ -36,6 +42,12 @@ export default class DAGNodeView extends Vue {
   })
   layout: NodeLayout;
 
+  
+  @Prop({
+    required: true
+  })
+  boardInfo: GraphBoardInfo;
+
   get inputs(): DAGNode[] {
     const results = [];
     this.node.fromNodes.forEach(value => {
@@ -44,16 +56,55 @@ export default class DAGNodeView extends Vue {
     return results;
   }
 
+  get viewPositionX() {
+    return this.layout.absX + "px";
+  }
+
+  get viewPositionY() {
+    return this.layout.absY + "px";
+  }
+
+  get viewWidth() {
+    return this.layout.width + "px";
+  }
+  get viewHeight() {
+    return this.layout.height + "px";
+  }
+
   isDragging: boolean = false;
-  startDrag() {}
+  originX = 0;
+  originY = 0;
+  screenOriginX = 0;
+  screenOriginY = 0;
+  startDrag(e: MouseEvent) {
+    this.isDragging = true;
+    this.originX =this.layout.absX
+    this.originY =this.layout.absY
+    this.screenOriginX = e.screenX;
+    this.screenOriginY = e.screenY;
+    window.addEventListener("mousemove", this.dragging);
+    window.addEventListener("mouseup", e => {
+      this.isDragging = false;
+      window.removeEventListener("mousemove", this.dragging);
+    });
+  }
+
+  dragging(e: MouseEvent) {
+    this.layout.absX = this.originX + e.screenX - this.screenOriginX - this.boardInfo.transformX;
+    this.layout.absY = this.originY + e.screenY - this.screenOriginY - this.boardInfo.transformY;
+    // this.updateViewPortToGraph();
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-.shader-node {
+.dag-node {
   width: 100px;
   height: 50px;
   border: 1px solid #aaa;
+  position: absolute;
+  font-size: 12px;
 }
+
 </style>
 

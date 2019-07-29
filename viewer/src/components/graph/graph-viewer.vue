@@ -1,24 +1,16 @@
 <template>
-  <div class="graph-viewer" 
-  tabindex="-1">
-    <div class="graph-wrap"
-      :style="{
+  <div class="graph-viewer" tabindex="-1">
+    <div class="graph-wrap" :style="{
           transform
-        }"
-    >
-
-    <slot> </slot>
-
-    <div class="mask"
-      v-if="showMove"
-      @mousedown ="startDrag"
-    >
+        }">
+      <slot></slot>
     </div>
+
+    <div class="mask" v-if="showMove" @mousedown="startDrag"></div>
 
     <div class="ops">
       <button v-if="!showMove" @click="showMove = true">move</button>
-      <button  v-if="showMove" @click="showMove = false">unmove</button>
-      <button  @click="layout">relayout</button>
+      <button v-if="showMove" @click="showMove = false">unmove</button>
     </div>
   </div>
 </template>
@@ -29,43 +21,41 @@ import { Vector4 } from "../../../../src/math";
 import { GraphBoardInfo } from "../../model/graph-view";
 
 @Component({
-  components: {
-  }
+  components: {}
 })
 export default class GraphViewer extends Vue {
-  @Prop({required: true}) board: GraphBoardInfo;
+  @Prop({ required: true }) board: GraphBoardInfo;
 
-  offsetX:number =  0
-  offsetY:number =  0
-
-  get transform(){
-    return `translate(${this.board.transformX}px, ${this.board.transformY}px)`
+  get transform() {
+    return `translate(${this.board.transformX}px, ${this.board.transformY}px)`;
   }
 
   showMove = false;
 
-  isDraging = false;
+  isDragging = false;
   originTransformX: number;
   originTransformY: number;
-  screenOriginX:number;
-  screenOriginY:number;
-  startDrag(e){
-    this.isDraging = true;
+  screenOriginX: number;
+  screenOriginY: number;
+  startDrag(e) {
+    this.isDragging = true;
     this.screenOriginX = e.screenX;
     this.screenOriginY = e.screenY;
     this.originTransformX = this.board.transformX;
     this.originTransformY = this.board.transformY;
     window.addEventListener("mousemove", this.dragging);
     window.addEventListener("mouseup", e => {
-      this.isDraging = false;
+      this.isDragging = false;
       window.removeEventListener("mousemove", this.dragging);
     });
   }
 
-  dragging(e){
-    this.board.transformX = this.originTransformX + e.screenX - this.screenOriginX;
-    this.board.transformY = this.originTransformY + e.screenY - this.screenOriginY;
-    this.$emit("updateAllViewport")
+  dragging(e) {
+    this.board.transformX =
+      this.originTransformX + e.screenX - this.screenOriginX;
+    this.board.transformY =
+      this.originTransformY + e.screenY - this.screenOriginY;
+    this.$emit("updateAllViewport");
   }
 
   // actualSize(node: GraphNodeView){
@@ -116,21 +106,18 @@ export default class GraphViewer extends Vue {
   //   window.removeEventListener("resize", this.updateBoard)
   // }
 
-  // updateBoard(){
-  //   this.board.offsetX = this.$el.getBoundingClientRect().left;
-  //   this.board.offsetY = this.$el.getBoundingClientRect().top;
-  //   this.board.width = this.$el.clientWidth;
-  //   this.board.height = this.$el.clientHeight;
-  //   this.updateAllViewports();
-  // }
-
+  updateBoard(){
+    this.board.width = this.$el.clientWidth;
+    this.board.height = this.$el.clientHeight;
+    // this.updateAllViewports();
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 .graph-viewer {
-  pointer-events: none;
-  position: absolute;
+  // pointer-events: none;
+  // position: absolute;
   top: 0px;
   left: 0px;
   width: 100%;
@@ -155,15 +142,15 @@ export default class GraphViewer extends Vue {
   width: 100%;
   height: 100%;
   cursor: grab;
-  top:0px;
-  left:0px;
+  top: 0px;
+  left: 0px;
   position: absolute;
   pointer-events: auto;
 }
 
-.ops{
-  top:0px;
-  left:0px;
+.ops {
+  top: 0px;
+  left: 0px;
   position: absolute;
   pointer-events: auto;
 }
