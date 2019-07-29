@@ -24,38 +24,22 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";;
+import { Component, Prop, Vue } from "vue-property-decorator";
+import { Vector4 } from "../../../../src/math";
+import { GraphBoardInfo } from "../../model/graph-view";
 
 @Component({
   components: {
   }
 })
 export default class GraphViewer extends Vue {
-  @Prop() graphview: GraphView;
+  @Prop({required: true}) board: GraphBoardInfo;
 
-  board = {
-    offsetX: 0,
-    offsetY: 0,
-    width: 10,
-    height: 10,
-    transformX :100,
-    transformY :100,
-  };
+  offsetX:number =  0
+  offsetY:number =  0
 
   get transform(){
     return `translate(${this.board.transformX}px, ${this.board.transformY}px)`
-  }
-
-  get passNodeType(){
-    return GraphNodeViewType.passNode
-  }
-
-  get targetNodeType(){
-    return GraphNodeViewType.targetNode
-  }
-
-  get shaderFunctionNodeType(){
-    return GraphNodeViewType.shaderFuncNode
   }
 
   showMove = false;
@@ -81,72 +65,65 @@ export default class GraphViewer extends Vue {
   dragging(e){
     this.board.transformX = this.originTransformX + e.screenX - this.screenOriginX;
     this.board.transformY = this.originTransformY + e.screenY - this.screenOriginY;
-    this.updateAllViewports();
+    this.$emit("updateAllViewport")
   }
 
-  actualSize(node: GraphNodeView){
-    const targetNode = GLApp.pipeline.graph.getNodeByID(node.uuid);
-    node.width = targetNode.width / window.devicePixelRatio / 2;
-    node.height =  targetNode.height / window.devicePixelRatio / 2;
-    this.updateViewport(node);
-  }
+  // actualSize(node: GraphNodeView){
+  //   const targetNode = GLApp.pipeline.graph.getNodeByID(node.uuid);
+  //   node.width = targetNode.width / window.devicePixelRatio / 2;
+  //   node.height =  targetNode.height / window.devicePixelRatio / 2;
+  //   this.updateViewport(node);
+  // }
 
-  defaultSize(node: GraphNodeView){
-    node.width = GraphView.targetNodeDefaultSize;
-    node.height = GraphView.targetNodeDefaultSize;
-    this.updateViewport(node);
-  }
+  // defaultSize(node: GraphNodeView){
+  //   node.width = GraphView.targetNodeDefaultSize;
+  //   node.height = GraphView.targetNodeDefaultSize;
+  //   this.updateViewport(node);
+  // }
 
-  updateViewport(node: GraphNodeView){
-    const viewport = new Vector4();
-    viewport.set(
-      node.positionX + this.board.transformX,
-      this.board.height - node.positionY - node.height - this.board.transformY,
-      node.width,
-      node.height
-    );
-    viewport.multiplyScalar(window.devicePixelRatio);
-    if(GLApp.pipeline.graph){ // TODO
-      const engine = GLApp.engine;
-      GLApp.pipeline.graph.updateRenderTargetDebugView(engine, node.uuid, viewport);
-    }
-  }
+  // updateViewport(node: GraphNodeView){
+  //   const viewport = new Vector4();
+  //   viewport.set(
+  //     node.positionX + this.board.transformX,
+  //     this.board.height - node.positionY - node.height - this.board.transformY,
+  //     node.width,
+  //     node.height
+  //   );
+  //   viewport.multiplyScalar(window.devicePixelRatio);
+  //   if(GLApp.pipeline.graph){ // TODO
+  //     const engine = GLApp.engine;
+  //     GLApp.pipeline.graph.updateRenderTargetDebugView(engine, node.uuid, viewport);
+  //   }
+  // }
 
-  updateAllViewports(){
-    this.graphview.nodes.forEach(node =>{
-      this.updateViewport(node)
-    })
-  }
+  // updateAllViewports(){
+  //   this.graphview.nodes.forEach(node =>{
+  //     this.updateViewport(node)
+  //   })
+  // }
 
-  layout(){
-    this.graphview.layout()
-    this.updateAllViewports();
-  }
+  // layout(){
+  //   this.graphview.layout()
+  //   this.updateAllViewports();
+  // }
 
-  mounted() {
-    this.updateBoard();
-    window.addEventListener("resize", this.updateBoard)
-  }
+  // mounted() {
+  //   this.updateBoard();
+  //   window.addEventListener("resize", this.updateBoard)
+  // }
 
-  beforeDestroy(){
-    window.removeEventListener("resize", this.updateBoard)
-  }
+  // beforeDestroy(){
+  //   window.removeEventListener("resize", this.updateBoard)
+  // }
 
-  updateBoard(){
-    this.board.offsetX = this.$el.getBoundingClientRect().left;
-    this.board.offsetY = this.$el.getBoundingClientRect().top;
-    this.board.width = this.$el.clientWidth;
-    this.board.height = this.$el.clientHeight;
-    this.updateAllViewports();
-  }
+  // updateBoard(){
+  //   this.board.offsetX = this.$el.getBoundingClientRect().left;
+  //   this.board.offsetY = this.$el.getBoundingClientRect().top;
+  //   this.board.width = this.$el.clientWidth;
+  //   this.board.height = this.$el.clientHeight;
+  //   this.updateAllViewports();
+  // }
 
-  get lines() {
-    let lines = [];
-    this.graphview.nodes.forEach(node => {
-      lines = lines.concat(node.getConnectionLines(this.graphview, this.board));
-    });
-    return lines;
-  }
 }
 </script>
 

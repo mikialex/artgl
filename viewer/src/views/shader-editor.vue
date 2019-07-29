@@ -5,13 +5,15 @@
         <button @click="addUniform">uniform</button>
         <button>attribute</button>
       </div>
-      <DAGNodeView
-      v-for="node in nodes"
-      :key="node.uuid"
-      :node ="node"
-      >
-        test
-      </DAGNodeView>
+      <GraphView>
+        <DAGNodeView
+        v-for="node in nodes"
+        :key="node.uuid"
+        :node ="node"
+        >
+          test
+        </DAGNodeView>
+      </GraphView>
     </div>
 
     <div class="viewer">
@@ -38,7 +40,9 @@ import {ShaderApp} from '../shader-application';
 import { injectFragmentShaderHeaders, GLDataType } from '../../../src/webgl/shader-util';
 import { ShaderGraph, uniform } from '../../../src/artgl';
 import DAGNodeView from '../components/graph/dag-node.vue';
+import GraphView from '../components/graph/graph-viewer.vue';
 import { ShaderNode } from '../../../src/shader-graph/shader-node';
+import { GraphBoardInfo } from '../model/graph-view'
 
 @Component({
   components:{
@@ -49,6 +53,13 @@ export default class ShaderEditor extends Vue {
   showCode:boolean = false;
   graph: ShaderGraph = null;
   codeGenResult: string = "";
+
+  board: GraphBoardInfo = {
+    width: 0,
+    height: 0,
+    transformX :0,
+    transformY :0,
+  }
 
   nodes: ShaderNode[] = [];
 

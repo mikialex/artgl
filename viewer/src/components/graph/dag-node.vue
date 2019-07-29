@@ -20,6 +20,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { ShaderGraph, ShaderNode, DAGNode } from "../../../../src/artgl";
+import { NodeLayout } from "../../model/graph-view";
 
 @Component({
   components: {}
@@ -29,6 +30,11 @@ export default class DAGNodeView extends Vue {
     required: true
   })
   node: DAGNode;
+
+  @Prop({
+    required: true
+  })
+  layout: NodeLayout;
 
   get inputs(): DAGNode[] {
     const results = [];

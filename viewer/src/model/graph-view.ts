@@ -3,6 +3,21 @@ import { PassGraphNode } from '../../../src/render-graph/node/pass-graph-node';
 import { DAGNode } from '../../../src/core/dag-node';
 import { RenderTargetNode } from '../../../src/render-graph/node/render-target-node';
 
+
+export interface GraphBoardInfo{
+  width: number,
+  height: number,
+  transformX :number,
+  transformY :number,
+}
+
+export interface NodeLayout{
+  absX:number,
+  absY:number,
+  width: number,
+  height: number,
+}
+
 export class GraphView {
   nodes: GraphNodeView[] = [];
   nodeMap: Map<string, GraphNodeView> = new Map();
