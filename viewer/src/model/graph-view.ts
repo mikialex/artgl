@@ -1,19 +1,15 @@
-import { RenderGraph } from '../../../src/artgl';
-import { PassGraphNode } from '../../../src/render-graph/node/pass-graph-node';
 import { DAGNode } from '../../../src/core/dag-node';
-import { RenderTargetNode } from '../../../src/render-graph/node/render-target-node';
 
-
-export interface GraphBoardInfo{
+export interface GraphBoardInfo {
   width: number,
   height: number,
-  transformX :number,
-  transformY :number,
+  transformX: number,
+  transformY: number,
 }
 
-export interface NodeLayout{
-  absX:number,
-  absY:number,
+export interface NodeLayout {
+  absX: number,
+  absY: number,
   width: number,
   height: number,
 }
@@ -67,20 +63,38 @@ export function layoutGraph(
   })
 }
 
-function createConnectionSVGLine(
-  x1: number, y1: number,
-  x2: number, y2: number,
-  ) {
-  const anchorStartX = (x1 + x2) * 0.5;
-  return 'M ' + x1 + ' ' +
-    y1 +
-    ' C ' +
-    anchorStartX + ' ' +
-    y1 +
-    ' , ' +
-    anchorStartX + ' ' +
-    y2 +
-    ' , ' +
-    x2 + ' ' +
-    y2;
+
+export class ConnectionLine {
+  startX: number = 0;
+  startY: number = 0;
+  endX: number = 0;
+  endY: number = 0;
+
+  draw(hud: LinesHUD) {
+    const ctx = hud.ctx;
+    ctx.beginPath();
+    ctx.moveTo(this.startX, this.startY);
+    ctx.lineTo(this.endX, this.endY);
+    ctx.stroke();
+  }
+}
+
+export class LinesHUD {
+  constructor(el: HTMLCanvasElement) {
+    this.el = el;
+    this.ctx = el.getContext('2d');
+  }
+  el: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  width: number = 0;
+  height: number = 0;
+
+  clear() {
+    this.ctx.clearRect(0, 0, this.width, this.height);
+  }
+
+  draw(lines: ConnectionLine[]) {
+    this.clear();
+    lines.forEach(line => line.draw(this));
+  }
 }

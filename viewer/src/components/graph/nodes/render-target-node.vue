@@ -24,7 +24,7 @@ export default class RenderTargetNodeView extends Vue {
     required: true
   })
   layout: NodeLayout;
-
+  
   actualSize() {
     this.layout.width = this.node.widthAbs / 2 / window.devicePixelRatio;
     this.layout.height = this.node.heightAbs / 2 / window.devicePixelRatio;

@@ -46,6 +46,13 @@ export default class DAGNodeView extends Vue {
     required: true
   })
   boardInfo: GraphBoardInfo;
+  
+  @Prop({
+    required: false,
+    default: true
+  })
+  editable: boolean;
+
 
   get inputs(): DAGNode[] {
     const results = [];

@@ -49,8 +49,6 @@ export class RenderTargetNode extends DAGNode{
   widthAbs: number = 0;
   heightAbs: number = 0;
 
-  // framebuffer: GLFramebuffer;
-
   private fromGetter: () => Nullable<string>
   private from: string = null;
 

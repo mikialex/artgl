@@ -24,6 +24,7 @@
           />
         </DAGNodeView>
       </GraphView>
+      <LineHUDCanvas :lines="lines" />
     </div>
 
     <div class="command-bar">
@@ -44,12 +45,14 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { GLApp } from "../application";
 import GraphView from "../components/graph/graph-viewer.vue";
 import DAGNodeView from "../components/graph/dag-node.vue";
+import LineHUDCanvas from "./line-hud-canvas.vue";
 import RenderTargetNodeView from "../components/graph/nodes/render-target-node.vue";
 import {
   GraphBoardInfo,
   ViewNode,
   layoutGraph,
-  NodeLayout
+  NodeLayout,
+  ConnectionLine
 } from "../model/graph-view";
 import { RenderTargetNode } from "../../../src/render-graph/node/render-target-node";
 import { Vector4 } from "../../../src/artgl";
@@ -58,7 +61,8 @@ import { Vector4 } from "../../../src/artgl";
   components: {
     GraphView,
     DAGNodeView,
-    RenderTargetNodeView
+    RenderTargetNodeView,
+    LineHUDCanvas
   }
 })
 export default class ViewerCanvas extends Vue {
@@ -91,6 +95,7 @@ export default class ViewerCanvas extends Vue {
   };
 
   nodes: ViewNode[] = [];
+  lines: ConnectionLine[] = [];
 
   updateViewport({ node, layout }) {
     if (node instanceof RenderTargetNode) {
@@ -128,7 +133,6 @@ export default class ViewerCanvas extends Vue {
   }
 
   inspectGraph() {
-    // this.graphView = GraphView.create(GLApp.pipeline.graph);
     GLApp.pipeline.graph.enableDebuggingView = true;
     const nodes = GLApp.pipeline.graph.nodes;
     this.nodes = nodes.map(node => {
@@ -174,13 +178,20 @@ export default class ViewerCanvas extends Vue {
 
 <style lang="scss" scoped>
 .canvas-wrap {
-  // width: calc(100vw - 600px);
   flex-grow: 1;
   border: 1px solid #ddd;
   position: relative;
 }
 
+.lines-hud {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0px;
+}
+
 .graph-viewer-wrap {
+  pointer-events: none;
   position: absolute;
   top: 0px;
   width: 100%;
