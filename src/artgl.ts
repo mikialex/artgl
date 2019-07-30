@@ -27,7 +27,7 @@ export { Scene } from "./scene/scene";
 export { SceneNode } from "./scene/scene-node";
 
 // render graph
-export { RenderGraph } from './render-graph/render-graph';
+export * from './render-graph/exports';
 
 // shader graph
 export { ShaderGraph } from './shader-graph/shader-graph';

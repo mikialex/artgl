@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { DAGNode } from "../../../../../src/artgl";
+import { DAGNode, RenderTargetNode } from "../../../../../src/artgl";
 import { NodeLayout, GraphBoardInfo } from "../../../model/graph-view";
 
 @Component({
@@ -18,14 +18,29 @@ export default class RenderTargetNodeView extends Vue {
   @Prop({
     required: true
   })
-  node: DAGNode;
+  node: RenderTargetNode;
+
+  @Prop({
+    required: true
+  })
+  layout: NodeLayout;
 
   actualSize() {
-    // this.$emit("actualSize", this.view);
+    this.layout.width = this.node.widthAbs / 2 / window.devicePixelRatio;
+    this.layout.height = this.node.heightAbs / 2 / window.devicePixelRatio;
+    this.$emit("updateSize", {
+      node: this.node,
+      layout: this.layout,
+    });
   }
 
   defaultSize() {
-    // this.$emit("defaultSize", this.view);
+    this.layout.width = 200;
+    this.layout.height = 200;
+    this.$emit("updateSize", {
+      node: this.node,
+      layout: this.layout,
+    });
   }
 }
 </script>

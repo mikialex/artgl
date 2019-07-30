@@ -3,7 +3,6 @@ import { PassGraphNode } from "./node/pass-graph-node";
 import { RenderTargetNode } from "./node/render-target-node";
 import { RenderEngine } from "../engine/render-engine";
 import { QuadSource } from './quad-source';
-import { Vector4 } from "../math/vector4";
 import { RenderPass } from "./pass";
 
 
@@ -173,19 +172,6 @@ export class RenderGraph {
     if (this.screenNode === undefined) {
       throw "screen root not found"
     }
-  }
-
-  updateRenderTargetDebugView(engine: RenderEngine, nodeId: string, viewPort: Vector4) {
-    if (this.screenNode.uuid === nodeId) {
-      RenderPass.screenDebugViewPort.copy(viewPort);
-      return
-    }
-
-    this.renderTargetNodes.forEach(node => {
-      if (node.uuid === nodeId) {
-        node.debugViewPort.copy(viewPort);
-      }
-    })
   }
 
 }

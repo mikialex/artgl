@@ -93,7 +93,7 @@ export default class DAGNodeView extends Vue {
       this.originX + e.screenX - this.screenOriginX;
     this.layout.absY =
       this.originY + e.screenY - this.screenOriginY;
-    this.$emit("updateViewport");
+    this.$emit("updateViewport", {node: this.node, layout: this.layout});
   }
 }
 </script>

@@ -7,18 +7,20 @@
       <div style="position: absolute; bottom: 0px">
         <button @click="layout">layout</button>
       </div>
-      <GraphView :board="board">
+      <GraphView :board="board" @updateAllViewport="updateAllViewport">
         <DAGNodeView
           v-for="nodeView in nodes"
           :key="nodeView.node.uuid"
           :node="nodeView.node"
           :layout="nodeView.layout"
           :boardInfo="board"
-          @updateViewport="updateViewport(nodeView)"
+          @updateViewport="updateViewport"
         >
           <RenderTargetNodeView
             v-if="isRenderTargetNode(nodeView.node)"
             :node="nodeView.node"
+            :layout="nodeView.layout"
+            @updateSize="updateViewport"
           />
         </DAGNodeView>
       </GraphView>
@@ -43,8 +45,14 @@ import { GLApp } from "../application";
 import GraphView from "../components/graph/graph-viewer.vue";
 import DAGNodeView from "../components/graph/dag-node.vue";
 import RenderTargetNodeView from "../components/graph/nodes/render-target-node.vue";
-import { GraphBoardInfo, ViewNode, layoutGraph } from "../model/graph-view";
+import {
+  GraphBoardInfo,
+  ViewNode,
+  layoutGraph,
+  NodeLayout
+} from "../model/graph-view";
 import { RenderTargetNode } from "../../../src/render-graph/node/render-target-node";
+import { Vector4 } from "../../../src/artgl";
 
 @Component({
   components: {
@@ -70,7 +78,6 @@ export default class ViewerCanvas extends Vue {
   }
 
   pick(e: MouseEvent) {
-    // console.log(e.offsetX)
     const canvas = this.$el.querySelector("canvas");
     GLApp.pickColor(e.offsetX, canvas.clientHeight - e.offsetY);
   }
@@ -85,41 +92,27 @@ export default class ViewerCanvas extends Vue {
 
   nodes: ViewNode[] = [];
 
-  updateViewport() {}
+  updateViewport({ node, layout }) {
+    if (node instanceof RenderTargetNode) {
+      const viewport = new Vector4();
+      const l = layout as NodeLayout;
+      const n = node as RenderTargetNode;
+      viewport.set(
+        l.absX + this.board.transformX,
+        this.board.height - l.absY - l.height - this.board.transformY,
+        l.width,
+        l.height
+      );
+      viewport.multiplyScalar(window.devicePixelRatio);
+      n.debugViewPort.copy(viewport);
+    }
+  }
 
-  //  actualSize(node: GraphNodeView){
-  //     const targetNode = GLApp.pipeline.graph.getNodeByID(node.uuid);
-  //     node.width = targetNode.width / window.devicePixelRatio / 2;
-  //     node.height =  targetNode.height / window.devicePixelRatio / 2;
-  //     this.updateViewport(node);
-  //   }
-
-  //   defaultSize(node: GraphNodeView){
-  //     node.width = GraphView.targetNodeDefaultSize;
-  //     node.height = GraphView.targetNodeDefaultSize;
-  //     this.updateViewport(node);
-  //   }
-
-  //   updateViewport(node: GraphNodeView){
-  //     const viewport = new Vector4();
-  //     viewport.set(
-  //       node.positionX + this.board.transformX,
-  //       this.board.height - node.positionY - node.height - this.board.transformY,
-  //       node.width,
-  //       node.height
-  //     );
-  //     viewport.multiplyScalar(window.devicePixelRatio);
-  //     if(GLApp.pipeline.graph){ // TODO
-  //       const engine = GLApp.engine;
-  //       GLApp.pipeline.graph.updateRenderTargetDebugView(engine, node.uuid, viewport);
-  //     }
-  //   }
-
-  //   updateAllViewports(){
-  //     this.graphview.nodes.forEach(node =>{
-  //       this.updateViewport(node)
-  //     })
-  //   }
+  updateAllViewport() {
+    this.nodes.forEach(node => {
+      this.updateViewport(node);
+    });
+  }
 
   layout() {
     const map = {};
@@ -127,10 +120,11 @@ export default class ViewerCanvas extends Vue {
       map[node.node.uuid] = node.layout;
     });
     layoutGraph(GLApp.pipeline.graph.screenNode, map);
+    this.updateAllViewport();
   }
 
-  isRenderTargetNode(node){
-    return node instanceof RenderTargetNode
+  isRenderTargetNode(node) {
+    return node instanceof RenderTargetNode;
   }
 
   inspectGraph() {
@@ -149,10 +143,10 @@ export default class ViewerCanvas extends Vue {
       };
     });
     this.showGraphViewer = true;
+    this.layout();
   }
 
   closeGraphInspector() {
-    // this.graphView = null;
     GLApp.pipeline.graph.enableDebuggingView = false;
     this.showGraphViewer = false;
   }
