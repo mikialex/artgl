@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Provide } from "vue-property-decorator";
+import { Component, Prop, Vue, ProvideReactive } from "vue-property-decorator";
 import { GLApp } from "../application";
 import GraphView from "../components/graph/graph-viewer.vue";
 import DAGNodeView from "../components/graph/dag-node.vue";
@@ -94,8 +94,8 @@ export default class ViewerCanvas extends Vue {
     transformY: 0
   };
 
-  @Provide() nodes: ViewNode[] = [];
-  @Provide() lines: ConnectionLine[] = [];
+  @ProvideReactive() nodes: ViewNode[] = [];
+  @ProvideReactive() lines: ConnectionLine[] = [];
 
   updateViewport({ node, layout }) {
     if (node instanceof RenderTargetNode) {

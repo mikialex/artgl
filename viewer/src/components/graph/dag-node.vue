@@ -17,26 +17,31 @@
 
     <!-- <div class="input-info">
       <div v-for="fromNode in inputs" :key="fromNode.uuid">{{node.uuid}}</div>
-    </div> -->
+    </div>-->
 
     <slot></slot>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Inject } from "vue-property-decorator";
+import { Component, Prop, Vue, InjectReactive } from "vue-property-decorator";
 import { ShaderGraph, ShaderNode, DAGNode } from "../../../../src/artgl";
-import { NodeLayout, GraphBoardInfo, ViewNode, ConnectionLine, getRightCenter } from "../../model/graph-view";
+import {
+  NodeLayout,
+  GraphBoardInfo,
+  ViewNode,
+  ConnectionLine,
+  getRightCenter
+} from "../../model/graph-view";
 import { findFirst } from "../../../../src/util/array";
 
 @Component({
   components: {}
 })
 export default class DAGNodeView extends Vue {
-  
-  @Inject() nodes: ViewNode[];
-  @Inject() lines: ConnectionLine[];
-  
+  @InjectReactive() nodes: ViewNode[];
+  @InjectReactive() lines: ConnectionLine[];
+
   @Prop({
     required: true
   })
@@ -58,36 +63,42 @@ export default class DAGNodeView extends Vue {
   })
   editable: boolean;
 
-  getNodesLayout(node: DAGNode){
-    return findFirst(this.nodes, vn =>{
+  getNodesLayout(node: DAGNode) {
+    return findFirst(this.nodes, vn => {
       return vn.node === node;
-    }).layout
+    }).layout;
   }
 
   getLines(): ConnectionLine[] {
-    return this.inputs.map(inputNode =>{
-      const rightCenter = getRightCenter(this.getNodesLayout(inputNode))
-      const line =  new ConnectionLine()
-      line.startX = rightCenter.x
-      line.startY = rightCenter.y
-      line.startX = this.layout.absX
-      line.startY = this.layout.absY
-      return line
-    })
+    return this.inputs.map(inputNode => {
+      const rightCenter = getRightCenter(this.getNodesLayout(inputNode));
+      const line = new ConnectionLine();
+      line.startX = rightCenter.x;
+      line.startY = rightCenter.y;
+      line.endX = this.layout.absX;
+      line.endY = this.layout.absY;
+      return line;
+    });
   }
 
-  updateLine(){
-    // this.getLines().forEach(line => {
-    //   this.lines.push(line)
-    // });
-      this.lines.push(new ConnectionLine)
+  selfLines: ConnectionLine[] = [];
+  updateLine() {
+    this.selfLines.forEach(line => {
+      const position = this.lines.indexOf(line);
+      if (position !== -1) {
+        this.lines.splice(position, 1);
+      }
+    });
+    this.selfLines = this.getLines();
+    this.selfLines.forEach(line => {
+      this.lines.push(line);
+    });
   }
 
-  mounted(){
+  mounted() {
     this.updateLine();
     setTimeout(() => {
-      
-    console.log(this.nodes)
+      console.log(this.nodes);
     }, 1000);
   }
 
@@ -132,11 +143,9 @@ export default class DAGNodeView extends Vue {
   }
 
   dragging(e: MouseEvent) {
-    this.layout.absX =
-      this.originX + e.screenX - this.screenOriginX;
-    this.layout.absY =
-      this.originY + e.screenY - this.screenOriginY;
-    this.$emit("updateViewport", {node: this.node, layout: this.layout});
+    this.layout.absX = this.originX + e.screenX - this.screenOriginX;
+    this.layout.absY = this.originY + e.screenY - this.screenOriginY;
+    this.$emit("updateViewport", { node: this.node, layout: this.layout });
   }
 }
 </script>

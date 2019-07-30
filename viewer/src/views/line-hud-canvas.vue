@@ -21,6 +21,7 @@ export default class LineHUDCanvas extends Vue {
     this.HUD = new LinesHUD(this.$el as HTMLCanvasElement);
     window.addEventListener("resize", this.updateSize);
     window.requestAnimationFrame(this.draw);
+    this.updateSize();
   }
 
   beforeDestroy() {
@@ -28,9 +29,11 @@ export default class LineHUDCanvas extends Vue {
   }
 
   updateSize() {
-    const el = this.$el;
+    const el = this.$el as HTMLCanvasElement;
     this.HUD.width = el.clientWidth;
     this.HUD.height = el.clientHeight;
+    el.width = el.clientWidth;
+    el.height = el.clientHeight;
   }
 
   draw() {
