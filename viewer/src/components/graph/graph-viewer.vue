@@ -1,0 +1,113 @@
+<template>
+  <div class="graph-viewer" tabindex="-1">
+    <div :style="{
+          transform
+        }">
+      <slot></slot>
+    </div>
+
+    <div class="mask" v-if="showMove" @mousedown="startDrag"></div>
+
+    <div class="ops">
+      <button v-if="!showMove" @click="showMove = true">move</button>
+      <button v-if="showMove" @click="showMove = false">unmove</button>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { Component, Prop, Vue } from "vue-property-decorator";
+import { Vector4 } from "../../../../src/math";
+import { GraphBoardInfo } from "../../model/graph-view";
+
+@Component({
+  components: {}
+})
+export default class GraphViewer extends Vue {
+  @Prop({ required: true }) board: GraphBoardInfo;
+
+  get transform() {
+    return `translate(${this.board.transformX}px, ${this.board.transformY}px)`;
+  }
+
+  showMove = false;
+
+  isDragging = false;
+  originTransformX: number;
+  originTransformY: number;
+  screenOriginX: number;
+  screenOriginY: number;
+  startDrag(e) {
+    this.isDragging = true;
+    this.screenOriginX = e.screenX;
+    this.screenOriginY = e.screenY;
+    this.originTransformX = this.board.transformX;
+    this.originTransformY = this.board.transformY;
+    window.addEventListener("mousemove", this.dragging);
+    window.addEventListener("mouseup", e => {
+      this.isDragging = false;
+      window.removeEventListener("mousemove", this.dragging);
+    });
+  }
+
+  dragging(e) {
+    this.board.transformX =
+      this.originTransformX + e.screenX - this.screenOriginX;
+    this.board.transformY =
+      this.originTransformY + e.screenY - this.screenOriginY;
+    this.$emit("updateAllViewport");
+  }
+
+  mounted() {
+    this.updateBoard();
+    window.addEventListener("resize", this.updateBoard)
+  }
+
+  beforeDestroy(){
+    window.removeEventListener("resize", this.updateBoard)
+  }
+
+  updateBoard() {
+    this.board.width = this.$el.clientWidth;
+    this.board.height = this.$el.clientHeight;
+    this.$emit("updateAllViewport");
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.graph-viewer {
+  pointer-events: none;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.connector {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: calc(100% - 40px);
+  z-index: -10;
+}
+
+.mask {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  top: 0px;
+  left: 0px;
+  position: absolute;
+  pointer-events: auto;
+}
+
+.ops {
+  top: 0px;
+  left: 0px;
+  position: absolute;
+  pointer-events: auto;
+}
+</style>

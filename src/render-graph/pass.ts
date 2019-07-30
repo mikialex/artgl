@@ -75,14 +75,13 @@ export class RenderPass{
     })
   } 
 
-  static screenDebugViewPort = new Vector4(200, 0, 200, 200)
   execute(engine: RenderEngine, graph: RenderGraph) {
 
     // setup viewport and render target
     if (this.isOutputScreen) {
       engine.renderer.setRenderTargetScreen();
       if (graph.enableDebuggingView) {
-        const debugViewPort = RenderPass.screenDebugViewPort;
+        const debugViewPort = graph.screenNode.debugViewPort;
         engine.renderer.state.setViewport(
           debugViewPort.x, debugViewPort.y,
           debugViewPort.z, debugViewPort.w

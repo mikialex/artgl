@@ -1,4 +1,4 @@
-export interface RenderConfig{
+export interface RenderConfig {
   name: string,
   type: 'folder' | undefined,
   value: RenderConfig[] | any,

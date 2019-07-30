@@ -1,6 +1,7 @@
 <template>
   <div>
-    <input type="range" 
+    <input 
+    type="range" 
     :max="config.max"
     :min="config.min"
     :step="config.step"

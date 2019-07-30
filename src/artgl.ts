@@ -20,16 +20,18 @@ export { Shading } from "./core/shading";
 export { BufferData } from "./core/buffer-data";
 export { Camera } from "./core/camera";
 export { Observable } from "./core/observable";
+export { DAGNode } from "./core/dag-node";
 
 // scene
 export { Scene } from "./scene/scene";
 export { SceneNode } from "./scene/scene-node";
 
 // render graph
-export { RenderGraph } from './render-graph/render-graph';
+export * from './render-graph/exports';
 
 // shader graph
 export { ShaderGraph } from './shader-graph/shader-graph';
+export * from './shader-graph/shader-node';
 export * from './shader-graph/node-maker';
 
 // shading lib

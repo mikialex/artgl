@@ -11,11 +11,8 @@ export class PassGraphNode extends DAGNode {
     super();
     this.name = define.name;
 
-    this.pass = new RenderPass(define);
-
     if (define.inputs !== undefined) {
       this.inputsGetter = define.inputs;
-      this.updateDependNode(graph);
     }
 
   }
@@ -43,8 +40,8 @@ export class PassGraphNode extends DAGNode {
     })
   }
 
-  updatePass(engine: RenderEngine, activeNodes: RenderGraphNode[]) {
-    this.pass.updateInputTargets(this.inputs);
+  updatePass(engine: RenderEngine, pass: RenderPass, activeNodes: RenderGraphNode[]) {
+    pass.updateInputTargets(this.inputs);
     let foundedNode = null;
     if (this.toNodes.size === 0) {
       throw "cant found render target node for a render pass"
@@ -60,14 +57,12 @@ new found target pass: ${activeNodes[i].name};
               `
             }
             foundedNode = node
-            this.pass.setOutPutTarget(engine, node);
+            pass.setOutPutTarget(engine, node);
           }
         }
       }
     })
-    this.pass.checkIsValid();
+    pass.checkIsValid();
   }
-
-  pass: RenderPass;
 
 }
