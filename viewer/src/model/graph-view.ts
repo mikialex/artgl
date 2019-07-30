@@ -14,6 +14,13 @@ export interface NodeLayout {
   height: number,
 }
 
+export function getRightCenter(layout: NodeLayout) {
+  return {
+    x: layout.absX + layout.width,
+    y: layout.absY + layout.height / 2,
+  }
+}
+
 export interface ViewNode {
   node: DAGNode;
   layout: NodeLayout;

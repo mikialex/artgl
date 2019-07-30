@@ -24,14 +24,19 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Inject } from "vue-property-decorator";
 import { ShaderGraph, ShaderNode, DAGNode } from "../../../../src/artgl";
-import { NodeLayout, GraphBoardInfo } from "../../model/graph-view";
+import { NodeLayout, GraphBoardInfo, ViewNode, ConnectionLine, getRightCenter } from "../../model/graph-view";
+import { findFirst } from "../../../../src/util/array";
 
 @Component({
   components: {}
 })
 export default class DAGNodeView extends Vue {
+  
+  @Inject() nodes: ViewNode[];
+  @Inject() lines: ConnectionLine[];
+  
   @Prop({
     required: true
   })
@@ -46,13 +51,45 @@ export default class DAGNodeView extends Vue {
     required: true
   })
   boardInfo: GraphBoardInfo;
-  
+
   @Prop({
     required: false,
     default: true
   })
   editable: boolean;
 
+  getNodesLayout(node: DAGNode){
+    return findFirst(this.nodes, vn =>{
+      return vn.node === node;
+    }).layout
+  }
+
+  getLines(): ConnectionLine[] {
+    return this.inputs.map(inputNode =>{
+      const rightCenter = getRightCenter(this.getNodesLayout(inputNode))
+      const line =  new ConnectionLine()
+      line.startX = rightCenter.x
+      line.startY = rightCenter.y
+      line.startX = this.layout.absX
+      line.startY = this.layout.absY
+      return line
+    })
+  }
+
+  updateLine(){
+    // this.getLines().forEach(line => {
+    //   this.lines.push(line)
+    // });
+      this.lines.push(new ConnectionLine)
+  }
+
+  mounted(){
+    this.updateLine();
+    setTimeout(() => {
+      
+    console.log(this.nodes)
+    }, 1000);
+  }
 
   get inputs(): DAGNode[] {
     const results = [];
@@ -65,7 +102,6 @@ export default class DAGNodeView extends Vue {
   get viewPositionX() {
     return this.layout.absX + "px";
   }
-
   get viewPositionY() {
     return this.layout.absY + "px";
   }
