@@ -31,7 +31,7 @@ import {
   GraphBoardInfo,
   ViewNode,
   ConnectionLine,
-  getRightCenter
+  getRightEnd
 } from "../../model/graph-view";
 import { findFirst } from "../../../../src/util/array";
 
@@ -71,7 +71,7 @@ export default class DAGNodeView extends Vue {
 
   getLines(): ConnectionLine[] {
     return this.inputs.map(inputNode => {
-      const rightCenter = getRightCenter(this.getNodesLayout(inputNode));
+      const rightCenter = getRightEnd(this.getNodesLayout(inputNode));
       const line = new ConnectionLine();
       line.startX = rightCenter.x;
       line.startY = rightCenter.y;
@@ -97,9 +97,6 @@ export default class DAGNodeView extends Vue {
 
   mounted() {
     this.updateLine();
-    setTimeout(() => {
-      console.log(this.nodes);
-    }, 1000);
   }
 
   get inputs(): DAGNode[] {
@@ -146,6 +143,7 @@ export default class DAGNodeView extends Vue {
     this.layout.absX = this.originX + e.screenX - this.screenOriginX;
     this.layout.absY = this.originY + e.screenY - this.screenOriginY;
     this.$emit("updateViewport", { node: this.node, layout: this.layout });
+    this.$emit("updateLine", this.node)
   }
 }
 </script>

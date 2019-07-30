@@ -4,7 +4,7 @@
     <div v-if="!isRunning" class="stop-notation">STOPPED</div>
 
     <div class="graph-viewer-wrap" v-if="showGraphViewer">
-      <div style="position: absolute; bottom: 0px">
+      <div style="position: absolute; bottom: 0px; pointer-events: auto;">
         <button @click="layout">layout</button>
       </div>
       <GraphView :board="board" @updateAllViewport="updateAllViewport">
@@ -15,6 +15,8 @@
           :layout="nodeView.layout"
           :boardInfo="board"
           @updateViewport="updateViewport"
+          @updateLine = "updateLine"
+          ref="vueNodes"
         >
           <RenderTargetNodeView
             v-if="isRenderTargetNode(nodeView.node)"
@@ -24,7 +26,7 @@
           />
         </DAGNodeView>
       </GraphView>
-      <LineHUDCanvas :lines="lines" />
+      <LineHUDCanvas :lines="lines" :boardInfo="board" />
     </div>
 
     <div class="command-bar">
@@ -55,7 +57,7 @@ import {
   ConnectionLine
 } from "../model/graph-view";
 import { RenderTargetNode } from "../../../src/render-graph/node/render-target-node";
-import { Vector4 } from "../../../src/artgl";
+import { Vector4, DAGNode } from "../../../src/artgl";
 
 @Component({
   components: {
@@ -113,6 +115,24 @@ export default class ViewerCanvas extends Vue {
     }
   }
 
+  updateLine(node: DAGNode){
+    this.notifyNodeNeedUpdateLine(node)
+    node.toNodes.forEach(no =>{
+      this.notifyNodeNeedUpdateLine(no);
+    })
+  }
+
+  notifyNodeNeedUpdateLine(n: DAGNode){
+    if(this.$refs.vueNodes){
+      for (let i = 0; i < (this.$refs.vueNodes as Array<DAGNodeView>).length; i++) {
+        const v = this.$refs.vueNodes[i];
+        if(v.node === n){
+          v.updateLine();
+        }
+      }
+    }
+  }
+
   updateAllViewport() {
     this.nodes.forEach(node => {
       this.updateViewport(node);
@@ -126,6 +146,8 @@ export default class ViewerCanvas extends Vue {
     });
     layoutGraph(GLApp.pipeline.graph.screenNode, map);
     this.updateAllViewport();
+    
+    this.nodes.forEach(node => this.updateLine(node.node))
   }
 
   isRenderTargetNode(node) {

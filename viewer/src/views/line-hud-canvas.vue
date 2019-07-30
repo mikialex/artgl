@@ -3,7 +3,7 @@
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { LinesHUD, ConnectionLine } from "../model/graph-view";
+import { LinesHUD, ConnectionLine, GraphBoardInfo } from "../model/graph-view";
 
 @Component({
   components: {}
@@ -16,6 +16,11 @@ export default class LineHUDCanvas extends Vue {
     required: true
   })
   lines: ConnectionLine[];
+
+  @Prop({
+    required: true
+  })
+  boardInfo: GraphBoardInfo;
 
   mounted() {
     this.HUD = new LinesHUD(this.$el as HTMLCanvasElement);
@@ -37,7 +42,7 @@ export default class LineHUDCanvas extends Vue {
   }
 
   draw() {
-    this.HUD.draw(this.lines);
+    this.HUD.draw(this.lines, this.boardInfo);
     if (this.isRunning) {
       window.requestAnimationFrame(this.draw);
     }

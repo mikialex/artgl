@@ -14,10 +14,10 @@ export interface NodeLayout {
   height: number,
 }
 
-export function getRightCenter(layout: NodeLayout) {
+export function getRightEnd(layout: NodeLayout) {
   return {
     x: layout.absX + layout.width,
-    y: layout.absY + layout.height / 2,
+    y: layout.absY + 10,
   }
 }
 
@@ -77,11 +77,11 @@ export class ConnectionLine {
   endX: number = 0;
   endY: number = 0;
 
-  draw(hud: LinesHUD) {
+  draw(hud: LinesHUD, boardInfo: GraphBoardInfo) {
     const ctx = hud.ctx;
     ctx.beginPath();
-    ctx.moveTo(this.startX, this.startY);
-    ctx.lineTo(this.endX, this.endY);
+    ctx.moveTo(this.startX + boardInfo.transformX, this.startY + boardInfo.transformY);
+    ctx.lineTo(this.endX + boardInfo.transformX, this.endY + boardInfo.transformY);
     ctx.stroke();
   }
 }
@@ -100,8 +100,8 @@ export class LinesHUD {
     this.ctx.clearRect(0, 0, this.width, this.height);
   }
 
-  draw(lines: ConnectionLine[]) {
+  draw(lines: ConnectionLine[], boardInfo: GraphBoardInfo) {
     this.clear();
-    lines.forEach(line => line.draw(this));
+    lines.forEach(line => line.draw(this, boardInfo));
   }
 }
