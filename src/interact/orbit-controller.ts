@@ -21,6 +21,7 @@ export class OrbitController extends Controller {
 
   spherical: Spherical = new Spherical();
   rotateAngleFactor = 0.5
+  panFactor = 0.002
 
   // restriction
   maxPolarAngle = 179 / 180 * Math.PI;
@@ -29,8 +30,11 @@ export class OrbitController extends Controller {
   // damping
   sphericalDelta: Spherical = new Spherical(0, 0, 0);
   zoomingFactor: number = 1;
+  panOffset: Vector3 = new Vector3();
+
   enableDamping = true;
   dampingFactor = 0.25;
+  panDampingFactor = 0.5;
 
 
   public registerInteractor(interactor: Interactor) {
@@ -59,9 +63,11 @@ export class OrbitController extends Controller {
     this.needUpdate = true;
   }
   move = (offset: Vector2) => {
-    offset.rotate(-this.spherical.azim).multiplyScalar(this.spherical.radius * 0.002);
-    this.spherical.center.x += offset.x;
-    this.spherical.center.z += offset.y;
+    offset.rotate(-this.spherical.azim).multiplyScalar(this.spherical.radius * this.panFactor);
+
+
+    this.panOffset.x += offset.x;
+    this.panOffset.z += offset.y;
     this.needUpdate = true;
   }
 
@@ -73,18 +79,24 @@ export class OrbitController extends Controller {
     if (this.sphericalDelta.azim > 0.0001 ||
       this.sphericalDelta.polar > 0.0001 ||
       this.sphericalDelta.radius > 0.0001 ||
-      Math.abs(this.zoomingFactor - 1) > 0.0001
-      ) {
+      Math.abs(this.zoomingFactor - 1) > 0.0001 ||
+      this.panOffset.mag() > 0.01
+    ) {
       this.needUpdate = true;
     }
 
 
     if (this.needUpdate) {
       this.spherical.radius *= this.zoomingFactor;
+
       this.spherical.azim += this.sphericalDelta.azim;
+
       this.spherical.polar = MathUtil.clamp(
         this.spherical.polar + this.sphericalDelta.polar,
         this.minPolarAngle, this.maxPolarAngle);
+
+      this.spherical.center.add(this.panOffset);
+
       tempVec.setFromSpherical(this.spherical).add(this.spherical.center);
       this.camera.transform.position.copy(tempVec);
       this.camera.lookAt(this.spherical.center);
@@ -96,12 +108,11 @@ export class OrbitController extends Controller {
       this.sphericalDelta.azim *= (1 - this.dampingFactor);
       this.sphericalDelta.polar *= (1 - this.dampingFactor);
       this.zoomingFactor = this.zoomingFactor + (1 - this.zoomingFactor) * this.dampingFactor;
-      // this.zoomingFactor *= (1 - this.dampingFactor);
-      // panOffset.multiplyScalar( 1 - this.dampingFactor );
+      this.panOffset.multiplyScalar(1 - this.panDampingFactor);
     } else {
       this.sphericalDelta.set(0, 0, 0);
       this.zoomingFactor = 1;
-      // this.panOffset.set( 0, 0, 0 );
+      this.panOffset.set(0, 0, 0);
     }
   }
 
