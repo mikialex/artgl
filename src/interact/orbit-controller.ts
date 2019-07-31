@@ -76,9 +76,9 @@ export class OrbitController extends Controller {
 
   public update() {
 
-    if (this.sphericalDelta.azim > 0.0001 ||
-      this.sphericalDelta.polar > 0.0001 ||
-      this.sphericalDelta.radius > 0.0001 ||
+    if (Math.abs(this.sphericalDelta.azim) > 0.0001 ||
+      Math.abs(this.sphericalDelta.polar) > 0.0001 ||
+      Math.abs(this.sphericalDelta.radius) > 0.0001 ||
       Math.abs(this.zoomingFactor - 1) > 0.0001 ||
       this.panOffset.mag() > 0.01
     ) {

@@ -12,7 +12,6 @@ export class ShaderApplication {
 
   shader: Shading;
   mesh: Mesh;
-  interactor: Interactor;
   orbitController: OrbitController;
 
   engine: RenderEngine;
@@ -22,9 +21,8 @@ export class ShaderApplication {
     this.canvas = canvas;
     this.engine = new RenderEngine(canvas);
     this.engine.camera.transform.position.set(20, 10, 10)
-    this.interactor = new Interactor(canvas);
     this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);
-    this.orbitController.registerInteractor(this.interactor);
+    this.orbitController.registerInteractor(this.engine.interactor);
     this.shader = new Shading().decorate(new NormalShading());
     this.loadScene();
     this.tick();

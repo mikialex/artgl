@@ -31,9 +31,11 @@ const defaultRenderTargetTextureDescriptor = DefaultTextureDescriptor;
 export class GLTextureManager implements GLReleasable{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
+    this.POTResizeCanvas = document.createElement('canvas')
   }
   readonly renderer: GLRenderer;
-  private textures: Map<Texture, WebGLTexture>  = new Map();
+  private textures: Map<Texture, WebGLTexture> = new Map();
+  private POTResizeCanvas: HTMLCanvasElement;
   // private textures: Map<Texture, WebGLTextureWithVersionIDWrap> = new Map();
 
   init() {

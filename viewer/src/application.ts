@@ -17,7 +17,6 @@ export class Application {
   el: HTMLCanvasElement;
   hasInitialized: boolean = false;
   scene: Scene = new Scene();
-  interactor: Interactor;
   orbitController: OrbitController;
 
   conf: RenderConfig;
@@ -28,9 +27,8 @@ export class Application {
     this.pipeline = new RenderPipeline();
     this.pipeline.build(this.engine, this.scene);
     this.engine.camera.transform.position.set(20, 10, 10)
-    this.interactor = new Interactor(canvas);
     this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);
-    this.orbitController.registerInteractor(this.interactor);
+    this.orbitController.registerInteractor(this.engine.interactor);
     this.hasInitialized = true;
     this.createScene(this.scene);
 
@@ -84,12 +82,12 @@ export class Application {
   }
 
   run() {
-    this.interactor.enabled = true;
+    this.engine.interactor.enabled = true;
     this.framer.run();
   }
 
   stop() {
-    this.interactor.enabled = false;
+    this.engine.interactor.enabled = false;
     this.framer.stop();
   }
 

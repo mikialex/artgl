@@ -21,6 +21,7 @@ import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/vao";
 import { Vector4 } from "../math/vector4";
 import { Shading, ShaderUniformProvider } from "../core/shading";
+import { Interactor } from "../interact/interactor";
 
 export interface RenderSource{
   resetSource(): void;
@@ -57,12 +58,16 @@ export class RenderEngine implements GLReleasable{
       (this.camera as PerspectiveCamera).aspect = el.width / el.height;
     }
 
+    this.interactor = new Interactor(el);
+
     InnerUniformMap.forEach((des, key) => {
       this.globalUniforms.set(key, new UniformProxy(des.default))
     })
     
     this.preferVAO = true;
   }
+
+  readonly interactor: Interactor
 
   readonly renderer: GLRenderer;
   _preferVAO: boolean = true;
@@ -438,6 +443,7 @@ export class RenderEngine implements GLReleasable{
   dispose() {
     this.resizeObservable.clear();
     this.releaseGL();
+    this.interactor.dispose();
   }
 
 
