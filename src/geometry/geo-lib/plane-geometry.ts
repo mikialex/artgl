@@ -1,7 +1,4 @@
-
-import { BufferData } from '../../core/buffer-data';
 import { StandardGeometry } from '../standard-geometry';
-
 
 export class PlaneGeometry extends StandardGeometry {
   constructor(width?: number, height?: number,
@@ -67,20 +64,8 @@ export class PlaneGeometry extends StandardGeometry {
         indices.push( b, c, d );
       }
     }
-  
 
-    const positionBuffer = new BufferData(new Float32Array(vertices), 3);
-    this.bufferDatum.position = positionBuffer;
-
-    const normalBuffer = new BufferData(new Float32Array(normals), 3);
-    this.bufferDatum.normal = normalBuffer;
-
-    const uvBuffer = new BufferData(new Float32Array(uvs), 2);
-    this.bufferDatum.uv = uvBuffer;
-
-    const indexBuffer = new BufferData(new Uint16Array(indices), 1);
-    this.indexBuffer = indexBuffer;
-
+    this.create(indices, vertices, normals, uvs);
   }
 
 }

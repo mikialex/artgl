@@ -1,5 +1,4 @@
 import { RenderEngine } from "../engine/render-engine";
-
 export type BufferDataType = Float32Array | Uint16Array | Uint32Array;
 
 /**
@@ -7,9 +6,20 @@ export type BufferDataType = Float32Array | Uint16Array | Uint32Array;
  * Provided some convenient methods for data manipulating
  */
 export class BufferData{
+  static f3(data: number[]): BufferData {
+    return new BufferData(new Float32Array(data), 3)
+  }
+  static f2(data: number[]): BufferData {
+    return new BufferData(new Float32Array(data), 2)
+  }
+  static u16Index(data: number[]): BufferData {
+    return new BufferData(new Uint16Array(data), 1)
+  }
+
   constructor(data: BufferDataType, stride: number) {
     this.data = data;
     this.count = this.data.length / this.stride;
+    this.stride = stride;
   }
   data: BufferDataType;
   count: number = 1;

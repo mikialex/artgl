@@ -2,7 +2,7 @@ import { BufferData } from "./buffer-data";
 import { Box3 } from "../math/entity/box3";
 import { Sphere } from "../math/entity/sphere";
 import { generateUUID } from '../math/uuid';
-import { RenderRange, PrimitiveVisitor } from "./render-object";
+import { RenderRange } from "./render-object";
 import { Face3 } from "../math/entity/face3";
 import { Line3 } from "../math/entity/line3";
 import { Vector3 } from "../math/vector3";
