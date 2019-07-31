@@ -5,9 +5,9 @@ import {
 import { PointLight } from '../../../src/core/light';
 
 export default function (root:SceneNode) {
-  const testGeo = new SphereGeometry(1, 40, 40);
-  const testPlane = new PlaneGeometry(10, 10, 10, 10);
-  const testBox = new CubeGeometry(5, 3, 4)
+  const sphereGeo = new SphereGeometry(1, 40, 40);
+  const planeGeo = new PlaneGeometry(10, 10, 10, 10);
+  const cubeGeo = new CubeGeometry(5, 3, 4)
   const light = new PointLight();
   
   let shading = new Shading()
@@ -18,15 +18,11 @@ export default function (root:SceneNode) {
     console.log(config);
   })
 
-  const planeMesh = new Mesh();
-  planeMesh.geometry = testPlane;
-  planeMesh.shading = shading;
+  const planeMesh = new Mesh().g(planeGeo).s(shading)
   root.addChild(planeMesh);
 
 
-  const boxMesh = new Mesh();
-  boxMesh.geometry = testBox;
-  boxMesh.shading = shading;
+  const boxMesh = new Mesh().g(cubeGeo).s(shading)
   boxMesh.transform.position.y = -2;
   root.addChild(boxMesh);
 
@@ -40,12 +36,8 @@ export default function (root:SceneNode) {
       node2.transform.position.y = j;
       node.addChild(node2);
       for (let k = 0; k < 5; k++) {
-        const testMesh = new Mesh();
-        testMesh.geometry = testGeo;
-        
-        // this mesh receive that light
-        testMesh.shading = shading;
 
+        const testMesh = new Mesh().g(sphereGeo).s(shading)
         testMesh.transform.position.z = k;
         testMesh.transform.scale.set(0.3, 0.3, 0.3);
         node2.addChild(testMesh);

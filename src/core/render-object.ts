@@ -69,4 +69,18 @@ export class RenderObject extends SceneNode {
 
   foreachPrimitive(_visitor: PrimitiveVisitor) { throw "not implement" }
 
+  g(geometry: Geometry) {
+    this.geometry = geometry;
+    return this;
+  }
+
+  m(material: Material) {
+    this.material = material;
+    return this;
+  }
+
+  s(shading: Shading) {
+    this.shading = shading;
+    return this;
+  }
 }
