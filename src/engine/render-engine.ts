@@ -319,7 +319,7 @@ export class RenderEngine implements GLReleasable{
   }
 
   private connectGeometry(geometry: Geometry, program: GLProgram) {
-
+    
     // check index buffer and update program.indexUINT
     if (program.useIndexDraw) {
       if (geometry.indexBuffer === null) {

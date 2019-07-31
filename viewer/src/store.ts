@@ -7,8 +7,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    showConfigPanel: true,
-    showScenePanel: true,
+    showConfigPanel: false,
+    showScenePanel: false,
     examples,
     viewExample: "",
   },

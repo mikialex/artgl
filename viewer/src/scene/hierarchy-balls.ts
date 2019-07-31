@@ -1,12 +1,13 @@
 import {
   SphereGeometry, PlaneGeometry,
-  NormalShading, Mesh, SceneNode, Shading
+  NormalShading, Mesh, SceneNode, Shading, CubeGeometry
 } from '../../../src/artgl';
 import { PointLight } from '../../../src/core/light';
 
 export default function (root:SceneNode) {
-  let testGeo = new SphereGeometry(1, 40, 40);
-  let testPlane = new PlaneGeometry(10, 10, 10, 10);
+  const testGeo = new SphereGeometry(1, 40, 40);
+  const testPlane = new PlaneGeometry(10, 10, 10, 10);
+  const testBox = new CubeGeometry(5, 3, 4)
   const light = new PointLight();
   
   let shading = new Shading()
@@ -21,6 +22,15 @@ export default function (root:SceneNode) {
   planeMesh.geometry = testPlane;
   planeMesh.shading = shading;
   root.addChild(planeMesh);
+
+
+  const boxMesh = new Mesh();
+  boxMesh.geometry = testBox;
+  boxMesh.shading = shading;
+  boxMesh.transform.position.y = -2;
+  root.addChild(boxMesh);
+
+
   for (let i = 0; i < 5; i++) {
     const node = new SceneNode();
     node.transform.position.x = i;
