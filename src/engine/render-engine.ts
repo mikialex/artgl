@@ -5,7 +5,6 @@ import { Matrix4 } from "../math/matrix4";
 import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
-import { DrawMode } from "../webgl/const";
 import { Material } from "../core/material";
 import { GLTextureUniform } from "../webgl/uniform/uniform-texture";
 import { PerspectiveCamera } from "../camera/perspective-camera";
@@ -70,6 +69,7 @@ export class RenderEngine implements GLReleasable{
   readonly interactor: Interactor
 
   readonly renderer: GLRenderer;
+
   _preferVAO: boolean = true;
   _vaoEnabled: boolean = false;
   get vaoEnabled(): boolean { return this._vaoEnabled };

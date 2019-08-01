@@ -1,7 +1,9 @@
 import { Quaternion } from './quaternion';
-import { Matrix4 } from './Matrix4';
+import { Matrix4 } from './matrix4';
 import { Spherical } from './Spherical';
 import { DataObject, VectorDataObject, ArrayFlattenable } from './index';
+
+const tempMatrix = new Matrix4();
 
 export class Vector3
   implements
@@ -10,9 +12,9 @@ export class Vector3
   ArrayFlattenable<Vector3>
 {
   private buffer: Float32Array = new Float32Array(3);
-  public x: number;
-  public y: number;
-  public z: number;
+  x: number;
+  y: number;
+  z: number;
 
   constructor(x?: number, y?: number, z?: number) {
     this.x = x || 0;
@@ -20,99 +22,113 @@ export class Vector3
     this.z = z || 0;
   }
 
-  public set(x: number, y: number, z: number): Vector3 {
+  set(x: number, y: number, z: number): Vector3 {
     this.x = x;
     this.y = y;
     this.z = z;
     return this;
   }
 
-  public copy(v: Vector3): Vector3 {
+  copy(v: Vector3): Vector3 {
     this.x = v.x;
     this.y = v.y;
     this.z = v.z;
     return this;
   }
 
-  public equals(v: Vector3) {
+  equals(v: Vector3) {
     return ((v.x === this.x) && (v.y === this.y)) && (v.z === this.z);
   }
 
-  public clone(): Vector3 {
+  clone(): Vector3 {
     return new Vector3(this.x, this.y, this.z);
   }
 
-  public add(v: Vector3): Vector3 {
+  add(v: Vector3): Vector3 {
     this.x += v.x;
     this.y += v.y;
     this.z += v.z;
     return this;
   }
 
-  public sub(v: Vector3): Vector3 {
+  addVectors(a: Vector3, b: Vector3): Vector3 {
+    this.x = a.x + b.x;
+    this.y = a.y + b.y;
+    this.z = a.z + b.z;
+    return this;
+  }
+
+  sub(v: Vector3): Vector3 {
     this.x -= v.x;
     this.y -= v.y;
     this.z -= v.z;
     return this;
   }
 
-  public mag(): number {
+  subVectors(a: Vector3, b: Vector3): Vector3 {
+    this.x = a.x - b.x;
+    this.y = a.y - b.y;
+    this.z = a.z - b.z;
+    return this;
+  }
+
+  mag(): number {
     return this.x * this.x + this.y * this.y + this.z * this.z;
   }
 
-  public length(): number {
+  length(): number {
     return Math.sqrt(this.mag());
   }
 
-  public multiply(v: Vector3): Vector3 {
+  multiply(v: Vector3): Vector3 {
     this.x *= v.x;
     this.y *= v.y;
     this.z *= v.z;
     return this;
   }
 
-  public multiplyScalar(scalar: number): Vector3 {
+  multiplyScalar(scalar: number): Vector3 {
     this.x *= scalar;
     this.y *= scalar;
     this.z *= scalar;
     return this;
   }
 
-  public normalize(): Vector3 {
+  normalize(): Vector3 {
     const inv_length = 1.0 / this.length();
     return this.multiplyScalar(inv_length);
   }
 
-  public lengthManhattan() {
+  lengthManhattan() {
     return Math.abs(this.x) + Math.abs(this.y) + Math.abs(this.z);
   }
 
-  public min(v: Vector3) {
+  min(v: Vector3) {
     this.x = Math.min(this.x, v.x);
     this.y = Math.min(this.y, v.y);
     this.z = Math.min(this.z, v.z);
     return this;
   }
 
-  public max(v: Vector3) {
+  max(v: Vector3) {
     this.x = Math.max(this.x, v.x);
     this.y = Math.max(this.y, v.y);
     this.z = Math.max(this.z, v.z);
     return this;
   }
 
-  public clamp(min: Vector3, max: Vector3): Vector3 {
+  clamp(min: Vector3, max: Vector3): Vector3 {
     this.x = Math.max(min.x, Math.min(max.x, this.x));
     this.y = Math.max(min.y, Math.min(max.y, this.y));
     this.z = Math.max(min.z, Math.min(max.z, this.z));
     return this;
   }
 
-  public dot(v: Vector3): number {
+  dot(v: Vector3): number {
     return this.x * v.x + this.y * v.y + this.z * v.z;
   }
 
-  public crossVectors(a: Vector3, b: Vector3): Vector3 {
+  crossVectors(a: Vector3, b: Vector3): Vector3 {
     const ax = a.x, ay = a.y, az = a.z;
     const bx = b.x, by = b.y, bz = b.z;
     this.x = ay * bz - az * by;
@@ -121,18 +137,11 @@ export class Vector3
     return this;
   }
 
-  public cross(v: Vector3): Vector3 {
+  cross(v: Vector3): Vector3 {
     return this.crossVectors(this, v);
   }
 
-  public addVectors ( a: Vector3, b : Vector3): Vector3 {
-		this.x = a.x + b.x;
-		this.y = a.y + b.y;
-		this.z = a.z + b.z;
-		return this;
-	}
-
-  public setFromQuaternion(q: Quaternion): Vector3 {
+  setFromQuaternion(q: Quaternion): Vector3 {
     const x = this.x, y = this.y, z = this.z;
     const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
 
@@ -150,7 +159,7 @@ export class Vector3
     return this;
   }
 
-  public setFromSpherical(s: Spherical): Vector3 {
+  setFromSpherical(s: Spherical): Vector3 {
     const sinRadius = Math.sin(s.polar) * s.radius;
     this.x = sinRadius * Math.sin(s.azim);
     this.y = Math.cos(s.polar) * s.radius;
@@ -158,7 +167,7 @@ export class Vector3
     return this;
   }
 
-  public applyMatrix4(m: Matrix4): Vector3 {
+  applyMatrix4(m: Matrix4): Vector3 {
     const x = this.x;
     const y = this.y;
     const z = this.z;
@@ -172,6 +181,34 @@ export class Vector3
     return this;
   }
 
+  transformDirection(m: Matrix4): Vector3 {
+    // input: THREE.Matrix4 affine matrix
+    // vector interpreted as a direction
+    var x = this.x, y = this.y, z = this.z;
+    var e = m.elements;
+    this.x = e[0] * x + e[4] * y + e[8] * z;
+    this.y = e[1] * x + e[5] * y + e[9] * z;
+    this.z = e[2] * x + e[6] * y + e[10] * z;
+    return this.normalize();
+  }
+
+  setFromMatrixPosition(m: Matrix4): Vector3 {
+    var e = m.elements;
+    this.x = e[12];
+    this.y = e[13];
+    this.z = e[14];
+    return this;
+  }
+
+  project(matrixWorldInverse: Matrix4, projectionMatrix: Matrix4) {
+    return this.applyMatrix4(matrixWorldInverse).applyMatrix4(projectionMatrix);
+  }
+
+  unProject(matrixWorld: Matrix4, projectionMatrix: Matrix4) {
+    tempMatrix.multiplyMatrices(matrixWorld, tempMatrix.getInverse(projectionMatrix, false));
+    return this.applyMatrix4(tempMatrix);
+  }
+
   distanceTo(v: Vector3) {
     return Math.sqrt(this.distanceToSquared(v));
   }
@@ -181,7 +218,7 @@ export class Vector3
     return dx * dx + dy * dy + dz * dz;
   }
 
-  public getBuffer() {
+  getBuffer() {
     if (this.buffer === undefined) {
       this.buffer = new Float32Array([this.x, this.y, this.z]);
     } else {

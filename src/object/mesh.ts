@@ -1,9 +1,10 @@
 import { RenderObject, PrimitiveVisitor, PrimitiveType } from "../core/render-object";
-import { DrawMode } from "../webgl/const";
-import { RayCasterable, Raycaster } from "../core/raycaster";
+import { DrawMode, CullSide } from "../webgl/const";
+import { RayCasterable, Raycaster, RayCastResult } from "../core/raycaster";
+import { Face3 } from "../math/entity/face3";
+import { Vector3 } from "../math/vector3";
 export class Mesh extends RenderObject
-  implements RayCasterable
-{
+  implements RayCasterable {
 
   constructor() {
     super();
@@ -18,9 +19,24 @@ export class Mesh extends RenderObject
     }
   }
 
+  raycast(raycaster: Raycaster, results: RayCastResult[]) {
+    const localRay = raycaster.getLocalRay(this.worldMatrix);
+    this.geometry.foreachFace((face: Face3) => {
+      const hitPosition = new Vector3();
 
-  raycast(raycaster: Raycaster, results: RayCasterable[]) {
-    throw new Error("Method not implemented.");
+      const result = localRay.intersectTriangle(
+        face.p1, face.p2, face.p3,
+        this.state.cullSide === CullSide.CullFaceBack,
+        hitPosition)
+
+      if (result !== null) {
+        results.push({
+          object: this,
+          hitLocalPosition: result
+        })
+      }
+
+    }, this.range)
   }
   raycastIfHit(raycaster: Raycaster): boolean {
     throw new Error("Method not implemented.");

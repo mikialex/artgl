@@ -1,9 +1,10 @@
 import { Vector3, Matrix4, MathUtil } from "../math/index";
 import { Camera } from "../core/camera";
+import { ScreenSpaceRayProvider, Raycaster } from "../core/raycaster";
 
 const tempMatrix = new Matrix4();
 
-export class PerspectiveCamera extends Camera {
+export class PerspectiveCamera extends Camera implements ScreenSpaceRayProvider {
   constructor(near?: number, far?: number,
     fov?: number, aspect?: number, zoom?: number) {
     super();
@@ -58,6 +59,12 @@ export class PerspectiveCamera extends Camera {
     this.transform.quaternion.setFromRotationMatrix(tempMatrix);
   }
 
-
+  updateRaycaster(caster: Raycaster, xRate: number, yRate: number): void {
+    caster.worldRay.origin.setFromMatrixPosition(this.worldMatrix);
+    caster.worldRay.direction.set(xRate, yRate, 0.5)
+      .unProject(this.worldMatrix, this.projectionMatrix)
+      .sub(caster.worldRay.origin)
+      .normalize();
+  }
 
 }
