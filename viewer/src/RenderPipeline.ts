@@ -4,8 +4,11 @@ import {
   InnerSupportUniform, DepthShading, Scene, RenderEngine, Shading
 } from "../../src/artgl";
 import { EffectComposer } from '../../src/render-graph/render-graph';
+import { RenderConfig } from './components/conf/interface';
+import { createConf } from './conf';
 
 export class RenderPipeline{
+  config: RenderConfig
 
   graph: RenderGraph = new RenderGraph();
   composer: EffectComposer = new EffectComposer();
@@ -48,6 +51,7 @@ export class RenderPipeline{
   }
 
   build(engine: RenderEngine, scene: Scene) {
+    this.config = createConf(engine, this);
     this.graph.defineGraph(
       this.composer,
       {

@@ -85,7 +85,10 @@ export default class ViewerCanvas extends Vue {
 
   pick(e: MouseEvent) {
     const canvas = this.$el.querySelector("canvas");
-    GLApp.pickColor(e.offsetX, canvas.clientHeight - e.offsetY);
+    GLApp.pickColor(
+      e.offsetX / canvas.clientWidth, 
+      (canvas.clientHeight - e.offsetY) / canvas.clientHeight
+    );
   }
 
   showGraphViewer: boolean = false;

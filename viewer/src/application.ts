@@ -1,11 +1,9 @@
 import {
-  RenderEngine, Mesh, PerspectiveCamera, Interactor, OrbitController,
-  OBJLoader, NormalShading, Scene, Observable, Framer
+  RenderEngine, Mesh, PerspectiveCamera, OrbitController,
+  OBJLoader, Scene, Observable, Framer
 } from '../../src/artgl';
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
-import { createConf } from './conf';
-import { RenderConfig } from './components/conf/interface';
 import { RenderPipeline } from './RenderPipeline';
 
 export const STATIC_SERVER = "http://localhost:3000/"
@@ -18,8 +16,6 @@ export class Application {
   hasInitialized: boolean = false;
   scene: Scene = new Scene();
   orbitController: OrbitController;
-
-  conf: RenderConfig;
 
   initialize(canvas: HTMLCanvasElement) {
     this.el = canvas;
@@ -34,7 +30,6 @@ export class Application {
 
     window.addEventListener('resize', this.onContainerResize);
     this.onContainerResize();
-    this.conf = createConf(this);
     this.framer.setFrame(this.render);
   }
 
@@ -77,7 +72,10 @@ export class Application {
   pickColor(x: number, y: number) {
     const f = this.engine.renderer.framebufferManager.getFramebuffer("sceneResult");
     const result = new Uint8Array(10);
-    f.readPixels(x, y, 1, 1, result);
+    f.readPixels(
+      x * this.engine.renderer.width,
+      y * this.engine.renderer.height,
+      1, 1, result);
     console.log(`${result[0]}`)
   }
 

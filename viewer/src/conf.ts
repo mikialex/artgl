@@ -1,7 +1,8 @@
-import { Application } from './application';
 import { RenderConfig } from './components/conf/interface'
+import { RenderEngine } from '../../src/artgl';
+import { RenderPipeline } from './RenderPipeline';
 
-export function createConf(app: Application): RenderConfig {
+export function createConf(engine: RenderEngine, pipeline: RenderPipeline): RenderConfig {
   return {
     name: 'root',
     type: 'folder',
@@ -14,10 +15,10 @@ export function createConf(app: Application): RenderConfig {
             value: [
               {
                 name: 'width',
-                value: app.engine.renderer.width,
+                value: engine.renderer.width,
                 onChange: (value: number) => {
-                  app.sampleCount = 0;
-                  app.engine.setActualSize(value, app.engine.renderer.height);
+                  pipeline.sampleCount = 0;
+                  engine.setActualSize(value, engine.renderer.height);
                 },
                 editors: [
                   {
@@ -30,10 +31,10 @@ export function createConf(app: Application): RenderConfig {
               },
               {
                 name: 'height',
-                value: app.engine.renderer.height,
+                value: engine.renderer.height,
                 onChange: (value: number) => {
-                  app.sampleCount = 0;
-                  app.engine.setActualSize(app.engine.renderer.width, value);
+                  pipeline.sampleCount = 0;
+                  engine.setActualSize(engine.renderer.width, value);
                 },
                 editors: [
                   {
@@ -53,16 +54,16 @@ export function createConf(app: Application): RenderConfig {
         value: [
           {
             name: 'preferUseVAO',
-            value: app.engine.preferVAO,
+            value: engine.preferVAO,
             onChange: (value: boolean) => {
-              app.engine.preferVAO = value
+              engine.preferVAO = value
             },
           },
           {
             name: 'enableUniformDiffUpload',
-            value: app.engine.renderer.enableUniformDiff,
+            value: engine.renderer.enableUniformDiff,
             onChange: (value: boolean) => {
-              app.engine.renderer.enableUniformDiff = value
+              engine.renderer.enableUniformDiff = value
             },
             description: 'this is a demo description'
           },
@@ -71,11 +72,11 @@ export function createConf(app: Application): RenderConfig {
             value: [
               {
                 name: 'enable',
-                value: app.pipeline.enableTAA,
+                value: pipeline.enableTAA,
                 onChange: (value: boolean) => {
-                  app.pipeline.enableTAA = value;
+                  pipeline.enableTAA = value;
                   if (!value) {
-                    app.sampleCount = 0;
+                    pipeline.sampleCount = 0;
                   }
                 },
               },
@@ -86,21 +87,21 @@ export function createConf(app: Application): RenderConfig {
             value: [
               {
                 name: 'enable',
-                value: app.pipeline.enableTSSAO,
+                value: pipeline.enableTSSAO,
                 onChange: (value: boolean) => {
-                  app.pipeline.enableTSSAO = value;
-                  if (!value) {
-                    app.pipeline.composeShading.uniforms.get('u_tssaoComposeRate').setValue(0);
+                  pipeline.enableTSSAO = value;
+                  if (value) {
+                    pipeline.composeShading.tssaoComposeRate = 1;
                   } else {
-                    app.pipeline.composeShading.uniforms.get('u_tssaoComposeRate').setValue(1.0);
+                    pipeline.composeShading.tssaoComposeRate = 0;
                   }
                 },
               },
               {
                 name: 'composeRate',
-                value: app.pipeline.composeShading.uniforms.get('u_tssaoComposeRate').value,
+                value: pipeline.composeShading.tssaoComposeRate,
                 onChange: (value: number) => {
-                  app.pipeline.composeShading.uniforms.get('u_tssaoComposeRate').setValue(value);
+                  pipeline.composeShading.tssaoComposeRate = value;
                 },
                 editors: [
                   {
@@ -113,9 +114,9 @@ export function createConf(app: Application): RenderConfig {
               },
               {
                 name: 'composeThreshold',
-                value: app.pipeline.composeShading.uniforms.get('u_tssaoComposeThreshold').value,
+                value: pipeline.composeShading.tssaoComposeThreshold,
                 onChange: (value: number) => {
-                  app.pipeline.composeShading.uniforms.get('u_tssaoComposeThreshold').setValue(value);
+                  pipeline.composeShading.tssaoComposeThreshold = value;
                 },
                 editors: [
                   {
@@ -128,10 +129,10 @@ export function createConf(app: Application): RenderConfig {
               },
               {
                 name: 'radius',
-                value: app.pipeline.tssaoShading.uniforms.get('u_aoRadius').value,
+                value: pipeline.tssaoShading.aoRadius,
                 onChange: (value: number) => {
-                  app.pipeline.tssaoShading.uniforms.get('u_aoRadius').setValue(value);
-                  app.sampleCount = 0;
+                  pipeline.tssaoShading.aoRadius = value;
+                  pipeline.sampleCount = 0;
                 },
                 editors: [
                   {
@@ -144,9 +145,9 @@ export function createConf(app: Application): RenderConfig {
               },
               {
                 name: 'sample_count_to_show',
-                value: app.pipeline.composeShading.uniforms.get('u_tssaoShowThreshold').value,
+                value: pipeline.composeShading.tssaoShowThreshold,
                 onChange: (value: number) => {
-                  app.pipeline.composeShading.uniforms.get('u_tssaoShowThreshold').setValue(value);
+                  pipeline.composeShading.tssaoShowThreshold = value;
                 },
                 editors: [
                   {

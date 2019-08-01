@@ -25,8 +25,7 @@ export default class Viewer extends Vue {
   mounted(){
     const canvas = this.$el.querySelector('#viewer-canvas') as HTMLCanvasElement;
     GLApp.initialize(canvas);
-    // this.appConf = GLApp.conf;
-    console.log(GLApp.conf)
+    this.appConf = GLApp.pipeline.config;
   }
 
   appConf = {
