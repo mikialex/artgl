@@ -1,26 +1,23 @@
 
+ArtGL is a TypeScript WebGL framework.
 
-## About Project
-
-ArtGL is an underdevelopment next generation webGL framework.
-
-## Design
+## Design & Features
 
 ### easy and clear
 
-As easy as three.js. You can regard this project as a better three.js, with better design and better code quality.
+As easy as three.js. You can regard this project as a better three.js, maybe with better design and better code quality. Many code referenced from three.js :)
 
 ### extendable architecture
 
 Instead of making a specific renderer for specific usage, or a general renderer that hard to extent features, artgl is a  framework for general usage. You can easily customize it, extent it to meet you real requirements.
 
-### declarative and powerful render pipeline by renderGraph
+### declarative render pipeline by renderGraph API
 
-Write a json like config for renderGraph, the rendergraph will handle all things about render procedure. Make multi pass rendering, add custom optimizer, tweaking effects, debug performance, more delightful.
+Write a json like config for renderGraph, the rendergraph will handle all things about render procedure. Make multi pass rendering, add custom optimizer, tweaking effects, debug performance, more delightful than before.
 
-### experimental shaderGraph for reliable and expressive shader source abstraction
+### expressive shading abstraction by shaderGraph API
 
-We also use graph as the shader fragment linker. No more confusing #define #include, make shader effect development productive as well as a good abstraction for shader factory.
+We also use graph as the shader fragment linker. No more confusing #define #include. Make shader effect development productive. Provide good abstraction for shader and shader source.
 
 ### experimental WebAssembly accelerated scene render data computation 
 
@@ -36,6 +33,9 @@ This repo also contains sub projects: example/ and viewer/
 
 [viewer readme](./viewer/README.md)
 
+## demos
+
+[viewer demo](https://mikialex.github.io/artgl/viewer/dist/#/)
 
 ## Posts(cn/zh)
 
@@ -55,7 +55,7 @@ Some old post maybe not meet the current design, just for reference;
 
 ### Shading API
 
-Decouple light effect with material effect, decorate any shading with
+Decouple effect with another effect in shader, decorate shading with
 any other shading.
 
 ```ts
@@ -63,21 +63,17 @@ any other shading.
 const scene = new Scene();
 const light = new PointLight();
 
-scene.add(light)
+const shading = new Shading()
+  .decorate(new NormalShading())
+  .decorate(light);
+
+scene.root.add(light)
 
 const mesh = new Mesh();
-
 mesh.geometry = new SphereGeometry();
 mesh.material = new Material();
 mesh.material.channel(Channel.Diffuse).load("../diff.png");
-
-const basicShade = new MeshBasicShading()
-const shading = basicShade.decorate(light.decorator);
-
 mesh.shading = shading;
-mesh.technique = shade.make();
-mesh.technique.set("opacity", 0.5);
-
 
 ```
 
@@ -85,6 +81,7 @@ mesh.technique.set("opacity", 0.5);
 
 ```ts
 
+...
 const el = canvas;
 const engine = new RenderEngine(canvas);
 const graph = new RenderGraph(this.engine);
@@ -149,28 +146,33 @@ graph.setGraph({
 
 // this may not a real example, just demo how it looks
 
-export class TSSAOShading extends Shading {
-  update() {
-    const VPMatrix = innerUniform(InnerSupportUniform.VPMatrix);
-    const sampleCount = uniform("u_sampleCount", GLDataType.float).default(0);
-    const depthTex = texture("depthResult");
-    this.graph.reset()
-      .setVertexRoot(
-        vec4(attribute(
-        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-      ), constValue(1)))
-      .setVary("v_uv", attribute(
-        { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
-      ))
+export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
+  
+  @MapUniform("u_sampleCount")
+  sampleCount: number = 0;
 
-    const vUV = this.graph.getVary("v_uv");
+  @MapUniform("VPMatrixInverse")
+  VPMatrixInverse: Matrix4 = new Matrix4()
+
+  @MapUniform("u_aoRadius")
+  aoRadius: number = 1
+
+  decorate(graph: ShaderGraph) {
+    const VPMatrix = innerUniform(InnerSupportUniform.VPMatrix);
+    const sampleCount = this.getPropertyUniform("sampleCount");
+    const depthTex = texture("depthResult");
+    graph
+      .setVertexRoot(screenQuad())
+      .declareFragUV()
+
+    const vUV = graph.getVary(UvFragVary);
     const depth = unPackDepth.make().input("enc", depthTex.fetch(vUV))
 
     const worldPosition = getWorldPosition.make()
       .input("uv", vUV)
       .input("depth", depth)
       .input("VPMatrix", VPMatrix)
-      .input("VPMatrixInverse", uniform("VPMatrixInverse", GLDataType.Mat4).default(new Matrix4()))
+      .input("VPMatrixInverse", this.getPropertyUniform("VPMatrixInverse"))
 
     const Random2D1 = rand2DT.make()
       .input("cood", vUV)
@@ -185,7 +187,7 @@ export class TSSAOShading extends Shading {
 
     const newPositionRand = newSamplePosition.make()
       .input("positionOld", worldPosition.swizzling("xyz"))
-      .input("distance", uniform("u_aoRadius", GLDataType.float).default(1))
+      .input("distance", this.getPropertyUniform("aoRadius"))
       .input("dir", randDir)
 
     const newDepth = unPackDepth.make()
@@ -203,7 +205,7 @@ export class TSSAOShading extends Shading {
         )
       )
 
-    this.graph.setFragmentRoot(
+    graph.setFragmentRoot(
       tssaoMix.make()
         .input("oldColor", texture("AOAcc").fetch(vUV).swizzling("xyz"))
         .input("newColor",
