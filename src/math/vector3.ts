@@ -1,9 +1,7 @@
 import { Quaternion } from './quaternion';
-import { Matrix4 } from './matrix4';
+import { Matrix4 } from '../math';
 import { Spherical } from './Spherical';
 import { DataObject, VectorDataObject, ArrayFlattenable } from './index';
-
-const tempMatrix = new Matrix4();
 
 export class Vector3
   implements
@@ -11,7 +9,6 @@ export class Vector3
   VectorDataObject<Vector3>,
   ArrayFlattenable<Vector3>
 {
-  private buffer: Float32Array = new Float32Array(3);
   x: number;
   y: number;
   z: number;
@@ -205,6 +202,7 @@ export class Vector3
   }
 
   unProject(matrixWorld: Matrix4, projectionMatrix: Matrix4) {
+    const tempMatrix = new Matrix4();
     tempMatrix.multiplyMatrices(matrixWorld, tempMatrix.getInverse(projectionMatrix, false));
     return this.applyMatrix4(tempMatrix);
   }
@@ -218,15 +216,8 @@ export class Vector3
     return dx * dx + dy * dy + dz * dz;
   }
 
-  getBuffer() {
-    if (this.buffer === undefined) {
-      this.buffer = new Float32Array([this.x, this.y, this.z]);
-    } else {
-      this.buffer[0] = this.x;
-      this.buffer[1] = this.y;
-      this.buffer[2] = this.z;
-    }
-    return this.buffer;
+  getBuffer(): Float32Array {
+    return new Float32Array([this.x, this.y, this.z]);
   }
 
   fromArray(array: number[], offset?: number) {

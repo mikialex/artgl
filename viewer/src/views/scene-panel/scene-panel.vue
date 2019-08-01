@@ -37,6 +37,12 @@
         <div>
           uniformUpload: {{renderView.uniformUpload}}
         </div>
+        <div>
+          faceDraw: {{renderView.faceDraw}}
+        </div>
+        <div>
+          vertexDraw: {{renderView.vertexDraw}}
+        </div>
       </div>
       <div v-else class="render-info-group">
         sync scene to get synced render info stat

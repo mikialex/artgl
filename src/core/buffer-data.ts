@@ -37,14 +37,13 @@ export class BufferData{
     }
   }
 
-  setIndex(index: number, value: number, offset?:number) {
+  setIndex(index: number, value: number, offset:number) {
     this.shouldUpdate = true;
-    this.data[index * this.stride + offset === undefined ? 0 : offset] = value;
+    this.data[index * this.stride + offset] = value;
   }
 
-  getIndex(index: number, offset?: number): number {
-    this.shouldUpdate = true;
-    return this.data[index * this.stride + offset === undefined ? 0 : offset];
+  getIndex(index: number, offset: number): number {
+    return this.data[index * this.stride + offset];
   }
 
   setData(data: BufferDataType) {

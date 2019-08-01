@@ -5,6 +5,7 @@ import {
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
 import { RenderPipeline } from './RenderPipeline';
+import { Raycaster } from '../../src/core/raycaster';
 
 export const STATIC_SERVER = "http://localhost:3000/"
 
@@ -16,6 +17,7 @@ export class Application {
   hasInitialized: boolean = false;
   scene: Scene = new Scene();
   orbitController: OrbitController;
+  raycaster: Raycaster = new Raycaster();
 
   initialize(canvas: HTMLCanvasElement) {
     this.el = canvas;
@@ -77,6 +79,10 @@ export class Application {
       y * this.engine.renderer.height,
       1, 1, result);
     console.log(`${result[0]}`)
+
+    // this.raycaster.update(this.engine.camera as PerspectiveCamera, x * 2 - 1, y * 2 - 1);
+    // const resultCast = this.raycaster.pick(this.scene);
+    // console.log(resultCast.map(re => re.object.geometry.constructor.name));
   }
 
   run() {

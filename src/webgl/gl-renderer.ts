@@ -120,6 +120,12 @@ export class GLRenderer implements GLReleasable{
     }
 
     this.state.textureSlot.resetSlotIndex();
+
+    // update draw count // TODO support other draw type
+    if (mode === DrawMode.TRIANGLES) {
+      this.stat.faceDraw += this.activeProgram.drawCount / 3
+      this.stat.vertexDraw += this.activeProgram.drawCount
+    }
   }
 
   currentFramebuffer: Nullable<GLFramebuffer> = null;

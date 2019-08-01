@@ -1,4 +1,4 @@
-import { Vector3 } from "./vector3";
+import { Vector3 } from "../math";
 import { Quaternion } from "./quaternion";
 import { DataObject, ArrayFlattenable } from "./index";
 

@@ -1,4 +1,4 @@
-import { Vector3 } from "../vector3";
+import { Vector3 } from "../../math";
 
 
 test('vector default value 0, 0, 0', () => {

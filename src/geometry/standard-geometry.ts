@@ -58,9 +58,9 @@ export class StandardGeometry extends Geometry {
       const p1Index = i * 3;
       const p2Index = i * 3 + 1;
       const p3Index = i * 3 + 2;
-      tempFace3.p1.set(position.getIndex(p1Index), position.getIndex(p1Index + 1), position.getIndex(p1Index + 2));
-      tempFace3.p2.set(position.getIndex(p2Index), position.getIndex(p2Index + 1), position.getIndex(p2Index + 2));
-      tempFace3.p3.set(position.getIndex(p3Index), position.getIndex(p3Index + 1), position.getIndex(p3Index + 2));
+      tempFace3.p1.set(position.getIndex(p1Index, 0), position.getIndex(p1Index, 1), position.getIndex(p1Index, 2));
+      tempFace3.p2.set(position.getIndex(p2Index, 0), position.getIndex(p2Index, 1), position.getIndex(p2Index,  2));
+      tempFace3.p3.set(position.getIndex(p3Index, 0), position.getIndex(p3Index, 1), position.getIndex(p3Index,  2));
       visitor(tempFace3);
     }
   };
@@ -76,9 +76,9 @@ export class StandardGeometry extends Geometry {
       const p1Index = i * 3;
       const p2Index = i * 3 + 1;
       const p3Index = i * 3 + 2;
-      tempFace3.p1.set(position.getIndex(p1Index), position.getIndex(p1Index + 1), position.getIndex(p1Index + 2));
-      tempFace3.p2.set(position.getIndex(p2Index), position.getIndex(p2Index + 1), position.getIndex(p2Index + 2));
-      tempFace3.p3.set(position.getIndex(p3Index), position.getIndex(p3Index + 1), position.getIndex(p3Index + 2));
+      tempFace3.p1.set(position.getIndex(p1Index, 0), position.getIndex(p1Index, 1), position.getIndex(p1Index, 2));
+      tempFace3.p2.set(position.getIndex(p2Index, 0), position.getIndex(p2Index, 1), position.getIndex(p2Index, 2));
+      tempFace3.p3.set(position.getIndex(p3Index, 0), position.getIndex(p3Index, 1), position.getIndex(p3Index, 2));
 
       tempLine3.p1.copy(tempFace3.p1)
       tempLine3.p2.copy(tempFace3.p2)
@@ -95,7 +95,7 @@ export class StandardGeometry extends Geometry {
     const start = range === undefined ? 0 : range.start;
     const end = range === undefined ? position.count : (range.start + range.count);
     for (let i = start; i < end; i++) {
-      tempVector3.set(position.getIndex(i), position.getIndex(i + 1), position.getIndex(i + 2));
+      tempVector3.set(position.getIndex(i, 0), position.getIndex(i, 1), position.getIndex(i, 2));
       visitor(tempVector3);
     }
   };

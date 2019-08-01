@@ -21,8 +21,9 @@ export class Mesh extends RenderObject
 
   raycast(raycaster: Raycaster, results: RayCastResult[]) {
     const localRay = raycaster.getLocalRay(this.worldMatrix);
+    const hitPosition = new Vector3();
+
     this.geometry.foreachFace((face: Face3) => {
-      const hitPosition = new Vector3();
 
       const result = localRay.intersectTriangle(
         face.p1, face.p2, face.p3,
@@ -32,17 +33,20 @@ export class Mesh extends RenderObject
       if (result !== null) {
         results.push({
           object: this,
-          hitLocalPosition: result
+          hitLocalPosition: hitPosition.clone()
         })
       }
 
     }, this.range)
   }
+
   raycastIfHit(raycaster: Raycaster): boolean {
     throw new Error("Method not implemented.");
   }
-  raycastFirst(raycaster: Raycaster): import("../core/raycaster").RayCastResult {
+
+  raycastFirst(raycaster: Raycaster): RayCastResult {
     throw new Error("Method not implemented.");
   }
+  
   raycasterable: true = true;
 }

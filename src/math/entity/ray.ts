@@ -1,5 +1,4 @@
-import { Vector3 } from "../vector3";
-import { Matrix4 } from "../matrix4";
+import { Vector3, Matrix4 } from "../../math";
 
 const diff = new Vector3();
 const edge1 = new Vector3();

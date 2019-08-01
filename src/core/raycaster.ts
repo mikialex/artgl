@@ -33,7 +33,7 @@ export interface RayCasterable {
 /**
  * A general raycast result
  */
-export interface RayCastResult{
+export interface RayCastResult {
 
   /**
    * hit object
@@ -48,7 +48,7 @@ export interface RayCastResult{
   hitLocalPosition: Vector3
 }
 
-export interface ScreenSpaceRayProvider{
+export interface ScreenSpaceRayProvider {
   updateRaycaster(caster: Raycaster, xRate: number, yRate: number): void;
 }
 
@@ -62,8 +62,6 @@ export class Raycaster {
   worldRay: Ray = new Ray();
   localRay: Ray = new Ray();
 
-  results: RayCastResult[] = [];
-
   update(rayProvider: ScreenSpaceRayProvider, xRate: number, yRate: number) {
     rayProvider.updateRaycaster(this, xRate, yRate);
   }
@@ -73,14 +71,24 @@ export class Raycaster {
   }
 
   pick(source: RenderSource, preFilter?: (obj: RenderObject) => boolean) {
+    const results: RayCastResult[] = [];
     foreachRenderableInSource(source, (obj) => {
-      if (preFilter(obj) && (obj as unknown as RayCasterable).raycasterable) {
-        (obj as unknown as RayCasterable).raycast(this, this.results);
+
+      if ((obj as unknown as RayCasterable).raycasterable !== true) {
+        return
       }
+
+      if (preFilter !== undefined && !preFilter(obj)) {
+        return;
+      }
+
+      (obj as unknown as RayCasterable).raycast(this, results);
+
     })
+    return results;
   }
 
   pickFirst(source: RenderSource, preFilter?: (obj: RenderObject) => boolean) {
-    
+
   }
 }

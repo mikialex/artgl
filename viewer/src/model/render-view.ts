@@ -6,6 +6,9 @@ export class RenderView{
   uniformUpload: number;
   drawcall: number;
 
+  faceDraw: number = 0;
+  vertexDraw: number = 0;
+
   static create(engine: RenderEngine) {
     const renderer = engine.renderer;
     const view = new RenderView;
@@ -18,5 +21,7 @@ export class RenderView{
     this.programSwitchCount = engine.renderer.stat.programSwitch;
     this.uniformUpload = engine.renderer.stat.uniformUpload;
     this.drawcall = engine.renderer.stat.drawcall;
+    this.faceDraw = engine.renderer.stat.faceDraw;
+    this.vertexDraw = engine.renderer.stat.vertexDraw;
   }
 }
