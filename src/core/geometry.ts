@@ -15,43 +15,61 @@ import { Vector3 } from "../math/vector3";
  * @class Geometry
  */
 export abstract class Geometry {
-  constructor() {
-  }
-  name: string
+  name: string = ""
   uuid = generateUUID();
+
   readonly bufferDatum: { [index: string]: BufferData } = {};
   indexBuffer: BufferData;
-  get needUpdate(): boolean{
+
+  get needUploadGL(): boolean{
     for (const key in this.bufferDatum) {
-      if (this.bufferDatum[key].shouldUpdate) {
+      if (this.bufferDatum[key].dataChanged) {
         return true
       }
     }
     return false;
   }
 
+  _shapeChanged = true;
+  set shapeChanged(value: boolean) {
+    this._shapeChanged = value;
+    if (value) {
+      this._AABBBoxNeedUpdate = true;
+      this._boundingSphereNeedUpdate = true;
+    }
+  };
+
   _AABBBox: Box3 = new Box3();
+  _AABBBoxNeedUpdate = true;
   abstract updateAABBBox(): void;
   get AABBBox(): Box3 {
-    if (this.needUpdate) {
+    if (this._AABBBoxNeedUpdate) {
       this.updateAABBBox();
+      this._AABBBoxNeedUpdate = false;
     }
     return this._AABBBox;
   }
 
   _boundingSphere: Sphere = new Sphere();
+  _boundingSphereNeedUpdate = true;
   abstract updateBoundingSphere(): void;
   get boundingSphere(): Sphere {
-    if (this.needUpdate) {
+    if (this._boundingSphereNeedUpdate) {
       this.updateBoundingSphere();
+      this._boundingSphereNeedUpdate = false;
     }
     return this._boundingSphere;
+  }
+
+  buildShape() {
+    this.shape();
+    this.shapeChanged = true;
   }
 
   /**
    * creat or update the geometry's data in BufferDatum
    */
-  abstract populate(): void;
+  abstract shape(): void;
 
   abstract foreachFace(visitor: (face: Face3) => any, range?: RenderRange): any;
   abstract foreachLineSegment(visitor:  (face: Line3) => any, range?: RenderRange): any;

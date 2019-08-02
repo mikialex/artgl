@@ -3,8 +3,10 @@ import { DrawMode, CullSide } from "../webgl/const";
 import { RayCasterable, Raycaster, RayCastResult } from "../core/raycaster";
 import { Face3 } from "../math/entity/face3";
 import { Matrix4, Vector3 } from "../math";
+import { Sphere } from "../math/entity/sphere";
 
 const inverse = new Matrix4();
+const sphere = new Sphere();
 
 export class Mesh extends RenderObject
   implements RayCasterable {
@@ -27,6 +29,15 @@ export class Mesh extends RenderObject
     const localRay = raycaster.getLocalRay(inverse);
     const hitPosition = new Vector3();
 
+    // filter by world sphere
+    sphere.copy(this.geometry.boundingSphere);
+    sphere.applyMatrix4(this.worldMatrix);
+    if (!raycaster.worldRay.ifIntersectSphere(sphere)) {
+      return;
+    }
+
+    console.log("t")
+    // have to check face
     this.geometry.foreachFace((face: Face3) => {
 
       const result = localRay.intersectTriangle(
@@ -51,6 +62,6 @@ export class Mesh extends RenderObject
   raycastFirst(raycaster: Raycaster): RayCastResult {
     throw new Error("Method not implemented.");
   }
-  
+
   raycasterable: true = true;
 }

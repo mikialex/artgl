@@ -2,9 +2,9 @@ import { Vector3 } from "../math";
 import { Quaternion } from "./quaternion";
 import { DataObject, ArrayFlattenable } from "./index";
 
-const tempx: Vector3 = new Vector3;
-const tempy: Vector3 = new Vector3;
-const tempz: Vector3 = new Vector3;
+const tempX: Vector3 = new Vector3();
+const tempY: Vector3 = new Vector3();
+const tempZ: Vector3 = new Vector3();
 
 export class Matrix4
   implements
@@ -60,7 +60,7 @@ export class Matrix4
   compose(position: Vector3, quaternion: Quaternion, scale: Vector3) {
     this.makeRotationFromQuaternion(quaternion);
     this.scale(scale.x, scale.y, scale.z);
-    this.setPostion(position.x, position.y, position.z);
+    this.setPosition(position.x, position.y, position.z);
     return this;
   }
 
@@ -208,29 +208,29 @@ export class Matrix4
 
     const te = this.elements;
 
-    tempz.copy(origin).sub(target);
-    if (tempz.mag() === 0) {
-      tempz.z = 1;
+    tempZ.copy(origin).sub(target);
+    if (tempZ.mag() === 0) {
+      tempZ.z = 1;
     }
 
-    tempz.normalize();
-    tempx.crossVectors(up, tempz);
-    if (tempx.mag() === 0) {
+    tempZ.normalize();
+    tempX.crossVectors(up, tempZ);
+    if (tempX.mag() === 0) {
       if (Math.abs(up.z) === 1) {
-        tempz.x += 0.0001;
+        tempZ.x += 0.0001;
       } else {
-        tempz.z += 0.0001;
+        tempZ.z += 0.0001;
       }
-      tempz.normalize();
-      tempx.crossVectors(up, tempz);
+      tempZ.normalize();
+      tempX.crossVectors(up, tempZ);
     }
 
-    tempx.normalize();
-    tempy.crossVectors(tempz, tempx);
+    tempX.normalize();
+    tempY.crossVectors(tempZ, tempX);
 
-    te[0] = tempx.x; te[4] = tempy.x; te[8] = tempz.x;
-    te[1] = tempx.y; te[5] = tempy.y; te[9] = tempz.y;
-    te[2] = tempx.z; te[6] = tempy.z; te[10] = tempz.z;
+    te[0] = tempX.x; te[4] = tempY.x; te[8] = tempZ.x;
+    te[1] = tempX.y; te[5] = tempY.y; te[9] = tempZ.y;
+    te[2] = tempX.z; te[6] = tempY.z; te[10] = tempZ.z;
 
     return this;
   };
@@ -244,12 +244,20 @@ export class Matrix4
     return this;
   }
 
-  setPostion(x: number, y: number, z: number) {
+  setPosition(x: number, y: number, z: number) {
     var te = this.elements;
     te[12] = x;
     te[13] = y;
     te[14] = z;
     return this;
+  }
+
+  getMaxScaleOnAxis() {
+    var te = this.elements;
+    var scaleXSq = te[0] * te[0] + te[1] * te[1] + te[2] * te[2];
+    var scaleYSq = te[4] * te[4] + te[5] * te[5] + te[6] * te[6];
+    var scaleZSq = te[8] * te[8] + te[9] * te[9] + te[10] * te[10];
+    return Math.sqrt(Math.max(scaleXSq, scaleYSq, scaleZSq));
   }
 
   makeRotationFromQuaternion(q: Quaternion) {

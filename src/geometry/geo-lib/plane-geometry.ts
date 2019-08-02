@@ -10,7 +10,7 @@ export class PlaneGeometry extends StandardGeometry {
     this.widthSegments = widthSegments !== undefined ? widthSegments : 1;
     this.heightSegments = heightSegments !== undefined ? heightSegments : 1;
 
-    this.populate();
+    this.buildShape();
   }
   name = 'PlaneGeometry'
   width: number;
@@ -18,7 +18,7 @@ export class PlaneGeometry extends StandardGeometry {
   widthSegments: number;
   heightSegments: number;
 
-  populate() {
+  shape() {
 
     var width_half = this.width / 2;
     var height_half = this.height / 2;

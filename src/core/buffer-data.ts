@@ -24,7 +24,7 @@ export class BufferData{
   data: BufferDataType;
   count: number = 1;
   stride: number = 1;
-  shouldUpdate = true;
+  dataChanged = true;
 
   foreach(
     visitor: (data: BufferDataType, index: number, stride: number, countIndex: number) => any,
@@ -38,7 +38,7 @@ export class BufferData{
   }
 
   setIndex(index: number, value: number, offset:number) {
-    this.shouldUpdate = true;
+    this.dataChanged = true;
     this.data[index * this.stride + offset] = value;
   }
 
@@ -47,7 +47,7 @@ export class BufferData{
   }
 
   setData(data: BufferDataType) {
-    this.shouldUpdate = true;
+    this.dataChanged = true;
     this.data = data;
     this.count = this.data.length / this.stride;
   }

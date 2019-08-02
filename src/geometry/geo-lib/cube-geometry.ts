@@ -14,7 +14,7 @@ export class CubeGeometry extends StandardGeometry {
     if (heightSegments !== undefined) { this.heightSegments = heightSegments; }
     if (depthSegments !== undefined) { this.depthSegments = depthSegments; }
 
-    this.populate();
+    this.buildShape();
   }
 
   width: number = 1;
@@ -24,7 +24,7 @@ export class CubeGeometry extends StandardGeometry {
   heightSegments: number = 1;
   depthSegments: number = 1;
 
-  populate() {
+  shape() {
 
     const indices = [];
     const vertices = [];

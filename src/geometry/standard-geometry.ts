@@ -67,7 +67,7 @@ export class StandardGeometry extends Geometry {
   };
 
   /**
-   * this may redundant visit a lot
+   * this may redundant visit 
    */
   foreachLineSegment(visitor: (line: Line3) => any, range?: RenderRange) {
     const position = this.bufferDatum.position;
@@ -92,17 +92,22 @@ export class StandardGeometry extends Geometry {
     }
   };
 
+  /**
+   * this may redundant visit 
+   */
   foreachVertex(visitor: (point: Vector3) => any, range?: RenderRange) {
     const position = this.bufferDatum.position;
-    const start = range === undefined ? 0 : range.start;
-    const end = range === undefined ? position.count : (range.start + range.count);
+    const index = this.indexBuffer;
+    const start = (range === undefined ? 0 : range.start) / 3;
+    const end = (range === undefined ? position.count : (range.start + range.count)) / 3;
     for (let i = start; i < end; i++) {
-      tempVector3.set(position.getIndex(i, 0), position.getIndex(i, 1), position.getIndex(i, 2));
+      const p1Index = index.getIndex(i, 0);
+      tempVector3.set(position.getIndex(p1Index, 0), position.getIndex(p1Index, 1), position.getIndex(p1Index, 2));
       visitor(tempVector3);
     }
   };
 
-  populate() {
+  shape() {
     throw 'generate methods not impl'
   }
 }

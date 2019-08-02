@@ -1,9 +1,12 @@
 import { Vector3, Matrix4 } from "../../math";
+import { Sphere } from "./sphere";
 
 const diff = new Vector3();
 const edge1 = new Vector3();
 const edge2 = new Vector3();
 const normal = new Vector3();
+
+const v1 = new Vector3();
 
 export class Ray {
   origin: Vector3;
@@ -90,6 +93,26 @@ export class Ray {
     // Ray intersects triangle.
     return this.at(QdN / DdN, target);
 
+  }
+
+  ifIntersectSphere(sphere: Sphere) {
+    return this.distanceSqToPoint(sphere.center) <= (sphere.radius * sphere.radius);
+  }
+
+  distanceToPoint(point: Vector3) {
+    return Math.sqrt(this.distanceSqToPoint(point));
+  }
+
+  distanceSqToPoint(point: Vector3) {
+    var directionDistance = v1.subVectors(point, this.origin).dot(this.direction);
+
+    // point behind the ray
+    if (directionDistance < 0) {
+      return this.origin.distanceToSquared(point);
+    }
+
+    v1.copy(this.direction).multiplyScalar(directionDistance).add(this.origin);
+    return v1.distanceToSquared(point);
   }
 
   applyMatrix4(matrix4: Matrix4) {

@@ -16,7 +16,7 @@ export class SphereGeometry extends StandardGeometry {
     this.thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
     this.thetaEnd = this.thetaStart + this.thetaLength;
 
-    this.populate();
+    this.buildShape();
   }
   name = 'SphereGeometry'
   radius = 1;
@@ -28,7 +28,7 @@ export class SphereGeometry extends StandardGeometry {
   thetaLength = Math.PI * 2;
   thetaEnd: number;
 
-  populate() {
+  shape() {
 
     let ix: number, iy: number;
     let index = 0;
