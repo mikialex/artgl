@@ -2,7 +2,10 @@ import { RenderObject, PrimitiveVisitor, PrimitiveType } from "../core/render-ob
 import { DrawMode, CullSide } from "../webgl/const";
 import { RayCasterable, Raycaster, RayCastResult } from "../core/raycaster";
 import { Face3 } from "../math/entity/face3";
-import { Vector3 } from "../math/vector3";
+import { Matrix4, Vector3 } from "../math";
+
+const inverse = new Matrix4();
+
 export class Mesh extends RenderObject
   implements RayCasterable {
 
@@ -20,7 +23,8 @@ export class Mesh extends RenderObject
   }
 
   raycast(raycaster: Raycaster, results: RayCastResult[]) {
-    const localRay = raycaster.getLocalRay(this.worldMatrix);
+    inverse.getInverse(this.worldMatrix, false)
+    const localRay = raycaster.getLocalRay(inverse);
     const hitPosition = new Vector3();
 
     this.geometry.foreachFace((face: Face3) => {

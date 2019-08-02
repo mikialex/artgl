@@ -60,7 +60,7 @@ export class Raycaster {
   near: number = 0;
   far: number = 1;
   worldRay: Ray = new Ray();
-  localRay: Ray = new Ray();
+  private localRay: Ray = new Ray();
 
   update(rayProvider: ScreenSpaceRayProvider, xRate: number, yRate: number) {
     rayProvider.updateRaycaster(this, xRate, yRate);
