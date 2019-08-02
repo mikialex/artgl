@@ -396,6 +396,7 @@ export class RenderEngine implements GLReleasable{
         throw 'range should be set if use none index geometry'
       }
     }
+    // TODO set range
     program.drawFrom = start;
     program.drawCount = count;
   }

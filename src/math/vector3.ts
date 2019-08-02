@@ -26,6 +26,13 @@ export class Vector3
     return this;
   }
 
+  setAll(x: number): Vector3 {
+    this.x = x;
+    this.y = x;
+    this.z = x;
+    return this;
+  }
+
   copy(v: Vector3): Vector3 {
     this.x = v.x;
     this.y = v.y;

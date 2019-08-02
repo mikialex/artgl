@@ -82,7 +82,8 @@ export class Application {
 
     this.raycaster.update(this.engine.camera as PerspectiveCamera, x * 2 - 1, y * 2 - 1);
     const resultCast = this.raycaster.pick(this.scene);
-    console.log(resultCast.map(re => re.object.geometry.constructor.name));
+    console.log(resultCast);
+    // console.log(resultCast.map(re => re.object.geometry.constructor.name));
   }
 
   run() {

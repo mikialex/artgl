@@ -36,7 +36,6 @@ export class Mesh extends RenderObject
       return;
     }
 
-    console.log("t")
     // have to check face
     this.geometry.foreachFace((face: Face3) => {
 

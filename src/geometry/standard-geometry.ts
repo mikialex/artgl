@@ -39,7 +39,7 @@ export class StandardGeometry extends Geometry {
     this.foreachVertex((point) => {
       maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(point));
     })
-    sphere.radius = maxRadiusSq;
+    sphere.radius = Math.sqrt(maxRadiusSq);
   }
 
   updateAABBBox() {
@@ -53,8 +53,8 @@ export class StandardGeometry extends Geometry {
   foreachFace(visitor: (face: Face3) => any, range?: RenderRange) {
     const position = this.bufferDatum.position;
     const index = this.indexBuffer;
-    const start = (range === undefined ? 0 : range.start) / 3;
-    const end = (range === undefined ? position.count : (range.start + range.count)) / 3;
+    const start = range === undefined ? 0 : range.start;
+    const end = range === undefined ? index.count : (range.start + range.count);
     for (let i = start; i < end; i++) {
       const p1Index = index.getIndex(i * 3, 0);
       const p2Index = index.getIndex(i * 3 + 1, 0);
@@ -72,8 +72,8 @@ export class StandardGeometry extends Geometry {
   foreachLineSegment(visitor: (line: Line3) => any, range?: RenderRange) {
     const position = this.bufferDatum.position;
     const index = this.indexBuffer;
-    const start = (range === undefined ? 0 : range.start) / 3;
-    const end = (range === undefined ? position.count : (range.start + range.count)) / 3;
+    const start = range === undefined ? 0 : range.start;
+    const end = range === undefined ? index.count : (range.start + range.count);
     for (let i = start; i < end; i++) {
       const p1Index = index.getIndex(i * 3, 0);
       const p2Index = index.getIndex(i * 3 + 1, 0);
@@ -98,8 +98,8 @@ export class StandardGeometry extends Geometry {
   foreachVertex(visitor: (point: Vector3) => any, range?: RenderRange) {
     const position = this.bufferDatum.position;
     const index = this.indexBuffer;
-    const start = (range === undefined ? 0 : range.start) / 3;
-    const end = (range === undefined ? position.count : (range.start + range.count)) / 3;
+    const start = range === undefined ? 0 : range.start;
+    const end = range === undefined ? index.count : (range.start + range.count);
     for (let i = start; i < end; i++) {
       const p1Index = index.getIndex(i, 0);
       tempVector3.set(position.getIndex(p1Index, 0), position.getIndex(p1Index, 1), position.getIndex(p1Index, 2));

@@ -18,13 +18,15 @@ export class BufferData{
 
   constructor(data: BufferDataType, stride: number) {
     this.data = data;
-    this.count = this.data.length / this.stride;
     this.stride = stride;
   }
   data: BufferDataType;
-  count: number = 1;
   stride: number = 1;
   dataChanged = true;
+
+  get count() {
+    return this.data.length / this.stride;
+  }
 
   foreach(
     visitor: (data: BufferDataType, index: number, stride: number, countIndex: number) => any,
@@ -49,7 +51,6 @@ export class BufferData{
   setData(data: BufferDataType) {
     this.dataChanged = true;
     this.data = data;
-    this.count = this.data.length / this.stride;
   }
 
   getGLAttribute(engine: RenderEngine): WebGLBuffer {
