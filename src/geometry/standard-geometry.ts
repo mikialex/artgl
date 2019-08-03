@@ -4,6 +4,7 @@ import { Face3 } from "../math/entity/face3";
 import { Line3 } from "../math/entity/line3";
 import { Vector3 } from "../math/vector3";
 import { BufferData } from "../core/buffer-data";
+import { CommonAttribute } from "../webgl/attribute";
 
 const tempFace3 = new Face3();
 const tempLine3 = new Line3();
@@ -17,18 +18,25 @@ export class StandardGeometry extends Geometry {
     super();
   }
 
-  create(indices: number[], vertices: number[], normals: number[], uvs: number[]) {
-    const positionBuffer = BufferData.f3(vertices);
-    this.bufferDatum.position = positionBuffer;
+  static create(index: number[], position: number[], normal: number[], uv: number[]): StandardGeometry {
+    return new StandardGeometry().create(index, position, normal, uv)
+  }
 
-    const normalBuffer = BufferData.f3(normals);
-    this.bufferDatum.normal = normalBuffer;
+  create(index: number[], position: number[], normal: number[], uv: number[]): StandardGeometry {
+    const positionBuffer = BufferData.f3(position);
+    this.bufferDatum[CommonAttribute.position] = positionBuffer;
 
-    const uvBuffer = BufferData.f2(uvs);
-    this.bufferDatum.uv = uvBuffer;
+    const normalBuffer = BufferData.f3(normal);
+    this.bufferDatum[CommonAttribute.normal] = normalBuffer;
 
-    const indexBuffer = BufferData.u16Index(indices);
+    const uvBuffer = BufferData.f2(uv);
+    this.bufferDatum[CommonAttribute.uv] = uvBuffer;
+
+    // TODO distinguish u16 case
+    const indexBuffer = BufferData.u32Index(index);
     this.indexBuffer = indexBuffer;
+
+    return this;
   }
 
   updateBoundingSphere() {

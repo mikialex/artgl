@@ -1,4 +1,3 @@
-import { AttributeDescriptor, AttributeUsage } from "../webgl/attribute";
 import { ShaderAttributeInputNode, ShaderCommonUniformInputNode, ShaderInnerUniformInputNode, ShaderTexture, ShaderNode, ShaderConstType, ShaderConstNode, ShaderCombineNode } from "./shader-node";
 import { GLDataType } from "../webgl/shader-util";
 import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
@@ -7,21 +6,20 @@ import { VPTransform, MTransform } from "./built-in/transform";
 import { Vector2 } from "../math/vector2";
 import { Vector3, Matrix4 } from "../math";
 import { Vector4 } from "../math/vector4";
+import { CommonAttribute } from "../webgl/attribute";
 
 // TODO simplify it
-export function attribute(att: AttributeDescriptor) {
-  return new ShaderAttributeInputNode(att);
+export function attribute(name: string, type: GLDataType) {
+  return new ShaderAttributeInputNode({ name, type });
 }
 
 export function texture(name: string, type?: GLTextureType) {
-  const t = type !== undefined ? type :  GLTextureType.texture2D;
+  const t = type !== undefined ? type : GLTextureType.texture2D;
   return new ShaderTexture(name, t);
 }
 
 export function uniform(name: string, type: GLDataType) {
-  return new ShaderCommonUniformInputNode({
-    name, type
-  })
+  return new ShaderCommonUniformInputNode({ name, type });
 }
 
 export function uniformFromValue(name: string, value: any) {
@@ -47,51 +45,47 @@ export function innerUniform(type: InnerSupportUniform) {
   })
 }
 
-export function value(value: ShaderConstType){
+export function value(value: ShaderConstType) {
   return new ShaderConstNode(value);
 }
 
-export function vec2(...args: ShaderNode[] ) {
+export function vec2(...args: ShaderNode[]) {
   return new ShaderCombineNode(args, GLDataType.floatVec2)
 }
 
-export function vec3(...args: ShaderNode[] ) {
+export function vec3(...args: ShaderNode[]) {
   return new ShaderCombineNode(args, GLDataType.floatVec3)
 }
 
-export function vec4(...args: ShaderNode[] ) {
+export function vec4(...args: ShaderNode[]) {
   return new ShaderCombineNode(args, GLDataType.floatVec4)
 }
 
-export function constValue(value: any){
+export function constValue(value: any) {
   return new ShaderConstNode(value);
 }
 
 export function MVPWorld() {
 
   return VPTransform.make()
-  .input("VPMatrix", innerUniform(InnerSupportUniform.VPMatrix))
+    .input("VPMatrix", innerUniform(InnerSupportUniform.VPMatrix))
     .input("position",
       MTransform.make()
-      .input('MMatrix', innerUniform(InnerSupportUniform.MMatrix))
-      .input('position', attribute(
-        { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-      ))
+        .input('MMatrix', innerUniform(InnerSupportUniform.MMatrix))
+        .input('position', attribute(CommonAttribute.position, GLDataType.floatVec3))
     )
 
   // return MVPTransform.make()
   // .input("VPMatrix", innerUniform(InnerSupportUniform.VPMatrix))
   // .input("MMatrix", innerUniform(InnerSupportUniform.MMatrix))
   // .input("position", attribute(
-  //   { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
+  //   { name: 'position', type: GLDataType.floatVec3 }
   // ))
 }
 
 export function screenQuad() {
   return vec4(
-    attribute(
-    { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
-    ),
+    attribute(CommonAttribute.position, GLDataType.floatVec3),
     constValue(1)
   )
 }

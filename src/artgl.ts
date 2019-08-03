@@ -3,13 +3,14 @@
 // low level gl layer
 export { GLRenderer } from "./webgl/gl-renderer";
 export { GLProgram } from "./webgl/program";
+export * from "./webgl/const";
 
 // artgl engine layer
 export { RenderEngine } from "./engine/render-engine";
 export { Framer } from "./engine/framer";
 export { InnerSupportUniform } from './webgl/uniform/uniform';
 
-export { RenderObject } from "./core/render-object";
+export * from "./core/render-object";
 export { Mesh } from "./object/mesh";
 export { Line } from "./object/line";
 export { Points } from "./object/points";

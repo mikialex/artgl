@@ -1,7 +1,7 @@
 import { TestBridge } from './test-bridge';
 import {
-  Vector3, RenderEngine, Scene, SphereGeometry, Mesh,
-  Line, Points, PerspectiveCamera, Vector4, OrbitController
+  Vector3, RenderRange, Vector4, RenderEngine, CullSide,
+  Scene, SphereGeometry, Mesh, PerspectiveCamera, OrbitController
 } from '../../src/artgl';
 
 export default async function test(testBridge: TestBridge) {
@@ -13,26 +13,20 @@ export default async function test(testBridge: TestBridge) {
 
   const scene = new Scene();
 
-  const geometry = new SphereGeometry();
-
   const mesh = new Mesh();
-  const line = new Line();
-  const points = new Points();
 
+  const geometry = new SphereGeometry();
   mesh.geometry = geometry;
-  line.geometry = geometry;
-  points.geometry = geometry;
 
-  line.transform.position.x = -5;
-  points.transform.position.x = 5;
+  const range = RenderRange.fromStandardGeometry(geometry);
+  mesh.range = range;
+  mesh.state.cullSide = CullSide.CullFaceNone;
 
   scene.root.addChild(mesh);
-  scene.root.addChild(line);
-  scene.root.addChild(points);
 
   const camera = engine.camera as PerspectiveCamera;
-  camera.transform.position.set(0, 0, 15);
-  camera.lookAt(new Vector3(0,0,0))
+  camera.transform.position.set(0, 0, 5);
+  camera.lookAt(new Vector3(0, 0, 0))
 
   function draw() {
     engine.connectCamera();
@@ -43,13 +37,30 @@ export default async function test(testBridge: TestBridge) {
 
   draw();
 
-
   //==<
 
   await testBridge.screenShotCompareElement(canvas, "test");
 
   const orbitController = new OrbitController(camera as PerspectiveCamera);
   orbitController.registerInteractor(engine.interactor);
+
+  let allCount = range.count
+
+  testBridge.testConfig = {
+    name: 'width',
+    value: range.count,
+    onChange: (value: number) => {
+      range.count = value;
+    },
+    editors: [
+      {
+        type: 'slider',
+        min: 0,
+        max: allCount,
+        step: 1
+      },
+    ]
+  }
 
   testBridge.framer.setFrame(() => {
     orbitController.update();

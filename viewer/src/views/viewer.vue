@@ -15,6 +15,7 @@ import ScenePanel from './scene-panel/scene-panel.vue'
 import ObjectPanel from './object-panel/object-panel.vue'
 import ViewerCanvas from './viewer-canvas.vue'
 import {GLApp} from '../application';
+import { RenderConfig } from '../components/conf/interface';
 
 @Component({
   components:{
@@ -28,7 +29,7 @@ export default class Viewer extends Vue {
     this.appConf = GLApp.pipeline.config;
   }
 
-  appConf = {
+  appConf: RenderConfig = {
     name: 'root',
     type: 'folder',
     value: []

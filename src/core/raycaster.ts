@@ -21,7 +21,7 @@ export interface RayCasterable {
   /**
    * get all raycast point on this obj, push the results in results array
    */
-  raycast(raycaster: Raycaster, results: RayCastResult[]);
+  raycast(raycaster: Raycaster, results: RayCastResult[]): RayCastResult[];
 
   /**
    * get first raycast point on this obj, return null if not hit

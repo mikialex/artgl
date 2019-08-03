@@ -1,15 +1,12 @@
 
-import { generateUUID, Vector3, Matrix4 } from "../math";
+import { generateUUID } from "../math";
 import { Nullable } from "../type";
 import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { Observable } from "./observable";
 import { RenderEngine } from "../engine/render-engine";
 import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
-import { GLDataType } from '../webgl/shader-util';
-import { Vector2 } from '../math/vector2';
-import { Vector4 } from '../math/vector4';
-import { uniform, uniformFromValue } from '../shader-graph/node-maker';
+import { uniformFromValue } from '../shader-graph/node-maker';
 
 export interface ShaderUniformProvider{
 

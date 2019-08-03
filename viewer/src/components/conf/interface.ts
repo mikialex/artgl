@@ -1,6 +1,6 @@
 export interface RenderConfig {
   name: string,
-  type: 'folder' | undefined,
+  type?: 'folder',
   value: RenderConfig[] | any,
   onChange?
   editors?

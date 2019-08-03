@@ -6,7 +6,7 @@ interface ControllerCallback {
   callback: Function
 }
 
-const prev = new Vector2();
+// const prev = new Vector2();
 const mousePosition = new Vector2();
 const v1 = new Vector2();
 
@@ -21,6 +21,7 @@ export class Interactor{
   enabled: boolean = true;
   mouseButton: number = -1; // -1 is default state for no button pressed 
   inputElement: HTMLElement;
+  prev = new Vector2();
 
   private controllers: Controller[] = [];
 
@@ -57,21 +58,21 @@ export class Interactor{
       return;
     }
     mousePosition.set(event.clientX, event.clientY);
-    v1.copy(prev).sub(mousePosition);
+    v1.copy(this.prev).sub(mousePosition);
     if (this.mouseButton === 0) {
       this.groupEmit(this.leftMouseMoveCallBacks, v1);
     }
     if (this.mouseButton === 2) {
       this.groupEmit(this.rightMouseMoveCallBacks, v1);
     }
-    prev.copy(mousePosition);
+    this.prev.copy(mousePosition);
   }
 
   private onMouseDown = (event: MouseEvent) => {
     if (!this.enabled) {
       return;
     }
-    prev.set(event.clientX, event.clientY);
+    this.prev.set(event.clientX, event.clientY);
     this.mouseButton = event.button;
     event.preventDefault();
   }

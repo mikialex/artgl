@@ -7,8 +7,13 @@ import { Face3 } from "../math/entity/face3";
 import { Line3 } from "../math/entity/line3";
 import { Vector3 } from "../math";
 import { Shading } from "./shading";
+import { StandardGeometry } from "../geometry/standard-geometry";
 
 export class RenderRange {
+  static fromStandardGeometry(geometry: StandardGeometry) {
+    return new RenderRange(0, geometry.indexBuffer.count);
+  }
+
   constructor(start?: number, count?: number) {
     if (start !== undefined) {
       this.start = start;

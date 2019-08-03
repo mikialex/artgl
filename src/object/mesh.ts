@@ -24,7 +24,7 @@ export class Mesh extends RenderObject
     }
   }
 
-  raycast(raycaster: Raycaster, results: RayCastResult[]) {
+  raycast(raycaster: Raycaster, results: RayCastResult[]): RayCastResult[] {
     inverse.getInverse(this.worldMatrix, false)
     const localRay = raycaster.getLocalRay(inverse);
     const hitPosition = new Vector3();
