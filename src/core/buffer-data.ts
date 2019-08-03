@@ -61,3 +61,12 @@ export class BufferData{
     return this.data.byteLength;
   }
 }
+
+export class InstancedBufferData extends BufferData{
+  constructor(data: BufferDataType, stride: number, divisor: number) {
+    super(data, stride);
+    this.divisor = divisor;
+  }
+
+  divisor: number = 1;
+}

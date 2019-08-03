@@ -40,4 +40,8 @@ export class GLAttribute {
     gl.enableVertexAttribArray(this.location);
   }
 
+  useInstanceBuffer(buffer: WebGLBuffer) {
+    
+  }
+
 }
