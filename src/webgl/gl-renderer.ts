@@ -11,7 +11,7 @@ import { GLFramebuffer } from "./gl-framebuffer";
 import { GLStat } from "./gl-stat";
 import { GLVAOManager } from "./vao";
 
-export class GLRenderer implements GLReleasable{
+export class GLRenderer implements GLReleasable {
   constructor(el?: HTMLCanvasElement, options?: any) {
     if (el === undefined) {
       el = document.createElement('canvas');
@@ -102,41 +102,40 @@ export class GLRenderer implements GLReleasable{
     }
   }
 
-  drawInstance(mode: DrawMode, useIndex: boolean) {
-    if (this.activeProgram === null) {
+  draw(mode: DrawMode) {
+    const program = this.activeProgram;
+    if (program === null) {
       throw 'renderer hasn\'t active program'
     }
 
-    if (useIndex) {
-      // this.gl.drawElements(
-      //   mode,
-      //   this.activeProgram.drawCount,
-      //   this.activeProgram.indexUINT ? this.gl.UNSIGNED_INT : this.gl.UNSIGNED_SHORT,
-      //   0
-      // );
+    if (!program.useInstance) {
+      if (program.useIndexDraw) {
+        this.gl.drawElements(
+          mode,
+          program.drawCount,
+          program._indexUINT ? this.gl.UNSIGNED_INT : this.gl.UNSIGNED_SHORT,
+          program.drawFrom
+        );
+      } else {
+        this.gl.drawArrays(mode, program.drawFrom, program.drawCount);
+      }
     } else {
-      // this.gl.drawArrays(mode, this.activeProgram.drawFrom, this.activeProgram.drawCount);
-    }
-    this.stat.drawcall++;
-
-    if (this.enableRenderErrorCatch) {
-      this.checkGLError();
-    }
-  }
-
-  draw(mode: DrawMode, useIndex: boolean) {
-    if (this.activeProgram === null) {
-      throw 'renderer hasn\'t active program'
-    }
-    if (useIndex) {
-      this.gl.drawElements(
-        mode,
-        this.activeProgram.drawCount,
-        this.activeProgram._indexUINT ? this.gl.UNSIGNED_INT : this.gl.UNSIGNED_SHORT,
-        0
-      );
-    } else {
-      this.gl.drawArrays(mode, this.activeProgram.drawFrom, this.activeProgram.drawCount);
+      if (program.useIndexDraw) {
+        // https://developer.mozilla.org/en-US/docs/Web/API/ANGLE_instanced_arrays/drawElementsInstancedANGLE
+        this.angleInstanceExt.drawElementsInstancedANGLE(
+          mode,
+          program.drawCount,
+          program._indexUINT ? this.gl.UNSIGNED_INT : this.gl.UNSIGNED_SHORT,
+          program.drawFrom,
+          program.instanceCount);
+      } else {
+        // https://developer.mozilla.org/en-US/docs/Web/API/ANGLE_instanced_arrays/drawArraysInstancedANGLE
+        this.angleInstanceExt.drawArraysInstancedANGLE(
+          mode,
+          program.drawFrom,
+          program.drawCount,
+          program.instanceCount);
+      }
     }
 
     if (this.enableRenderErrorCatch) {
@@ -145,11 +144,11 @@ export class GLRenderer implements GLReleasable{
 
     this.state.textureSlot.resetSlotIndex();
 
+    // update draw stat // TODO support other draw type
     this.stat.drawcall++;
-    // update draw count // TODO support other draw type
     if (mode === DrawMode.TRIANGLES) {
-      this.stat.faceDraw += this.activeProgram.drawCount / 3
-      this.stat.vertexDraw += this.activeProgram.drawCount
+      this.stat.faceDraw += (program.drawCount / 3 * program.instanceCount)
+      this.stat.vertexDraw += (program.drawCount * program.instanceCount)
     }
   }
 
@@ -157,7 +156,7 @@ export class GLRenderer implements GLReleasable{
     const errorCode = this.gl.getError();
     if (errorCode !== this.gl.NO_ERROR) {
       // debugger
-      throw `gl draw error: ${ errorCode }`;
+      throw `gl draw error: ${errorCode}`;
     }
   }
 
@@ -174,7 +173,7 @@ export class GLRenderer implements GLReleasable{
       }
     }
   }
-  
+
   setRenderTargetScreen() {
     this.setRenderTarget(null);
   }

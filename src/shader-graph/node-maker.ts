@@ -79,7 +79,7 @@ export function MVPWorld() {
   // .input("VPMatrix", innerUniform(InnerSupportUniform.VPMatrix))
   // .input("MMatrix", innerUniform(InnerSupportUniform.MMatrix))
   // .input("position", attribute(
-  //   { name: 'position', type: GLDataType.floatVec3, usage: AttributeUsage.position }
+  //   { name: 'position', type: GLDataType.floatVec3 }
   // ))
 }
 

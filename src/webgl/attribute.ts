@@ -30,7 +30,8 @@ export class GLAttribute {
       this.angleInstanceExt = ext;
     }
 
-    if (descriptor.asInstance !== undefined) {
+    if (descriptor.asInstance === true) {
+      program.useInstance = true;
       this.asInstance = descriptor.asInstance
       this.instanceDivisor = descriptor.instanceDivisor
     }

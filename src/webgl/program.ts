@@ -47,7 +47,6 @@ export class GLProgram{
   constructor(renderer: GLRenderer, config: GLProgramConfig) {
     fulfillProgramConfig(config);
     this.renderer = renderer;
-    this.id = generateUUID();
 
     this.vertexShader = new GLShader(this.renderer, ShaderType.vertex);
     this.fragmentShader = new GLShader(this.renderer, ShaderType.fragment);
@@ -69,8 +68,9 @@ export class GLProgram{
     renderer.programManager.addNewProgram(this);
 
   }
-  id: string;
-  name: string = "any";
+  
+  id: string = generateUUID();
+
   readonly renderer: GLRenderer;
   private program: Nullable<WebGLProgram> = null;
   getProgram(): WebGLProgram {
@@ -79,22 +79,29 @@ export class GLProgram{
     }
     return this.program
   };
+
   private config: GLProgramConfig;
+  
+  getConfig(): Readonly<GLProgramConfig> {
+    return this.config;
+  }
+
   private attributes: { [index: string]: GLAttribute } = {};
   private uniforms: { [index: string]: GLUniform } = {};
   private globalUniforms: GLUniform[] = [];
   private textures: { [index: string]: GLTextureUniform } = {};
+
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
-
-  getConfig(): Readonly<GLProgramConfig>{
-    return this.config;
-  }
 
   framebufferTextureMap: { [index: string]: string } = {};
 
   drawFrom: number = 0;
   drawCount: number = 0;
+
+  instanceCount: number = 0;
+  useInstance: boolean = false;
+
   useIndexDraw: boolean = false;
   _indexUINT: boolean = false;
   set indexUINT(value: boolean) {

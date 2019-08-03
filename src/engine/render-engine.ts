@@ -210,7 +210,7 @@ export class RenderEngine implements GLReleasable{
     object.state.syncGL(this.renderer)
 
     // render
-    this.renderer.draw(object.drawMode, program.useIndexDraw);
+    this.renderer.draw(object.drawMode);
   }
 
   renderFrameBuffer(framebuffer: GLFramebuffer, debugViewPort: Vector4) {
@@ -352,12 +352,11 @@ export class RenderEngine implements GLReleasable{
       }
     }
 
-    // no vao procedure
+    // common procedure
     program.forAttributes(att => {
-      // TODO should not by name but by attributeUsage
       const bufferData = geometry.bufferDatum[att.name];
       if (bufferData === undefined) {
-        throw `program ${program.name} needs an attribute named ${att.name}, but cant find in geometry data`;
+        throw `program needs an attribute named ${att.name}, but cant find in geometry data`;
       }
       let glBuffer = this.getGLAttributeBuffer(bufferData);
       if (glBuffer === undefined && bufferData.dataChanged) {
@@ -375,7 +374,6 @@ export class RenderEngine implements GLReleasable{
       }
       program.useIndexBuffer(glBuffer);
     }
-
 
     // create vao
     if (this._vaoEnabled) {
