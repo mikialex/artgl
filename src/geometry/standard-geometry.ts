@@ -18,18 +18,25 @@ export class StandardGeometry extends Geometry {
     super();
   }
 
-  create(indices: number[], vertices: number[], normals: number[], uvs: number[]) {
-    const positionBuffer = BufferData.f3(vertices);
+  static create(index: number[], position: number[], normal: number[], uv: number[]): StandardGeometry {
+    return new StandardGeometry().create(index, position, normal, uv)
+  }
+
+  create(index: number[], position: number[], normal: number[], uv: number[]): StandardGeometry {
+    const positionBuffer = BufferData.f3(position);
     this.bufferDatum[CommonAttribute.position] = positionBuffer;
 
-    const normalBuffer = BufferData.f3(normals);
+    const normalBuffer = BufferData.f3(normal);
     this.bufferDatum[CommonAttribute.normal] = normalBuffer;
 
-    const uvBuffer = BufferData.f2(uvs);
+    const uvBuffer = BufferData.f2(uv);
     this.bufferDatum[CommonAttribute.uv] = uvBuffer;
 
-    const indexBuffer = BufferData.u16Index(indices);
+    // TODO distinguish u8 case
+    const indexBuffer = BufferData.u16Index(index);
     this.indexBuffer = indexBuffer;
+
+    return this;
   }
 
   updateBoundingSphere() {

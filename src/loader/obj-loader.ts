@@ -2,7 +2,6 @@ import { Geometry } from "../core/geometry";
 import { Vector3 } from "../math/vector3";
 import { Vector2 } from "../math/vector2";
 import { loadStringFromFile } from "../util/file-io";
-import { BufferData } from "../core/buffer-data";
 import { generateNormalFromPosition } from "../util/normal-generation";
 import { StandardGeometry } from "../geometry/standard-geometry";
 import { GeometryLoader } from "../core/loader";
@@ -280,7 +279,6 @@ export class OBJLoader extends GeometryLoader{
       }
 
     }
-    const geometry = new StandardGeometry();
     const position: number[] = [];
     this.wrappedPositionForArtgl.forEach(po => {
       position.push(po.x);
@@ -288,37 +286,35 @@ export class OBJLoader extends GeometryLoader{
       position.push(po.z);
     })
 
-    const normal: number[] = [];
-    this.wrappedNormalsForArtgl.forEach(po => {
-      normal.push(po.x);
-      normal.push(po.y);
-      normal.push(po.z);
+
+    const uv: number[] = [];
+    this.wrappedUvsForArtgl.forEach(po => {
+      uv.push(po.x);
+      uv.push(po.y);
     })
-    const positionBuffer = new Float32Array(position);
-    const normalBuffer = new Float32Array(normal);
-    let indexBuffer;
-    if (this.indicesForArtgl.length > 65535) {
-      indexBuffer = new Uint32Array(this.indicesForArtgl);
-      geometry.indexBuffer = new BufferData(indexBuffer, 1);
-    } else {
-      indexBuffer = new Uint16Array(this.indicesForArtgl);
-      geometry.indexBuffer = new BufferData(indexBuffer, 1);
-    }
-    geometry.bufferDatum.position = new BufferData(positionBuffer, 3);
+
+    let normal: number[] = [];
     const useGeneratedNormal = false;
     if (useGeneratedNormal) {
-      geometry.bufferDatum.normal = new BufferData(generateNormalFromPosition(positionBuffer), 3);
+      normal = Array.from(generateNormalFromPosition(new Float32Array(position)));
     } else {
-      geometry.bufferDatum.normal = new BufferData(normalBuffer, 3);
+      normal = [];
+      this.wrappedNormalsForArtgl.forEach(po => {
+        normal.push(po.x);
+        normal.push(po.y);
+        normal.push(po.z);
+      })
     }
-    console.log('indexlength:' + indexBuffer.length);
-    console.log('positionBuffer:' + positionBuffer.length);
 
+    const geometry = StandardGeometry.create(
+      this.indicesForArtgl, position, normal, uv);
+    
     if (fileName) {
-      geometry.name = "Objfile-" + fileName;
+      geometry.name = "ObjFile-" + fileName;
     } else {
-      geometry.name = "Objfile-unnamed";
+      geometry.name = "ObjFile-unnamed";
     }
+
     return geometry;
   }
 }
