@@ -1,6 +1,7 @@
 // https://github.com/pissang/claygl/blob/master/src/core/GLInfo.js
 
 export enum GLExtList {
+  ANGLE_instanced_arrays = "ANGLE_instanced_arrays",
   OES_texture_float = "OES_texture_float",
   OES_texture_half_float = "OES_texture_half_float",
   OES_texture_float_linear = "OES_texture_float_linear",
@@ -25,15 +26,19 @@ export enum GLParamList {
 const EXTENSION_LIST = Object.keys(GLExtList);
 const PARAMETER_NAMES = Object.keys(GLParamList);
 
-export class GLInfo{
+export class GLInfo {
   constructor(gl: WebGLRenderingContext) {
     this.gl = gl;
     this.createAllExtension();
     this.getAllParams();
+    if (this.getExtension(GLExtList.OES_element_index_uint) !== undefined) {
+      this.supportUintIndexDraw = true;
+    }
   }
   private gl: WebGLRenderingContext
   private extensions: { [index: string]: any } = {}
   private parameters: { [index: string]: any } = {}
+  readonly supportUintIndexDraw: boolean;
 
   private createExtension(name: string) {
     const gl = this.gl;
@@ -47,14 +52,14 @@ export class GLInfo{
     this.extensions[name] = ext;
   }
 
-  getExtension (name: GLExtList) {
+  getExtension(name: GLExtList) {
     if (!(name in this.extensions)) {
       this.createExtension(name);
     }
     return this.extensions[name];
   };
 
-  getParameter (name: string) {
+  getParameter(name: string) {
     return this.parameters[name];
   };
 

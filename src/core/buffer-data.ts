@@ -12,8 +12,8 @@ export class BufferData{
   static f2(data: number[]): BufferData {
     return new BufferData(new Float32Array(data), 2)
   }
-  static u16Index(data: number[]): BufferData {
-    return new BufferData(new Uint16Array(data), 1)
+  static u32Index(data: number[]): BufferData {
+    return new BufferData(new Uint32Array(data), 1)
   }
 
   constructor(data: BufferDataType, stride: number) {

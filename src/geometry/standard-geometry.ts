@@ -32,8 +32,8 @@ export class StandardGeometry extends Geometry {
     const uvBuffer = BufferData.f2(uv);
     this.bufferDatum[CommonAttribute.uv] = uvBuffer;
 
-    // TODO distinguish u8 case
-    const indexBuffer = BufferData.u16Index(index);
+    // TODO distinguish u16 case
+    const indexBuffer = BufferData.u32Index(index);
     this.indexBuffer = indexBuffer;
 
     return this;

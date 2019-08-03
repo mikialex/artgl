@@ -96,7 +96,13 @@ export class GLProgram{
   drawFrom: number = 0;
   drawCount: number = 0;
   useIndexDraw: boolean = false;
-  indexUINT: boolean = false;
+  _indexUINT: boolean = false;
+  set indexUINT(value: boolean) {
+    if (value && !this._indexUINT && !this.renderer.glInfo.supportUintIndexDraw) {
+      throw "your webgl not support uint draw"
+    }
+    this._indexUINT = value
+  }
 
 
   public defineFrameBufferTextureDep(framebufferName: string, uniformName: string) {

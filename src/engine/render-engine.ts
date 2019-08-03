@@ -210,7 +210,7 @@ export class RenderEngine implements GLReleasable{
     object.state.syncGL(this.renderer)
 
     // render
-    this.renderer.render(object.drawMode, program.useIndexDraw);
+    this.renderer.draw(object.drawMode, program.useIndexDraw);
   }
 
   renderFrameBuffer(framebuffer: GLFramebuffer, debugViewPort: Vector4) {

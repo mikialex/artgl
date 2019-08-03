@@ -1,4 +1,4 @@
-import { GLInfo } from "./gl-info";
+import { GLInfo, GLExtList } from "./gl-info";
 import { GLProgram, GLProgramConfig } from "./program";
 import { GLProgramManager } from "./program-manager";
 import { GLAttributeBufferDataManager } from "./attribute-buffer-manager";
@@ -30,12 +30,19 @@ export class GLRenderer implements GLReleasable{
     this.vaoManager = new GLVAOManager(this);
     this.state = new GLState(this);
     this.textureManger.init();
+
+    const ext = this.glInfo.getExtension(GLExtList.ANGLE_instanced_arrays);
+    if (ext !== undefined) {
+      this.angleInstanceExt = ext;
+    }
+
     this.setSize(this.el.offsetWidth, this.el.offsetHeight);
   }
   readonly gl: WebGLRenderingContext;
   readonly el: HTMLCanvasElement;
 
   readonly glInfo: GLInfo;
+  private angleInstanceExt: Nullable<ANGLE_instanced_arrays> = null;
 
   // enable this will cause great performance issue
   // only enable this when debug draw range issue
@@ -95,7 +102,29 @@ export class GLRenderer implements GLReleasable{
     }
   }
 
-  render(mode: DrawMode, useIndex: boolean) {
+  drawInstance(mode: DrawMode, useIndex: boolean) {
+    if (this.activeProgram === null) {
+      throw 'renderer hasn\'t active program'
+    }
+
+    if (useIndex) {
+      // this.gl.drawElements(
+      //   mode,
+      //   this.activeProgram.drawCount,
+      //   this.activeProgram.indexUINT ? this.gl.UNSIGNED_INT : this.gl.UNSIGNED_SHORT,
+      //   0
+      // );
+    } else {
+      // this.gl.drawArrays(mode, this.activeProgram.drawFrom, this.activeProgram.drawCount);
+    }
+    this.stat.drawcall++;
+
+    if (this.enableRenderErrorCatch) {
+      this.checkGLError();
+    }
+  }
+
+  draw(mode: DrawMode, useIndex: boolean) {
     if (this.activeProgram === null) {
       throw 'renderer hasn\'t active program'
     }
@@ -103,28 +132,32 @@ export class GLRenderer implements GLReleasable{
       this.gl.drawElements(
         mode,
         this.activeProgram.drawCount,
-        this.activeProgram.indexUINT ? this.gl.UNSIGNED_INT : this.gl.UNSIGNED_SHORT,
+        this.activeProgram._indexUINT ? this.gl.UNSIGNED_INT : this.gl.UNSIGNED_SHORT,
         0
       );
     } else {
       this.gl.drawArrays(mode, this.activeProgram.drawFrom, this.activeProgram.drawCount);
     }
-    this.stat.drawcall++;
 
     if (this.enableRenderErrorCatch) {
-      const errorCode = this.gl.getError();
-      if (errorCode !== this.gl.NO_ERROR) {
-        // debugger
-        throw `gl draw error: ${ errorCode }`;
-      }
+      this.checkGLError();
     }
 
     this.state.textureSlot.resetSlotIndex();
 
+    this.stat.drawcall++;
     // update draw count // TODO support other draw type
     if (mode === DrawMode.TRIANGLES) {
       this.stat.faceDraw += this.activeProgram.drawCount / 3
       this.stat.vertexDraw += this.activeProgram.drawCount
+    }
+  }
+
+  checkGLError() {
+    const errorCode = this.gl.getError();
+    if (errorCode !== this.gl.NO_ERROR) {
+      // debugger
+      throw `gl draw error: ${ errorCode }`;
     }
   }
 
