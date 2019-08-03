@@ -29,21 +29,6 @@ export class GLAttributeBufferDataManager implements GLReleasable {
     return buffer;
   }
 
-  createInstanceBuffer(data: ArrayBuffer): WebGLBuffer {
-    const gl = this.renderer.gl;
-    const buffer = gl.createBuffer();
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-
-    // https://segmentfault.com/a/1190000017048578
-    gl.enableVertexAttribArray(aOffsetLocation); // 启用偏移量attribute变量从缓冲区取数据
-    gl.vertexAttribPointer(aOffsetLocation, 3, gl.FLOAT, false, 12, 0); // 定义每个数据的长度为3个分量，长度为12 = 3 * 4（浮点数长度）。
-    gl.vertexAttribDivisor(aOffsetLocation, 1);
-
-    return buffer;
-  }
-
   disposeBuffer(data: ArrayBuffer) {
     if (!this.buffers.has(data)) {
       throw 'cant find buffer to dispose';

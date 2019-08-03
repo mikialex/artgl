@@ -4,6 +4,7 @@ import { Face3 } from "../math/entity/face3";
 import { Line3 } from "../math/entity/line3";
 import { Vector3 } from "../math/vector3";
 import { BufferData } from "../core/buffer-data";
+import { CommonAttribute } from "../webgl/attribute";
 
 const tempFace3 = new Face3();
 const tempLine3 = new Line3();
@@ -19,13 +20,13 @@ export class StandardGeometry extends Geometry {
 
   create(indices: number[], vertices: number[], normals: number[], uvs: number[]) {
     const positionBuffer = BufferData.f3(vertices);
-    this.bufferDatum.position = positionBuffer;
+    this.bufferDatum[CommonAttribute.position] = positionBuffer;
 
     const normalBuffer = BufferData.f3(normals);
-    this.bufferDatum.normal = normalBuffer;
+    this.bufferDatum[CommonAttribute.normal] = normalBuffer;
 
     const uvBuffer = BufferData.f2(uvs);
-    this.bufferDatum.uv = uvBuffer;
+    this.bufferDatum[CommonAttribute.uv] = uvBuffer;
 
     const indexBuffer = BufferData.u16Index(indices);
     this.indexBuffer = indexBuffer;

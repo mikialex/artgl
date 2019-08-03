@@ -1,18 +1,18 @@
 import { GLDataType, getGLDataTypeStride } from "./shader-util";
 import { GLProgram } from "./program";
 
-export const enum AttributeUsage {
-  position,
-  normal,
-  color,
-  uv,
-  unset
+export const enum CommonAttribute {
+  position = 'position',
+  normal = 'normal',
+  color = 'color',
+  uv = 'uv',
 }
 
 export interface AttributeDescriptor {
   name: string,
   type: GLDataType,
-  usage: AttributeUsage
+  asInstance?: boolean, // default false
+  instanceDivisor?: number // default 1
 }
 
 export class GLAttribute {
@@ -22,13 +22,22 @@ export class GLAttribute {
     this.location = this.gl.getAttribLocation(program.getProgram(), descriptor.name);
     this.type = descriptor.type;
     this.isActive = this.location !== -1;
+
+    if (descriptor.asInstance !== undefined) {
+      this.asInstance = descriptor.asInstance
+      this.instanceDivisor = descriptor.instanceDivisor
+    }
   }
+  
   readonly name: string;
   readonly gl: WebGLRenderingContext;
   readonly location: number;
   readonly type: GLDataType;
   readonly count: number = 0;
   readonly isActive: boolean;
+
+  readonly asInstance: boolean = false;
+  readonly instanceDivisor: number;
 
   useBuffer(buffer: WebGLBuffer) {
     if (!this.isActive) {
@@ -38,10 +47,9 @@ export class GLAttribute {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.vertexAttribPointer(this.location, getGLDataTypeStride(this.type), gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(this.location);
-  }
-
-  useInstanceBuffer(buffer: WebGLBuffer) {
-    
+    if (this.asInstance) {
+      // gl.vertexAttribDivisor(this.location, this.instanceDivisor);
+    }
   }
 
 }

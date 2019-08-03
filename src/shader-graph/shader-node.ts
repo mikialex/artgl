@@ -5,7 +5,7 @@ import {
   InnerSupportUniform, UniformDescriptor,
   InnerUniformMapDescriptor, InnerUniformMap
 } from "../webgl/uniform/uniform";
-import { AttributeUsage, AttributeDescriptor } from "../webgl/attribute";
+import { AttributeDescriptor } from "../webgl/attribute";
 import { Vector2 } from "../math/vector2";
 import { Vector3 } from "../math/index";
 import { Vector4 } from "../math/vector4";
@@ -110,9 +110,7 @@ export class ShaderInnerUniformInputNode extends ShaderInputNode {
 export class ShaderAttributeInputNode extends ShaderInputNode {
   constructor(des: AttributeDescriptor) {
     super(des.name, des.type);
-    this.attributeUsage = des.usage;
   }
-  attributeUsage: AttributeUsage
 }
 
 // castValidFloat

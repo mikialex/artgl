@@ -3,7 +3,7 @@ import { GLShader, ShaderType } from "./shader";
 import { generateUUID } from "../math/uuid";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
 import { GLUniform, UniformDescriptor, getInnerUniformDescriptor, InnerUniformMapDescriptor, InnerSupportUniform } from "./uniform/uniform";
-import { AttributeDescriptor, GLAttribute, AttributeUsage } from "./attribute";
+import { AttributeDescriptor, GLAttribute } from "./attribute";
 import { Nullable } from "../type";
 import { GLTextureUniform, TextureDescriptor } from "./uniform/uniform-texture";
 import { RenderEngine } from "../engine/render-engine";
@@ -68,11 +68,6 @@ export class GLProgram{
     }
     renderer.programManager.addNewProgram(this);
 
-    config.attributes.forEach(att => {
-      if (att.usage !== undefined) {
-        this.attributeUsageMap[att.usage] = this.attributes[att.name];
-      }
-    });
   }
   id: string;
   name: string = "any";
@@ -86,7 +81,6 @@ export class GLProgram{
   };
   private config: GLProgramConfig;
   private attributes: { [index: string]: GLAttribute } = {};
-  private attributeUsageMap: { [index: number]: GLAttribute } = {};
   private uniforms: { [index: string]: GLUniform } = {};
   private globalUniforms: GLUniform[] = [];
   private textures: { [index: string]: GLTextureUniform } = {};
@@ -178,10 +172,6 @@ export class GLProgram{
       throw 'try to set a none exist attribute';
     }
     attribute.useBuffer(data);
-  }
-
-  getAttributeByUsage(usage:AttributeUsage) {
-    return this.attributeUsageMap[usage];
   }
 
   setTexture(name: string, webglTexture: WebGLTexture) {

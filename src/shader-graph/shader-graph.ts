@@ -1,7 +1,7 @@
 import { GLProgramConfig } from "../webgl/program";
 import { genFragShader, genVertexShader } from "./code-gen";
 import {
-  ShaderInputNode, ShaderTexture, ShaderFunctionNode, 
+  ShaderInputNode, ShaderTexture, ShaderFunctionNode,
   ShaderAttributeInputNode, ShaderInnerUniformInputNode,
   ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode,
   ShaderTextureFetchNode
@@ -9,8 +9,8 @@ import {
 import { Nullable } from "../type";
 import { attribute } from "./node-maker";
 import { GLDataType } from "../webgl/shader-util";
-import { AttributeUsage } from "../webgl/attribute";
 import { DivW } from "./built-in/transform";
+import { CommonAttribute } from "../webgl/attribute";
 
 
 export const UvFragVary = "v_uv"
@@ -44,16 +44,12 @@ export class ShaderGraph {
     return this;
   }
 
-  declareFragNormal(): ShaderGraph{
-    return this.setVary(NormalFragVary, attribute(
-      { name: 'normal', type: GLDataType.floatVec3, usage: AttributeUsage.normal }
-    ))
+  declareFragNormal(): ShaderGraph {
+    return this.setVary(NormalFragVary, attribute(CommonAttribute.normal, GLDataType.floatVec3))
   }
-  
+
   declareFragUV(): ShaderGraph {
-    return this.setVary(UvFragVary, attribute(
-      { name: 'uv', type: GLDataType.floatVec2, usage: AttributeUsage.uv }
-    ))
+    return this.setVary(UvFragVary, attribute(CommonAttribute.uv, GLDataType.floatVec2))
   }
 
 
@@ -132,7 +128,6 @@ export class ShaderGraph {
       .map((node: ShaderAttributeInputNode) => {
         return {
           name: node.name,
-          usage: node.attributeUsage,
           type: node.type,
         }
       });
@@ -153,19 +148,19 @@ export class ShaderGraph {
           mapInner: node.mapInner,
         }
       });
-    
+
     const textureSet = new Set<ShaderTexture>();
     nodes.filter(n => n instanceof ShaderTextureFetchNode)
-      .forEach((node: ShaderTextureFetchNode)  => {
+      .forEach((node: ShaderTextureFetchNode) => {
         textureSet.add(node.source)
       })
     const textures = [];
     textureSet.forEach(st => {
       textures.push({
-        name:st.name,
-        type:st.type 
-        })
+        name: st.name,
+        type: st.type
       })
+    })
 
     const varyings = [];
     this.varyings.forEach((node, key) => {
