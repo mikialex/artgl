@@ -1,4 +1,4 @@
-import testScene from './scene'
+import renderRange from './render-range'
 import testDrawPrimitive from './draw-primitives'
 import { HeadlessTestBridge } from './test-bridge'
 
@@ -21,12 +21,12 @@ interface Example{
 
 export const examples: Example[] = [
   {
-    name: "basic scene",
-    build: testScene
-  },
-  {
     name: "primitive",
     build: testDrawPrimitive
+  },
+  {
+    name: "render range",
+    build: renderRange
   },
 ];
 

@@ -56,7 +56,11 @@ export class GLAttribute {
     gl.vertexAttribPointer(this.location, getGLDataTypeStride(this.type), gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(this.location);
     if (this.asInstance) {
-      this.angleInstanceExt.vertexAttribDivisorANGLE(this.location, this.instanceDivisor);
+      if (this.angleInstanceExt !== null) {
+        this.angleInstanceExt.vertexAttribDivisorANGLE(this.location, this.instanceDivisor);
+      } else {
+        throw "instance not support"
+      }
     }
     
   }

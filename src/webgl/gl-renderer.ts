@@ -120,6 +120,9 @@ export class GLRenderer implements GLReleasable {
         this.gl.drawArrays(mode, program.drawFrom, program.drawCount);
       }
     } else {
+      if (this.angleInstanceExt === null) {
+        throw 'instance not support'
+      }
       if (program.useIndexDraw) {
         // https://developer.mozilla.org/en-US/docs/Web/API/ANGLE_instanced_arrays/drawElementsInstancedANGLE
         this.angleInstanceExt.drawElementsInstancedANGLE(

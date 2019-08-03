@@ -393,8 +393,10 @@ export class RenderEngine implements GLReleasable{
       } else {
         throw 'range should be set if use none index geometry'
       }
+    } else {
+      start = range.start;
+      count = range.count;
     }
-    // TODO set range
     program.drawFrom = start;
     program.drawCount = count;
   }

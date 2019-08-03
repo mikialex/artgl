@@ -8,12 +8,14 @@
       <canvas></canvas>
     </div>
     <div v-if="exampleHasBuild">
-      <button @click ="start" v-if="!isRunning">start</button>
-      <button @click ="step" v-if="!isRunning">step</button>
-      <button @click ="stop" v-if="isRunning">stop</button>
+      <button @click="start" v-if="!isRunning">start</button>
+      <button @click="step" v-if="!isRunning">step</button>
+      <button @click="stop" v-if="isRunning">stop</button>
     </div>
-    <div v-else>
-      example is in building
+    <div v-else>example is in building</div>
+
+    <div v-if="config">
+      <Config :config="config" />
     </div>
   </div>
 </template>
@@ -21,16 +23,24 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { ViewerTestBridge } from "../../../../example/contents/test-bridge";
+import Config from "../../components/conf/config.vue";
+import { RenderConfig } from "../../components/conf/interface";
 
 const bridge = new ViewerTestBridge();
 
 @Component({
-  components: {}
+  components: { Config }
 })
 export default class ConfigPanel extends Vue {
   $store: any;
   $router: any;
   $route: any;
+
+  config: RenderConfig = {
+    name: 'example config',
+    type: 'folder',
+    value: []
+  };
 
   get example() {
     this.$store.state.viewExample = this.$route.params.name;
@@ -46,23 +56,28 @@ export default class ConfigPanel extends Vue {
   exampleHasBuild: boolean = false;
   isRunning: boolean = false;
 
-  start(){
+  start() {
     bridge.framer.run();
     this.isRunning = true;
   }
 
-  stop(){
+  stop() {
     bridge.framer.stop();
     this.isRunning = false;
   }
 
-  step(){
+  step() {
     bridge.framer.step();
   }
 
   async mounted() {
     console.log(this.example);
     await this.example.build(bridge);
+
+    if(bridge.testConfig !== undefined){
+      this.config.value.push(bridge.testConfig)
+    }
+
     this.exampleHasBuild = true;
   }
 }
