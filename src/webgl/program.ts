@@ -200,6 +200,13 @@ export class GLProgram{
     this.uniforms[name].set(data);
   }
 
+  setUniformIfExist(name: string, data: GLData) {
+    const uni = this.uniforms[name];
+    if (uni !== undefined) {
+      this.uniforms[name].set(data);
+    }
+  }
+
   updateInnerGlobalUniforms(engine: RenderEngine) {
     this.globalUniforms.forEach(uni => {
       uni.set(engine.getGlobalUniform(uni.innerGlobal as InnerSupportUniform).value)

@@ -15,6 +15,10 @@ export class ViewerTestBridge implements TestBridge {
   framer: Framer = new Framer(); 
   testConfig?: RenderConfig;
 
+  reset() {
+    this.framer = new Framer();
+    this.testConfig = undefined;
+  }
 }
 
 export class HeadlessTestBridge implements TestBridge {

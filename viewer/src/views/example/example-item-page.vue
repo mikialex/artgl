@@ -71,7 +71,8 @@ export default class ConfigPanel extends Vue {
   }
 
   async mounted() {
-    console.log(this.example);
+    bridge.reset();
+    
     await this.example.build(bridge);
 
     if(bridge.testConfig !== undefined){

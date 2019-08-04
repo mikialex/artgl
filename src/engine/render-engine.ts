@@ -283,7 +283,7 @@ export class RenderEngine implements GLReleasable{
         return;
       }
       provider.uniforms.forEach((value, key) => {
-        program.setUniform(key, value);
+        program.setUniformIfExist(key, value); // maybe user defined, but not really in shader
       })
       provider.hasAnyUniformChanged = false;
       this.lastUploadedShaderUniformProvider.add(provider);

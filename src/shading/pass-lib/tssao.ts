@@ -11,8 +11,8 @@ import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
 
 const newSamplePosition = new ShaderFunction({
   source: `
-  vec3 newPosition(vec3 positionOld, float distance, vec3 dir){
-    return distance * dir + positionOld;
+  vec3 newPosition(vec3 positionOld, float distance, vec3 dir, float rand){
+    return distance * rand * dir + positionOld;
   }
   `
 })
@@ -90,6 +90,7 @@ export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
       .input("positionOld", worldPosition.swizzling("xyz"))
       .input("distance", this.getPropertyUniform("aoRadius"))
       .input("dir", randDir)
+      .input("rand", Random2D1)
 
     const newDepth = unPackDepth.make()
       .input("enc",
@@ -104,7 +105,7 @@ export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
                 )
             )
         )
-      )
+    )
 
     graph.setFragmentRoot(
       tssaoMix.make()
