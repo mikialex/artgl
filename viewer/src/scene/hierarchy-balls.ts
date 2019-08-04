@@ -1,18 +1,29 @@
 import {
-  SphereGeometry, PlaneGeometry,
-  NormalShading, Mesh, SceneNode, Shading, CubeGeometry
+  SphereGeometry, PlaneGeometry, AmbientLight, Mesh, SceneNode,
+  Shading, CubeGeometry, Vector3, DirectionalLight
 } from '../../../src/artgl';
-import { PointLight } from '../../../src/core/light';
+import { PointLight } from '../../../src/light/point-light';
 
 export default function (root: SceneNode) {
   const sphereGeo = new SphereGeometry(1, 40, 40);
   const planeGeo = new PlaneGeometry(10, 10, 10, 10);
   const cubeGeo = new CubeGeometry(5, 3, 4)
-  const light = new PointLight();
+
+  const pointLight = new PointLight();
+  pointLight.position = new Vector3(0, 3, 0);
+  pointLight.radius = 5;
+  const ambient = new AmbientLight();
+  ambient.color = new Vector3(0.3, 0.3, 0.3);
+  const dirLight = new DirectionalLight();
+  dirLight.color = new Vector3(0.1, 0.1, 0.1);
+  dirLight.direction = new Vector3(1, 1, -1).normalize();
+
 
   let shading = new Shading()
-    .decorate(new NormalShading())
-    .decorate(light);
+    // .decorate(new NormalShading())
+    .decorate(pointLight)
+    .decorate(ambient)
+    .decorate(dirLight)
 
   shading.afterShaderCompiled.add((config) => {
     console.log(config);

@@ -1,6 +1,6 @@
 import {
   RenderEngine, Mesh, PerspectiveCamera, OrbitController,
-  OBJLoader, Scene, Observable, Framer
+  OBJLoader, Scene, Observable, Framer, Vector4
 } from '../../src/artgl';
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
@@ -18,6 +18,7 @@ export class Application {
   scene: Scene = new Scene();
   orbitController: OrbitController;
   raycaster: Raycaster = new Raycaster();
+  backgroundColor: Vector4 = new Vector4();
 
   initialize(canvas: HTMLCanvasElement) {
     this.el = canvas;
@@ -64,6 +65,7 @@ export class Application {
     this.beforeRender.notifyObservers(this.engine);
     this.orbitController.update();
 
+    this.engine.renderer.state.colorbuffer.setClearColor(this.backgroundColor);
     this.pipeline.render(this.engine, this.scene);
 
     this.afterRender.notifyObservers(this.engine);

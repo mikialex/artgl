@@ -39,6 +39,8 @@ export * from './shader-graph/node-maker';
 export * from './shading/basic-lib/exports';
 export * from './shading/pass-lib/exports';
 
+export * from './light/exports';
+
 // geometry lib
 export { SphereGeometry } from "./geometry/geo-lib/sphere-geometry";
 export { PlaneGeometry } from "./geometry/geo-lib/plane-geometry";

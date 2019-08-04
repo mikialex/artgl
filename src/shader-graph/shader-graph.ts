@@ -6,11 +6,11 @@ import {
   ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode,
   ShaderTextureFetchNode
 } from "./shader-node";
-import { Nullable } from "../type";
-import { attribute } from "./node-maker";
+import { attribute, constValue, MVPWorld } from "./node-maker";
 import { GLDataType } from "../webgl/shader-util";
 import { DivW } from "./built-in/transform";
 import { CommonAttribute } from "../webgl/attribute";
+import { Vector4 } from "../math";
 
 
 export const UvFragVary = "v_uv"
@@ -19,8 +19,12 @@ export const NDCPositionFragVary = "v_position_ndc"
 export const WorldPositionFragVary = "v_position_world"
 
 export class ShaderGraph {
-  fragmentRoot: Nullable<ShaderNode>;
-  vertexRoot: Nullable<ShaderNode>;
+  constructor() {
+    this.reset();
+  }
+
+  fragmentRoot: ShaderNode;
+  vertexRoot: ShaderNode;
   varyings: Map<string, ShaderNode> = new Map();
 
   setFragmentRoot(root: ShaderNode): ShaderGraph {
@@ -28,9 +32,10 @@ export class ShaderGraph {
     return this;
   }
 
-  setVertexRoot(root: ShaderNode): ShaderGraph {
-    this.vertexRoot = root;
-    // this for:  if user use node maker MVPWorld, it can auto gen world position vary for convenient
+  // TODO maybe can do better
+  // this for:  if user use node maker MVPWorld, it can auto gen world position vary for convenient
+  updateAutoWorldPositionVary(root: ShaderNode) {
+    this.varyings.delete(WorldPositionFragVary);
     if (root instanceof ShaderFunctionNode && root.factory.define.name === "VPTransform") {
       const next = root.inputMap.get("position")
       if (next === undefined) {
@@ -40,19 +45,27 @@ export class ShaderGraph {
         this.setVary(WorldPositionFragVary, next.swizzling("xyz"));
       }
     }
-    this.setVary(NDCPositionFragVary, DivW.make().input("position", root));
+  }
+
+  setVertexRoot(root: ShaderNode): ShaderGraph {
+    this.vertexRoot = root;
+    this.updateAutoWorldPositionVary(root)
     return this;
   }
 
   declareFragNormal(): ShaderGraph {
+    if (this.varyings.has(NormalFragVary)) {
+      return this;
+    }
     return this.setVary(NormalFragVary, attribute(CommonAttribute.normal, GLDataType.floatVec3))
   }
 
   declareFragUV(): ShaderGraph {
+    if (this.varyings.has(UvFragVary)) {
+      return this;
+    }
     return this.setVary(UvFragVary, attribute(CommonAttribute.uv, GLDataType.floatVec2))
   }
-
-
 
   setVary(key: string, root: ShaderNode): ShaderGraph {
     const ret = this.varyings.get(key);
@@ -76,18 +89,13 @@ export class ShaderGraph {
   }
 
   reset(): ShaderGraph {
-    this.fragmentRoot = null;
-    this.vertexRoot = null;
+    this.varyings.clear();
+    this.setVertexRoot(MVPWorld());
+    this.setFragmentRoot(constValue(new Vector4()))
     return this;
   }
 
   compile(): GLProgramConfig {
-    if (this.vertexRoot === null) {
-      throw "can't compile shadergraph, vertex root not set"
-    }
-    if (this.fragmentRoot === null) {
-      throw "can't compile shadergraph, fragment root not set"
-    }
     return {
       ...this.collectInputs(),
       vertexShaderString: this.compileVertexSource(),
