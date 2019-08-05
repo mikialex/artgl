@@ -24,13 +24,13 @@ export class StandardGeometry extends Geometry {
 
   create(index: number[], position: number[], normal: number[], uv: number[]): StandardGeometry {
     const positionBuffer = BufferData.f3(position);
-    this.bufferDatum[CommonAttribute.position] = positionBuffer;
+    this.setBuffer(CommonAttribute.position, positionBuffer);
 
     const normalBuffer = BufferData.f3(normal);
-    this.bufferDatum[CommonAttribute.normal] = normalBuffer;
+    this.setBuffer(CommonAttribute.normal, normalBuffer);
 
     const uvBuffer = BufferData.f2(uv);
-    this.bufferDatum[CommonAttribute.uv] = uvBuffer;
+    this.setBuffer(CommonAttribute.uv, uvBuffer);
 
     // TODO distinguish u16 case
     const indexBuffer = BufferData.u32Index(index);
@@ -59,7 +59,7 @@ export class StandardGeometry extends Geometry {
   }
 
   foreachFace(visitor: (face: Face3) => any, range?: RenderRange) {
-    const position = this.bufferDatum.position;
+    const position = this.getBuffer(CommonAttribute.position);
     const index = this.indexBuffer;
     const start = range === undefined ? 0 : range.start;
     const end = range === undefined ? index.count : (range.start + range.count);
@@ -78,7 +78,7 @@ export class StandardGeometry extends Geometry {
    * this may redundant visit 
    */
   foreachLineSegment(visitor: (line: Line3) => any, range?: RenderRange) {
-    const position = this.bufferDatum.position;
+    const position = this.getBuffer(CommonAttribute.position);
     const index = this.indexBuffer;
     const start = range === undefined ? 0 : range.start;
     const end = range === undefined ? index.count : (range.start + range.count);
@@ -104,7 +104,7 @@ export class StandardGeometry extends Geometry {
    * this may redundant visit 
    */
   foreachVertex(visitor: (point: Vector3) => any, range?: RenderRange) {
-    const position = this.bufferDatum.position;
+    const position = this.getBuffer(CommonAttribute.position);
     const index = this.indexBuffer;
     const start = range === undefined ? 0 : range.start;
     const end = range === undefined ? index.count : (range.start + range.count);

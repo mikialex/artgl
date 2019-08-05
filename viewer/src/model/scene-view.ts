@@ -21,9 +21,9 @@ export class GeometryView{
     view.uuid = geometry.uuid;
     view.name = geometry.name === undefined ? 'unnamed' : geometry.name;
     view.buffers = [];
-    for (const key in geometry.bufferDatum) {
-      if (geometry.bufferDatum.hasOwnProperty(key)) {
-        const bufferdata = geometry.bufferDatum[key];
+    for (const key in geometry._bufferDatum) {
+      if (geometry._bufferDatum.hasOwnProperty(key)) {
+        const bufferdata = geometry._bufferDatum[key];
         view.buffers.push({
           name: key,
           type: 'bufferdata',

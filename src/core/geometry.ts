@@ -18,16 +18,48 @@ export abstract class Geometry {
   name: string = ""
   uuid = generateUUID();
 
-  readonly bufferDatum: { [index: string]: BufferData } = {};
-  indexBuffer: BufferData;
+  /**
+   * This for mark VAO need update, if buffer layout has changed,
+   * or bufferData it self changed, we need mark it, and after upload,
+   *  call _markBufferArrayHasUpload set it back;
+   */
+  _bufferArraysChange: boolean = true;
+  _markBufferArrayHasUpload() {
+    this._bufferArraysChange = false;
+  }
 
-  get needUploadGL(): boolean{
-    for (const key in this.bufferDatum) {
-      if (this.bufferDatum[key].dataChanged) {
-        return true
+  _bufferDatum: { [index: string]: BufferData } = {};
+  _indexBuffer: BufferData;
+  
+  getBuffer(name: string) {
+    return this._bufferDatum[name];
+  }
+
+  setBuffer(name: string, data: BufferData) {
+    this._bufferDatum[name] = data;
+    this._bufferArraysChange = true;
+  }
+
+  get indexBuffer() {
+    return this._indexBuffer;
+  }
+
+  set indexBuffer(value: BufferData) {
+    this._indexBuffer = value;
+    this._bufferArraysChange = true;
+  }
+
+  checkBufferArrayChange() {
+    if (this._bufferArraysChange) {
+      return this._bufferArraysChange
+    }
+    for (const key in this._bufferDatum) {
+      if (this._bufferDatum[key].dataChanged) {
+        this._bufferArraysChange = true;
+        return this._bufferArraysChange;
       }
     }
-    return false;
+    return this._bufferArraysChange;
   }
 
   _shapeChanged = true;

@@ -37,6 +37,8 @@ export class RenderRange {
   start: number = 0;
   count: number = 0;
 
+  instanceCount: number = 1;
+
 }
 
 export const enum PrimitiveType {

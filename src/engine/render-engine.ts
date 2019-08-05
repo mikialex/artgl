@@ -343,7 +343,7 @@ export class RenderEngine implements GLReleasable{
     if (this._vaoEnabled) {
       const vaoManager = this.renderer.vaoManager;
       const webglVAO = vaoManager.getVAO(geometry)
-      if (webglVAO === undefined && geometry.needUploadGL) {
+      if (webglVAO === undefined && geometry.checkBufferArrayChange()) {
         vaoManager.deleteVAO(geometry);
         vaoUnbindCallback = vaoManager.createVAO(geometry);
       } else {
@@ -354,7 +354,7 @@ export class RenderEngine implements GLReleasable{
 
     // common procedure
     program.forAttributes(att => {
-      const bufferData = geometry.bufferDatum[att.name];
+      const bufferData = geometry.getBuffer(att.name);
       if (bufferData === undefined) {
         throw `program needs an attribute named ${att.name}, but cant find in geometry data`;
       }
@@ -377,8 +377,9 @@ export class RenderEngine implements GLReleasable{
 
     // create vao
     if (this._vaoEnabled) {
-      if (vaoUnbindCallback) {
+      if (vaoUnbindCallback !== undefined) {
         vaoUnbindCallback.unbind();
+        geometry._markBufferArrayHasUpload();
         this.renderer.vaoManager.useVAO(vaoUnbindCallback.vao)
       }
     }
