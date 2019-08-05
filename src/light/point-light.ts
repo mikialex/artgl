@@ -24,20 +24,14 @@ const pointLightShading = new ShaderFunction({
 
 export class PointLight extends Light<PointLight> {
 
-  decorate(decorated: ShaderGraph) {
-    decorated
-      .declareFragNormal()
-      .setFragmentRoot(
-        collectLight.make()
-          .input("base", decorated.getFragRoot())
-          .input("light", pointLightShading.make()
-            .input("fragPosition", decorated.getVary(WorldPositionFragVary))
-            .input("fragNormal", decorated.getVary(NormalFragVary))
-            .input("lightPosition", this.getPropertyUniform('position'))
-            .input("color", this.getPropertyUniform('color'))
-            .input("radius", this.getPropertyUniform('radius'))
-          )
-      )
+  produceLightFragEffect(decorated: ShaderGraph) {
+    decorated.declareFragNormal();
+    return pointLightShading.make()
+      .input("fragPosition", decorated.getVary(WorldPositionFragVary))
+      .input("fragNormal", decorated.getVary(NormalFragVary))
+      .input("lightPosition", this.getPropertyUniform('position'))
+      .input("color", this.getPropertyUniform('color'))
+      .input("radius", this.getPropertyUniform('radius'))
   }
 
   @MapUniform("u_pointLight_color")

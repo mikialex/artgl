@@ -17,15 +17,9 @@ const ambientLightShading = new ShaderFunction({
 
 export class AmbientLight extends Light<AmbientLight> {
 
-  decorate(decorated: ShaderGraph) {
-    decorated
-      .setFragmentRoot(
-        collectLight.make()
-          .input("base", decorated.getFragRoot())
-          .input("light", ambientLightShading.make()
-            .input("color", this.getPropertyUniform('color'))
-          )
-      )
+  produceLightFragEffect(_decorated: ShaderGraph) {
+    return ambientLightShading.make()
+      .input("color", this.getPropertyUniform('color'))
   }
 
   @MapUniform("color")

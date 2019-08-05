@@ -2,7 +2,7 @@ import { SceneNode } from "../scene/scene-node";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { uniformFromValue } from "../shader-graph/node-maker";
 import { ShaderUniformProvider } from "./shading";
-import { ShaderCommonUniformInputNode } from "../shader-graph/shader-node";
+import { ShaderCommonUniformInputNode, ShaderNode } from "../shader-graph/shader-node";
 import { ShaderFunction } from "../shader-graph/shader-function";
 
 // TODO I cant figure out right multi inheritance impl with strong type, code duplicate 
@@ -19,7 +19,16 @@ export class Light<T> extends SceneNode implements ShaderUniformProvider {
     }
   }
 
-  decorate(_graph: ShaderGraph): void {
+  decorate(decorated: ShaderGraph): void {
+    decorated
+      .setFragmentRoot(
+        collectLight.make()
+          .input("base", decorated.getFragRoot())
+          .input("light", this.produceLightFragEffect(decorated))
+      )
+  }
+
+  produceLightFragEffect(_graph: ShaderGraph): ShaderNode {
     throw new Error("Method not implemented.");
   }
 

@@ -38,6 +38,7 @@ export abstract class Geometry {
   setBuffer(name: string, data: BufferData) {
     this._bufferDatum[name] = data;
     this._bufferArraysChange = true;
+    return this;
   }
 
   get indexBuffer() {
@@ -47,6 +48,11 @@ export abstract class Geometry {
   set indexBuffer(value: BufferData) {
     this._indexBuffer = value;
     this._bufferArraysChange = true;
+  }
+
+  setIndexBuffer(value: BufferData) {
+    this.indexBuffer = value;
+    return this;
   }
 
   checkBufferArrayChange() {
@@ -106,10 +112,6 @@ export abstract class Geometry {
   abstract foreachFace(visitor: (face: Face3) => any, range?: RenderRange): any;
   abstract foreachLineSegment(visitor:  (face: Line3) => any, range?: RenderRange): any;
   abstract foreachVertex(visitor:  (face: Vector3) => any, range?: RenderRange): any;
-
-  dispose() {
-
-  }
 
 }
 

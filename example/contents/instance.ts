@@ -1,6 +1,7 @@
 import {
   Transformation, BufferData, CubeGeometry, Shading,
-  PureShading
+  PureShading,
+  Mesh
 } from "../../src/artgl";
 import { TestBridge } from "./test-bridge";
 
@@ -31,12 +32,15 @@ function createInstanceTransformBuffer() {
 export default async function test(testBridge: TestBridge) {
   const transformBuffer = new BufferData(createInstanceTransformBuffer(), 16);
 
-  const cubeG = new CubeGeometry();
-  const transformAttributeName ="transformInstance"
-  cubeG.bufferDatum[transformAttributeName] = transformBuffer;
+  const transformAttributeName = "transformInstance";
+
+  const cubeG = new CubeGeometry()
+    .setBuffer(transformAttributeName, transformBuffer);
 
   const shading = new Shading();
   shading.decorate(new PureShading());
+
+  const mesh = new Mesh().g(cubeG).s(shading);
 
   
 }

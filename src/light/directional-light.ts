@@ -23,19 +23,13 @@ const directionalLightShading = new ShaderFunction({
 
 export class DirectionalLight extends Light<DirectionalLight> {
 
-  decorate(decorated: ShaderGraph) {
-    decorated
-      .declareFragNormal()
-      .setFragmentRoot(
-        collectLight.make()
-          .input("base", decorated.getFragRoot())
-          .input("light", directionalLightShading.make()
-            .input("fragPosition", decorated.getVary(WorldPositionFragVary))
-            .input("fragNormal", decorated.getVary(NormalFragVary))
-            .input("lightDirection", this.getPropertyUniform('direction'))
-            .input("color", this.getPropertyUniform('color'))
-          )
-      )
+  produceLightFragEffect(decorated: ShaderGraph) {
+    decorated.declareFragNormal();
+    return directionalLightShading.make()
+      .input("fragPosition", decorated.getVary(WorldPositionFragVary))
+      .input("fragNormal", decorated.getVary(NormalFragVary))
+      .input("lightDirection", this.getPropertyUniform('direction'))
+      .input("color", this.getPropertyUniform('color'))
   }
 
   @MapUniform("u_directionalLight_color")

@@ -2,6 +2,7 @@ import { ShaderFunction } from "../../shader-graph/shader-function";
 import { BaseEffectShading } from "../../core/shading";
 import { ShaderGraph } from "../../artgl";
 import { NormalFragVary } from "../../shader-graph/shader-graph";
+import { PointLight } from "../../light/exports";
 
 const normalShading = new ShaderFunction({
   source:
@@ -11,6 +12,8 @@ const normalShading = new ShaderFunction({
 })
 
 export class PBRShading extends BaseEffectShading<PBRShading> {
+
+  pointLight: PointLight
 
   decorate(graph: ShaderGraph): void {
     // graph
