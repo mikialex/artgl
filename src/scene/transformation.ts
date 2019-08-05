@@ -23,17 +23,23 @@ export class Transformation{
       this.transformFrameChanged = true;
     }
 
-    // todo add rotation and qua change watcher
-    // this._quaternion.onChange = () => {
-    //   this.matrixIsDirty = true;
-    //   this.transformChanged = true;
-    // }
+    this._rotation.onChangeCallback = () => {
+      this.matrixIsDirty = true;
+      this.transformFrameChanged = true;
+      this._quaternion.setFromEuler(this._rotation, false);
+    }
+
+    this._quaternion.onChangeCallback = () => {
+      this.matrixIsDirty = true;
+      this.transformFrameChanged = true;
+      this._rotation.setFromQuaternion(this._quaternion, this._rotation.order, false);
+    }
   }
 
   transformFrameChanged = true;
 
   private _matrix: Matrix4 = new Matrix4();
-  private matrixIsDirty = false;
+  private matrixIsDirty = true;
 
   private _position: Vector3Observable = new Vector3Observable();
   private positionIsDirty = false;

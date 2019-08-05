@@ -8,7 +8,6 @@ import {
 } from "./shader-node";
 import { attribute, constValue, MVPWorld } from "./node-maker";
 import { GLDataType } from "../webgl/shader-util";
-import { DivW } from "./built-in/transform";
 import { CommonAttribute } from "../webgl/attribute";
 import { Vector4 } from "../math";
 

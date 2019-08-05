@@ -4,7 +4,7 @@ import { Matrix4 } from './matrix4';
 import { MathUtil } from './util';
 import { DataObject } from './index';
 
-enum EulerOrder {
+export enum EulerOrder {
   'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX'
 }
 
@@ -30,9 +30,9 @@ export class Euler implements DataObject<Euler>{
   get x() { return this._x };
   get y() { return this._y };
   get z() { return this._z };
-  set x(value) { this._x = value };
-  set y(value) { this._y = value };
-  set z(value) { this._z = value };
+  set x(value) { this._x = value; this.onChangeCallback(); };
+  set y(value) { this._y = value; this.onChangeCallback(); };
+  set z(value) { this._z = value; this.onChangeCallback(); };
 
   get order() { return this._order };
   set order(value: EulerOrder) { this._order = value };
@@ -149,7 +149,7 @@ export class Euler implements DataObject<Euler>{
     return this.setFromRotationMatrix(tempMatrix, order, update);
   };
 
-  set(x: number, y: number, z: number, order: EulerOrder) {
+  set(x: number, y: number, z: number, order?: EulerOrder) {
     this._x = x;
     this._y = y;
     this._z = z;

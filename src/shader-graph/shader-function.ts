@@ -16,6 +16,9 @@ export interface ShaderFunctionParsedDefine{
   returnType: GLDataType
 }
 
+
+const functionNamesRecord = {};
+
 /**
  *  Define a shader function node factory
  *  that with depend some input 
@@ -25,10 +28,20 @@ export interface ShaderFunctionParsedDefine{
  */
 export class ShaderFunction{
   constructor(define: ShaderFunctionDefine) {
+
     this.define = parseShaderFunctionMetaInfo(define);
+
+    const record = functionNamesRecord[this.define.name];
+    if (record !== undefined) {
+      functionNamesRecord[this.define.name] = record + 1;
+      this.define.name = this.define.name + record
+    } else {
+      functionNamesRecord[this.define.name] = 1;
+    }
+
   }
 
-  define: ShaderFunctionParsedDefine
+  readonly define: ShaderFunctionParsedDefine
 
   make(): ShaderFunctionNode {
     const node = new ShaderFunctionNode(this);

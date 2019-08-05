@@ -15,7 +15,7 @@ const directionalLightShading = new ShaderFunction({
       vec3 color
       ){
         float light = max(0.0, dot(fragNormal, lightDirection));
-        return vec4(vec3(light), 1.0);
+        return vec4(light * color, 1.0);
     }
   `
 })

@@ -11,11 +11,14 @@ export default function (root: SceneNode) {
 
   const pointLight = new PointLight();
   pointLight.position = new Vector3(0, 3, 0);
-  pointLight.radius = 5;
+  pointLight.color = new Vector3(0.9, 0.8, 0.5);
+  pointLight.radius = 10;
+
   const ambient = new AmbientLight();
-  ambient.color = new Vector3(0.3, 0.3, 0.3);
+  ambient.color = new Vector3(0.3, 0.3, 0.4);
+
   const dirLight = new DirectionalLight();
-  dirLight.color = new Vector3(0.1, 0.1, 0.1);
+  dirLight.color = new Vector3(0.3, 0.6, 0.4);
   dirLight.direction = new Vector3(1, 1, -1).normalize();
 
 
@@ -32,6 +35,11 @@ export default function (root: SceneNode) {
   const planeMesh = new Mesh().g(planeGeo).s(shading)
   root.addChild(planeMesh);
 
+  const ground = new Mesh().g(planeGeo).s(shading)
+  ground.transform.position.y = -2;
+  ground.transform.rotation.x = - Math.PI / 4;
+  ground.transform.rotation.y = - Math.PI / 4;
+  root.addChild(ground);
 
   const boxMesh = new Mesh().g(cubeGeo).s(shading)
   boxMesh.transform.position.y = -2;
