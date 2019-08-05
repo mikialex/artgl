@@ -66,7 +66,6 @@ export function constValue(value: any) {
 }
 
 export function MVPWorld() {
-
   return VPTransform.make()
     .input("VPMatrix", innerUniform(InnerSupportUniform.VPMatrix))
     .input("position",
@@ -74,13 +73,6 @@ export function MVPWorld() {
         .input('MMatrix', innerUniform(InnerSupportUniform.MMatrix))
         .input('position', attribute(CommonAttribute.position, GLDataType.floatVec3))
     )
-
-  // return MVPTransform.make()
-  // .input("VPMatrix", innerUniform(InnerSupportUniform.VPMatrix))
-  // .input("MMatrix", innerUniform(InnerSupportUniform.MMatrix))
-  // .input("position", attribute(
-  //   { name: 'position', type: GLDataType.floatVec3 }
-  // ))
 }
 
 export function screenQuad() {
@@ -88,4 +80,12 @@ export function screenQuad() {
     attribute(CommonAttribute.position, GLDataType.floatVec3),
     constValue(1)
   )
+}
+
+export function makeInstance(
+  node: ShaderCommonUniformInputNode | ShaderAttributeInputNode
+) {
+  return new ShaderAttributeInputNode({
+    name: node.name, type: node.type
+  }).makeInstance();
 }

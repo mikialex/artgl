@@ -26,6 +26,7 @@ export { DAGNode } from "./core/dag-node";
 // scene
 export { Scene } from "./scene/scene";
 export { SceneNode } from "./scene/scene-node";
+export { Transformation } from "./scene/transformation";
 
 // render graph
 export * from './render-graph/exports';

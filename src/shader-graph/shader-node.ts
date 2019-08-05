@@ -111,6 +111,12 @@ export class ShaderAttributeInputNode extends ShaderInputNode {
   constructor(des: AttributeDescriptor) {
     super(des.name, des.type);
   }
+
+  isInstance: boolean;
+  makeInstance() {
+    this.isInstance = true;
+    return this;
+  }
 }
 
 // castValidFloat

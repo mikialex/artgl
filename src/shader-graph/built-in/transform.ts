@@ -24,15 +24,6 @@ export const VPTransform = new ShaderFunction({
   `
 })
 
-export const MVPTransform = new ShaderFunction({
-  description: 'Using camera view projection matrix and model matrix to transform vertices',
-  source: `
-    vec4 VPTransform (mat4 VPMatrix, mat4 MMatrix, vec3 position){
-      return VPMatrix * MMatrix * vec4(position, 1.0);
-    }
-  `,
-})
-
 export const getWorldPosition = new ShaderFunction({
   description:
     `Transform from the current view projection matrix and its inverse, 
