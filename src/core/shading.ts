@@ -14,6 +14,12 @@ export interface ShaderUniformProvider{
   * impl this to decorate your shader source, add uniform input
   */
   decorate(graph: ShaderGraph): void;
+
+  /**
+   * one UniformProvider can have others provider depends and inject, return them in a array
+   */
+  registerProvider(): ShaderUniformProvider[];
+
   hasAnyUniformChanged: boolean;
   uniforms: Map<string, any>;
   propertyUniformNameMap: Map<string, string>;
@@ -27,17 +33,22 @@ export class Shading {
   needRebuildShader: boolean = true;
 
   uniformProvider: ShaderUniformProvider[] = [];
+  graphDecorator: ShaderUniformProvider[] = [];
 
-  decorate(deco: ShaderUniformProvider): Shading {
-    this.uniformProvider.push(deco);
+  decorate(decorator: ShaderUniformProvider): Shading {
+    const toRegister = decorator.registerProvider();
+    toRegister.forEach(provider => {
+      this.uniformProvider.push(provider);
+    })
+    this.graphDecorator.push(decorator);
     return this;
   }
 
   afterShaderCompiled: Observable<GLProgramConfig> = new Observable();
   build() {
     this.graph.reset()
-    this.uniformProvider.forEach(provider => {
-      provider.decorate(this.graph);
+    this.graphDecorator.forEach(decorator => {
+      decorator.decorate(this.graph);
     })
   }
 
@@ -112,6 +123,10 @@ export abstract class BaseEffectShading<T> implements ShaderUniformProvider{
   }
 
   abstract decorate(graph: ShaderGraph): void;
+
+  registerProvider(): ShaderUniformProvider[] {
+    return [this];
+  }
 
   hasAnyUniformChanged: boolean = true;
   propertyUniformNameMap: Map<string, string>;

@@ -28,6 +28,10 @@ export class Light<T> extends SceneNode implements ShaderUniformProvider {
       )
   }
 
+  registerProvider(): ShaderUniformProvider[] {
+    return [this];
+  }
+
   produceLightFragEffect(_graph: ShaderGraph): ShaderNode {
     throw new Error("Method not implemented.");
   }
