@@ -25,7 +25,11 @@ export class RenderPipeline{
   composeShader: Shading = new Shading().decorate(this.composeShading);
   depthShader = new Shading().decorate(new DepthShading());
 
-  sampleCount: number = 0;
+  private sampleCount: number = 0;
+
+  resetSample() {
+    this.sampleCount = 0;
+  }
 
   private tickNum = 0;
   get isEvenTick() {

@@ -103,8 +103,9 @@ export class Application {
   }
 
   createScene(scene: Scene): Scene {
-    hierarchyBallBuilder(scene.root);
+    const config = hierarchyBallBuilder(scene.root, this);
     // this.loadOBJFromURL();
+    this.pipeline.config.value.push(config);
     return scene;
   }
 

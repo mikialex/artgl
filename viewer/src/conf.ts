@@ -17,7 +17,7 @@ export function createConf(engine: RenderEngine, pipeline: RenderPipeline): Rend
                 name: 'width',
                 value: engine.renderer.width,
                 onChange: (value: number) => {
-                  pipeline.sampleCount = 0;
+                  pipeline.resetSample();
                   engine.setActualSize(value, engine.renderer.height);
                 },
                 editors: [
@@ -33,7 +33,7 @@ export function createConf(engine: RenderEngine, pipeline: RenderPipeline): Rend
                 name: 'height',
                 value: engine.renderer.height,
                 onChange: (value: number) => {
-                  pipeline.sampleCount = 0;
+                  pipeline.resetSample();
                   engine.setActualSize(engine.renderer.width, value);
                 },
                 editors: [
@@ -76,7 +76,7 @@ export function createConf(engine: RenderEngine, pipeline: RenderPipeline): Rend
                 onChange: (value: boolean) => {
                   pipeline.enableTAA = value;
                   if (!value) {
-                    pipeline.sampleCount = 0;
+                    pipeline.resetSample();
                   }
                 },
               },
@@ -132,7 +132,7 @@ export function createConf(engine: RenderEngine, pipeline: RenderPipeline): Rend
                 value: pipeline.tssaoShading.aoRadius,
                 onChange: (value: number) => {
                   pipeline.tssaoShading.aoRadius = value;
-                  pipeline.sampleCount = 0;
+                  pipeline.resetSample();
                 },
                 editors: [
                   {

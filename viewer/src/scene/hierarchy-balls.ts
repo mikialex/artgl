@@ -3,8 +3,11 @@ import {
   Shading, CubeGeometry, Vector3, DirectionalLight
 } from '../../../src/artgl';
 import { PointLight } from '../../../src/light/point-light';
+import { ExposureController } from '../../../src/shading/basic-lib/exposurer';
+import { RenderConfig } from '@/components/conf/interface';
+import { Application } from '../application';
 
-export default function (root: SceneNode) {
+export default function (root: SceneNode, app: Application): RenderConfig {
   const sphereGeo = new SphereGeometry(1, 40, 40);
   const planeGeo = new PlaneGeometry(10, 10, 10, 10);
   const cubeGeo = new CubeGeometry(5, 3, 4)
@@ -21,12 +24,14 @@ export default function (root: SceneNode) {
   dirLight.color = new Vector3(0.3, 0.6, 0.4);
   dirLight.direction = new Vector3(1, 1, -1).normalize();
 
+  const exposureController = new ExposureController();
 
   let shading = new Shading()
     // .decorate(new NormalShading())
     .decorate(pointLight)
     .decorate(ambient)
     .decorate(dirLight)
+    .decorate(exposureController)
 
   shading.afterShaderCompiled.add((config) => {
     console.log(config);
@@ -65,5 +70,21 @@ export default function (root: SceneNode) {
       }
     }
   }
-  return root;
+
+  return {
+    name: 'exposureMax',
+    value: 1 / exposureController.toneMappingExposure,
+    onChange: (value: number) => {
+      exposureController.toneMappingExposure = 1 / value;
+      app.pipeline.resetSample();
+    },
+    editors: [
+      {
+        type: 'slider',
+        min: 0,
+        max: 5,
+        step: 0.1
+      },
+    ]
+  }
 }

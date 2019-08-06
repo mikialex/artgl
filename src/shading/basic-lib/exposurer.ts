@@ -6,14 +6,14 @@ import { vec4, constValue } from "../../shader-graph/node-maker";
 const controlExposureShading = new ShaderFunction({
   source:
     `vec3 LinearToneMapping(vec3 intensity, float toneMappingExposure){
-      return toneMappingExposure * color;
+      return toneMappingExposure * intensity;
     }`
 })
 
-export class ExposureControl extends BaseEffectShading<ExposureControl> {
+export class ExposureController extends BaseEffectShading<ExposureController> {
   
   @MapUniform("toneMappingExposure")
-  toneMappingExposure: number = 1;
+  toneMappingExposure: number = 1 / 2;
 
   decorate(graph: ShaderGraph): void {
     graph
@@ -22,7 +22,7 @@ export class ExposureControl extends BaseEffectShading<ExposureControl> {
         vec4(
           controlExposureShading.make()
             .input("intensity", graph.getFragRoot().swizzling("xyz"))
-            .input("intensity", this.getPropertyUniform("toneMappingExposure")),
+            .input("toneMappingExposure", this.getPropertyUniform("toneMappingExposure")),
           constValue(1)
         )
         
