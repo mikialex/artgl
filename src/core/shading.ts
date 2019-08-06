@@ -32,6 +32,7 @@ export class Shading {
   programConfigCache: Nullable<GLProgramConfig> = null;
   needRebuildShader: boolean = true;
 
+  // TODO question: how to change provider?
   uniformProvider: ShaderUniformProvider[] = [];
   graphDecorator: ShaderUniformProvider[] = [];
 
