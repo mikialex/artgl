@@ -20,8 +20,10 @@ export class OrbitController extends Controller {
   }
 
   spherical: Spherical = new Spherical();
-  rotateAngleFactor = 0.5
-  panFactor = 0.002
+
+  rotateAngleFactor = 0.2
+  panFactor = 0.0002
+  zoomFactor = 0.3;
 
   // restriction
   maxPolarAngle = 179 / 180 * Math.PI;
@@ -29,12 +31,13 @@ export class OrbitController extends Controller {
 
   // damping
   sphericalDelta: Spherical = new Spherical(0, 0, 0);
-  zoomingFactor: number = 1;
+  zooming: number = 1;
   panOffset: Vector3 = new Vector3();
 
   enableDamping = true;
-  dampingFactor = 0.25;
-  panDampingFactor = 0.5;
+  zoomingDampingFactor = 0.1;
+  rotateDampingFactor = 0.1;
+  panDampingFactor = 0.1;
 
 
   public registerInteractor(interactor: Interactor) {
@@ -59,7 +62,8 @@ export class OrbitController extends Controller {
     this.needUpdate = true;
   }
   zoom = (factor: number) => {
-    this.zoomingFactor = factor;
+    console.log(factor)
+    this.zooming = 1 + (factor - 1) * this.zoomFactor;
     this.needUpdate = true;
   }
   move = (offset: Vector2) => {
@@ -79,15 +83,15 @@ export class OrbitController extends Controller {
     if (Math.abs(this.sphericalDelta.azim) > 0.0001 ||
       Math.abs(this.sphericalDelta.polar) > 0.0001 ||
       Math.abs(this.sphericalDelta.radius) > 0.0001 ||
-      Math.abs(this.zoomingFactor - 1) > 0.0001 ||
-      this.panOffset.mag() > 0.01
+      Math.abs(this.zooming - 1) > 0.0001 ||
+      this.panOffset.mag() > 0.0001
     ) {
       this.needUpdate = true;
     }
 
 
     if (this.needUpdate) {
-      this.spherical.radius *= this.zoomingFactor;
+      this.spherical.radius *= this.zooming;
 
       this.spherical.azim += this.sphericalDelta.azim;
 
@@ -105,13 +109,13 @@ export class OrbitController extends Controller {
 
     // update damping effect
     if (this.enableDamping === true) {
-      this.sphericalDelta.azim *= (1 - this.dampingFactor);
-      this.sphericalDelta.polar *= (1 - this.dampingFactor);
-      this.zoomingFactor = this.zoomingFactor + (1 - this.zoomingFactor) * this.dampingFactor;
+      this.sphericalDelta.azim *= (1 - this.rotateDampingFactor);
+      this.sphericalDelta.polar *= (1 - this.rotateDampingFactor);
+      this.zooming = this.zooming + (1 - this.zooming) * this.zoomingDampingFactor;
       this.panOffset.multiplyScalar(1 - this.panDampingFactor);
     } else {
       this.sphericalDelta.set(0, 0, 0);
-      this.zoomingFactor = 1;
+      this.zooming = 1;
       this.panOffset.set(0, 0, 0);
     }
   }

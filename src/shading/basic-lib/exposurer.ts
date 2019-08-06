@@ -13,7 +13,7 @@ const controlExposureShading = new ShaderFunction({
 export class ExposureController extends BaseEffectShading<ExposureController> {
   
   @MapUniform("toneMappingExposure")
-  toneMappingExposure: number = 1 / 2;
+  toneMappingExposure: number = 1 / 1;
 
   decorate(graph: ShaderGraph): void {
     graph
