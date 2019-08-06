@@ -22,7 +22,7 @@ export class SceneNode {
   parent: Nullable<SceneNode> = null;
   children: SceneNode[] = [];
 
-  transform: Transformation = new Transformation();
+  readonly transform: Transformation = new Transformation();
   _worldMatrix = new Matrix4();
   _worldMatrixUpdateFrameId: number = 0;
   get worldMatrix() {

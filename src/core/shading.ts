@@ -18,7 +18,7 @@ export interface ShaderUniformProvider{
   /**
    * one UniformProvider can have others provider depends and inject, return them in a array
    */
-  registerProvider(): ShaderUniformProvider[];
+  foreachProvider(visitor: (p: ShaderUniformProvider)=> any): void;
 
   hasAnyUniformChanged: boolean;
   uniforms: Map<string, any>;
@@ -33,22 +33,44 @@ export class Shading {
   needRebuildShader: boolean = true;
 
   // TODO question: how to change provider?
-  uniformProvider: ShaderUniformProvider[] = [];
-  graphDecorator: ShaderUniformProvider[] = [];
+  // uniformProvider: ShaderUniformProvider[] = [];
+  _decorators: ShaderUniformProvider[] = [];
 
-  decorate(decorator: ShaderUniformProvider): Shading {
-    const toRegister = decorator.registerProvider();
-    toRegister.forEach(provider => {
-      this.uniformProvider.push(provider);
-    })
-    this.graphDecorator.push(decorator);
+  _decoratorSlot: Map<string, ShaderUniformProvider> = new Map();
+
+  updateDecorator(decorator: ShaderUniformProvider, slot: string) {
+    if (slot === undefined) {
+      slot = decorator.constructor.name
+    }
+
+    const previous = this._decoratorSlot.get(slot);
+    if (previous === undefined) {
+      throw `slot ${slot} has not been decorate before`
+    }
+    if (decorator instanceof previous.constructor) {
+      this._decoratorSlot.set(slot, decorator);
+    } else {
+      throw  `provider not the same type before`
+    }
+  }
+
+  decorate(decorator: ShaderUniformProvider, decorateSlot?: string, ): Shading {
+    if (decorateSlot === undefined) {
+      decorateSlot = decorator.constructor.name
+    }
+
+    if (this._decoratorSlot.has(decorateSlot)) {
+      throw  `slot ${decorateSlot} has been decorate before`
+    }
+    this._decoratorSlot.set(decorateSlot, decorator)
+    this._decorators.push(decorator);
     return this;
   }
 
   afterShaderCompiled: Observable<GLProgramConfig> = new Observable();
   build() {
     this.graph.reset()
-    this.graphDecorator.forEach(decorator => {
+    this._decorators.forEach(decorator => {
       decorator.decorate(this.graph);
     })
   }
@@ -125,8 +147,8 @@ export abstract class BaseEffectShading<T> implements ShaderUniformProvider{
 
   abstract decorate(graph: ShaderGraph): void;
 
-  registerProvider(): ShaderUniformProvider[] {
-    return [this];
+  foreachProvider(visitor: (p: ShaderUniformProvider) => any) {
+    return visitor(this);
   }
 
   hasAnyUniformChanged: boolean = true;

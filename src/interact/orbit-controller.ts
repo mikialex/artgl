@@ -62,7 +62,6 @@ export class OrbitController extends Controller {
     this.needUpdate = true;
   }
   zoom = (factor: number) => {
-    console.log(factor)
     this.zooming = 1 + (factor - 1) * this.zoomFactor;
     this.needUpdate = true;
   }

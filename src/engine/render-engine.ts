@@ -275,18 +275,20 @@ export class RenderEngine implements GLReleasable{
     this.getGlobalUniform(InnerSupportUniform.MMatrix).setValue(object.worldMatrix);
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
 
-    shading.uniformProvider.forEach(provider => {
-      if (this.lastUploadedShaderUniformProvider.has(provider)
-        && !provider.hasAnyUniformChanged 
-      ) {
-        // if we found this uniform provider has updated before and not changed, we can skip!
-        return;
-      }
-      provider.uniforms.forEach((value, key) => {
-        program.setUniformIfExist(key, value); // maybe user defined, but not really in shader
+    shading._decorators.forEach(decorator => {
+      decorator.foreachProvider(provider => {
+        if (this.lastUploadedShaderUniformProvider.has(provider)
+          && !provider.hasAnyUniformChanged
+        ) {
+          // if we found this uniform provider has updated before and not changed, we can skip!
+          return;
+        }
+        provider.uniforms.forEach((value, key) => {
+          program.setUniformIfExist(key, value); // maybe user defined, but not really in shader
+        })
+        provider.hasAnyUniformChanged = false;
+        this.lastUploadedShaderUniformProvider.add(provider);
       })
-      provider.hasAnyUniformChanged = false;
-      this.lastUploadedShaderUniformProvider.add(provider);
     })
 
     return program;

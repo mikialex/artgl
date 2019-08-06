@@ -28,8 +28,8 @@ export class Light<T> extends SceneNode implements ShaderUniformProvider {
       )
   }
 
-  registerProvider(): ShaderUniformProvider[] {
-    return [this];
+  foreachProvider(visitor: (p: ShaderUniformProvider) => any) {
+    return visitor(this);
   }
 
   produceLightFragEffect(_graph: ShaderGraph): ShaderNode {
