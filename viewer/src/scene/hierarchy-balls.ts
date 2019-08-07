@@ -72,19 +72,41 @@ export default function (root: SceneNode, app: Application): RenderConfig {
   }
 
   return {
-    name: 'exposureMax',
-    value: 1 / exposureController.toneMappingExposure,
-    onChange: (value: number) => {
-      exposureController.toneMappingExposure = 1 / value;
-      app.pipeline.resetSample();
-    },
-    editors: [
+    name: 'exposureControll',
+    value: [
       {
-        type: 'slider',
-        min: 0,
-        max: 5,
-        step: 0.1
+        name: 'exposureMax',
+        value: 1 / exposureController.toneMappingExposure,
+        onChange: (value: number) => {
+          exposureController.toneMappingExposure = 1 / value;
+          app.pipeline.resetSample();
+        },
+        editors: [
+          {
+            type: 'slider',
+            min: 0,
+            max: 5,
+            step: 0.1
+          },
+        ]
       },
+      {
+        name: 'exposureWhitePoint',
+        value: exposureController.toneMappingWhitePoint,
+        onChange: (value: number) => {
+          exposureController.toneMappingWhitePoint = value;
+          app.pipeline.resetSample();
+        },
+        editors: [
+          {
+            type: 'slider',
+            min: 0,
+            max: 5,
+            step: 0.1
+          },
+        ]
+      }
     ]
   }
+
 }

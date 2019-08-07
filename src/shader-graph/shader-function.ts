@@ -56,9 +56,18 @@ export class ShaderFunction{
     return node;
   }
 
-  genShaderFunctionIncludeCode(): string {
+  genShaderFunctionIncludeCode(resolvedFunction: Set<ShaderFunction>): string {
     const builder = new CodeBuilder()
     builder.reset();
+
+    this.dependShaderFunction.forEach(func => {
+      if (!resolvedFunction.has(func)) {
+        builder.writeBlock(func.genShaderFunctionIncludeCode(resolvedFunction));
+        resolvedFunction.add(func)
+      }
+    })
+    resolvedFunction.add(this)
+
     const define = this.define;
     const varType = getShaderTypeStringFromGLDataType(define.returnType);
     let functionInputs = "";
@@ -88,7 +97,9 @@ export class ShaderFunction{
   private replaceFunctionCalls(src: string) {
     let source = src.slice();
     this.dependShaderFunction.forEach(func => {
-      replaceFunctionCallByName(source, func.name, func.define.name)
+      if (func.name.trim() !== func.define.name.trim()) {
+        replaceFunctionCallByName(source, func.name, func.define.name)
+      }
     })
     return source;
   }
