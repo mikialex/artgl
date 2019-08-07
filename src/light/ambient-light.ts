@@ -1,5 +1,5 @@
 import { ShaderFunction } from "../shader-graph/shader-function";
-import { Light, collectLight } from "../core/light";
+import { Light } from "../core/light";
 import { MapUniform } from "../core/shading";
 import { Vector3 } from "../math";
 import { ShaderGraph } from "../shader-graph/shader-graph";

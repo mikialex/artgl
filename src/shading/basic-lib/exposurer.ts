@@ -17,7 +17,6 @@ export class ExposureController extends BaseEffectShading<ExposureController> {
 
   decorate(graph: ShaderGraph): void {
     graph
-      .declareFragNormal()
       .setFragmentRoot(
         vec4(
           controlExposureShading.make()
