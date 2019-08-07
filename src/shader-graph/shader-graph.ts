@@ -4,7 +4,6 @@ import {
   ShaderInputNode, ShaderTextureNode, ShaderFunctionNode,
   ShaderAttributeInputNode, ShaderInnerUniformInputNode,
   ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode,
-  ShaderTextureFetchNode
 } from "./shader-node";
 import { attribute, constValue, MVPWorld } from "./node-maker";
 import { GLDataType } from "../webgl/shader-util";
