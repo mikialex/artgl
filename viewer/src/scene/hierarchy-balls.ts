@@ -72,7 +72,7 @@ export default function (root: SceneNode, app: Application): RenderConfig {
   }
 
   return {
-    name: 'exposureControll',
+    name: 'exposureControl',
     value: [
       {
         name: 'exposureMax',

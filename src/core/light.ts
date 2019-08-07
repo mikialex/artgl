@@ -1,13 +1,15 @@
 import { SceneNode } from "../scene/scene-node";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { uniformFromValue } from "../shader-graph/node-maker";
-import { ShaderUniformProvider } from "./shading";
+import { ShaderUniformProvider, ShaderUniformDecorator } from "./shading";
 import { ShaderCommonUniformInputNode, ShaderNode } from "../shader-graph/shader-node";
 import { ShaderFunction } from "../shader-graph/shader-function";
+import { Observable } from "./observable";
 
 // TODO I cant figure out right multi inheritance impl with strong type, code duplicate 
 
-export class Light<T> extends SceneNode implements ShaderUniformProvider {
+export class Light<T> extends SceneNode
+  implements ShaderUniformProvider, ShaderUniformDecorator {
   constructor() {
     super();
     // need check if has initialized by decorator
@@ -35,6 +37,8 @@ export class Light<T> extends SceneNode implements ShaderUniformProvider {
   produceLightFragEffect(_graph: ShaderGraph): ShaderNode {
     throw new Error("Method not implemented.");
   }
+
+  notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable()
 
   hasAnyUniformChanged: boolean;
 

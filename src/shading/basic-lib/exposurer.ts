@@ -1,4 +1,4 @@
-import { BaseEffectShading, MapUniform } from "../../core/shading";
+import { BaseEffectShading, MapUniform, MarkNeedRedecorate } from "../../core/shading";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { ShaderGraph } from "../../shader-graph/shader-graph";
 import { vec4, constValue } from "../../shader-graph/node-maker";
@@ -49,6 +49,7 @@ export class ExposureController extends BaseEffectShading<ExposureController> {
   @MapUniform("toneMappingWhitePoint")
   toneMappingWhitePoint: number = 1;
 
+  @MarkNeedRedecorate()
   toneMapType: ToneMapType = ToneMapType.Uncharted2ToneMapping;
 
   getToneMapFunction() {
