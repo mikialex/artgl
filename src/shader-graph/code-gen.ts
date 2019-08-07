@@ -81,8 +81,10 @@ function genShaderFunctionDepend(nodes: Map<ShaderNode, varRecord>): string {
       dependFunctions.add(node.factory)
     }
   })
+
+  const resolvedFunction = new Set<ShaderFunction>();
   dependFunctions.forEach(func => {
-    functionsStr += func.genShaderFunctionIncludeCode()
+    functionsStr += func.genShaderFunctionIncludeCode(resolvedFunction)
     functionsStr += "\n"
   })
   return functionsStr

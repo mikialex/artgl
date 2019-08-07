@@ -52,7 +52,7 @@ export class ShaderGraph {
     return this;
   }
 
-  declareFragNormal(): ShaderGraph {
+  private declareFragNormal(): ShaderGraph {
     if (this.varyings.has(NormalFragVary)) {
       return this;
     }
@@ -67,10 +67,6 @@ export class ShaderGraph {
   }
 
   setVary(key: string, root: ShaderNode): ShaderGraph {
-    const ret = this.varyings.get(key);
-    if (ret !== undefined) {
-      throw 'duplicate vary key found'
-    }
     this.varyings.set(key, root);
     return this;
   }
@@ -80,9 +76,14 @@ export class ShaderGraph {
   }
 
   getVary(key: string): ShaderVaryInputNode {
-    const ret = this.varyings.get(key);
+    let ret = this.varyings.get(key);
     if (ret === undefined) {
-      throw 'cant get vary'
+      if (key === NormalFragVary) {
+        this.declareFragNormal();
+        ret =  this.varyings.get(key);
+      } else {
+        throw 'cant get vary'
+      }
     }
     return new ShaderVaryInputNode(key, ret.type);
   }

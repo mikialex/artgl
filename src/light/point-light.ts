@@ -1,5 +1,5 @@
 import { ShaderFunction } from "../shader-graph/shader-function";
-import { Light, collectLight } from "../core/light";
+import { Light } from "../core/light";
 import { WorldPositionFragVary, NormalFragVary, ShaderGraph } from "../shader-graph/shader-graph";
 import { MapUniform } from "../core/shading";
 import { Vector3 } from "../math";
@@ -25,7 +25,6 @@ const pointLightShading = new ShaderFunction({
 export class PointLight extends Light<PointLight> {
 
   produceLightFragEffect(decorated: ShaderGraph) {
-    decorated.declareFragNormal();
     return pointLightShading.make()
       .input("fragPosition", decorated.getVary(WorldPositionFragVary))
       .input("fragNormal", decorated.getVary(NormalFragVary))

@@ -3,7 +3,7 @@ import {
   Shading, CubeGeometry, Vector3, DirectionalLight
 } from '../../../src/artgl';
 import { PointLight } from '../../../src/light/point-light';
-import { ExposureController } from '../../../src/shading/basic-lib/exposurer';
+import { ExposureController, ToneMapType } from '../../../src/shading/basic-lib/exposurer';
 import { RenderConfig } from '@/components/conf/interface';
 import { Application } from '../application';
 
@@ -32,6 +32,8 @@ export default function (root: SceneNode, app: Application): RenderConfig {
     .decorate(ambient)
     .decorate(dirLight)
     .decorate(exposureController)
+  
+  console.log(exposureController)
 
   shading.afterShaderCompiled.add((config) => {
     console.log(config);
@@ -72,19 +74,53 @@ export default function (root: SceneNode, app: Application): RenderConfig {
   }
 
   return {
-    name: 'exposureMax',
-    value: 1 / exposureController.toneMappingExposure,
-    onChange: (value: number) => {
-      exposureController.toneMappingExposure = 1 / value;
-      app.pipeline.resetSample();
-    },
-    editors: [
+    name: 'exposureControl',
+    value: [
       {
-        type: 'slider',
-        min: 0,
-        max: 5,
-        step: 0.1
+        name: 'exposureMax',
+        value: 1 / exposureController.toneMappingExposure,
+        onChange: (value: number) => {
+          exposureController.toneMappingExposure = 1 / value;
+          app.pipeline.resetSample();
+        },
+        editors: [
+          {
+            type: 'slider',
+            min: 0,
+            max: 5,
+            step: 0.1
+          },
+        ]
       },
+      {
+        name: 'exposureWhitePoint',
+        value: exposureController.toneMappingWhitePoint,
+        onChange: (value: number) => {
+          exposureController.toneMappingWhitePoint = value;
+          app.pipeline.resetSample();
+        },
+        editors: [
+          {
+            type: 'slider',
+            min: 0,
+            max: 5,
+            step: 0.1
+          },
+        ]
+      },
+      {
+        name: 'exposureToneMapType',
+        value: exposureController.toneMapType,
+        valueConfig: {
+          type: "select",
+          selectItem: Object.keys(ToneMapType)
+        },
+        onChange: (value: ToneMapType) => {
+          exposureController.toneMapType = value;
+          app.pipeline.resetSample();
+        },
+      }
     ]
   }
+
 }

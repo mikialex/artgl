@@ -32,8 +32,8 @@ export default class Editors extends Vue {
     return this.editorConfig.length !== 1;
   }
 
-  @Prop() editorConfig: any;
-  @Prop() value: any;
+  @Prop({ required: true }) editorConfig: any;
+  @Prop({ required: true }) value: any;
 
   get editor(){
     return this.editorConfig[this.currentEditor];

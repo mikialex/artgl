@@ -11,7 +11,7 @@ import Folder from "./folder.vue";
   components: { Folder }
 })
 export default class ConfigPanel extends Vue {
-  @Prop() config: any;
+  @Prop({ required: true }) config: any;
 }
 </script>
 

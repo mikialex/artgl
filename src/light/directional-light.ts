@@ -1,5 +1,5 @@
 import { ShaderFunction } from "../shader-graph/shader-function";
-import { Light, collectLight } from "../core/light";
+import { Light } from "../core/light";
 import { ShaderGraph } from "../artgl";
 import { WorldPositionFragVary, NormalFragVary } from "../shader-graph/shader-graph";
 import { MapUniform } from "../core/shading";
@@ -24,7 +24,6 @@ const directionalLightShading = new ShaderFunction({
 export class DirectionalLight extends Light<DirectionalLight> {
 
   produceLightFragEffect(decorated: ShaderGraph) {
-    decorated.declareFragNormal();
     return directionalLightShading.make()
       .input("fragPosition", decorated.getVary(WorldPositionFragVary))
       .input("fragNormal", decorated.getVary(NormalFragVary))

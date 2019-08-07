@@ -13,7 +13,6 @@ export class NormalShading extends BaseEffectShading<NormalShading> {
 
   decorate(graph: ShaderGraph): void {
     graph
-      .declareFragNormal()
       .setFragmentRoot(
         normalShading.make().input("normal", graph.getVary(NormalFragVary))
       )

@@ -14,8 +14,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 @Component
 export default class NumberSliderEditor extends Vue {
 
-  @Prop() value: number;
-  @Prop() config: number;
+  @Prop({ required: true }) value: number;
+  @Prop({ required: true }) config: number;
 
   get _value(){
     return this.value;
