@@ -35,11 +35,13 @@ const Uncharted2ToneMapping = new ShaderFunction({
   dependFunction: [Uncharted2Helper]
 })
 
-export const enum ToneMapType {
-  Linear,
-  Uncharted2ToneMapping,
+export enum ToneMapType {
+  Linear = "Linear",
+  Uncharted2ToneMapping= "Uncharted2ToneMapping",
 
 }
+
+console.log(ToneMapType);
 
 export class ExposureController extends BaseEffectShading<ExposureController> {
 

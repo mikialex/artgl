@@ -36,7 +36,7 @@ import ConfigItem from './item.vue';
 })
 export default class Folder extends Vue {
   expand:boolean = true;
-  @Prop() config: any;
+  @Prop({ required: true }) config: any;
 
   get isEmptyList(){
     return this.config.value.length === 0

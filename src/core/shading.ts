@@ -130,6 +130,9 @@ export class Shading {
 
 export function MarkNeedRedecorate() {
   return (target: ShaderUniformDecorator, key: string) => {
+    if (target.notifyNeedRedecorate === undefined) {
+      target.notifyNeedRedecorate = new Observable();
+    }
     let val = target[key];
     const getter = () => {
       return val;
@@ -137,7 +140,7 @@ export function MarkNeedRedecorate() {
     const setter = (value) => {
       const oldValue = val;
       val = value;
-      if (oldValue !== value && target.notifyNeedRedecorate !== undefined) {
+      if (oldValue !== value) {
         target.notifyNeedRedecorate.notifyObservers(target);
       }
     };
@@ -192,6 +195,10 @@ export abstract class BaseEffectShading<T>
     if (this.propertyUniformNameMap === undefined) {
       this.propertyUniformNameMap = new Map();
     }
+
+    if (this.notifyNeedRedecorate === undefined) {
+      this.notifyNeedRedecorate = new Observable()
+    }
   }
 
   abstract decorate(graph: ShaderGraph): void;
@@ -200,7 +207,7 @@ export abstract class BaseEffectShading<T>
     return visitor(this);
   }
 
-  notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable()
+  notifyNeedRedecorate: Observable<ShaderUniformDecorator>
 
   hasAnyUniformChanged: boolean = true;
   propertyUniformNameMap: Map<string, string>;

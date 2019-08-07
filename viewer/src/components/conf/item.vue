@@ -6,11 +6,17 @@
       </div>
       <div class="inline-editor">
         <NumberEditor
-          v-if="typeof config.value === 'number'"
+          v-if="typeof config.value === 'number' && config.valueConfig === undefined"
           v-model="configValue"/>
         <BooleanEditor
-          v-if="typeof config.value === 'boolean'"
+          v-if="typeof config.value === 'boolean' && config.valueConfig === undefined"
           v-model="configValue"/>
+
+        <SelectEditor
+          v-if="config.valueConfig && config.valueConfig.type === 'select'"
+          :list ="config.valueConfig.selectItem"
+          v-model="configValue"/>
+
         <button class="expand-editor"
           @click="expandEditor = !expandEditor"
           v-if="shouldHaveCustomEditor">&</button>
@@ -28,15 +34,17 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import Editors from './editors.vue';
 import NumberEditor from './number.vue';
 import BooleanEditor from './boolean.vue';
+import SelectEditor from './select.vue';
+
 @Component({
   components:{
-    Editors, NumberEditor, BooleanEditor
+    Editors, NumberEditor, BooleanEditor, SelectEditor
   }
 })
 export default class ConfigItem extends Vue {
   expandEditor:boolean = false;
 
-  @Prop() config: any;
+  @Prop({ required: true }) config: any;
 
   get configValue(){
     return this.config.value;
