@@ -1,7 +1,7 @@
 import { GLProgramConfig } from "../webgl/program";
 import { genFragShader, genVertexShader } from "./code-gen";
 import {
-  ShaderInputNode, ShaderTexture, ShaderFunctionNode,
+  ShaderInputNode, ShaderTextureNode, ShaderFunctionNode,
   ShaderAttributeInputNode, ShaderInnerUniformInputNode,
   ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode,
   ShaderTextureFetchNode
@@ -157,18 +157,14 @@ export class ShaderGraph {
         }
       });
 
-    const textureSet = new Set<ShaderTexture>();
-    nodes.filter(n => n instanceof ShaderTextureFetchNode)
-      .forEach((node: ShaderTextureFetchNode) => {
-        textureSet.add(node.source)
-      })
-    const textures = [];
-    textureSet.forEach(st => {
-      textures.push({
-        name: st.name,
-        type: st.type
-      })
-    })
+    const textures = inputNodes
+      .filter(node => node instanceof ShaderTextureNode)
+      .map((node: ShaderTextureNode) => {
+        return {
+          name: node.name,
+          type: node.textureType,
+        }
+      });
 
     const varyings = [];
     this.varyings.forEach((node, key) => {

@@ -23,7 +23,8 @@ export const enum GLDataType{
   Mat2,
   Mat3,
   Mat4,
-  boolean
+  boolean,
+  sampler2D
 }
 
 const shaderStringMap: { [index: string]: GLDataType } = {
@@ -34,6 +35,7 @@ const shaderStringMap: { [index: string]: GLDataType } = {
   'mat2': GLDataType.Mat2,
   'mat3': GLDataType.Mat3,
   'mat4': GLDataType.Mat4,
+  'sampler2D': GLDataType.sampler2D
 }
 let reverseShaderStringMap: { [index: number]: string } = {};
 Object.keys(shaderStringMap).forEach(key => {
