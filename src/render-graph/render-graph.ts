@@ -67,11 +67,6 @@ export class RenderGraph {
     return nodes;
   }
 
-  /**
-   * Clear the graph pass info as needed
-   *
-   * @memberof RenderGraph
-   */
   reset() {
     this.renderTargetNodes.clear();
     this.passNodes.clear();
@@ -79,9 +74,6 @@ export class RenderGraph {
 
   /**
    * Setup a new Graph configuration
-   *
-   * @param {GraphDefine} graphDefine
-   * @memberof RenderGraph
    */
   defineGraph(composer: EffectComposer, graphDefine: GraphDefine): void {
     this.reset();
@@ -91,8 +83,6 @@ export class RenderGraph {
 
   /**
    * Update the pass queue from current graph configure
-   *
-   * @memberof RenderGraph
    */
   update(engine: RenderEngine, composer: EffectComposer) {
     

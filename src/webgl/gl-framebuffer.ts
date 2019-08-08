@@ -56,6 +56,8 @@ export class GLFramebuffer {
   width: number;
   height: number;
 
+  formatKey: string;
+
   enableDepth: boolean = true;
   webglDepthBuffer: Nullable<WebGLRenderbuffer> = null;
   webglFrameBuffer: WebGLFramebuffer;

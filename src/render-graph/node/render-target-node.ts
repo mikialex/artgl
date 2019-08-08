@@ -27,13 +27,20 @@ export class RenderTargetNode extends DAGNode{
         pixelFormat: PixelFormat.RGBA,
         dimensionType: DimensionType.bindRenderSize,
       }
+    } else {
+      if (define.format.pixelFormat === undefined) {
+        define.format.pixelFormat = PixelFormat.RGBA;
+      }
+      if (define.format.dimensionType === undefined) {
+        define.format.dimensionType = DimensionType.bindRenderSize;
+      }
     }
 
     if (define.format.dimensionType === DimensionType.bindRenderSize) {
       this.autoWidthRatio = define.format.width !== undefined ? MathUtil.clamp(define.format.width, 0, 1) : 1;
       this.autoHeightRatio = define.format.height !== undefined ? MathUtil.clamp(define.format.height, 0, 1) : 1;
     }
-    this.enableDepth = define.format.disableDepthBuffer !== undefined ? define.format.disableDepthBuffer : true;
+    this.enableDepth = define.format.enableDepthBuffer !== undefined ? define.format.enableDepthBuffer : false;
     
   }
   readonly isScreenNode: boolean;
@@ -44,7 +51,7 @@ export class RenderTargetNode extends DAGNode{
 
   autoWidthRatio: number = 0;
   autoHeightRatio: number = 0;
-  enableDepth: boolean = true;
+  enableDepth: boolean = false;
 
   widthAbs: number = 0;
   heightAbs: number = 0;

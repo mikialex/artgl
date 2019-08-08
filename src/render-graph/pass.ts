@@ -28,14 +28,6 @@ export class RenderPass{
 
   }
 
-  updateInputTargets(inputs: PassInputMapInfo) {
-    this.inputTarget.clear();
-    Object.keys(inputs).forEach(inputKey => {
-      const mapTo = inputs[inputKey];
-      this.inputTarget.set(inputKey, mapTo)
-    })
-  }
-
   readonly define: PassDefine;
   public name: string;
 
@@ -74,6 +66,14 @@ export class RenderPass{
       engine.renderFrameBuffer(framebuffer, debugInputViewport)
     })
   } 
+
+  updateInputTargets(inputs: PassInputMapInfo) {
+    this.inputTarget.clear();
+    Object.keys(inputs).forEach(inputKey => {
+      const mapTo = inputs[inputKey];
+      this.inputTarget.set(inputKey, mapTo)
+    })
+  }
 
   execute(engine: RenderEngine, graph: RenderGraph) {
 

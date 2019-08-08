@@ -66,10 +66,16 @@ export class RenderPipeline{
         },
         {
           name: 'sceneResult',
+          format: {
+            enableDepthBuffer: true,
+          },
           from: () => 'SceneOrigin',
         },
         {
           name: 'depthResult',
+          format: {
+            enableDepthBuffer: true,
+          },
           from: () => 'Depth',
         },
         {

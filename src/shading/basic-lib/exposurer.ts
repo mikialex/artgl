@@ -41,8 +41,6 @@ export enum ToneMapType {
 
 }
 
-console.log(ToneMapType);
-
 export class ExposureController extends BaseEffectShading<ExposureController> {
 
   @MapUniform("toneMappingExposure")
