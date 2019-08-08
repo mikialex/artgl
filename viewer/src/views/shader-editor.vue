@@ -6,16 +6,28 @@
         <button @click="addUniform">uniform</button>
         <button>attribute</button>
       </div>
-      <GraphView :board="board">
-        <DAGNodeView
-          v-for="nodeView in nodes"
-          :key="nodeView.node.uuid"
-          :node="nodeView.node"
-          :layout="nodeView.layout"
-          :boardInfo="board"
-          @updateViewport="updateViewport(nodeView)"
-        ></DAGNodeView>
-      </GraphView>
+      <div style="position: absolute; top:0px; width: 100%;height: 100%">
+        <LineHUDCanvas :lines="lines" :boardInfo="board" />
+        <GraphView :board="board">
+          <DAGNodeView
+            v-for="nodeView in nodes"
+            :key="nodeView.node.uuid"
+            :node="nodeView.node"
+            :layout="nodeView.layout"
+            :boardInfo="board"
+            @updateViewport="updateViewport(nodeView)"
+            @updateLine = "updateLine"
+            ref="vueNodes"
+          >
+            <ShaderFunctionNodeView
+              v-if="isShaderFunctionNode(nodeView.node)"
+              :node="nodeView.node"
+              :layout="nodeView.layout"
+              @updateSize="updateViewport"
+            />
+          </DAGNodeView>
+        </GraphView>
+      </div>
     </div>
 
     <div class="viewer">
@@ -34,22 +46,38 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, ProvideReactive } from "vue-property-decorator";
 import { ShaderApp } from "../shader-application";
 import {
   injectFragmentShaderHeaders,
   GLDataType
 } from "../../../src/webgl/shader-util";
-import { ShaderGraph, uniform, DAGNode } from "../../../src/artgl";
+import {
+  ShaderGraph,
+  uniform,
+  DAGNode,
+  TSSAOShading,
+  Shading
+} from "../../../src/artgl";
 import DAGNodeView from "../components/graph/dag-node.vue";
+import ShaderFunctionNodeView from "../components/graph/nodes/shader-function-node.vue";
 import GraphView from "../components/graph/graph-viewer.vue";
-import { ShaderNode } from "../../../src/shader-graph/shader-node";
-import { GraphBoardInfo, NodeLayout, ViewNode } from "../model/graph-view";
+import { ShaderNode, ShaderFunctionNode } from "../../../src/shader-graph/shader-node";
+import LineHUDCanvas from "./line-hud-canvas.vue";
+import {
+  GraphBoardInfo,
+  NodeLayout,
+  ViewNode,
+  ConnectionLine,
+  layoutGraph
+} from "../model/graph-view";
 
 @Component({
   components: {
     DAGNodeView,
-    GraphView
+    GraphView,
+    LineHUDCanvas,
+    ShaderFunctionNodeView
   }
 })
 export default class ShaderEditor extends Vue {
@@ -64,7 +92,8 @@ export default class ShaderEditor extends Vue {
     transformY: 0
   };
 
-  nodes: ViewNode[] = [];
+  @ProvideReactive() nodes: ViewNode[] = [];
+  @ProvideReactive() lines: ConnectionLine[] = [];
 
   mounted() {
     const canvas = this.$el.querySelector("#shader-editor-canvas");
@@ -74,20 +103,64 @@ export default class ShaderEditor extends Vue {
     this.board.width = canvas.clientWidth;
     this.board.height = canvas.clientHeight;
 
+    const tssaoShading = new TSSAOShading();
+    const tssaoShader = new Shading().decorate(tssaoShading);
+    tssaoShader.getProgramConfig();
+    this.nodes = tssaoShader.graph.nodes.map(node => {
+      return {
+        node,
+        layout: {
+          absX: 0,
+          absY: 0,
+          width: 200,
+          height: 200
+        }
+      };
+    });
+    this.layout(tssaoShader);
     // this.graphView = GraphView.createFromShaderGraph(ShaderApp.graph);
     console.log(this.graph);
   }
 
-  layout() {}
+  layout(tssaoShader: Shading) {
+    const map = {};
+    this.nodes.forEach(node => {
+      map[node.node.uuid] = node.layout;
+    });
+    layoutGraph(tssaoShader.graph.fragmentRoot, map);
+  }
 
   updateViewport(view: ViewNode) {
     console.log("upd");
+  }
+
+  isShaderFunctionNode(node) {
+    return node instanceof ShaderFunctionNode;
   }
 
   codeGen() {
     this.showCode = true;
     // const result = ShaderApp.graph.compile();
     // this.codeGenResult = injectFragmentShaderHeaders(result, result.fragmentShaderString);
+  }
+
+  updateLine(node: DAGNode){
+    console.log('l')
+    this.notifyNodeNeedUpdateLine(node)
+    node.toNodes.forEach(no =>{
+      this.notifyNodeNeedUpdateLine(no);
+    })
+  }
+
+  notifyNodeNeedUpdateLine(n: DAGNode){
+    if(this.$refs.vueNodes){
+      for (let i = 0; i < (this.$refs.vueNodes as Array<DAGNodeView>).length; i++) {
+        const v = this.$refs.vueNodes[i];
+        if(v.node === n){
+          v.updateLine();
+        }
+      }
+    }
   }
 
   addUniform() {

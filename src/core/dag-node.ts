@@ -99,6 +99,25 @@ export class DAGNode {
     visit(this);
   }
 
+  traverseDFS2(visitor: (node: DAGNode) => any) {
+    const visited: Map<DAGNode, number> = new Map();
+    function visit(node: DAGNode, depth: number) {
+      if (!visited.has(node)) {
+        visited.set(node, depth);
+        visitor(node);
+        node.fromNodes.forEach(n => {
+          visit(n, depth + 1);
+        });
+      } else {
+        if (visited.get(node) < depth) {
+          throw 'graph contains cycle.'
+        }
+      }
+    }
+    visit(this, 0);
+  }
+
+
   generateAllDependencyList(): DAGNode[] {
     const result: DAGNode[] = [];
     this.traverseDFS((n) => {
