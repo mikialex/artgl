@@ -188,12 +188,6 @@ export class RenderEngine implements GLReleasable{
     })
   }
 
-  renderObjects(objects: RenderObject[]) {
-    for (let i = 0; i < objects.length; i++) {
-      this.renderObject(objects[i]);
-    }
-  }
-
   renderObject(object: RenderObject) {
 
     // prepare technique

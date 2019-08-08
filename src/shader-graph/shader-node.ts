@@ -153,11 +153,13 @@ export class ShaderConstNode extends ShaderNode {
   shaderString: string;
 }
 
-export class ShaderTexture {
+export class ShaderTextureNode extends ShaderInputNode {
   constructor(
     public name: string,
-    public type: GLTextureType
+    public type: GLDataType,
+    public textureType: GLTextureType
   ) {
+    super(name, type);
   }
 
   fetch(node: ShaderNode): ShaderTextureFetchNode {
@@ -165,24 +167,15 @@ export class ShaderTexture {
   }
 }
 
-function fromGLTextureType2GLDataType(type: GLTextureType): GLDataType {
-  switch (type) {
-    case GLTextureType.texture2D:
-      return GLDataType.floatVec4
-
-    default:
-      throw "not support"
-  }
-}
-
 export class ShaderTextureFetchNode extends ShaderNode {
   constructor(
-    public source: ShaderTexture,
+    public source: ShaderTextureNode,
     public fetchByNode: ShaderNode
   ) {
     super(fetchByNode.type);
+    source.connectTo(this);
     fetchByNode.connectTo(this);
-    this.type = fromGLTextureType2GLDataType(source.type)
+    this.type = GLDataType.floatVec4
   }
 }
 
