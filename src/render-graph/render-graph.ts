@@ -4,6 +4,7 @@ import { RenderTargetNode } from "./node/render-target-node";
 import { RenderEngine } from "../engine/render-engine";
 import { QuadSource } from './quad-source';
 import { RenderPass } from "./pass";
+import { FrameBufferPool } from "./framebuffer-pool";
 
 
 export type RenderGraphNode = PassGraphNode | RenderTargetNode;
@@ -84,7 +85,7 @@ export class RenderGraph {
   /**
    * Update the pass queue from current graph configure
    */
-  update(engine: RenderEngine, composer: EffectComposer) {
+  update(engine: RenderEngine, composer: EffectComposer, framebufferPool: FrameBufferPool) {
     
     //updateNodesConnection
     this.passNodes.forEach(node => {
@@ -98,18 +99,13 @@ export class RenderGraph {
     const nodeQueue = this.screenNode.generateDependencyOrderList() as RenderGraphNode[];
     composer.reset();
     nodeQueue.forEach(node => {
-      if (node instanceof RenderTargetNode) {
-        node.updateSize(engine);
-      }
-    })
-    nodeQueue.forEach(node => {
       if (node instanceof PassGraphNode) {
         const pass = composer.getPass(node);
-        if (pass === undefined) {
-          throw "err" // TODO
-        }
-        node.updatePass(engine, pass, nodeQueue);
+        node.updatePass(pass);
         composer.addPass(pass);
+      } else if (node instanceof RenderTargetNode) {
+        const pass = composer.getPass(node.fromPassNode);
+        node.updatePass(engine, pass)
       }
     })
   }
@@ -117,7 +113,7 @@ export class RenderGraph {
   private constructPassGraph(passesDefine: PassDefine[], composer: EffectComposer) {
     passesDefine.forEach(define => {
       if (!this.passNodes.has(define.name)) {
-        const node = new PassGraphNode(this, define);
+        const node = new PassGraphNode(define);
         this.passNodes.set(define.name, node);
         composer.registerNode(node, define);
       } else {

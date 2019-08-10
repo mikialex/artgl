@@ -7,6 +7,9 @@ import { RenderEngine } from "../../engine/render-engine";
 import { Nullable } from "../../type";
 import { Vector4 } from '../../math/vector4';
 import { PixelFormat } from "../../webgl/const";
+import { FrameBufferPool } from "../framebuffer-pool";
+import { RenderPass } from "../pass";
+import { PassGraphNode } from "./pass-graph-node";
 
 export class RenderTargetNode extends DAGNode{
   constructor(define: RenderTargetDefine) {
@@ -56,19 +59,39 @@ export class RenderTargetNode extends DAGNode{
   widthAbs: number = 0;
   heightAbs: number = 0;
 
+  formatKey: string = "";
+
   private fromGetter: () => Nullable<string>
   private from: string = null;
 
-  getOrCreateFrameBuffer(engine: RenderEngine): GLFramebuffer {
-    const f = engine.renderer.framebufferManager.getFramebuffer(this.name);
-    if (f) {
-      return f
-    } else {
-      return engine.renderer.framebufferManager.createFrameBuffer(
-        engine, this.name, this.widthAbs, this.heightAbs, this.enableDepth);
+  private _fromPassNode: Nullable<PassGraphNode> = null
+
+  set fromPassNode(node: Nullable<PassGraphNode>) {
+    if (node === null) {
+      this._fromPassNode = node;
+      this.clearAllFrom();
+      return 
     }
+    this._fromPassNode = node;
+    node.connectTo(this);
   }
 
+  get fromPassNode() {
+    return this._fromPassNode
+  }
+
+  getOrCreateFrameBuffer(framebufferPool: FrameBufferPool): GLFramebuffer {
+    return framebufferPool.requestFramebuffer(
+      this.formatKey, this.widthAbs, this.heightAbs, this.enableDepth);
+  }
+
+  private updateFormatKey() {
+    this.formatKey = GLFramebuffer.buildFBOFormatKey(
+      this.widthAbs, this.heightAbs, this.enableDepth
+    );
+  }
+
+  // update abs size info from given engine render size
   updateSize(engine: RenderEngine) {
     if (this.isScreenNode) {
       return;
@@ -86,22 +109,33 @@ export class RenderTargetNode extends DAGNode{
     }
     this.widthAbs = Math.max(5, width);
     this.heightAbs = Math.max(5, height);
-    
-    this.getOrCreateFrameBuffer(engine).resize(engine, width, height);
+    this.updateFormatKey();
   }
 
+  // update graph structure
   updateDependNode(graph: RenderGraph) {
-    
     // disconnect depends pass node
-    this.clearAllFrom();
+    this.fromPassNode = null;
 
     this.from = this.fromGetter();
 
     if (this.from !== null) {
       const passNode = graph.getRenderPassDependence(this.from);
-      passNode.connectTo(this);
+      this.fromPassNode = passNode;
     }
-    
+  }
+
+    // from updated graph structure, setup render pass
+  updatePass(engine: RenderEngine, pass: RenderPass) {
+    this.updateSize(engine);
+    if (this.name === RenderGraph.screenRoot) {
+      pass.isOutputScreen = true;
+    } else {
+      pass.outputWidth = this.widthAbs;
+      pass.outputHeight = this.heightAbs;
+      pass.outputHasDepth = this.enableDepth;
+      pass.isOutputScreen = false;
+    }
   }
 
 }

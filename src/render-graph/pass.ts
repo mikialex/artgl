@@ -1,11 +1,15 @@
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { RenderEngine } from "../engine/render-engine";
-import { RenderGraph } from "./render-graph";
+import { RenderGraph, RenderGraphNode } from "./render-graph";
 import { PassDefine, PassInputMapInfo } from "./interface";
 import { RenderTargetNode } from "./node/render-target-node";
 import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
 import { Shading } from "../core/shading";
+import { FrameBufferPool } from "./framebuffer-pool";
+
+type uniformName = string;
+type framebufferName = string;
 
 export class RenderPass{
   constructor(define: PassDefine) {
@@ -40,24 +44,18 @@ export class RenderPass{
   
   private overrideShading: Nullable<Shading> = null;
 
-  // key: uniformName ;   value: inputFramebufferName
-  private inputTarget: Map<string, string> = new Map();
-  private outputTarget: GLFramebuffer
+  inputTarget: Map<uniformName, framebufferName> = new Map();
 
+  // outputInfos
+  outputFramebufferName: framebufferName;
+  outputWidth: number;
+  outputHeight: number;
+  outputHasDepth: boolean;
 
-  setOutPutTarget(engine: RenderEngine, renderTargetNode: RenderTargetNode) {
-    if (renderTargetNode.name === RenderGraph.screenRoot) {
-      this.outputTarget = undefined;
-      this.isOutputScreen = true;
-    } else {
-      this.outputTarget = renderTargetNode.getOrCreateFrameBuffer(engine);
-      this.isOutputScreen = false;
-    }
-  }
-  private isOutputScreen: boolean = true;
+  isOutputScreen: boolean = true;
 
   renderDebugResult(engine: RenderEngine, graph: RenderGraph) {
-    const debugOutputViewport = graph.renderTargetNodes.get(this.outputTarget.name).debugViewPort;
+    const debugOutputViewport = graph.renderTargetNodes.get(this.outputFramebufferName).debugViewPort;
     engine.renderFrameBuffer(this.outputTarget, debugOutputViewport)
     // this will cause no use draw TODO optimize
     this.inputTarget.forEach((inputFramebufferName, _uniformName) => {
@@ -67,15 +65,10 @@ export class RenderPass{
     })
   } 
 
-  updateInputTargets(inputs: PassInputMapInfo) {
-    this.inputTarget.clear();
-    Object.keys(inputs).forEach(inputKey => {
-      const mapTo = inputs[inputKey];
-      this.inputTarget.set(inputKey, mapTo)
-    })
-  }
+  execute(engine: RenderEngine, graph: RenderGraph, framebufferPool: FrameBufferPool) {
 
-  execute(engine: RenderEngine, graph: RenderGraph) {
+    this.checkIsValid();
+    let outputTarget: GLFramebuffer;
 
     // setup viewport and render target
     if (this.isOutputScreen) {
@@ -91,8 +84,9 @@ export class RenderPass{
         engine.renderer.state.setFullScreenViewPort();
       }
     } else {
-      engine.renderer.setRenderTarget(this.outputTarget);
-      engine.renderer.state.setViewport(0, 0, this.outputTarget.width, this.outputTarget.height);
+      outputTarget = framebufferPool.requestFramebuffer()
+      engine.renderer.setRenderTarget(outputTarget);
+      engine.renderer.state.setViewport(0, 0, this.outputWidth, this.outputHeight);
     }
   
     // input binding 
@@ -113,7 +107,7 @@ export class RenderPass{
       engine.renderer.state.colorbuffer.clear();
     }
     if (this.enableDepthClear) {
-      if (!this.isOutputScreen && this.outputTarget.enableDepth) {
+      if (!this.isOutputScreen && this.outputHasDepth) {
         engine.renderer.state.depthbuffer.clear();
       }
     }
@@ -146,11 +140,11 @@ export class RenderPass{
     if (this.isOutputScreen) {
       return
     }
-    const target = this.outputTarget.name;
+    const target = this.outputFramebufferName;
     this.inputTarget.forEach(input => {
       if (input === target) {
         throw `you cant output to the render target which is depend on: 
-Duplicate target: ${this.outputTarget.name};`
+Duplicate target: ${this.outputFramebufferName};`
       }
     })
   }

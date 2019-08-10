@@ -4,10 +4,6 @@ import { generateUUID } from "../math";
 
 type formatKey = string;
 
-function buildFBOFormatKey(width: number, height: number, needDepth: boolean) {
-  return `${width}-${height}-${needDepth}`
-}
-
 export class FrameBufferPool{
   constructor(engine: RenderEngine) {
     this.engine = engine;
@@ -42,7 +38,7 @@ export class FrameBufferPool{
   * notify this fbo is not need to be keep, if input fbo has pooled before
   */
   discardFramebuffer(framebuffer: GLFramebuffer) {
-    this.availableBuffers.delete(framebuffer.formatKey);
+    this.availableBuffers.delete(framebuffer._formatKey);
 
   }
 
@@ -51,6 +47,11 @@ export class FrameBufferPool{
     if (!this.locked) {
       throw 'not fbo request before'
     }
+    if (needKeep) {
+      this.contentKeepBuffers.add(framebuffer)
+    } else {
+      this.availableBuffers.set(framebuffer._formatKey, framebuffer);
+    }
   }
 
   markFramebufferNotNeedKeepContent(framebuffer: GLFramebuffer) {
@@ -58,7 +59,7 @@ export class FrameBufferPool{
       throw 'this fbo is not content keeping'
     }
     this.contentKeepBuffers.delete(framebuffer);
-    this.availableBuffers.set(framebuffer.formatKey, framebuffer);
+    this.availableBuffers.set(framebuffer._formatKey, framebuffer);
   }
 
 }

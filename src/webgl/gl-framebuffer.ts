@@ -40,6 +40,10 @@ function loadGLAttachmentPoints(gl: WebGLRenderingContext) {
 export type FramebufferReadBufferType = Uint8Array | Uint16Array | Float32Array;
 
 export class GLFramebuffer {
+  static buildFBOFormatKey(width: number, height: number, needDepth: boolean) {
+    return `${width}-${height}-${needDepth}`
+  }
+
   constructor(renderer: GLRenderer, name: string, width: number, height: number) {
     this.name = name;
     this.renderer = renderer;
@@ -56,7 +60,7 @@ export class GLFramebuffer {
   width: number;
   height: number;
 
-  formatKey: string;
+  _formatKey: string;
 
   enableDepth: boolean = true;
   webglDepthBuffer: Nullable<WebGLRenderbuffer> = null;

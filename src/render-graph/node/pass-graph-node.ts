@@ -1,13 +1,11 @@
 import { DAGNode } from "../../core/dag-node";
 import { PassDefine, PassInputMapInfo } from "../interface";
-import { RenderGraph, RenderGraphNode } from "../render-graph";
+import { RenderGraph } from "../render-graph";
 import { RenderPass } from "../pass";
-import { RenderTargetNode } from './render-target-node';
 import { Nullable } from "../../type";
-import { RenderEngine } from "../../engine/render-engine";
 
 export class PassGraphNode extends DAGNode {
-  constructor(graph: RenderGraph, define: PassDefine) {
+  constructor(define: PassDefine) {
     super();
     this.name = define.name;
 
@@ -20,6 +18,7 @@ export class PassGraphNode extends DAGNode {
   inputs: PassInputMapInfo = {}
   readonly name: string;
 
+  // update graph structure
   updateDependNode(graph: RenderGraph) {
     // disconnect all depends node 
     this.clearAllFrom();
@@ -40,29 +39,13 @@ export class PassGraphNode extends DAGNode {
     })
   }
 
-  updatePass(engine: RenderEngine, pass: RenderPass, activeNodes: RenderGraphNode[]) {
-    pass.updateInputTargets(this.inputs);
-    let foundedNode = null;
-    if (this.toNodes.size === 0) {
-      throw "cant found render target node for a render pass"
-    }
-    this.toNodes.forEach(node => {
-      if (node instanceof RenderTargetNode) {
-        for (let i = 0; i < activeNodes.length; i++) {
-          if (activeNodes[i] === node) {
-            if (foundedNode !== null) {
-              throw `RenderGraph update error: one target node should only has one pass targeted;
-previous found target pass: ${foundedNode.name};
-new found target pass: ${activeNodes[i].name};
-              `
-            }
-            foundedNode = node
-            pass.setOutPutTarget(engine, node);
-          }
-        }
-      }
+  // from updated graph structure, setup render pass
+  updatePass(pass: RenderPass) {
+    pass.inputTarget.clear();
+    Object.keys(this.inputs).forEach(inputKey => {
+      const mapTo = this.inputs[inputKey];
+      pass.inputTarget.set(inputKey, mapTo)
     })
-    pass.checkIsValid();
   }
 
 }
