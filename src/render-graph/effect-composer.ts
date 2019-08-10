@@ -3,7 +3,6 @@ import { FrameBufferPool } from "./framebuffer-pool";
 import { RenderPass } from "./pass";
 import { RenderTargetNode } from "./node/render-target-node";
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
-import { PassDefine } from "./interface";
 
 /**
  * Responsible for rendergraph execution and optimization
@@ -25,16 +24,34 @@ export class EffectComposer {
 
   render(engine: RenderEngine, graph: RenderGraph) {
     this.passes.forEach((pass, index) => {
-      let framebuffer: GLFramebuffer = this.keptFramebuffer.get(pass.outputTarget)
+      const output = pass.outputTarget;
+      let framebuffer: GLFramebuffer = this.keptFramebuffer.get(output)
 
       if (framebuffer === undefined) {
-        framebuffer = this.framebufferPool.requestFramebuffer(pass.outputTarget)
+        framebuffer = this.framebufferPool.requestFramebuffer(output)
       }
 
+      pass.uniformNameFBOMap.forEach((targetName, uniformName) => {
+        const targetDepend = graph.getRenderTargetDependence(targetName);
+        let inputFBO = this.keptFramebuffer.get(targetDepend);
+
+        // if input not exist, its never initialized(empty fbo). created now!
+        if (inputFBO === undefined) {
+          targetDepend.updateSize(engine);
+          inputFBO = this.framebufferPool.requestFramebuffer(targetDepend)
+          this.keptFramebuffer.set(targetDepend, inputFBO);
+        }
+
+        pass.uniformNameFBOMap.set(uniformName, inputFBO.name)
+      })
+    
       pass.execute(engine, graph, framebuffer);
+
+      this.keptFramebuffer.set(output, framebuffer);
 
       this.framebufferDropList[index].forEach(target => {
         this.framebufferPool.returnFramebuffer(this.keptFramebuffer.get(target))
+        this.keptFramebuffer.delete(target)
       })
 
     });

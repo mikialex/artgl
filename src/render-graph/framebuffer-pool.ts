@@ -24,7 +24,7 @@ export class FrameBufferPool {
 
   framebuffers: Map<FBOGeneratedName, GLFramebuffer> = new Map();
 
-  availableBuffers: Map<formatKey, GLFramebuffer> = new Map();
+  availableBuffers: Map<formatKey, GLFramebuffer[]> = new Map();
 
   clearAll() {
     this.framebuffers.forEach(buffer => {
@@ -40,8 +40,11 @@ export class FrameBufferPool {
   requestFramebuffer(node: RenderTargetNode) {
     const pooled = this.availableBuffers.get(node.formatKey);
     if (pooled !== undefined) {
-      this.availableBuffers.delete(pooled._formatKey);
-      return pooled;
+      const result = pooled.pop();
+      if (pooled.length === 0) {
+        this.availableBuffers.delete(node.formatKey);
+      }
+      return result;
     }
     
     const FBOName = generateUUID();
@@ -49,7 +52,6 @@ export class FrameBufferPool {
       this.engine, FBOName, node.widthAbs, node.heightAbs, node.enableDepth);
     
     this.framebuffers.set(FBOName, newFBO);
-    this.availableBuffers.set(newFBO._formatKey, newFBO);
 
     return newFBO;
   }
@@ -62,7 +64,12 @@ export class FrameBufferPool {
       throw 'cant return a framebuffer not belong to this pool'
     }
 
-    this.availableBuffers.set(framebuffer._formatKey, framebuffer);
+    let poolList = this.availableBuffers.get(framebuffer._formatKey);
+    if (poolList === undefined) {
+      poolList = [];
+      this.availableBuffers.set(framebuffer._formatKey, poolList);
+    }
+    poolList.push(framebuffer)
   }
 
 }

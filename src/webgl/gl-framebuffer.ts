@@ -52,6 +52,7 @@ export class GLFramebuffer {
     this.webglFrameBuffer = this.createGLFramebuffer();
     this.width = width;
     this.height = height;
+    this.updateFormatKey();
   }
   name: string;
   gl: WebGLRenderingContext;
@@ -67,6 +68,12 @@ export class GLFramebuffer {
   webglFrameBuffer: WebGLFramebuffer;
 
   textureAttachedSlot: FramebufferAttachTexture[] = [];
+
+  private updateFormatKey() {
+    this._formatKey = GLFramebuffer.buildFBOFormatKey(
+      this.width, this.height, this.enableDepth
+    );
+  }
 
   createGLFramebuffer() {
     const buffer = this.gl.createFramebuffer();
@@ -106,6 +113,7 @@ export class GLFramebuffer {
 
     this.disposeAttachedDepthBuffer();
     this.createAttachDepthBuffer();
+    this.updateFormatKey();
 
   }
 

@@ -90,7 +90,7 @@ export class RenderPass{
       engine.renderer.setRenderTarget(outputTarget);
       engine.renderer.state.setViewport(0, 0, this.outputTarget.widthAbs, this.outputTarget.heightAbs);
     }
-  
+    
     // input binding 
     if (this.overrideShading !== null) {
       engine.overrideShading = this.overrideShading;
