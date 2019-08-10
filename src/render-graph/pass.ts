@@ -5,6 +5,8 @@ import { PassDefine } from "./interface";
 import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
 import { Shading } from "../core/shading";
+import { RenderTargetNode } from "./node/render-target-node";
+import { PassGraphNode } from "./node/pass-graph-node";
 
 type uniformName = string;
 type framebufferName = string;
@@ -42,26 +44,27 @@ export class RenderPass{
   
   private overrideShading: Nullable<Shading> = null;
 
-  inputTarget: Map<uniformName, framebufferName> = new Map();
+  uniformNameFBOMap: Map<uniformName, framebufferName> = new Map();
+  framebuffersDepends: Set<framebufferName> = new Set();
 
+  passNode: PassGraphNode
   // outputInfos
-  outputFramebufferName: framebufferName;
-  outputWidth: number;
-  outputHeight: number;
-  outputHasDepth: boolean;
+  outputTarget: RenderTargetNode
 
-  isOutputScreen: boolean = true;
+  get isOutputScreen() {
+    return this.outputTarget.isScreenNode;
+  }
 
   renderDebugResult(engine: RenderEngine, graph: RenderGraph, framebuffer: GLFramebuffer) {
-    const debugOutputViewport = graph.renderTargetNodes.get(this.outputFramebufferName).debugViewPort;
-    engine.renderFrameBuffer(framebuffer, debugOutputViewport)
-    // this will cause no use draw TODO optimize
-    this.inputTarget.forEach((inputFramebufferName, _uniformName) => {
-      // this will break TODO
-      const framebuffer = engine.renderer.framebuffe rManager.getFramebuffer(inputFramebufferName);
-      const debugInputViewport = graph.renderTargetNodes.get(framebuffer.name).debugViewPort;
-      engine.renderFrameBuffer(framebuffer, debugInputViewport)
-    })
+    // const debugOutputViewport = graph.renderTargetNodes.get(this.outputFramebufferName).debugViewPort;
+    // engine.renderFrameBuffer(framebuffer, debugOutputViewport)
+    // // this will cause no use draw TODO optimize
+    // this.inputTarget.forEach((inputFramebufferName, _uniformName) => {
+    //   // this will break TODO
+    //   const framebuffer = engine.renderer.framebuffe rManager.getFramebuffer(inputFramebufferName);
+    //   const debugInputViewport = graph.renderTargetNodes.get(framebuffer.name).debugViewPort;
+    //   engine.renderFrameBuffer(framebuffer, debugInputViewport)
+    // })
   } 
 
   execute(engine: RenderEngine, graph: RenderGraph, framebuffer: GLFramebuffer) {
@@ -85,13 +88,13 @@ export class RenderPass{
     } else {
       outputTarget = framebuffer;
       engine.renderer.setRenderTarget(outputTarget);
-      engine.renderer.state.setViewport(0, 0, this.outputWidth, this.outputHeight);
+      engine.renderer.state.setViewport(0, 0, this.outputTarget.widthAbs, this.outputTarget.heightAbs);
     }
   
     // input binding 
     if (this.overrideShading !== null) {
       engine.overrideShading = this.overrideShading;
-      this.inputTarget.forEach((inputFramebufferName, uniformName) => {
+      this.uniformNameFBOMap.forEach((inputFramebufferName, uniformName) => {
         (engine.overrideShading as Shading).getProgram(engine).defineFrameBufferTextureDep(
           inputFramebufferName, uniformName
         );
@@ -106,7 +109,7 @@ export class RenderPass{
       engine.renderer.state.colorbuffer.clear();
     }
     if (this.enableDepthClear) {
-      if (!this.isOutputScreen && this.outputHasDepth) {
+      if (!this.isOutputScreen && this.outputTarget.enableDepth) {
         engine.renderer.state.depthbuffer.clear();
       }
     }
@@ -139,11 +142,11 @@ export class RenderPass{
     if (this.isOutputScreen) {
       return
     }
-    const target = this.outputFramebufferName;
-    this.inputTarget.forEach(input => {
+    const target = this.outputTarget.name;
+    this.uniformNameFBOMap.forEach(input => {
       if (input === target) {
         throw `you cant output to the render target which is depend on: 
-Duplicate target: ${this.outputFramebufferName};`
+Duplicate target: ${this.outputTarget.name};`
       }
     })
   }

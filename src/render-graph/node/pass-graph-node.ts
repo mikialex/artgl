@@ -41,11 +41,14 @@ export class PassGraphNode extends DAGNode {
 
   // from updated graph structure, setup render pass
   updatePass(pass: RenderPass) {
-    pass.inputTarget.clear();
+    pass.uniformNameFBOMap.clear();
+    pass.framebuffersDepends.clear();
     Object.keys(this.inputs).forEach(inputKey => {
       const mapTo = this.inputs[inputKey];
-      pass.inputTarget.set(inputKey, mapTo)
+      pass.uniformNameFBOMap.set(inputKey, mapTo)
+      pass.framebuffersDepends.add(mapTo)
     })
+    pass.passNode = this;
   }
 
 }

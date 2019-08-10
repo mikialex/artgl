@@ -85,18 +85,22 @@ export class RenderPipeline{
         },
         {
           name: 'TAAHistoryA',
+          keepContent: () => !this.isEvenTick,
           from: () => this.isEvenTick ? null : 'TAA',
         },
         {
           name: 'TAAHistoryB',
+          keepContent: () => this.isEvenTick,
           from: () => this.isEvenTick ? 'TAA' : null,
         },
         {
           name: 'TSSAOHistoryA',
+          keepContent: () => !this.isEvenTick,
           from: () => this.isEvenTick ? null : 'TSSAO',
         },
         {
           name: 'TSSAOHistoryB',
+          keepContent: () => this.isEvenTick,
           from: () => this.isEvenTick ? 'TSSAO' : null,
         },
       ],

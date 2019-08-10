@@ -24,6 +24,10 @@ export class RenderTargetNode extends DAGNode{
       return
     }
 
+    if (define.keepContent === undefined) {
+      define.keepContent = () => false;
+    }
+
     // set a default format config
     if (define.format === undefined) {
       define.format = {
@@ -120,17 +124,10 @@ export class RenderTargetNode extends DAGNode{
     }
   }
 
-    // from updated graph structure, setup render pass
+  // from updated graph structure, setup render pass
   updatePass(engine: RenderEngine, pass: RenderPass) {
     this.updateSize(engine);
-    if (this.name === RenderGraph.screenRoot) {
-      pass.isOutputScreen = true;
-    } else {
-      pass.outputWidth = this.widthAbs;
-      pass.outputHeight = this.heightAbs;
-      pass.outputHasDepth = this.enableDepth;
-      pass.isOutputScreen = false;
-    }
+    pass.outputTarget = this;
   }
 
 }

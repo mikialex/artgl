@@ -58,17 +58,18 @@ export class RenderGraph {
 
     // create and update pass queue
     const nodeQueue = this.screenNode.generateDependencyOrderList() as RenderGraphNode[];
-    composer.reset();
+    const passes = [];
     nodeQueue.forEach(node => {
       if (node instanceof PassGraphNode) {
         const pass = composer.getPass(node);
         node.updatePass(pass);
-        composer.addPass(pass);
+        passes.push(pass);
       } else if (node instanceof RenderTargetNode) {
         const pass = composer.getPass(node.fromPassNode);
         node.updatePass(engine, pass)
       }
     })
+    composer.setPasses(passes)
   }
 
   private constructPassGraph(passesDefine: PassDefine[], composer: EffectComposer) {
