@@ -74,7 +74,9 @@ export class Application {
   }
 
   pickColor(x: number, y: number) {
-    const f = this.engine.renderer.framebufferManager.getFramebuffer("sceneResult");
+    const f = this.pipeline.getFramebufferByName("sceneResult");
+    return;
+    // TODO
     const result = new Uint8Array(10);
     f.readPixels(
       x * this.engine.renderer.width,

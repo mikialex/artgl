@@ -11,6 +11,10 @@ export class EffectComposer {
   constructor(engine: RenderEngine) {
     this.engine = engine;
     this.framebufferPool = new FrameBufferPool(this.engine);
+
+    this.engine.resizeObservable.add(() => {
+      this.keptFramebuffer.clear();
+    })
   }
 
   private engine: RenderEngine;
@@ -21,6 +25,10 @@ export class EffectComposer {
 
   private keptFramebuffer: Map<RenderTargetNode, GLFramebuffer> = new Map();
   private framebufferDropList: RenderTargetNode[][] = [];
+
+  getFramebuffer(node: RenderTargetNode) {
+    return this.keptFramebuffer.get(node)
+  }
 
   render(engine: RenderEngine, graph: RenderGraph) {
     this.passes.forEach((pass, index) => {

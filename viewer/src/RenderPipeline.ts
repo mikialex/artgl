@@ -41,6 +41,15 @@ export class RenderPipeline{
     return this.tickNum % 2 === 0;
   }
 
+  getFramebufferByName(name: string) {
+    const node = this.graph.getRenderTargetDependence(name);
+    const fbo = this.composer.getFramebuffer(node);
+    if (fbo === undefined) {
+      console.warn(`fbo ${name} has been optimized, to make it available, set keep content always true in render target node config`)
+    }
+    return fbo;
+  }
+
   render(scene: Scene) {
     this.tickNum++;
 
