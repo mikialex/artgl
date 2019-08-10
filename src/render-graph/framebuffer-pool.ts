@@ -12,6 +12,12 @@ type FBOGeneratedName = string;
 export class FrameBufferPool {
   constructor(engine: RenderEngine) {
     this.engine = engine;
+
+    // when resize, clear all for convenience, TODO, optimize
+    // maybe we can mark fbo size dynamic, update(resize) dynamic first
+    this.engine.resizeObservable.add(() => {
+      this.clearAll();
+    })
   }
 
   private engine: RenderEngine;
@@ -20,8 +26,13 @@ export class FrameBufferPool {
 
   availableBuffers: Map<formatKey, GLFramebuffer> = new Map();
 
-  contentKeepBuffers: Set<GLFramebuffer> = new Set();
-
+  clearAll() {
+    this.framebuffers.forEach(buffer => {
+      this.engine.renderer.framebufferManager.deleteFramebuffer(buffer)
+    })
+    this.framebuffers.clear();
+    this.availableBuffers.clear();
+  }
 
   /**
    * get a GLFramebuffer from pool, if there is no fbo meet the config, create a new one, and pool it
@@ -29,11 +40,17 @@ export class FrameBufferPool {
   requestFramebuffer(node: RenderTargetNode) {
     const pooled = this.availableBuffers.get(node.formatKey);
     if (pooled !== undefined) {
+      this.availableBuffers.delete(pooled._formatKey);
       return pooled;
     }
+    
     const FBOName = generateUUID();
     const newFBO = this.engine.renderer.framebufferManager.createFrameBuffer(
-      this.engine, FBOName, width, height, needDepth);
+      this.engine, FBOName, node.widthAbs, node.heightAbs, node.enableDepth);
+    
+    this.framebuffers.set(FBOName, newFBO);
+    this.availableBuffers.set(newFBO._formatKey, newFBO);
+
     return newFBO;
   }
 
@@ -41,20 +58,11 @@ export class FrameBufferPool {
    * return a framebuffer that maybe request before, which will be pooling and reused 
    */
   returnFramebuffer(framebuffer: GLFramebuffer) {
-    if (needKeep) {
-      this.contentKeepBuffers.add(framebuffer)
-    } else {
-      this.availableBuffers.set(framebuffer._formatKey, framebuffer);
+    if (!this.framebuffers.has(framebuffer.name)) {
+      throw 'cant return a framebuffer not belong to this pool'
     }
+
+    this.availableBuffers.set(framebuffer._formatKey, framebuffer);
   }
-
-  /**
-    * notify this fbo is not need to be keep, if input fbo has pooled before
-    */
-  discardFramebuffer(node: RenderTargetNode) {
-    this.availableBuffers.delete(framebuffer._formatKey);
-
-  }
-
 
 }
