@@ -1,12 +1,10 @@
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { RenderEngine } from "../engine/render-engine";
-import { RenderGraph, RenderGraphNode } from "./render-graph";
-import { PassDefine, PassInputMapInfo } from "./interface";
-import { RenderTargetNode } from "./node/render-target-node";
+import { RenderGraph } from "./render-graph";
+import { PassDefine } from "./interface";
 import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
 import { Shading } from "../core/shading";
-import { FrameBufferPool } from "./framebuffer-pool";
 
 type uniformName = string;
 type framebufferName = string;
@@ -54,18 +52,19 @@ export class RenderPass{
 
   isOutputScreen: boolean = true;
 
-  renderDebugResult(engine: RenderEngine, graph: RenderGraph) {
+  renderDebugResult(engine: RenderEngine, graph: RenderGraph, framebuffer: GLFramebuffer) {
     const debugOutputViewport = graph.renderTargetNodes.get(this.outputFramebufferName).debugViewPort;
-    engine.renderFrameBuffer(this.outputTarget, debugOutputViewport)
+    engine.renderFrameBuffer(framebuffer, debugOutputViewport)
     // this will cause no use draw TODO optimize
     this.inputTarget.forEach((inputFramebufferName, _uniformName) => {
-      const framebuffer = engine.renderer.framebufferManager.getFramebuffer(inputFramebufferName);
+      // this will break TODO
+      const framebuffer = engine.renderer.framebuffe rManager.getFramebuffer(inputFramebufferName);
       const debugInputViewport = graph.renderTargetNodes.get(framebuffer.name).debugViewPort;
       engine.renderFrameBuffer(framebuffer, debugInputViewport)
     })
   } 
 
-  execute(engine: RenderEngine, graph: RenderGraph, framebufferPool: FrameBufferPool) {
+  execute(engine: RenderEngine, graph: RenderGraph, framebuffer: GLFramebuffer) {
 
     this.checkIsValid();
     let outputTarget: GLFramebuffer;
@@ -84,7 +83,7 @@ export class RenderPass{
         engine.renderer.state.setFullScreenViewPort();
       }
     } else {
-      outputTarget = framebufferPool.requestFramebuffer()
+      outputTarget = framebuffer;
       engine.renderer.setRenderTarget(outputTarget);
       engine.renderer.state.setViewport(0, 0, this.outputWidth, this.outputHeight);
     }
@@ -131,7 +130,7 @@ export class RenderPass{
 
 
     if (graph.enableDebuggingView && !this.isOutputScreen) {
-      this.renderDebugResult(engine, graph);
+      this.renderDebugResult(engine, graph, framebuffer);
     }
 
   }

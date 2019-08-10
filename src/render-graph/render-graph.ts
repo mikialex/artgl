@@ -3,48 +3,9 @@ import { PassGraphNode } from "./node/pass-graph-node";
 import { RenderTargetNode } from "./node/render-target-node";
 import { RenderEngine } from "../engine/render-engine";
 import { QuadSource } from './quad-source';
-import { RenderPass } from "./pass";
-import { FrameBufferPool } from "./framebuffer-pool";
-
+import { EffectComposer } from "./effect-composer";
 
 export type RenderGraphNode = PassGraphNode | RenderTargetNode;
-
-export class EffectComposer {
-
-  private passes: RenderPass[] = [];
-  private nodeMap: Map<PassGraphNode, RenderPass> = new Map();
-
-  render(engine: RenderEngine, graph: RenderGraph) {
-    this.passes.forEach(pass => {
-      pass.execute(engine, graph);
-    });
-  }
-
-  reset() {
-    this.passes = [];
-  }
-
-  addPass(pass: RenderPass) {
-    this.passes.push(pass);
-  }
-
-  registerNode(node: PassGraphNode, define: PassDefine ) {
-    const pass = new RenderPass(define)
-    this.nodeMap.set(node, pass);
-  }
-
-  clear() {
-    this.passes = [];
-    this.nodeMap.clear();
-  }
-
-  getPass(node: PassGraphNode): RenderPass {
-    return this.nodeMap.get(node);
-  }
-
-}
-
-
 
 export class RenderGraph {
 
@@ -85,7 +46,7 @@ export class RenderGraph {
   /**
    * Update the pass queue from current graph configure
    */
-  update(engine: RenderEngine, composer: EffectComposer, framebufferPool: FrameBufferPool) {
+  update(engine: RenderEngine, composer: EffectComposer) {
     
     //updateNodesConnection
     this.passNodes.forEach(node => {
@@ -95,7 +56,7 @@ export class RenderGraph {
       node.updateDependNode(this);
     });
 
-    // update pass queue
+    // create and update pass queue
     const nodeQueue = this.screenNode.generateDependencyOrderList() as RenderGraphNode[];
     composer.reset();
     nodeQueue.forEach(node => {

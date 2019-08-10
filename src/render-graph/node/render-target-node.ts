@@ -80,11 +80,6 @@ export class RenderTargetNode extends DAGNode{
     return this._fromPassNode
   }
 
-  getOrCreateFrameBuffer(framebufferPool: FrameBufferPool): GLFramebuffer {
-    return framebufferPool.requestFramebuffer(
-      this.formatKey, this.widthAbs, this.heightAbs, this.enableDepth);
-  }
-
   private updateFormatKey() {
     this.formatKey = GLFramebuffer.buildFBOFormatKey(
       this.widthAbs, this.heightAbs, this.enableDepth
