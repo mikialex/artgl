@@ -1,6 +1,5 @@
 import { GLFramebuffer } from "./gl-framebuffer";
 import { GLRenderer } from "./gl-renderer";
-import { GLReleasable } from '../type';
 import { RenderEngine } from "../engine/render-engine";
 
 export class GLFrameBufferManager {

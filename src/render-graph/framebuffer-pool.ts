@@ -22,7 +22,7 @@ export class FrameBufferPool {
 
   private engine: RenderEngine;
 
-  framebuffers: Map<FBOGeneratedName, GLFramebuffer>
+  framebuffers: Map<FBOGeneratedName, GLFramebuffer> = new Map();
 
   availableBuffers: Map<formatKey, GLFramebuffer> = new Map();
 

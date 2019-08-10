@@ -7,7 +7,6 @@ import { RenderEngine } from "../../engine/render-engine";
 import { Nullable } from "../../type";
 import { Vector4 } from '../../math/vector4';
 import { PixelFormat } from "../../webgl/const";
-import { FrameBufferPool } from "../framebuffer-pool";
 import { RenderPass } from "../pass";
 import { PassGraphNode } from "./pass-graph-node";
 

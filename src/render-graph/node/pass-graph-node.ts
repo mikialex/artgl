@@ -13,10 +13,13 @@ export class PassGraphNode extends DAGNode {
       this.inputsGetter = define.inputs;
     }
 
+    this.define = define;
+
   }
   private inputsGetter: Nullable<() => PassInputMapInfo> = null
   inputs: PassInputMapInfo = {}
   readonly name: string;
+  readonly define: PassDefine;
 
   // update graph structure
   updateDependNode(graph: RenderGraph) {

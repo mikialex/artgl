@@ -37,10 +37,10 @@ export class RenderGraph {
   /**
    * Setup a new Graph configuration
    */
-  defineGraph(composer: EffectComposer, graphDefine: GraphDefine): void {
+  defineGraph(graphDefine: GraphDefine): void {
     this.reset();
     this.allocateRenderTargetNodes(graphDefine.renderTargets);
-    this.constructPassGraph(graphDefine.passes, composer);
+    this.constructPassGraph(graphDefine.passes);
   }
 
   /**
@@ -61,23 +61,24 @@ export class RenderGraph {
     const passes = [];
     nodeQueue.forEach(node => {
       if (node instanceof PassGraphNode) {
-        const pass = composer.getPass(node);
+        const pass = composer.registerNode(node);
         node.updatePass(pass);
         passes.push(pass);
       } else if (node instanceof RenderTargetNode) {
-        const pass = composer.getPass(node.fromPassNode);
-        node.updatePass(engine, pass)
+        if (node.fromPassNode !== null) {
+          const pass = composer.getPass(node.fromPassNode);
+          node.updatePass(engine, pass)
+        }
       }
     })
     composer.setPasses(passes)
   }
 
-  private constructPassGraph(passesDefine: PassDefine[], composer: EffectComposer) {
+  private constructPassGraph(passesDefine: PassDefine[]) {
     passesDefine.forEach(define => {
       if (!this.passNodes.has(define.name)) {
         const node = new PassGraphNode(define);
         this.passNodes.set(define.name, node);
-        composer.registerNode(node, define);
       } else {
         throw 'duplicate pass define found'
       }

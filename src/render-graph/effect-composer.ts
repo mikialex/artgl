@@ -1,9 +1,9 @@
 import { RenderEngine, PassGraphNode, RenderGraph } from "../artgl";
 import { FrameBufferPool } from "./framebuffer-pool";
 import { RenderPass } from "./pass";
-import { PassDefine } from "./interface";
 import { RenderTargetNode } from "./node/render-target-node";
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
+import { PassDefine } from "./interface";
 
 /**
  * Responsible for rendergraph execution and optimization
@@ -16,7 +16,7 @@ export class EffectComposer {
 
   private engine: RenderEngine;
   private passes: RenderPass[] = [];
-  
+
   private nodeMap: Map<PassGraphNode, RenderPass> = new Map();
   private framebufferPool: FrameBufferPool;
 
@@ -28,7 +28,7 @@ export class EffectComposer {
       let framebuffer: GLFramebuffer = this.keptFramebuffer.get(pass.outputTarget)
 
       if (framebuffer === undefined) {
-          framebuffer = this.framebufferPool.requestFramebuffer(pass.outputTarget)
+        framebuffer = this.framebufferPool.requestFramebuffer(pass.outputTarget)
       }
 
       pass.execute(engine, graph, framebuffer);
@@ -44,25 +44,40 @@ export class EffectComposer {
     this.passes = passes;
 
     // compute dropList
-    this.framebufferDropList = new Array(this.passes.length).fill([]);
+    this.framebufferDropList = [];
+    for (let i = 0; i < this.passes.length; i++) {
+      this.framebufferDropList.push([])
+    }
+
     passes.forEach((pass, index) => {
+      this.nodeMap.set(pass.passNode, pass);
+
       const targetCreated = pass.outputTarget;
+      if (targetCreated.isScreenNode) {
+        return;
+      }
+
       if (targetCreated.define.keepContent()) {
-        return 
+        return;
       }
       for (let i = passes.length - 1; i > index; i--) {
         const passMaybeUsed = passes[i];
         if (passMaybeUsed.framebuffersDepends.has(targetCreated.name)) {
           this.framebufferDropList[i].push(targetCreated)
+          return;
         }
       }
     })
 
   }
 
-  registerNode(node: PassGraphNode, define: PassDefine ) {
-    const pass = new RenderPass(define)
+  registerNode(node: PassGraphNode) {
+    if (this.nodeMap.has(node)) {
+      return this.nodeMap.get(node);
+    }
+    const pass = new RenderPass(node.define)
     this.nodeMap.set(node, pass);
+    return pass;
   }
 
   clear() {

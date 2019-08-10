@@ -62,7 +62,6 @@ export class RenderPipeline{
   build(scene: Scene) {
     this.config = createConf(this.engine, this);
     this.graph.defineGraph(
-      this.composer,
       {
       renderTargets: [
         {
