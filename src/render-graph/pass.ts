@@ -8,7 +8,7 @@ import { Shading } from "../core/shading";
 import { RenderTargetNode } from "./node/render-target-node";
 import { PassGraphNode } from "./node/pass-graph-node";
 
-type uniformName = string;
+export type uniformName = string;
 type framebufferName = string;
 
 export class RenderPass{
@@ -45,7 +45,8 @@ export class RenderPass{
   private overrideShading: Nullable<Shading> = null;
 
   uniformNameFBOMap: Map<uniformName, framebufferName> = new Map();
-  framebuffersDepends: Set<framebufferName> = new Set();
+  uniformRenderTargetNodeMap: Map<uniformName, RenderTargetNode> = new Map();
+  framebuffersDepends: Set<RenderTargetNode> = new Set();
 
   passNode: PassGraphNode
   // outputInfos
@@ -56,15 +57,14 @@ export class RenderPass{
   }
 
   renderDebugResult(engine: RenderEngine, graph: RenderGraph, framebuffer: GLFramebuffer) {
-    // const debugOutputViewport = graph.renderTargetNodes.get(this.outputFramebufferName).debugViewPort;
-    // engine.renderFrameBuffer(framebuffer, debugOutputViewport)
-    // // this will cause no use draw TODO optimize
-    // this.inputTarget.forEach((inputFramebufferName, _uniformName) => {
-    //   // this will break TODO
-    //   const framebuffer = engine.renderer.framebuffe rManager.getFramebuffer(inputFramebufferName);
-    //   const debugInputViewport = graph.renderTargetNodes.get(framebuffer.name).debugViewPort;
-    //   engine.renderFrameBuffer(framebuffer, debugInputViewport)
-    // })
+    const debugOutputViewport = this.outputTarget.debugViewPort;
+    engine.renderFrameBuffer(framebuffer, debugOutputViewport)
+    // this will cause no use draw TODO optimize
+    this.uniformNameFBOMap.forEach((inputFramebufferName, uniformName) => {
+      const dependFramebuffer = engine.renderer.framebufferManager.getFramebuffer(inputFramebufferName);
+      const debugInputViewport = this.uniformRenderTargetNodeMap.get(uniformName).debugViewPort;
+      engine.renderFrameBuffer(dependFramebuffer, debugInputViewport)
+    })
   } 
 
   execute(engine: RenderEngine, graph: RenderGraph, framebuffer: GLFramebuffer) {

@@ -39,8 +39,7 @@ export class EffectComposer {
         framebuffer = this.framebufferPool.requestFramebuffer(output)
       }
 
-      pass.uniformNameFBOMap.forEach((targetName, uniformName) => {
-        const targetDepend = graph.getRenderTargetDependence(targetName);
+      pass.uniformRenderTargetNodeMap.forEach((targetDepend, uniformName) => {
         let inputFBO = this.keptFramebuffer.get(targetDepend);
 
         // if input not exist, its never initialized(empty fbo). created now!
@@ -87,7 +86,7 @@ export class EffectComposer {
       }
       for (let i = passes.length - 1; i > index; i--) {
         const passMaybeUsed = passes[i];
-        if (passMaybeUsed.framebuffersDepends.has(targetCreated.name)) {
+        if (passMaybeUsed.framebuffersDepends.has(targetCreated)) {
           this.framebufferDropList[i].push(targetCreated)
           return;
         }
