@@ -40,6 +40,10 @@ function loadGLAttachmentPoints(gl: WebGLRenderingContext) {
 export type FramebufferReadBufferType = Uint8Array | Uint16Array | Float32Array;
 
 export class GLFramebuffer {
+  static buildFBOFormatKey(width: number, height: number, needDepth: boolean) {
+    return `${width}-${height}-${needDepth}`
+  }
+
   constructor(renderer: GLRenderer, name: string, width: number, height: number) {
     this.name = name;
     this.renderer = renderer;
@@ -48,6 +52,7 @@ export class GLFramebuffer {
     this.webglFrameBuffer = this.createGLFramebuffer();
     this.width = width;
     this.height = height;
+    this.updateFormatKey();
   }
   name: string;
   gl: WebGLRenderingContext;
@@ -56,11 +61,19 @@ export class GLFramebuffer {
   width: number;
   height: number;
 
+  _formatKey: string;
+
   enableDepth: boolean = true;
   webglDepthBuffer: Nullable<WebGLRenderbuffer> = null;
   webglFrameBuffer: WebGLFramebuffer;
 
   textureAttachedSlot: FramebufferAttachTexture[] = [];
+
+  private updateFormatKey() {
+    this._formatKey = GLFramebuffer.buildFBOFormatKey(
+      this.width, this.height, this.enableDepth
+    );
+  }
 
   createGLFramebuffer() {
     const buffer = this.gl.createFramebuffer();
@@ -100,6 +113,7 @@ export class GLFramebuffer {
 
     this.disposeAttachedDepthBuffer();
     this.createAttachDepthBuffer();
+    this.updateFormatKey();
 
   }
 

@@ -35,12 +35,13 @@ export enum DimensionType {
 export interface RenderTargetDefine {
   name: string,
   from: () => Nullable<string>
+  keepContent?: () => boolean
   format?: {
-    pixelFormat: PixelFormat,
-    dimensionType: DimensionType,
+    pixelFormat?: PixelFormat,
+    dimensionType?: DimensionType,
     width?: number,
     height?: number,
-    disableDepthBuffer?: boolean
+    enableDepthBuffer?: boolean
   }
 }
 

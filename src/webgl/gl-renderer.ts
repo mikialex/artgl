@@ -45,7 +45,7 @@ export class GLRenderer implements GLReleasable {
   private angleInstanceExt: Nullable<ANGLE_instanced_arrays> = null;
 
   // enable this will cause great performance issue
-  // only enable this when debug draw range issue
+  // only enable this in develope 
   enableRenderErrorCatch: boolean = false;
   enableUniformDiff: boolean = true;
 
@@ -185,7 +185,7 @@ export class GLRenderer implements GLReleasable {
     this.attributeBufferManager.releaseGL();
     this.programManager.releaseGL();
     this.textureManger.releaseGL();
-    this.framebufferManager.releaseGL();
+    this.framebufferManager.dispose();
     this.vaoManager.releaseGL();
   }
 

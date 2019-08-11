@@ -1,11 +1,15 @@
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { RenderEngine } from "../engine/render-engine";
 import { RenderGraph } from "./render-graph";
-import { PassDefine, PassInputMapInfo } from "./interface";
-import { RenderTargetNode } from "./node/render-target-node";
+import { PassDefine } from "./interface";
 import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
 import { Shading } from "../core/shading";
+import { RenderTargetNode } from "./node/render-target-node";
+import { PassGraphNode } from "./node/pass-graph-node";
+
+export type uniformName = string;
+type framebufferName = string;
 
 export class RenderPass{
   constructor(define: PassDefine) {
@@ -28,14 +32,6 @@ export class RenderPass{
 
   }
 
-  updateInputTargets(inputs: PassInputMapInfo) {
-    this.inputTarget.clear();
-    Object.keys(inputs).forEach(inputKey => {
-      const mapTo = inputs[inputKey];
-      this.inputTarget.set(inputKey, mapTo)
-    })
-  }
-
   readonly define: PassDefine;
   public name: string;
 
@@ -48,34 +44,33 @@ export class RenderPass{
   
   private overrideShading: Nullable<Shading> = null;
 
-  // key: uniformName ;   value: inputFramebufferName
-  private inputTarget: Map<string, string> = new Map();
-  private outputTarget: GLFramebuffer
+  uniformNameFBOMap: Map<uniformName, framebufferName> = new Map();
+  uniformRenderTargetNodeMap: Map<uniformName, RenderTargetNode> = new Map();
+  framebuffersDepends: Set<RenderTargetNode> = new Set();
 
+  passNode: PassGraphNode
+  // outputInfos
+  outputTarget: RenderTargetNode
 
-  setOutPutTarget(engine: RenderEngine, renderTargetNode: RenderTargetNode) {
-    if (renderTargetNode.name === RenderGraph.screenRoot) {
-      this.outputTarget = undefined;
-      this.isOutputScreen = true;
-    } else {
-      this.outputTarget = renderTargetNode.getOrCreateFrameBuffer(engine);
-      this.isOutputScreen = false;
-    }
+  get isOutputScreen() {
+    return this.outputTarget.isScreenNode;
   }
-  private isOutputScreen: boolean = true;
 
-  renderDebugResult(engine: RenderEngine, graph: RenderGraph) {
-    const debugOutputViewport = graph.renderTargetNodes.get(this.outputTarget.name).debugViewPort;
-    engine.renderFrameBuffer(this.outputTarget, debugOutputViewport)
+  renderDebugResult(engine: RenderEngine, graph: RenderGraph, framebuffer: GLFramebuffer) {
+    const debugOutputViewport = this.outputTarget.debugViewPort;
+    engine.renderFrameBuffer(framebuffer, debugOutputViewport)
     // this will cause no use draw TODO optimize
-    this.inputTarget.forEach((inputFramebufferName, _uniformName) => {
-      const framebuffer = engine.renderer.framebufferManager.getFramebuffer(inputFramebufferName);
-      const debugInputViewport = graph.renderTargetNodes.get(framebuffer.name).debugViewPort;
-      engine.renderFrameBuffer(framebuffer, debugInputViewport)
+    this.uniformNameFBOMap.forEach((inputFramebufferName, uniformName) => {
+      const dependFramebuffer = engine.renderer.framebufferManager.getFramebuffer(inputFramebufferName);
+      const debugInputViewport = this.uniformRenderTargetNodeMap.get(uniformName).debugViewPort;
+      engine.renderFrameBuffer(dependFramebuffer, debugInputViewport)
     })
   } 
 
-  execute(engine: RenderEngine, graph: RenderGraph) {
+  execute(engine: RenderEngine, graph: RenderGraph, framebuffer: GLFramebuffer) {
+
+    this.checkIsValid();
+    let outputTarget: GLFramebuffer;
 
     // setup viewport and render target
     if (this.isOutputScreen) {
@@ -91,14 +86,15 @@ export class RenderPass{
         engine.renderer.state.setFullScreenViewPort();
       }
     } else {
-      engine.renderer.setRenderTarget(this.outputTarget);
-      engine.renderer.state.setViewport(0, 0, this.outputTarget.width, this.outputTarget.height);
+      outputTarget = framebuffer;
+      engine.renderer.setRenderTarget(outputTarget);
+      engine.renderer.state.setViewport(0, 0, this.outputTarget.widthAbs, this.outputTarget.heightAbs);
     }
-  
+    
     // input binding 
     if (this.overrideShading !== null) {
       engine.overrideShading = this.overrideShading;
-      this.inputTarget.forEach((inputFramebufferName, uniformName) => {
+      this.uniformNameFBOMap.forEach((inputFramebufferName, uniformName) => {
         (engine.overrideShading as Shading).getProgram(engine).defineFrameBufferTextureDep(
           inputFramebufferName, uniformName
         );
@@ -137,7 +133,7 @@ export class RenderPass{
 
 
     if (graph.enableDebuggingView && !this.isOutputScreen) {
-      this.renderDebugResult(engine, graph);
+      this.renderDebugResult(engine, graph, framebuffer);
     }
 
   }
@@ -147,7 +143,7 @@ export class RenderPass{
       return
     }
     const target = this.outputTarget.name;
-    this.inputTarget.forEach(input => {
+    this.uniformNameFBOMap.forEach(input => {
       if (input === target) {
         throw `you cant output to the render target which is depend on: 
 Duplicate target: ${this.outputTarget.name};`

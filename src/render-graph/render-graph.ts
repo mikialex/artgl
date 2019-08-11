@@ -3,47 +3,9 @@ import { PassGraphNode } from "./node/pass-graph-node";
 import { RenderTargetNode } from "./node/render-target-node";
 import { RenderEngine } from "../engine/render-engine";
 import { QuadSource } from './quad-source';
-import { RenderPass } from "./pass";
-
+import { EffectComposer } from "./effect-composer";
 
 export type RenderGraphNode = PassGraphNode | RenderTargetNode;
-
-export class EffectComposer {
-
-  private passes: RenderPass[] = [];
-  private nodeMap: Map<PassGraphNode, RenderPass> = new Map();
-
-  render(engine: RenderEngine, graph: RenderGraph) {
-    this.passes.forEach(pass => {
-      pass.execute(engine, graph);
-    });
-  }
-
-  reset() {
-    this.passes = [];
-  }
-
-  addPass(pass: RenderPass) {
-    this.passes.push(pass);
-  }
-
-  registerNode(node: PassGraphNode, define: PassDefine ) {
-    const pass = new RenderPass(define)
-    this.nodeMap.set(node, pass);
-  }
-
-  clear() {
-    this.passes = [];
-    this.nodeMap.clear();
-  }
-
-  getPass(node: PassGraphNode): RenderPass {
-    return this.nodeMap.get(node);
-  }
-
-}
-
-
 
 export class RenderGraph {
 
@@ -67,11 +29,6 @@ export class RenderGraph {
     return nodes;
   }
 
-  /**
-   * Clear the graph pass info as needed
-   *
-   * @memberof RenderGraph
-   */
   reset() {
     this.renderTargetNodes.clear();
     this.passNodes.clear();
@@ -79,20 +36,15 @@ export class RenderGraph {
 
   /**
    * Setup a new Graph configuration
-   *
-   * @param {GraphDefine} graphDefine
-   * @memberof RenderGraph
    */
-  defineGraph(composer: EffectComposer, graphDefine: GraphDefine): void {
+  defineGraph(graphDefine: GraphDefine): void {
     this.reset();
     this.allocateRenderTargetNodes(graphDefine.renderTargets);
-    this.constructPassGraph(graphDefine.passes, composer);
+    this.constructPassGraph(graphDefine.passes);
   }
 
   /**
    * Update the pass queue from current graph configure
-   *
-   * @memberof RenderGraph
    */
   update(engine: RenderEngine, composer: EffectComposer) {
     
@@ -104,32 +56,29 @@ export class RenderGraph {
       node.updateDependNode(this);
     });
 
-    // update pass queue
+    // create and update pass queue
     const nodeQueue = this.screenNode.generateDependencyOrderList() as RenderGraphNode[];
-    composer.reset();
-    nodeQueue.forEach(node => {
-      if (node instanceof RenderTargetNode) {
-        node.updateSize(engine);
-      }
-    })
+    const passes = [];
     nodeQueue.forEach(node => {
       if (node instanceof PassGraphNode) {
-        const pass = composer.getPass(node);
-        if (pass === undefined) {
-          throw "err" // TODO
+        const pass = composer.registerNode(node);
+        node.updatePass(pass);
+        passes.push(pass);
+      } else if (node instanceof RenderTargetNode) {
+        if (node.fromPassNode !== null) {
+          const pass = composer.getPass(node.fromPassNode);
+          node.updatePass(engine, pass)
         }
-        node.updatePass(engine, pass, nodeQueue);
-        composer.addPass(pass);
       }
     })
+    composer.setPasses(passes)
   }
 
-  private constructPassGraph(passesDefine: PassDefine[], composer: EffectComposer) {
+  private constructPassGraph(passesDefine: PassDefine[]) {
     passesDefine.forEach(define => {
       if (!this.passNodes.has(define.name)) {
-        const node = new PassGraphNode(this, define);
+        const node = new PassGraphNode(define);
         this.passNodes.set(define.name, node);
-        composer.registerNode(node, define);
       } else {
         throw 'duplicate pass define found'
       }

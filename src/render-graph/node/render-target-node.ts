@@ -7,6 +7,8 @@ import { RenderEngine } from "../../engine/render-engine";
 import { Nullable } from "../../type";
 import { Vector4 } from '../../math/vector4';
 import { PixelFormat } from "../../webgl/const";
+import { RenderPass } from "../pass";
+import { PassGraphNode } from "./pass-graph-node";
 
 export class RenderTargetNode extends DAGNode{
   constructor(define: RenderTargetDefine) {
@@ -21,11 +23,22 @@ export class RenderTargetNode extends DAGNode{
       return
     }
 
+    if (define.keepContent === undefined) {
+      define.keepContent = () => false;
+    }
+
     // set a default format config
     if (define.format === undefined) {
       define.format = {
         pixelFormat: PixelFormat.RGBA,
         dimensionType: DimensionType.bindRenderSize,
+      }
+    } else {
+      if (define.format.pixelFormat === undefined) {
+        define.format.pixelFormat = PixelFormat.RGBA;
+      }
+      if (define.format.dimensionType === undefined) {
+        define.format.dimensionType = DimensionType.bindRenderSize;
       }
     }
 
@@ -33,7 +46,7 @@ export class RenderTargetNode extends DAGNode{
       this.autoWidthRatio = define.format.width !== undefined ? MathUtil.clamp(define.format.width, 0, 1) : 1;
       this.autoHeightRatio = define.format.height !== undefined ? MathUtil.clamp(define.format.height, 0, 1) : 1;
     }
-    this.enableDepth = define.format.disableDepthBuffer !== undefined ? define.format.disableDepthBuffer : true;
+    this.enableDepth = define.format.enableDepthBuffer !== undefined ? define.format.enableDepthBuffer : false;
     
   }
   readonly isScreenNode: boolean;
@@ -44,24 +57,39 @@ export class RenderTargetNode extends DAGNode{
 
   autoWidthRatio: number = 0;
   autoHeightRatio: number = 0;
-  enableDepth: boolean = true;
+  enableDepth: boolean = false;
 
   widthAbs: number = 0;
   heightAbs: number = 0;
 
+  formatKey: string = "";
+
   private fromGetter: () => Nullable<string>
   private from: string = null;
 
-  getOrCreateFrameBuffer(engine: RenderEngine): GLFramebuffer {
-    const f = engine.renderer.framebufferManager.getFramebuffer(this.name);
-    if (f) {
-      return f
-    } else {
-      return engine.renderer.framebufferManager.createFrameBuffer(
-        engine, this.name, this.widthAbs, this.heightAbs, this.enableDepth);
+  private _fromPassNode: Nullable<PassGraphNode> = null
+
+  set fromPassNode(node: Nullable<PassGraphNode>) {
+    if (node === null) {
+      this._fromPassNode = node;
+      this.clearAllFrom();
+      return 
     }
+    this._fromPassNode = node;
+    node.connectTo(this);
   }
 
+  get fromPassNode() {
+    return this._fromPassNode
+  }
+
+  private updateFormatKey() {
+    this.formatKey = GLFramebuffer.buildFBOFormatKey(
+      this.widthAbs, this.heightAbs, this.enableDepth
+    );
+  }
+
+  // update abs size info from given engine render size
   updateSize(engine: RenderEngine) {
     if (this.isScreenNode) {
       return;
@@ -79,22 +107,26 @@ export class RenderTargetNode extends DAGNode{
     }
     this.widthAbs = Math.max(5, width);
     this.heightAbs = Math.max(5, height);
-    
-    this.getOrCreateFrameBuffer(engine).resize(engine, width, height);
+    this.updateFormatKey();
   }
 
+  // update graph structure
   updateDependNode(graph: RenderGraph) {
-    
     // disconnect depends pass node
-    this.clearAllFrom();
+    this.fromPassNode = null;
 
     this.from = this.fromGetter();
 
     if (this.from !== null) {
       const passNode = graph.getRenderPassDependence(this.from);
-      passNode.connectTo(this);
+      this.fromPassNode = passNode;
     }
-    
+  }
+
+  // from updated graph structure, setup render pass
+  updatePass(engine: RenderEngine, pass: RenderPass) {
+    this.updateSize(engine);
+    pass.outputTarget = this;
   }
 
 }

@@ -3,15 +3,20 @@ import {
   TSSAOShading, TSSAOBlendShading, Matrix4,
   InnerSupportUniform, DepthShading, Scene, RenderEngine, Shading
 } from "../../src/artgl";
-import { EffectComposer } from '../../src/render-graph/render-graph';
+import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
 import { createConf } from './conf';
 
 export class RenderPipeline{
-  config: RenderConfig
+  constructor(engine: RenderEngine) {
+    this.engine = engine;
+    this.composer = new EffectComposer(engine);
+  }
+  engine: RenderEngine;
+  config: RenderConfig;
 
   graph: RenderGraph = new RenderGraph();
-  composer: EffectComposer = new EffectComposer();
+  composer: EffectComposer;
 
   enableTAA = true;
   taaShading = new TAAShading()
@@ -36,28 +41,36 @@ export class RenderPipeline{
     return this.tickNum % 2 === 0;
   }
 
-  render(engine: RenderEngine, scene: Scene) {
+  getFramebufferByName(name: string) {
+    const node = this.graph.getRenderTargetDependence(name);
+    const fbo = this.composer.getFramebuffer(node);
+    if (fbo === undefined) {
+      console.warn(`fbo ${name} has been optimized, to make it available, set keep content always true in render target node config`)
+    }
+    return fbo;
+  }
+
+  render(scene: Scene) {
     this.tickNum++;
 
-    engine.connectCamera();
-    if (engine.isCameraChanged || scene.isFrameChange) {
+    this.engine.connectCamera();
+    if (this.engine.isCameraChanged || scene.isFrameChange) {
       this.sampleCount = 0;
     } else {
       if (this.enableTAA) {
-        engine.jitterProjectionMatrix();
+        this.engine.jitterProjectionMatrix();
       }
     }
 
     // if (this.sampleCount <= 100) {
-    this.graph.update(engine, this.composer);
-    this.composer.render(engine, this.graph);
+    this.graph.update(this.engine, this.composer);
+    this.composer.render(this.engine, this.graph);
     // }
   }
 
-  build(engine: RenderEngine, scene: Scene) {
-    this.config = createConf(engine, this);
+  build(scene: Scene) {
+    this.config = createConf(this.engine, this);
     this.graph.defineGraph(
-      this.composer,
       {
       renderTargets: [
         {
@@ -66,26 +79,36 @@ export class RenderPipeline{
         },
         {
           name: 'sceneResult',
+          format: {
+            enableDepthBuffer: true,
+          },
           from: () => 'SceneOrigin',
         },
         {
           name: 'depthResult',
+          format: {
+            enableDepthBuffer: true,
+          },
           from: () => 'Depth',
         },
         {
           name: 'TAAHistoryA',
+          keepContent: () => !this.isEvenTick,
           from: () => this.isEvenTick ? null : 'TAA',
         },
         {
           name: 'TAAHistoryB',
+          keepContent: () => this.isEvenTick,
           from: () => this.isEvenTick ? 'TAA' : null,
         },
         {
           name: 'TSSAOHistoryA',
+          keepContent: () => !this.isEvenTick,
           from: () => this.isEvenTick ? null : 'TSSAO',
         },
         {
           name: 'TSSAOHistoryB',
+          keepContent: () => this.isEvenTick,
           from: () => this.isEvenTick ? 'TSSAO' : null,
         },
       ],
@@ -112,8 +135,8 @@ export class RenderPipeline{
           source: [RenderGraph.quadSource],
           enableColorClear: false,
           beforePassExecute: () => {
-            engine.unJit();
-            const VP: Matrix4 = engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
+            this.engine.unJit();
+            const VP: Matrix4 = this.engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
             this.taaShading.VPMatrixInverse = this.taaShading.VPMatrixInverse.getInverse(VP, true); // TODO maybe add watch
             this.taaShading.sampleCount = this.sampleCount;
           },
@@ -130,7 +153,7 @@ export class RenderPipeline{
           source: [RenderGraph.quadSource],
           enableColorClear: false,
           beforePassExecute: () => {
-            const VP: Matrix4 = engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
+            const VP: Matrix4 = this.engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
             this.tssaoShading.VPMatrixInverse = this.tssaoShading.VPMatrixInverse.getInverse(VP, true);
             this.tssaoShading.sampleCount = this.sampleCount;
           },

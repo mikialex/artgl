@@ -23,8 +23,8 @@ export class Application {
   initialize(canvas: HTMLCanvasElement) {
     this.el = canvas;
     this.engine = new RenderEngine(canvas);
-    this.pipeline = new RenderPipeline();
-    this.pipeline.build(this.engine, this.scene);
+    this.pipeline = new RenderPipeline(this.engine);
+    this.pipeline.build(this.scene);
     this.engine.camera.transform.position.set(20, 10, 10)
     this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);
     this.orbitController.registerInteractor(this.engine.interactor);
@@ -66,7 +66,7 @@ export class Application {
     this.orbitController.update();
 
     this.engine.renderer.state.colorbuffer.setClearColor(this.backgroundColor);
-    this.pipeline.render(this.engine, this.scene);
+    this.pipeline.render(this.scene);
 
     this.afterRender.notifyObservers(this.engine);
     this.engine.renderer.stat.reset();
@@ -74,7 +74,9 @@ export class Application {
   }
 
   pickColor(x: number, y: number) {
-    const f = this.engine.renderer.framebufferManager.getFramebuffer("sceneResult");
+    const f = this.pipeline.getFramebufferByName("sceneResult");
+    return;
+    // TODO
     const result = new Uint8Array(10);
     f.readPixels(
       x * this.engine.renderer.width,

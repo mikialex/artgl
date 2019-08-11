@@ -1,13 +1,12 @@
 import { DAGNode } from "../../core/dag-node";
 import { PassDefine, PassInputMapInfo } from "../interface";
-import { RenderGraph, RenderGraphNode } from "../render-graph";
-import { RenderPass } from "../pass";
-import { RenderTargetNode } from './render-target-node';
+import { RenderGraph } from "../render-graph";
+import { RenderPass, uniformName } from "../pass";
 import { Nullable } from "../../type";
-import { RenderEngine } from "../../engine/render-engine";
+import { RenderTargetNode } from "../exports";
 
 export class PassGraphNode extends DAGNode {
-  constructor(graph: RenderGraph, define: PassDefine) {
+  constructor(define: PassDefine) {
     super();
     this.name = define.name;
 
@@ -15,54 +14,45 @@ export class PassGraphNode extends DAGNode {
       this.inputsGetter = define.inputs;
     }
 
+    this.define = define;
+
   }
   private inputsGetter: Nullable<() => PassInputMapInfo> = null
-  inputs: PassInputMapInfo = {}
+  inputs: Map<uniformName, RenderTargetNode> = new Map();
   readonly name: string;
+  readonly define: PassDefine;
 
+  // update graph structure
   updateDependNode(graph: RenderGraph) {
     // disconnect all depends node 
     this.clearAllFrom();
+    this.inputs.clear();
 
     // reval getter
     if (this.inputsGetter !== null) {
-      this.inputs = this.inputsGetter();
+      const inputs = this.inputsGetter();
+      Object.keys(inputs).forEach(key => {
+        const renderTargetNode = graph.getRenderTargetDependence(inputs[key]);
+        if (renderTargetNode === undefined) {
+          throw `render graph updating error, renderTarget depend node ${inputs[key]} cant found`;
+        }
+        this.inputs.set(key, renderTargetNode)
+        renderTargetNode.connectTo(this);
+      })
     }
-    const inputs = this.inputs;
-    // connect new depends node
-    Object.keys(inputs).forEach(inputUniformKey => {
-      const framebufferName = inputs[inputUniformKey]
-      const renderTargetNode = graph.getRenderTargetDependence(framebufferName);
-      if (renderTargetNode === undefined) {
-        throw `render graph updating error, renderTarget depend node ${framebufferName} cant found`;
-      }
-      renderTargetNode.connectTo(this);
-    })
+
   }
 
-  updatePass(engine: RenderEngine, pass: RenderPass, activeNodes: RenderGraphNode[]) {
-    pass.updateInputTargets(this.inputs);
-    let foundedNode = null;
-    if (this.toNodes.size === 0) {
-      throw "cant found render target node for a render pass"
-    }
-    this.toNodes.forEach(node => {
-      if (node instanceof RenderTargetNode) {
-        for (let i = 0; i < activeNodes.length; i++) {
-          if (activeNodes[i] === node) {
-            if (foundedNode !== null) {
-              throw `RenderGraph update error: one target node should only has one pass targeted;
-previous found target pass: ${foundedNode.name};
-new found target pass: ${activeNodes[i].name};
-              `
-            }
-            foundedNode = node
-            pass.setOutPutTarget(engine, node);
-          }
-        }
-      }
+  // from updated graph structure, setup render pass
+  updatePass(pass: RenderPass) {
+    pass.uniformNameFBOMap.clear();
+    pass.framebuffersDepends.clear();
+    pass.uniformRenderTargetNodeMap.clear();
+    this.inputs.forEach((targetNode, uniformName) => {
+      pass.uniformRenderTargetNodeMap.set(uniformName, targetNode)
+      pass.framebuffersDepends.add(targetNode)
     })
-    pass.checkIsValid();
+    pass.passNode = this;
   }
 
 }
