@@ -70,6 +70,11 @@ export const MathUtil = {
     return Math.pow(2, Math.round(Math.log(value) / Math.LN2));
   },
 
+
+  floorPowerOfTwo: function (value: number) {
+    return Math.pow(2, Math.floor(Math.log(value) / Math.LN2));
+  },
+
   nextPowerOfTwo: function (value: number) {
     value--;
     value |= value >> 1;

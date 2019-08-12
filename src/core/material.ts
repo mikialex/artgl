@@ -1,8 +1,8 @@
-import { Texture, DataTexture } from "./texture";
+import { Texture } from "./texture";
 import { generateUUID } from "../math/uuid";
 import { Vector3 } from "../math/index";
 
-export const enum ChannelType{
+export const enum ChannelType {
   diffuse = 'diffuse',
   roughness = 'roughness',
   metallic = 'metallic',
@@ -16,7 +16,7 @@ export const enum ChannelType{
  * @export
  * @class Material
  */
-export class Material{
+export class Material {
 
   uuid = generateUUID();
   private channels: Map<ChannelType, Texture> = new Map();
@@ -45,13 +45,14 @@ export class Material{
 }
 
 function generateTextureToPureColor(color: Vector3): Texture {
-  const texture = new DataTexture(); 
   const R = Math.floor(color.x * 256);
   const G = Math.floor(color.y * 256);
   const B = Math.floor(color.z * 256);
-  texture.data = new Uint8ClampedArray([
-    R, G, B, R, G, B, R, G, B, R, G, B, 
+  const A = 256;
+  const data = new Uint8ClampedArray([
+    R, G, B, A, R, G, B, A, R, G, B, A, R, G, B, A
   ]);
+  const texture = new Texture(data);
   return texture;
 }
 

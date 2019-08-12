@@ -11,7 +11,6 @@ import { Vector3, Matrix4 } from "../math";
 import { Vector4 } from "../math/vector4";
 import { CommonAttribute } from "../webgl/attribute";
 
-// TODO simplify it
 export function attribute(name: string, type: GLDataType) {
   return new ShaderAttributeInputNode({ name, type });
 }

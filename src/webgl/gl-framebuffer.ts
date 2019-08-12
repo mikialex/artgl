@@ -7,21 +7,20 @@ import { RenderEngine } from "../engine/render-engine";
 
 
 export class FramebufferAttachTexture extends Texture {
-  width: number = 5;
-  height: number = 5;
-
-  upload(engine: RenderEngine): WebGLTexture {
-    return engine.renderer.textureManger.createTextureForRenderTarget(this);
+  constructor() {
+    super(null)
   }
+
+  isDataTexture: true = true;
 
   attach(engine: RenderEngine, framebuffer: GLFramebuffer, attachPoint: number) {
     engine.renderer.setRenderTarget(framebuffer);
 
     const gl = framebuffer.gl;
-    this.width = framebuffer.width;
-    this.height = framebuffer.height;
+    this.setDataWidth(framebuffer.width);
+    this.setDataHeight(framebuffer.height);
     this.releaseGraphics(engine);
-    const glTexture = this.upload(engine);
+    const glTexture = engine.renderer.textureManger.createTextureForRenderTarget(this);
     const attachmentPoint = GLAttachmentPoints[attachPoint];
     gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, glTexture, 0);
   }

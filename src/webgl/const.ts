@@ -42,23 +42,6 @@ export const enum GLTextureTypeRaw {
   textureCubeMap = 0x8513,
 }
 
-
-export enum TextureFilter {
-  nearest = 0x2600,
-  linear = 0x2601,
-  NEAREST_MIPMAP_NEAREST = 0x2700,
-  LINEAR_MIPMAP_NEAREST = 0x2701,
-  NEAREST_MIPMAP_LINEAR = 0x2702,
-  LINEAR_MIPMAP_LINEAR = 0x2703
-}
-
-export enum TextureWrap {
-  repeat = 0x2901,
-  clampToEdge = 0x812F,
-  mirroredRepeat = 0x8370
-}
-
-
 export var FrontFaceDirectionCW = 0;
 export var FrontFaceDirectionCCW = 1;
 export var BasicShadowMap = 0;

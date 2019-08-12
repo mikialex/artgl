@@ -1,21 +1,21 @@
 import { GLRenderer } from "./gl-renderer";
-import { TextureFilter, TextureWrap } from "./const";
-import { Texture, HTMLImageTexture } from "../core/texture";
+import { Texture, TextureWrap, TextureFilter } from "../core/texture";
 import { GLReleasable } from '../type';
 import { FramebufferAttachTexture } from "./gl-framebuffer";
+import { GLTextureSlot } from "./states/gl-texture-slot";
 
 interface TextureDescriptor {
   minFilter: TextureFilter;
-  maxFilter: TextureFilter;
-  sWrap: TextureWrap;
-  tWrap: TextureWrap;
+  magFilter: TextureFilter;
+  wrapS: TextureWrap;
+  wrapT: TextureWrap;
 }
 
-const DefaultTextureDescriptor = {
+const DefaultTextureDescriptor: TextureDescriptor  = {
   minFilter: TextureFilter.nearest,
-  maxFilter: TextureFilter.nearest,
-  sWrap: TextureWrap.clampToEdge,
-  tWrap: TextureWrap.clampToEdge,
+  magFilter: TextureFilter.nearest,
+  wrapS: TextureWrap.clampToEdge,
+  wrapT: TextureWrap.clampToEdge,
 }
 
 const defaultRenderTargetTextureDescriptor = DefaultTextureDescriptor;
@@ -31,17 +31,15 @@ const defaultRenderTargetTextureDescriptor = DefaultTextureDescriptor;
 export class GLTextureManager implements GLReleasable{
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
+    this.slotManager = renderer.state.textureSlot;
     this.POTResizeCanvas = document.createElement('canvas')
-  }
-  readonly renderer: GLRenderer;
-  private textures: Map<Texture, WebGLTexture> = new Map();
-  private POTResizeCanvas: HTMLCanvasElement;
-  // private textures: Map<Texture, WebGLTextureWithVersionIDWrap> = new Map();
-
-  init() {
     const gl = this.renderer.gl;
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
   }
+  readonly renderer: GLRenderer;
+  private slotManager: GLTextureSlot;
+  private textures: Map<Texture, WebGLTexture> = new Map();
+  private POTResizeCanvas: HTMLCanvasElement;
 
   getGLTexture(texture: Texture) {
     return this.textures.get(texture);
@@ -53,21 +51,11 @@ export class GLTextureManager implements GLReleasable{
     this.textures.delete(texture);
   }
 
-  createTextureFromImageElement(texture: HTMLImageTexture) {
-    const gl = this.renderer.gl;
-    const glTexture = this.createWebGLTexture(DefaultTextureDescriptor);
-    gl.bindTexture(gl.TEXTURE_2D, glTexture);
-  
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
-    this.textures.set(texture, glTexture);
-    return glTexture;
-  }
-
   createTextureForRenderTarget(texture: FramebufferAttachTexture) {
     const gl = this.renderer.gl;
-    const glTexture = this.createWebGLTexture(defaultRenderTargetTextureDescriptor)
+    const glTexture = this.createEmptyWebGLTexture(defaultRenderTargetTextureDescriptor)
 
-    gl.bindTexture(gl.TEXTURE_2D, glTexture);
+    this.slotManager.bindTexture(gl.TEXTURE_2D, glTexture);
     const internalFormat = gl.RGBA;
     const border = 0;
     const format = gl.RGBA;
@@ -81,22 +69,45 @@ export class GLTextureManager implements GLReleasable{
 
     return glTexture;
   }
-  
-  private createWebGLTexture(config: TextureDescriptor): WebGLTexture {
+
+  private createEmptyWebGLTexture(description: TextureDescriptor): WebGLTexture {
     const gl = this.renderer.gl;
-    const texture = gl.createTexture();
-    if (texture === null) {
+    const glTexture = gl.createTexture();
+    if (glTexture === null) {
       throw 'webgl texture create fail';
     }
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, config.minFilter);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, config.maxFilter);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, config.sWrap);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, config.tWrap);
-    return texture;
+    this.slotManager.bindTexture(gl.TEXTURE_2D, glTexture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, description.minFilter);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, description.magFilter);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, description.wrapS);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, description.wrapT);
+    return glTexture
+  }
+  
+  createWebGLTexture(texture: Texture): WebGLTexture {
+    const gl = this.renderer.gl;
+    const glTexture = this.createEmptyWebGLTexture(texture);
+    if (texture.isDataTexture) { // which is a data texture
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+        texture.width, texture.height, 0,
+        gl.RGBA, gl.UNSIGNED_BYTE, texture.dataSource as ArrayBufferView);
+    } else {
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.dataSource as TexImageSource);
+    }
+
+    this.textures.set(texture, glTexture);
+    return glTexture;
   }
 
+  // getWebGLTexture(texture: Texture) {
+
+  //   let glTexture = this.textures.get(texture);
+  //   if (glTexture === undefined) {
+      
+  //   }
+  // }
+
   releaseGL() {
-    
+    // TODO
   }
 }

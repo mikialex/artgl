@@ -29,7 +29,7 @@ export class GLRenderer implements GLReleasable {
     this.framebufferManager = new GLFrameBufferManager(this);
     this.vaoManager = new GLVAOManager(this);
     this.state = new GLState(this);
-    this.textureManger.init();
+    this.textureManger = new GLTextureManager(this);
 
     const ext = this.glInfo.getExtension(GLExtList.ANGLE_instanced_arrays);
     if (ext !== undefined) {
@@ -78,7 +78,7 @@ export class GLRenderer implements GLReleasable {
 
   // resource managers
   readonly programManager = new GLProgramManager();
-  readonly textureManger = new GLTextureManager(this);
+  readonly textureManger: GLTextureManager;
   readonly attributeBufferManager = new GLAttributeBufferDataManager(this);
   readonly vaoManager: GLVAOManager;
   readonly framebufferManager: GLFrameBufferManager;
