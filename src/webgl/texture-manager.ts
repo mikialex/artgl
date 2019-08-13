@@ -90,9 +90,13 @@ export class GLTextureManager implements GLReleasable{
     if (texture.isDataTexture) { // which is a data texture
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
         texture.width, texture.height, 0,
-        gl.RGBA, gl.UNSIGNED_BYTE, texture.dataSource.source as ArrayBufferView);
+        gl.RGBA, gl.UNSIGNED_BYTE, texture.renderUsedDataSource.source as ArrayBufferView);
     } else {
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.dataSource.source as TexImageSource);
+      gl.texImage2D(
+        gl.TEXTURE_2D, 0,
+        gl.RGBA, gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        texture.renderUsedDataSource.source as TexImageSource);
     }
 
     this.textures.set(texture, glTexture);

@@ -1,5 +1,5 @@
 import { RenderEngine } from "../engine/render-engine";
-import { GraphicResourceReleasable } from "../type";
+import { GraphicResourceReleasable, Nullable } from "../type";
 
 export const enum PixelFormat {
   AlphaFormat = 1021,
@@ -69,7 +69,16 @@ export class Texture implements GraphicResourceReleasable {
 
   isDataTexture: boolean = false;
   private _dataSource: TextureSource;
-  get dataSource() { return this._dataSource }
+  private _POTResizedSource: Nullable<TextureSource>;
+  get rawDataSource() { return this._dataSource }
+  get potDataSource() { return this._POTResizedSource }
+  get renderUsedDataSource() {
+    if (this.potDataSource !== null) {
+      return  this._POTResizedSource
+    } else {
+      return this.rawDataSource
+    }
+  }
 
   _webGLMipMapInUsed: boolean = false;
   _mipmapArray: TextureSource[] = [];
@@ -103,11 +112,11 @@ export class Texture implements GraphicResourceReleasable {
   get minFilter() { return this._minFilter }
 
   get width() {
-    return this.dataSource.width
+    return this.renderUsedDataSource.width
   }
 
   get height() {
-    return this.dataSource.height
+    return this.renderUsedDataSource.height
   }
 
   getGLTexture(engine: RenderEngine): WebGLTexture {
