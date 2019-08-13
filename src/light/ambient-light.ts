@@ -17,9 +17,16 @@ const ambientLightShading = new ShaderFunction({
 
 export class AmbientLight extends Light<AmbientLight> {
 
-  produceLightFragEffect(_decorated: ShaderGraph) {
+  produceDefaultLightFragEffect(_decorated: ShaderGraph) {
     return ambientLightShading.make()
       .input("color", this.getPropertyUniform('color'))
+  }
+
+  produceLightFragDir(_graph: ShaderGraph): import("../artgl").ShaderNode {
+    throw new Error("Method not implemented.");
+  }
+  produceLightIntensity(_graph: ShaderGraph): import("../artgl").ShaderNode {
+    throw new Error("Method not implemented.");
   }
 
   @MapUniform("color")

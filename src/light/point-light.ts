@@ -24,13 +24,20 @@ const pointLightShading = new ShaderFunction({
 
 export class PointLight extends Light<PointLight> {
 
-  produceLightFragEffect(decorated: ShaderGraph) {
+  produceDefaultLightFragEffect(decorated: ShaderGraph) {
     return pointLightShading.make()
       .input("fragPosition", decorated.getVary(WorldPositionFragVary))
       .input("fragNormal", decorated.getVary(NormalFragVary))
       .input("lightPosition", this.getPropertyUniform('position'))
       .input("color", this.getPropertyUniform('color'))
       .input("radius", this.getPropertyUniform('radius'))
+  }
+
+  produceLightFragDir(_graph: ShaderGraph): import("../artgl").ShaderNode {
+    throw new Error("Method not implemented.");
+  }
+  produceLightIntensity(_graph: ShaderGraph): import("../artgl").ShaderNode {
+    throw new Error("Method not implemented.");
   }
 
   @MapUniform("u_pointLight_color")

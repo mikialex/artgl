@@ -8,7 +8,7 @@ import { Observable } from "./observable";
 
 // TODO I cant figure out right multi inheritance impl with strong type, code duplicate 
 
-export class Light<T> extends SceneNode
+export abstract class Light<T> extends SceneNode
   implements ShaderUniformProvider, ShaderUniformDecorator {
   constructor() {
     super();
@@ -26,7 +26,7 @@ export class Light<T> extends SceneNode
       .setFragmentRoot(
         collectLight.make()
           .input("base", decorated.getFragRoot())
-          .input("light", this.produceLightFragEffect(decorated))
+          .input("light", this.produceDefaultLightFragEffect(decorated))
       )
   }
 
@@ -34,9 +34,11 @@ export class Light<T> extends SceneNode
     return visitor(this);
   }
 
-  produceLightFragEffect(_graph: ShaderGraph): ShaderNode {
-    throw new Error("Method not implemented.");
-  }
+  abstract produceDefaultLightFragEffect(_graph: ShaderGraph): ShaderNode
+
+  abstract produceLightFragDir(_graph: ShaderGraph): ShaderNode 
+
+  abstract produceLightIntensity(_graph: ShaderGraph): ShaderNode 
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable()
 

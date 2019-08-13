@@ -23,12 +23,19 @@ const directionalLightShading = new ShaderFunction({
 
 export class DirectionalLight extends Light<DirectionalLight> {
 
-  produceLightFragEffect(decorated: ShaderGraph) {
+  produceDefaultLightFragEffect(decorated: ShaderGraph) {
     return directionalLightShading.make()
       .input("fragPosition", decorated.getVary(WorldPositionFragVary))
       .input("fragNormal", decorated.getVary(NormalFragVary))
       .input("lightDirection", this.getPropertyUniform('direction'))
       .input("color", this.getPropertyUniform('color'))
+  }
+
+  produceLightFragDir(_graph: ShaderGraph): import("../artgl").ShaderNode {
+    throw new Error("Method not implemented.");
+  }
+  produceLightIntensity(_graph: ShaderGraph): import("../artgl").ShaderNode {
+    throw new Error("Method not implemented.");
   }
 
   @MapUniform("u_directionalLight_color")
