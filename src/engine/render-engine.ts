@@ -269,7 +269,9 @@ export class RenderEngine implements GLReleasable{
     this.getGlobalUniform(InnerSupportUniform.MMatrix).setValue(object.worldMatrix);
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
 
-    shading._decorators.forEach(decorator => {
+    shading._decorators.forEach(defaultDecorator => {
+      const overrideDecorator = object.shadingParams.get(defaultDecorator)
+      const decorator = overrideDecorator === undefined ? defaultDecorator : overrideDecorator;
       decorator.foreachProvider(provider => {
         if (this.lastUploadedShaderUniformProvider.has(provider)
           && !provider.hasAnyUniformChanged

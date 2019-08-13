@@ -69,7 +69,7 @@ export class Texture implements GraphicResourceReleasable {
 
   isDataTexture: boolean = false;
   private _dataSource: TextureSource;
-  private _POTResizedSource: Nullable<TextureSource>;
+  private _POTResizedSource: Nullable<TextureSource> = null;
   get rawDataSource() { return this._dataSource }
   get potDataSource() { return this._POTResizedSource }
   get renderUsedDataSource() {

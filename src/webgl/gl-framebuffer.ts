@@ -1,14 +1,14 @@
 import { GLRenderer } from "./gl-renderer";
 import { Nullable } from "../type";
 import { PixelFormat } from "./const";
-import { Texture } from "../core/texture";
+import { Texture, TextureSource } from "../core/texture";
 import { RenderEngine } from "../engine/render-engine";
 
 
 
 export class FramebufferAttachTexture extends Texture {
   constructor() {
-    super(null)
+    super(TextureSource.forRenderTarget(1,1))
   }
 
   isDataTexture: true = true;

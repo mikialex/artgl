@@ -24,7 +24,7 @@ export class Material {
   setChannelColor(channel: ChannelType, color: Vector3) {
     let channelTexture = this.channels.get(channel);
     if (channelTexture === undefined) {
-      channelTexture = generateTextureToPureColor(color);
+      // channelTexture = generateTextureToPureColor(color);
     } else {
       updateTextureToPureColor(channelTexture, color);
     }
@@ -44,17 +44,17 @@ export class Material {
 
 }
 
-function generateTextureToPureColor(color: Vector3): Texture {
-  const R = Math.floor(color.x * 256);
-  const G = Math.floor(color.y * 256);
-  const B = Math.floor(color.z * 256);
-  const A = 256;
-  const data = new Uint8ClampedArray([
-    R, G, B, A, R, G, B, A, R, G, B, A, R, G, B, A
-  ]);
-  const texture = new Texture(data);
-  return texture;
-}
+// function generateTextureToPureColor(color: Vector3): Texture {
+//   const R = Math.floor(color.x * 256);
+//   const G = Math.floor(color.y * 256);
+//   const B = Math.floor(color.z * 256);
+//   const A = 256;
+//   const data = new Uint8ClampedArray([
+//     R, G, B, A, R, G, B, A, R, G, B, A, R, G, B, A
+//   ]);
+//   const texture = new Texture(data);
+//   return texture;
+// }
 
 function updateTextureToPureColor(texture: Texture, color: Vector3): Texture {
   return texture;
