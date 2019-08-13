@@ -30,7 +30,26 @@ export const enum TextureFilter {
   linear_mipmap_linear = 0x2703
 }
 
-export type WebGLTextureSource = TexImageSource | ArrayBufferView;
+export class TextureSource {
+  static fromImageElement(image: HTMLImageElement) {
+    const data = new TextureSource();
+    data.source = image;
+    data.width = image.width;
+    data.height = image.height;
+    return data;
+  }
+
+  static forRenderTarget(width: number, height: number) {
+    const data = new TextureSource();
+    data.source = null;
+    data.width = width;
+    data.height = height;
+    return data;
+  }
+  source: TexImageSource | ArrayBufferView = null
+  width: number;
+  height: number;
+}
 
 /**
  * texture container for bitmap render data
@@ -39,19 +58,21 @@ export type WebGLTextureSource = TexImageSource | ArrayBufferView;
  * @class Texture
  */
 export class Texture implements GraphicResourceReleasable {
-  constructor(dataSource: WebGLTextureSource) {
+  constructor(dataSource: TextureSource) {
     this._dataSource = dataSource;
   }
 
-  isDataTexture: boolean = false;
-
   private needUpdate: boolean = true;
+  setNeedUpdate() {
+    this.needUpdate = true;
+  }
 
-  private _dataSource: WebGLTextureSource;
+  isDataTexture: boolean = false;
+  private _dataSource: TextureSource;
   get dataSource() { return this._dataSource }
 
   _webGLMipMapInUsed: boolean = false;
-  _mipmapArray: WebGLTextureSource[] = [];
+  _mipmapArray: TextureSource[] = [];
 
   private _format: PixelFormat = PixelFormat.RGBAFormat
   get format() { return this._format }
@@ -81,34 +102,12 @@ export class Texture implements GraphicResourceReleasable {
   private _minFilter: TextureFilter = TextureFilter.nearest
   get minFilter() { return this._minFilter }
 
-  private _width: number = 0;
   get width() {
-    if (this.isDataTexture) {
-      return this._width;
-    } else {
-      return (this.dataSource as TexImageSource).width;
-    }
-  }
-  setDataWidth(width: number) {
-    this._width = width;
-    return this;
+    return this.dataSource.width
   }
 
-  private _height: number = 0;
   get height() {
-    if (this.isDataTexture) {
-      return this._height;
-    } else {
-      return (this.dataSource as TexImageSource).height;
-    }
-  }
-  setDataHeight(height: number) {
-    this._height = height;
-    return this;
-  }
-
-  setNeedUpdate() {
-    this.needUpdate = true;
+    return this.dataSource.height
   }
 
   getGLTexture(engine: RenderEngine): WebGLTexture {
@@ -154,7 +153,7 @@ export class Texture implements GraphicResourceReleasable {
     return this;
   }
 
-  useCustomMipMap(engine, sources: WebGLTextureSource[]) {
+  useCustomMipMap(engine, sources: TextureSource[]) {
     if (this.hasMipMapExist) {
       throw "this texture has mipmap upload, clear before use"
     }

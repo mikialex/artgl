@@ -17,7 +17,8 @@ export class FramebufferAttachTexture extends Texture {
     engine.renderer.setRenderTarget(framebuffer);
 
     const gl = framebuffer.gl;
-    this.setDataWidth(framebuffer.width).setDataHeight(framebuffer.height);
+    this.dataSource.width = framebuffer.width;
+    this.dataSource.height = framebuffer.height;
     this.releaseGraphics(engine);
     const glTexture = engine.renderer.textureManger.createTextureForRenderTarget(this);
     const attachmentPoint = GLAttachmentPoints[attachPoint];

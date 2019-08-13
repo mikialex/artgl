@@ -1,5 +1,5 @@
 import { GLRenderer } from "./gl-renderer";
-import { Texture, TextureWrap, TextureFilter, WebGLTextureSource } from "../core/texture";
+import { Texture, TextureWrap, TextureFilter, TextureSource } from "../core/texture";
 import { GLReleasable } from '../type';
 import { FramebufferAttachTexture } from "./gl-framebuffer";
 import { GLTextureSlot } from "./states/gl-texture-slot";
@@ -90,9 +90,9 @@ export class GLTextureManager implements GLReleasable{
     if (texture.isDataTexture) { // which is a data texture
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
         texture.width, texture.height, 0,
-        gl.RGBA, gl.UNSIGNED_BYTE, texture.dataSource as ArrayBufferView);
+        gl.RGBA, gl.UNSIGNED_BYTE, texture.dataSource.source as ArrayBufferView);
     } else {
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.dataSource as TexImageSource);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.dataSource.source as TexImageSource);
     }
 
     this.textures.set(texture, glTexture);
@@ -105,7 +105,7 @@ export class GLTextureManager implements GLReleasable{
     gl.generateMipmap(gl.TEXTURE_2D); 
   }
 
-  uploadCustomMipMap(glTexture: WebGLTexture, sources: WebGLTextureSource[]) {
+  uploadCustomMipMap(glTexture: WebGLTexture, sources: TextureSource[]) {
     // TODO
   }
 
