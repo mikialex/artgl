@@ -30,7 +30,7 @@ export const enum TextureFilter {
   linear_mipmap_linear = 0x2703
 }
 
-type WebGLTextureSource = TexImageSource | ArrayBufferView;
+export type WebGLTextureSource = TexImageSource | ArrayBufferView;
 
 /**
  * texture container for bitmap render data
@@ -50,8 +50,8 @@ export class Texture implements GraphicResourceReleasable {
   private _dataSource: WebGLTextureSource;
   get dataSource() { return this._dataSource }
 
-  private mipmapArray: WebGLTextureSource[] = [];
-  private useWebGLMipMap: boolean = true;
+  _webGLMipMapInUsed: boolean = false;
+  _mipmapArray: WebGLTextureSource[] = [];
 
   private _format: PixelFormat = PixelFormat.RGBAFormat
   get format() { return this._format }
@@ -91,6 +91,7 @@ export class Texture implements GraphicResourceReleasable {
   }
   setDataWidth(width: number) {
     this._width = width;
+    return this;
   }
 
   private _height: number = 0;
@@ -103,8 +104,8 @@ export class Texture implements GraphicResourceReleasable {
   }
   setDataHeight(height: number) {
     this._height = height;
+    return this;
   }
-
 
   setNeedUpdate() {
     this.needUpdate = true;
@@ -121,14 +122,44 @@ export class Texture implements GraphicResourceReleasable {
       this.needUpdate = false;
       return engine.renderer.textureManger.createWebGLTexture(this)
     }
+    return glTexture;
   }
 
   releaseGraphics(engine: RenderEngine) {
     engine.renderer.textureManger.deleteGLTexture(this);
   }
 
-  generateWebGLMipMap() {
-    // TODO
+  get hasMipMapExist() {
+    return this._mipmapArray.length > 0 || this._webGLMipMapInUsed;
+  }
+
+  clearMipMap(engine: RenderEngine) {
+    if (!this.hasMipMapExist) {
+      return;
+    }
+    // clear mipmap means we need recreate a new webgl texture
+    this.releaseGraphics(engine);
+    return this;
+  }
+
+  useWebGLMipMap(engine: RenderEngine) {
+    if (this._mipmapArray.length > 0) {
+      throw "this texture has custom mipmap upload, clear before use"
+    }
+    if (this._webGLMipMapInUsed) {
+      return this;
+    }
+    engine.renderer.textureManger.uploadWebGLMipMap(this.getGLTexture(engine));
+    this._webGLMipMapInUsed = true;
+    return this;
+  }
+
+  useCustomMipMap(engine, sources: WebGLTextureSource[]) {
+    if (this.hasMipMapExist) {
+      throw "this texture has mipmap upload, clear before use"
+    }
+    engine.renderer.textureManger.uploadWebGLMipMap();
+    sources.forEach(source => this._mipmapArray.push(source));
     return this;
   }
 

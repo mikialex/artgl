@@ -1,5 +1,5 @@
 import { GLRenderer } from "./gl-renderer";
-import { Texture, TextureWrap, TextureFilter } from "../core/texture";
+import { Texture, TextureWrap, TextureFilter, WebGLTextureSource } from "../core/texture";
 import { GLReleasable } from '../type';
 import { FramebufferAttachTexture } from "./gl-framebuffer";
 import { GLTextureSlot } from "./states/gl-texture-slot";
@@ -99,13 +99,15 @@ export class GLTextureManager implements GLReleasable{
     return glTexture;
   }
 
-  // getWebGLTexture(texture: Texture) {
+  uploadWebGLMipMap(glTexture: WebGLTexture) {
+    const gl = this.renderer.gl;
+    this.slotManager.bindTexture(gl.TEXTURE_2D, glTexture);
+    gl.generateMipmap(gl.TEXTURE_2D); 
+  }
 
-  //   let glTexture = this.textures.get(texture);
-  //   if (glTexture === undefined) {
-      
-  //   }
-  // }
+  uploadCustomMipMap(glTexture: WebGLTexture, sources: WebGLTextureSource[]) {
+    // TODO
+  }
 
   releaseGL() {
     // TODO
