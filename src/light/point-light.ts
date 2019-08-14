@@ -3,13 +3,14 @@ import { Light } from "../core/light";
 import { WorldPositionFragVary, NormalFragVary, ShaderGraph } from "../shader-graph/shader-graph";
 import { MapUniform } from "../core/shading";
 import { Vector3 } from "../math";
+import { ShaderNode } from '../shader-graph/shader-node';
+import { dir3D } from '../shader-graph/built-in/transform';
 
 const pointLightShading = new ShaderFunction({
   source:
     `
     vec4 pointLight(
       vec3 fragPosition,
-      vec3 fragNormal,
       vec3 lightPosition, 
       vec3 color,
       float radius ){
@@ -22,22 +23,28 @@ const pointLightShading = new ShaderFunction({
   `
 })
 
+
 export class PointLight extends Light<PointLight> {
 
   produceDefaultLightFragEffect(decorated: ShaderGraph) {
     return pointLightShading.make()
       .input("fragPosition", decorated.getVary(WorldPositionFragVary))
-      .input("fragNormal", decorated.getVary(NormalFragVary))
       .input("lightPosition", this.getPropertyUniform('position'))
       .input("color", this.getPropertyUniform('color'))
       .input("radius", this.getPropertyUniform('radius'))
   }
 
-  produceLightFragDir(_graph: ShaderGraph): import("../artgl").ShaderNode {
-    throw new Error("Method not implemented.");
+  produceLightFragDir(graph: ShaderGraph): ShaderNode {
+    return dir3D.make()
+      .input("from", this.getPropertyUniform('position'))
+      .input("to", graph.getVary(WorldPositionFragVary))
   }
-  produceLightIntensity(_graph: ShaderGraph): import("../artgl").ShaderNode {
-    throw new Error("Method not implemented.");
+  produceLightIntensity(graph: ShaderGraph): ShaderNode {
+    return pointLightShading.make()
+      .input("fragPosition", graph.getVary(WorldPositionFragVary))
+      .input("lightPosition", this.getPropertyUniform('position'))
+      .input("color", this.getPropertyUniform('color'))
+      .input("radius", this.getPropertyUniform('radius'))
   }
 
   @MapUniform("u_pointLight_color")

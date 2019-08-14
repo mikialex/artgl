@@ -48,13 +48,19 @@ export abstract class Light<T> extends SceneNode
 
   propertyUniformNameMap: Map<string, string>;
 
+  nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
   getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
+    if (this.nodeCreated.has(name as string)) {
+      return this.nodeCreated.get(name as string);
+    }
     const uniformName = this.propertyUniformNameMap.get(name as string);
     const value = this[name as string];
     if (value === undefined) {
       throw "uniform value not given"
     }
-    return uniformFromValue(uniformName, value);
+    const node = uniformFromValue(uniformName, value);
+    this.nodeCreated.set(name as string, node);
+    return node;
   }
 }
 

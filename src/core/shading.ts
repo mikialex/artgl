@@ -213,64 +213,19 @@ export abstract class BaseEffectShading<T>
   propertyUniformNameMap: Map<string, string>;
   uniforms: Map<string, any>;
 
+  nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
   getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
+    if (this.nodeCreated.has(name as string)) {
+      return this.nodeCreated.get(name as string);
+    }
     const uniformName = this.propertyUniformNameMap.get(name as string);
     const value = this[name as string];
     if (value === undefined) {
       throw "uniform value not given"
     }
-    return uniformFromValue(uniformName, value);
+    const node = uniformFromValue(uniformName, value);
+    this.nodeCreated.set(name as string, node);
+    return node;
   }
+
 }
-
-
-// type Constructor<T = SceneNode> = new (...args: any[]) => T;
-// type ConstructorTypeOf<T> = new (...args:any[]) => T;
-
-// export function ShaderUniformSceneNodeProvidable<T extends Constructor>(_target: T)
-//   : ConstructorTypeOf<SceneNode & BaseEffectShading<T>>
-// {
-//   return class <K> extends SceneNode implements ShaderUniformProvider{
-//     constructor() {
-//       super();
-//       // need check if has initialized by decorator
-//       if (this.uniforms === undefined) {
-//         this.uniforms = new Map();
-//       }
-//       if (this.propertyUniformNameMap === undefined) {
-//         this.propertyUniformNameMap = new Map();
-//       }
-//     }
-
-//     decorate(_graph: ShaderGraph): void {
-//       throw new Error("Method not implemented.");
-//     }
-
-//     hasAnyUniformChanged: boolean;
-
-//     propertyUniformNameMap: Map<string, string>;
-
-//     uniforms: Map<string, any>;
-
-//     getPropertyUniform(name: keyof K): ShaderCommonUniformInputNode {
-//       const uniformName = this.propertyUniformNameMap.get(name as string);
-//       const value = this[name as string];
-//       if (value === undefined) {
-//         throw "uniform value not given"
-//       }
-//       if (typeof value === "number") {
-//         return uniform(uniformName, GLDataType.float).default(value);
-//       } else if (value instanceof Vector2) {
-//         return uniform(uniformName, GLDataType.floatVec2).default(value);
-//       } else if (value instanceof Vector3) {
-//         return uniform(uniformName, GLDataType.floatVec3).default(value);
-//       } else if (value instanceof Vector4) {
-//         return uniform(uniformName, GLDataType.floatVec4).default(value);
-//       } else if (value instanceof Matrix4) {
-//         return uniform(uniformName, GLDataType.Mat4).default(value);
-//       } else {
-//         throw "un support uniform value"
-//       }
-//     }
-//   };
-// }

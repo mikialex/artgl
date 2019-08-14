@@ -3,7 +3,7 @@ import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 import { texture, innerUniform, screenQuad } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
-import { dir3D } from "../../shader-graph/built-in/transform";
+import { unitDir } from "../../shader-graph/built-in/transform";
 import { getWorldPosition, NDCxyToUV } from "../../shader-graph/built-in/transform";
 import { Matrix4 } from "../../math/index";
 import { rand2DT, rand } from "../../shader-graph/built-in/rand";
@@ -82,7 +82,7 @@ export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
     const Random2D2 = rand.make()
     .input("n", Random2D1)
     
-    const randDir = dir3D.make()
+    const randDir = unitDir.make()
       .input("x", Random2D1)
       .input("y", Random2D2)
 

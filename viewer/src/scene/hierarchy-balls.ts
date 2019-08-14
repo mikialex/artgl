@@ -1,6 +1,6 @@
 import {
   SphereGeometry, PlaneGeometry, AmbientLight, Mesh, SceneNode,
-  Shading, CubeGeometry, Vector3, DirectionalLight
+  Shading, CubeGeometry, Vector3, DirectionalLight, PhongShading
 } from '../../../src/artgl';
 import { PointLight } from '../../../src/light/point-light';
 import { ExposureController, ToneMapType } from '../../../src/shading/basic-lib/exposurer';
@@ -26,14 +26,15 @@ export default function (root: SceneNode, app: Application): RenderConfig {
 
   const exposureController = new ExposureController();
 
+  const phong = new PhongShading<PointLight>(pointLight);
+
   let shading = new Shading()
     // .decorate(new NormalShading())
-    .decorate(pointLight)
+    // .decorate(pointLight)
+    .decorate(phong)
     .decorate(ambient)
-    .decorate(dirLight)
+    // .decorate(dirLight)
     .decorate(exposureController)
-  
-  console.log(exposureController)
 
   shading.afterShaderCompiled.add((config) => {
     console.log(config);

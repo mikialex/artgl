@@ -297,24 +297,18 @@ export class RenderEngine implements GLReleasable{
 
       // acquire texture from material
       if (material !== undefined) {
-        if (tex.channel === undefined) {
-          throw 'use texture in material / use material to render should set texture uniform channel type'
-        }
-        const texture = material.getChannelTexture(tex.channel);
+        const texture = material.getChannelTexture(tex.name);
         glTexture = texture.getGLTexture(this);
       } 
 
       // acquire texture from framebuffer
       if (glTexture === undefined) {
         const framebufferName = program.framebufferTextureMap[tex.name];
-        if (framebufferName === undefined) {
-          throw  `cant find framebuffer for tex ${tex.name}, please define before use`
-        }
         glTexture = this.renderer.framebufferManager.getFramebufferTexture(framebufferName);
       }
 
       if (glTexture === undefined) {
-        throw 'texture bind failed'
+        throw `texture <${tex.name}>bind failed, for framebuffer texture, setup program.framebufferTextureMap`
       }
       
       tex.useTexture(glTexture);
