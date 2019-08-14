@@ -26,14 +26,6 @@ const pointLightShading = new ShaderFunction({
 
 export class PointLight extends Light<PointLight> {
 
-  produceDefaultLightFragEffect(decorated: ShaderGraph) {
-    return pointLightShading.make()
-      .input("fragPosition", decorated.getVary(WorldPositionFragVary))
-      .input("lightPosition", this.getPropertyUniform('position'))
-      .input("color", this.getPropertyUniform('color'))
-      .input("radius", this.getPropertyUniform('radius'))
-  }
-
   produceLightFragDir(graph: ShaderGraph): ShaderNode {
     return dir3D.make()
       .input("from", this.getPropertyUniform('position'))

@@ -141,7 +141,7 @@ export class ShaderConstNode extends ShaderNode {
       this.shaderString = `vec2(${svf(value.x)}, ${svf(value.y)})`;
     } else if (value instanceof Vector3) {
       super(GLDataType.floatVec3)
-      this.shaderString = `vec2(${svf(value.x)}, ${svf(value.y)}, ${svf(value.z)})`;
+      this.shaderString = `vec3(${svf(value.x)}, ${svf(value.y)}, ${svf(value.z)})`;
     } else if (value instanceof Vector4) {
       super(GLDataType.floatVec4)
       this.shaderString = `vec4(${svf(value.x)}, ${svf(value.y)}, ${svf(value.z)}, ${svf(value.w)})`;

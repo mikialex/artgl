@@ -26,15 +26,11 @@ export default function (root: SceneNode, app: Application): RenderConfig {
 
   const exposureController = new ExposureController();
 
-  const phongPoint = new PhongShading<PointLight>(pointLight);
-  const phongDir = new PhongShading<DirectionalLight>(dirLight);
+  const phong = new PhongShading<DirectionalLight | PointLight>([dirLight, pointLight]);
 
   let shading = new Shading()
-    // .decorate(new NormalShading())
-    .decorate(phongDir)
-    // .decorate(phongPoint)
+    .decorate(phong)
     .decorate(ambient)
-    // .decorate(dirLight)
     .decorate(exposureController)
 
   shading.afterShaderCompiled.add((config) => {
@@ -130,9 +126,9 @@ export default function (root: SceneNode, app: Application): RenderConfig {
     value: [
       {
         name: 'shininess',
-        value: phongDir.shininess,
+        value: phong.shininess,
         onChange: (value: number) => {
-          phongDir.shininess = value;
+          phong.shininess = value;
           app.pipeline.resetSample();
         },
         editors: [

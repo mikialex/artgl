@@ -1,10 +1,11 @@
 import { SceneNode } from "../scene/scene-node";
 import { ShaderGraph } from "../shader-graph/shader-graph";
-import { uniformFromValue } from "../shader-graph/node-maker";
+import { uniformFromValue, constValue } from "../shader-graph/node-maker";
 import { ShaderUniformProvider, ShaderUniformDecorator } from "./shading";
 import { ShaderCommonUniformInputNode, ShaderNode } from "../shader-graph/shader-node";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { Observable } from "./observable";
+import { Vector3 } from '../math';
 
 // TODO I cant figure out right multi inheritance impl with strong type, code duplicate 
 
@@ -26,15 +27,13 @@ export abstract class Light<T> extends SceneNode
       .setFragmentRoot(
         collectLight.make()
           .input("base", decorated.getFragRoot())
-          .input("light", this.produceDefaultLightFragEffect(decorated))
+          .input("light", this.produceLightIntensity(decorated))
       )
   }
 
   foreachProvider(visitor: (p: ShaderUniformProvider) => any) {
     return visitor(this);
   }
-
-  abstract produceDefaultLightFragEffect(_graph: ShaderGraph): ShaderNode
 
   abstract produceLightFragDir(_graph: ShaderGraph): ShaderNode 
 
@@ -66,10 +65,25 @@ export abstract class Light<T> extends SceneNode
 
 export const collectLight = new ShaderFunction({
   source: `
-  vec4 add(
-    vec4 base,
-    vec4 light){
+  vec3 add(
+    vec3 base,
+    vec3 light){
       return base + light;
   }
   `
 });
+
+export function collectLightNodes<T>(
+  lights: Light<T>[],
+  lightNodeMaker: (light: Light<T>) => ShaderNode) {
+  
+  let root: ShaderNode = constValue(new Vector3());
+  lights.forEach(light => {
+    const lightNode = lightNodeMaker(light);
+    root = collectLight.make()
+      .input("base", root)
+      .input("light", lightNode)
+  })
+
+  return root;
+}
