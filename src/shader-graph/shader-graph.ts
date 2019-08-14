@@ -9,6 +9,7 @@ import { attribute, constValue, MVPWorld } from "./node-maker";
 import { GLDataType } from "../webgl/shader-util";
 import { CommonAttribute } from "../webgl/attribute";
 import { Vector4 } from "../math";
+import { eyeDir } from "./built-in/transform";
 
 
 export const UvFragVary = "v_uv"
@@ -85,6 +86,16 @@ export class ShaderGraph {
       }
     }
     return new ShaderVaryInputNode(key, ret.type);
+  }
+
+  // TODO make it general
+  cachedInnerSupportEyeDir: ShaderNode
+  getEyeDir(): ShaderNode {
+    if (this.cachedInnerSupportEyeDir === undefined) {
+      this.cachedInnerSupportEyeDir = eyeDir.make().input(
+        "worldPosition", this.getVary(WorldPositionFragVary))
+    }
+    return this.cachedInnerSupportEyeDir
   }
 
   reset(): ShaderGraph {

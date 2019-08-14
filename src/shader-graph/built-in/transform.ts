@@ -1,5 +1,13 @@
 import { ShaderFunction } from "../shader-function";
 
+export const eyeDir = new ShaderFunction({
+  source: `
+  vec3 eyeDir ( vec4 worldPosition){
+    return normalize(worldPosition);
+  }
+  `
+})
+
 export const DivW = new ShaderFunction({
   source: `
     vec3 DivW ( vec4 position){
