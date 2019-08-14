@@ -9,16 +9,16 @@ import { dir3D } from '../shader-graph/built-in/transform';
 const pointLightShading = new ShaderFunction({
   source:
     `
-    vec4 pointLight(
+    vec3 pointLight(
       vec3 fragPosition,
       vec3 lightPosition, 
       vec3 color,
       float radius ){
         float distance = length(fragPosition - lightPosition);
         if( distance < radius){
-          return vec4(color * (1.0 - distance / radius), 0.0);
+          return color * (1.0 - distance / radius);
         }
-        return vec4(0.0);
+        return vec3(0.0);
     }
   `
 })

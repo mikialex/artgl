@@ -7,6 +7,7 @@ import { Observable, Observer } from "./observable";
 import { RenderEngine } from "../engine/render-engine";
 import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
 import { uniformFromValue } from '../shader-graph/node-maker';
+import { replaceFirst } from '../util/array';
 
 export interface ShaderUniformDecorator {
   /**
@@ -34,7 +35,6 @@ export interface ShaderUniformProvider {
   propertyUniformNameMap: Map<propertyName, uniformName>;
 }
 
-type decoratorRegisterName = string;
 export class Shading {
   uuid = generateUUID();
   graph: ShaderGraph = new ShaderGraph();
@@ -43,23 +43,23 @@ export class Shading {
   private _needRebuildShader: boolean = true;
 
   _decorators: ShaderUniformDecorator[] = [];
-  private _decoratorSlot: Map<decoratorRegisterName, ShaderUniformDecorator> = new Map();
+  private _decoratorSlot: Set<ShaderUniformDecorator> = new Set();
   private _decoratorObs: Map<ShaderUniformDecorator, Observer<ShaderUniformDecorator>> = new Map();
 
-  updateDecorator(decorator: ShaderUniformDecorator, slot: decoratorRegisterName) {
-    if (slot === undefined) {
-      slot = decorator.constructor.name
+  updateDecorator(oldDecorator: ShaderUniformDecorator, newDecorator: ShaderUniformDecorator) {
+    if (!this._decoratorSlot.has(oldDecorator)) {
+      throw  `decorator has not been decorate before`
     }
 
-    const previous = this._decoratorSlot.get(slot);
-    if (previous === undefined) {
-      throw `slot ${slot} has not been decorate before`
+    if (oldDecorator === newDecorator) {
+      return;
     }
-    if (decorator instanceof previous.constructor) {
-      this._decoratorSlot.set(slot, decorator);
-    } else {
-      throw `provider not the same type before`
-    }
+
+    this._decoratorSlot.delete(oldDecorator);
+    this._decoratorSlot.add(newDecorator);
+
+    replaceFirst(this._decorators, oldDecorator, newDecorator);
+    this._needRebuildShader = true;
   }
 
   reset() {
@@ -73,13 +73,9 @@ export class Shading {
     this._programConfigCache = null;
   }
 
-  decorate(decorator: ShaderUniformDecorator, decorateSlot?: string, ): Shading {
-    if (decorateSlot === undefined) {
-      decorateSlot = decorator.constructor.name
-    }
-
-    if (this._decoratorSlot.has(decorateSlot)) {
-      throw `slot ${decorateSlot} has been decorate before`
+  decorate(decorator: ShaderUniformDecorator): Shading {
+    if (this._decoratorSlot.has(decorator)) {
+      throw `this decorator has been decorate before`
     }
 
     const obs = decorator.notifyNeedRedecorate.add((_deco) => {
@@ -87,7 +83,7 @@ export class Shading {
     })
     this._decoratorObs.set(decorator, obs);
 
-    this._decoratorSlot.set(decorateSlot, decorator)
+    this._decoratorSlot.add(decorator)
     this._decorators.push(decorator);
     return this;
   }

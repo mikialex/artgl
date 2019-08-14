@@ -1,6 +1,6 @@
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { Light } from "../core/light";
-import { ShaderGraph } from "../artgl";
+import { ShaderGraph, ShaderNode } from "../artgl";
 import { WorldPositionFragVary, NormalFragVary } from "../shader-graph/shader-graph";
 import { MapUniform } from "../core/shading";
 import { Vector3 } from "../math";
@@ -31,11 +31,11 @@ export class DirectionalLight extends Light<DirectionalLight> {
       .input("color", this.getPropertyUniform('color'))
   }
 
-  produceLightFragDir(_graph: ShaderGraph): import("../artgl").ShaderNode {
-    throw new Error("Method not implemented.");
+  produceLightFragDir(graph: ShaderGraph): ShaderNode {
+    return this.getPropertyUniform("direction")
   }
-  produceLightIntensity(_graph: ShaderGraph): import("../artgl").ShaderNode {
-    throw new Error("Method not implemented.");
+  produceLightIntensity(_graph: ShaderGraph): ShaderNode {
+    return this.getPropertyUniform("color")
   }
 
   @MapUniform("u_directionalLight_color")

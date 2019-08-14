@@ -7,7 +7,7 @@ const phongShading = new ShaderFunction({
   source: `
   vec4 phongShading(
     vec3 lightDir,
-    vec4 lightIntensity,
+    vec3 lightIntensity,
     vec3 surfaceNormal,
     vec3 eyeDir,
     float shininess
