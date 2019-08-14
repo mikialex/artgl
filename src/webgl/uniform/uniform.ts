@@ -3,6 +3,7 @@ import { findUniformSetter, findUniformFlattener, findUniformDiffer, findUniform
 import { GLDataType } from "../shader-util";
 import { Matrix4 } from "../../math/matrix4";
 import { GLRenderer } from '../gl-renderer';
+import { Vector3 } from '../../math';
 
 export type uniformUploadType = number | Float32Array | number[]
 export type flattenerType= (value: any, receiveData: uniformUploadType) => uniformUploadType;
@@ -13,6 +14,7 @@ export type differType= (newValue: uniformUploadType, oldValue: uniformUploadTyp
 export const enum InnerSupportUniform{
   MMatrix,
   VPMatrix,
+  CameraWorldPosition,
   LastVPMatrix
 }
 
@@ -30,6 +32,9 @@ InnerUniformMap.set(InnerSupportUniform.VPMatrix, {
 })
 InnerUniformMap.set(InnerSupportUniform.LastVPMatrix, {
   name: 'LastVPMatrix', type: GLDataType.Mat4, default: new Matrix4()
+})
+InnerUniformMap.set(InnerSupportUniform.CameraWorldPosition, {
+  name: 'CameraWorldPosition', type: GLDataType.floatVec3, default: new Vector3()
 })
 
 

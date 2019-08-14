@@ -159,6 +159,10 @@ export class RenderEngine implements GLReleasable{
       this.camera.transform.matrix;
       this.camera.updateWorldMatrix(true);
       this.cameraMatrixReverse.getInverse(this.camera.worldMatrix, true);
+
+      // TODO this should cal world position
+      this.getGlobalUniform(InnerSupportUniform.CameraWorldPosition)
+        .setValue(this.camera.transform.position)
       needUpdateVP = true;
     }
 

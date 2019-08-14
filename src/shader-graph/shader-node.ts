@@ -59,7 +59,8 @@ export class ShaderFunctionNode extends ShaderNode {
       throw `this shader function node has not a input which key is ${key}`
     }
     if (dataType !== node.type) {
-      console.warn("node:", this);
+      console.warn(key)
+      console.warn("node:", this); 
       console.warn("inputNode:", node);
       throw "constructFragmentGraph failed: type mismatch"
     }

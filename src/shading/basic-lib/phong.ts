@@ -1,4 +1,4 @@
-import { BaseEffectShading, MapUniform } from "../../core/shading";
+import { BaseEffectShading, MapUniform, ShaderUniformProvider } from "../../core/shading";
 import { ShaderGraph, NormalFragVary } from "../../shader-graph/shader-graph";
 import { Light, collectLight } from "../../core/light";
 import { ShaderFunction } from "../../shader-graph/shader-function";
@@ -12,12 +12,11 @@ const phongShading = new ShaderFunction({
     vec3 eyeDir,
     float shininess
     ){
-      lightIntensity = vec4(1.0);
-      vec3 diffuseTerm = lightIntensity.xyz * max(dot(-lightDir,surfaceNormal), 0.0);
-      vec3 ReflectDir = normalize(-reflect(lightDir, surfaceNormal));  
+      float lightNormalDot = dot(-lightDir,surfaceNormal);
+      vec3 diffuseTerm = lightIntensity.xyz * max(lightNormalDot, 0.0);
+      vec3 ReflectDir = normalize(reflect(lightDir, surfaceNormal));  
       vec3 specularTerm = lightIntensity.xyz * pow(max(dot(ReflectDir,-eyeDir),0.0),0.3*shininess);
-      // return vec4(diffuseTerm + specularTerm, 1.0);
-      return vec4(specularTerm, 1.0);
+      return vec4(diffuseTerm + specularTerm, 1.0);
   }
   `
 })
@@ -44,9 +43,14 @@ export class PhongShading<T> extends BaseEffectShading<PhongShading<T>> {
       )
   }
 
+  foreachProvider(visitor: (p: ShaderUniformProvider) => any) {
+    visitor(this);
+    visitor(this.light);
+  }
+
   light: Light<T>
 
   @MapUniform("shininess")
-  shininess: number = 1;
+  shininess: number = 15;
 
 }

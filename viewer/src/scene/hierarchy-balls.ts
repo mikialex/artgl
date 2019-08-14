@@ -13,7 +13,7 @@ export default function (root: SceneNode, app: Application): RenderConfig {
   const cubeGeo = new CubeGeometry(5, 3, 4)
 
   const pointLight = new PointLight();
-  pointLight.position = new Vector3(0, 3, 0);
+  pointLight.position = new Vector3(-1, 3, 3);
   pointLight.color = new Vector3(0.9, 0.8, 0.5);
   pointLight.radius = 10;
 
@@ -74,7 +74,7 @@ export default function (root: SceneNode, app: Application): RenderConfig {
     }
   }
 
-  return {
+  const exposureConfig = {
     name: 'exposureControl',
     value: [
       {
@@ -121,6 +121,36 @@ export default function (root: SceneNode, app: Application): RenderConfig {
           app.pipeline.resetSample();
         },
       }
+    ]
+  }
+
+  const phongConfig = {
+    name: "phong",
+    value: [
+      {
+        name: 'shininess',
+        value: phong.shininess,
+        onChange: (value: number) => {
+          phong.shininess = value;
+          app.pipeline.resetSample();
+        },
+        editors: [
+          {
+            type: 'slider',
+            min: 0,
+            max: 100,
+            step: 1
+          },
+        ]
+      }
+    ]
+  }
+
+  return {
+    name: 'scene shading',
+    value: [
+      exposureConfig,
+      phongConfig
     ]
   }
 

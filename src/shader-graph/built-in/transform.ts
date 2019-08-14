@@ -2,8 +2,8 @@ import { ShaderFunction } from "../shader-function";
 
 export const eyeDir = new ShaderFunction({
   source: `
-  vec3 eyeDir (vec3 worldPosition){
-    return normalize(worldPosition);
+  vec3 eyeDir (vec3 worldPosition, vec3 cameraWorldPosition){
+    return normalize(worldPosition - cameraWorldPosition);
   }
   `
 })

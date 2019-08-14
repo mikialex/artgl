@@ -5,13 +5,14 @@ import {
   ShaderAttributeInputNode, ShaderInnerUniformInputNode,
   ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode,
 } from "./shader-node";
-import { attribute, constValue, MVPWorld, texture } from "./node-maker";
+import { attribute, constValue, MVPWorld, texture, innerUniform } from "./node-maker";
 import { GLDataType } from "../webgl/shader-util";
 import { CommonAttribute } from "../webgl/attribute";
 import { Vector4 } from "../math";
 import { eyeDir } from "./built-in/transform";
 import { ChannelType } from "../core/material";
 import { GLTextureType } from "../webgl/uniform/uniform-texture";
+import { InnerSupportUniform } from '../webgl/uniform/uniform';
 
 
 export const UvFragVary = "v_uv"
@@ -93,8 +94,9 @@ export class ShaderGraph {
   cachedInnerSupportEyeDir: ShaderNode
   getEyeDir(): ShaderNode {
     if (this.cachedInnerSupportEyeDir === undefined) {
-      this.cachedInnerSupportEyeDir = eyeDir.make().input(
-        "worldPosition", this.getVary(WorldPositionFragVary))
+      this.cachedInnerSupportEyeDir = eyeDir.make()
+        .input("worldPosition", this.getVary(WorldPositionFragVary))
+        .input("cameraWorldPosition", innerUniform(InnerSupportUniform.CameraWorldPosition))
     }
     return this.cachedInnerSupportEyeDir
   }
