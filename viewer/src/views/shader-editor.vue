@@ -7,7 +7,10 @@
         <button>attribute</button>
       </div>
       <div style="position: absolute; top:0px; width: 100%;height: 100%">
-        <LineHUDCanvas :lines="lines" :boardInfo="board" />
+        <LineHUDCanvas 
+        :nodes="nodes"
+        :nodesLayoutMap ="nodesLayoutMap"
+        :boardInfo="board" />
         <GraphView :board="board">
           <DAGNodeView
             v-for="nodeView in nodes"
@@ -16,8 +19,6 @@
             :layout="nodeView.layout"
             :boardInfo="board"
             @updateViewport="updateViewport(nodeView)"
-            @updateLine = "updateLine"
-            ref="vueNodes"
           >
             <ShaderFunctionNodeView
               v-if="isShaderFunctionNode(nodeView.node)"
@@ -46,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, ProvideReactive } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 import { ShaderApp } from "../shader-application";
 import {
   injectFragmentShaderHeaders,
@@ -68,7 +69,6 @@ import {
   GraphBoardInfo,
   NodeLayout,
   ViewNode,
-  ConnectionLine,
   layoutGraph
 } from "../model/graph-view";
 
@@ -92,8 +92,20 @@ export default class ShaderEditor extends Vue {
     transformY: 0
   };
 
-  @ProvideReactive() nodes: ViewNode[] = [];
-  @ProvideReactive() lines: ConnectionLine[] = [];
+  viewNodes: ViewNode[] = [];
+
+  get nodes(){
+    return this.viewNodes.map(vn => vn.node)
+  }
+
+  get nodesLayoutMap(){
+    const map = new Map();
+    this.viewNodes.forEach(vn=>{
+      map.set(vn.node, vn.layout)
+    })
+    return map;
+  }
+
 
   mounted() {
     const canvas = this.$el.querySelector("#shader-editor-canvas");
@@ -106,7 +118,7 @@ export default class ShaderEditor extends Vue {
     const tssaoShading = new TSSAOShading();
     const tssaoShader = new Shading().decorate(tssaoShading);
     tssaoShader.getProgramConfig();
-    this.nodes = tssaoShader.graph.nodes.map(node => {
+    this.viewNodes = tssaoShader.graph.nodes.map(node => {
       return {
         node,
         layout: {
@@ -124,7 +136,7 @@ export default class ShaderEditor extends Vue {
 
   layout(tssaoShader: Shading) {
     const map = {};
-    this.nodes.forEach(node => {
+    this.viewNodes.forEach(node => {
       map[node.node.uuid] = node.layout;
     });
     layoutGraph(tssaoShader.graph.fragmentRoot, map);
@@ -144,27 +156,8 @@ export default class ShaderEditor extends Vue {
     // this.codeGenResult = injectFragmentShaderHeaders(result, result.fragmentShaderString);
   }
 
-  updateLine(node: DAGNode){
-    console.log('l')
-    this.notifyNodeNeedUpdateLine(node)
-    node.toNodes.forEach(no =>{
-      this.notifyNodeNeedUpdateLine(no);
-    })
-  }
-
-  notifyNodeNeedUpdateLine(n: DAGNode){
-    if(this.$refs.vueNodes){
-      for (let i = 0; i < (this.$refs.vueNodes as Array<DAGNodeView>).length; i++) {
-        const v = this.$refs.vueNodes[i];
-        if(v.node === n){
-          v.updateLine();
-        }
-      }
-    }
-  }
-
   addUniform() {
-    this.nodes.push({
+    this.viewNodes.push({
       node: uniform("unnamed", GLDataType.float),
       layout: {
         absX: 0,

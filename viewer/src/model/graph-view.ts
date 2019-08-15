@@ -70,56 +70,47 @@ export function layoutGraph(
   })
 }
 
-
-export class ConnectionLine {
-  startX: number = 0;
-  startY: number = 0;
-  endX: number = 0;
-  endY: number = 0;
-
-  draw(hud: LinesHUD, boardInfo: GraphBoardInfo) {
-    const ctx = hud.ctx;
-    ctx.beginPath();
-    ctx.moveTo(this.startX + boardInfo.transformX, this.startY + boardInfo.transformY);
-    ctx.lineTo(this.endX + boardInfo.transformX, this.endY + boardInfo.transformY);
-    ctx.stroke();
-  }
-}
-
-export class LinesHUD {
-  constructor(el: HTMLCanvasElement) {
-    this.el = el;
-    this.ctx = el.getContext('2d');
-  }
+export class CanvasGraphUI{
   el: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
-  width: number = 0;
-  height: number = 0;
+  boardInfo: GraphBoardInfo;
+  width: number;
+  height: number;
+
+  constructor(el: HTMLCanvasElement, boardInfo: GraphBoardInfo) {
+    this.el = el;
+    this.ctx = el.getContext('2d');
+    this.boardInfo = boardInfo;
+  }
 
   clear() {
     this.ctx.clearRect(0, 0, this.width, this.height);
   }
-
-  draw(lines: ConnectionLine[], boardInfo: GraphBoardInfo) {
-    this.clear();
-    lines.forEach(line => line.draw(this, boardInfo));
-  }
-}
-
-export class CanvasGraphUI{
-  el: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D;
   
   drawConnectionLine(startX: number, startY: number, endX: number, endY: number) {
-    
+    const ctx = this.ctx;
+    ctx.beginPath();
+    ctx.moveTo(startX + this.boardInfo.transformX, startY + this.boardInfo.transformY);
+    ctx.lineTo(endX + this.boardInfo.transformX, endY + this.boardInfo.transformY);
+    ctx.stroke();
   }
 
-  drawViewNode(view: ViewNode) {
-    
+  drawViewNode(node: DAGNode, nodeLayoutMap: Map<DAGNode, NodeLayout>) {
+    const selfLayout = nodeLayoutMap.get(node);
+    node.fromNodes.forEach(n => {
+      const nodeLayout = nodeLayoutMap.get(n);
+      this.drawConnectionLine(
+        nodeLayout.absX, nodeLayout.absY,
+        selfLayout.absX, selfLayout.absY
+      );
+    })
   }
 
-  draw() {
-    
+  drawViewNodes(nodes: DAGNode[], nodeLayoutMap: Map<DAGNode, NodeLayout>) {
+    nodes.forEach(n => {
+      this.drawViewNode(n, nodeLayoutMap)
+    })
   }
+
 }
 

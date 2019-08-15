@@ -24,13 +24,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, InjectReactive } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 import { ShaderGraph, ShaderNode, DAGNode } from "../../../../src/artgl";
 import {
   NodeLayout,
   GraphBoardInfo,
   ViewNode,
-  ConnectionLine,
   getRightEnd
 } from "../../model/graph-view";
 import { findFirst } from "../../../../src/util/array";
@@ -39,9 +38,6 @@ import { findFirst } from "../../../../src/util/array";
   components: {}
 })
 export default class DAGNodeView extends Vue {
-  @InjectReactive() nodes: ViewNode[];
-  @InjectReactive() lines: ConnectionLine[];
-
   @Prop({
     required: true
   })
@@ -62,42 +58,6 @@ export default class DAGNodeView extends Vue {
     default: true
   })
   editable: boolean;
-
-  getNodesLayout(node: DAGNode) {
-    return findFirst(this.nodes, vn => {
-      return vn.node === node;
-    }).layout;
-  }
-
-  getLines(): ConnectionLine[] {
-    return this.inputs.map(inputNode => {
-      const rightCenter = getRightEnd(this.getNodesLayout(inputNode));
-      const line = new ConnectionLine();
-      line.startX = rightCenter.x;
-      line.startY = rightCenter.y;
-      line.endX = this.layout.absX;
-      line.endY = this.layout.absY;
-      return line;
-    });
-  }
-
-  selfLines: ConnectionLine[] = [];
-  updateLine() {
-    this.selfLines.forEach(line => {
-      const position = this.lines.indexOf(line);
-      if (position !== -1) {
-        this.lines.splice(position, 1);
-      }
-    });
-    this.selfLines = this.getLines();
-    this.selfLines.forEach(line => {
-      this.lines.push(line);
-    });
-  }
-
-  mounted() {
-    this.updateLine();
-  }
 
   get inputs(): DAGNode[] {
     const results = [];
