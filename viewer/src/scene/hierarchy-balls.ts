@@ -21,7 +21,7 @@ export default function (root: SceneNode, app: Application): RenderConfig {
   ambient.color = new Vector3(0.3, 0.3, 0.4);
 
   const dirLight = new DirectionalLight();
-  dirLight.color = new Vector3(0.3, 0.6, 0.4);
+  dirLight.color = new Vector3(0.3, 0.6, 0.8);
   dirLight.direction = new Vector3(1, 1, -1).normalize();
 
   const exposureController = new ExposureController();

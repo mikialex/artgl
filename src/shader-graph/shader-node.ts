@@ -11,12 +11,17 @@ import { Vector3 } from "../math/index";
 import { Vector4 } from "../math/vector4";
 import { GLTextureType } from "../webgl/uniform/uniform-texture";
 
+let shaderNodeGUIDCount = 0;
+
 export class ShaderNode extends DAGNode {
   constructor(
     public type: GLDataType
   ) {
     super();
+    this.guid = shaderNodeGUIDCount++;
   }
+
+  guid: number;
 
   swizzling(swizzleType: string) {
     return new ShaderSwizzleNode(this, swizzleType);
