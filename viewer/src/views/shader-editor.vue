@@ -143,7 +143,7 @@ export default class ShaderEditor extends Vue {
   }
 
   updateViewport(view: ViewNode) {
-    console.log("upd");
+    // console.log("upd");
   }
 
   isShaderFunctionNode(node) {

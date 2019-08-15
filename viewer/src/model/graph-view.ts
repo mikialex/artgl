@@ -1,4 +1,5 @@
 import { DAGNode } from '../../../src/core/dag-node';
+import { ShaderNode } from '../../../src/artgl';
 
 export interface GraphBoardInfo {
   width: number,
@@ -103,6 +104,7 @@ export class CanvasGraphUI{
   constructor(el: HTMLCanvasElement, boardInfo: GraphBoardInfo) {
     this.el = el;
     this.ctx = el.getContext('2d');
+    this.ctx.font = "16px Fira Code";
     this.boardInfo = boardInfo;
   }
 
@@ -113,12 +115,21 @@ export class CanvasGraphUI{
   drawConnectionLine(startX: number, startY: number, endX: number, endY: number) {
     const ctx = this.ctx;
     const xCenter = (startX + endX) / 2;
+    const xDiff = Math.abs(startX - endX);
     ctx.beginPath();
-    ctx.moveTo(startX, startY);
-    ctx.bezierCurveTo(
-      xCenter, startY,
-      xCenter, endY,
-      endX, endY);
+    if (endX >= startX) {
+      ctx.moveTo(startX, startY);
+      ctx.bezierCurveTo(
+        xCenter, startY,
+        xCenter, endY,
+        endX, endY);
+    } else {
+      ctx.moveTo(startX, startY);
+      ctx.bezierCurveTo(
+        startX + xDiff, startY,
+        endX - xDiff, endY,
+        endX, endY);
+    }
     ctx.stroke();
   }
 
@@ -131,11 +142,22 @@ export class CanvasGraphUI{
         selfLayout.absX, selfLayout.absY
       );
     })
+
+    const ctx = this.ctx;
+    if (node instanceof ShaderNode) {
+      ctx.save();
+      ctx.fillStyle = "#eee";
+      ctx.fillRect(selfLayout.absX, selfLayout.absY, 200, 100)
+      ctx.fillStyle = "#444";
+      ctx.fillText("Hello world =>", selfLayout.absX, selfLayout.absY);
+      ctx.restore();
+    }
   }
 
   drawViewNodes(nodes: DAGNode[], nodeLayoutMap: Map<DAGNode, NodeLayout>) {
-    this.ctx.strokeStyle = "#580"
-    this.ctx.save(); 
+    this.ctx.save();
+    this.ctx.strokeStyle = "#555"
+    this.ctx.lineWidth = 2;
     this.ctx.translate(this.boardInfo.transformX, this.boardInfo.transformY);
     nodes.forEach(n => {
       this.drawViewNode(n, nodeLayoutMap)
