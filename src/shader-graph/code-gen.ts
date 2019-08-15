@@ -205,9 +205,10 @@ function codeGenGraph(
   } {
   const builder = new CodeBuilder()
   builder.reset();
+
   const varList: varRecord[] = [];
   nodeDependList.forEach(nodeToGen => {
-    const varName = 'var' + nodeToGen.uuid.slice(0, 4);
+    const varName = 'var' + nodeToGen.guid;
     varList.push({
       refedNode: nodeToGen,
       varKey: varName,

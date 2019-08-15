@@ -63,7 +63,7 @@ export const ACESFilmicToneMapping = new ShaderFunction({
     `
     vec3 ACESFilmicToneMapping(vec3 intensity, float toneMappingExposure) {
       intensity *= toneMappingExposure;
-      return saturate( ( intensity * ( 2.51 * intensity + 0.03 ) ) / ( intensity * ( 2.43 * intensity + 0.59 ) + 0.14 ) );
+      return  ( intensity * ( 2.51 * intensity + 0.03 ) ) / ( intensity * ( 2.43 * intensity + 0.59 ) + 0.14 ) ;
     }
     `,
     description: `source: https://knarkowicz.wordpress.com/2016/01/06/aces-filmic-tone-mapping-curve/`,

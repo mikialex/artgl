@@ -7,6 +7,7 @@ import { Observable, Observer } from "./observable";
 import { RenderEngine } from "../engine/render-engine";
 import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
 import { uniformFromValue } from '../shader-graph/node-maker';
+import { replaceFirst } from '../util/array';
 
 export interface ShaderUniformDecorator {
   /**
@@ -34,7 +35,6 @@ export interface ShaderUniformProvider {
   propertyUniformNameMap: Map<propertyName, uniformName>;
 }
 
-type decoratorRegisterName = string;
 export class Shading {
   uuid = generateUUID();
   graph: ShaderGraph = new ShaderGraph();
@@ -43,23 +43,23 @@ export class Shading {
   private _needRebuildShader: boolean = true;
 
   _decorators: ShaderUniformDecorator[] = [];
-  private _decoratorSlot: Map<decoratorRegisterName, ShaderUniformDecorator> = new Map();
+  private _decoratorSlot: Set<ShaderUniformDecorator> = new Set();
   private _decoratorObs: Map<ShaderUniformDecorator, Observer<ShaderUniformDecorator>> = new Map();
 
-  updateDecorator(decorator: ShaderUniformDecorator, slot: decoratorRegisterName) {
-    if (slot === undefined) {
-      slot = decorator.constructor.name
+  updateDecorator(oldDecorator: ShaderUniformDecorator, newDecorator: ShaderUniformDecorator) {
+    if (!this._decoratorSlot.has(oldDecorator)) {
+      throw  `decorator has not been decorate before`
     }
 
-    const previous = this._decoratorSlot.get(slot);
-    if (previous === undefined) {
-      throw `slot ${slot} has not been decorate before`
+    if (oldDecorator === newDecorator) {
+      return;
     }
-    if (decorator instanceof previous.constructor) {
-      this._decoratorSlot.set(slot, decorator);
-    } else {
-      throw `provider not the same type before`
-    }
+
+    this._decoratorSlot.delete(oldDecorator);
+    this._decoratorSlot.add(newDecorator);
+
+    replaceFirst(this._decorators, oldDecorator, newDecorator);
+    this._needRebuildShader = true;
   }
 
   reset() {
@@ -73,13 +73,9 @@ export class Shading {
     this._programConfigCache = null;
   }
 
-  decorate(decorator: ShaderUniformDecorator, decorateSlot?: string, ): Shading {
-    if (decorateSlot === undefined) {
-      decorateSlot = decorator.constructor.name
-    }
-
-    if (this._decoratorSlot.has(decorateSlot)) {
-      throw `slot ${decorateSlot} has been decorate before`
+  decorate(decorator: ShaderUniformDecorator): Shading {
+    if (this._decoratorSlot.has(decorator)) {
+      throw `this decorator has been decorate before`
     }
 
     const obs = decorator.notifyNeedRedecorate.add((_deco) => {
@@ -87,7 +83,7 @@ export class Shading {
     })
     this._decoratorObs.set(decorator, obs);
 
-    this._decoratorSlot.set(decorateSlot, decorator)
+    this._decoratorSlot.add(decorator)
     this._decorators.push(decorator);
     return this;
   }
@@ -213,64 +209,19 @@ export abstract class BaseEffectShading<T>
   propertyUniformNameMap: Map<string, string>;
   uniforms: Map<string, any>;
 
+  nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
   getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
+    if (this.nodeCreated.has(name as string)) {
+      return this.nodeCreated.get(name as string);
+    }
     const uniformName = this.propertyUniformNameMap.get(name as string);
     const value = this[name as string];
     if (value === undefined) {
       throw "uniform value not given"
     }
-    return uniformFromValue(uniformName, value);
+    const node = uniformFromValue(uniformName, value);
+    this.nodeCreated.set(name as string, node);
+    return node;
   }
+
 }
-
-
-// type Constructor<T = SceneNode> = new (...args: any[]) => T;
-// type ConstructorTypeOf<T> = new (...args:any[]) => T;
-
-// export function ShaderUniformSceneNodeProvidable<T extends Constructor>(_target: T)
-//   : ConstructorTypeOf<SceneNode & BaseEffectShading<T>>
-// {
-//   return class <K> extends SceneNode implements ShaderUniformProvider{
-//     constructor() {
-//       super();
-//       // need check if has initialized by decorator
-//       if (this.uniforms === undefined) {
-//         this.uniforms = new Map();
-//       }
-//       if (this.propertyUniformNameMap === undefined) {
-//         this.propertyUniformNameMap = new Map();
-//       }
-//     }
-
-//     decorate(_graph: ShaderGraph): void {
-//       throw new Error("Method not implemented.");
-//     }
-
-//     hasAnyUniformChanged: boolean;
-
-//     propertyUniformNameMap: Map<string, string>;
-
-//     uniforms: Map<string, any>;
-
-//     getPropertyUniform(name: keyof K): ShaderCommonUniformInputNode {
-//       const uniformName = this.propertyUniformNameMap.get(name as string);
-//       const value = this[name as string];
-//       if (value === undefined) {
-//         throw "uniform value not given"
-//       }
-//       if (typeof value === "number") {
-//         return uniform(uniformName, GLDataType.float).default(value);
-//       } else if (value instanceof Vector2) {
-//         return uniform(uniformName, GLDataType.floatVec2).default(value);
-//       } else if (value instanceof Vector3) {
-//         return uniform(uniformName, GLDataType.floatVec3).default(value);
-//       } else if (value instanceof Vector4) {
-//         return uniform(uniformName, GLDataType.floatVec4).default(value);
-//       } else if (value instanceof Matrix4) {
-//         return uniform(uniformName, GLDataType.Mat4).default(value);
-//       } else {
-//         throw "un support uniform value"
-//       }
-//     }
-//   };
-// }

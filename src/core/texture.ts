@@ -39,6 +39,14 @@ export class TextureSource {
     return data;
   }
 
+  static fromPixelDataUint8(buffer: Uint8ClampedArray, width: number, height: number) {
+    const data = new TextureSource();
+    data.source = buffer;
+    data.width = width;
+    data.height = height;
+    return data;
+  }
+
   static forRenderTarget(width: number, height: number) {
     const data = new TextureSource();
     data.source = null;
@@ -74,7 +82,7 @@ export class Texture implements GraphicResourceReleasable {
   get potDataSource() { return this._POTResizedSource }
   get renderUsedDataSource() {
     if (this.potDataSource !== null) {
-      return  this._POTResizedSource
+      return this._POTResizedSource
     } else {
       return this.rawDataSource
     }

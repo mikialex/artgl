@@ -11,12 +11,17 @@ import { Vector3 } from "../math/index";
 import { Vector4 } from "../math/vector4";
 import { GLTextureType } from "../webgl/uniform/uniform-texture";
 
+let shaderNodeGUIDCount = 0;
+
 export class ShaderNode extends DAGNode {
   constructor(
     public type: GLDataType
   ) {
     super();
+    this.guid = shaderNodeGUIDCount++;
   }
+
+  guid: number;
 
   swizzling(swizzleType: string) {
     return new ShaderSwizzleNode(this, swizzleType);
@@ -59,7 +64,8 @@ export class ShaderFunctionNode extends ShaderNode {
       throw `this shader function node has not a input which key is ${key}`
     }
     if (dataType !== node.type) {
-      console.warn("node:", this);
+      console.warn(key)
+      console.warn("node:", this); 
       console.warn("inputNode:", node);
       throw "constructFragmentGraph failed: type mismatch"
     }
@@ -140,7 +146,7 @@ export class ShaderConstNode extends ShaderNode {
       this.shaderString = `vec2(${svf(value.x)}, ${svf(value.y)})`;
     } else if (value instanceof Vector3) {
       super(GLDataType.floatVec3)
-      this.shaderString = `vec2(${svf(value.x)}, ${svf(value.y)}, ${svf(value.z)})`;
+      this.shaderString = `vec3(${svf(value.x)}, ${svf(value.y)}, ${svf(value.z)})`;
     } else if (value instanceof Vector4) {
       super(GLDataType.floatVec4)
       this.shaderString = `vec4(${svf(value.x)}, ${svf(value.y)}, ${svf(value.z)}, ${svf(value.w)})`;
