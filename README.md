@@ -13,11 +13,11 @@ Instead of making a specific renderer for specific usage, or a general renderer 
 
 ### declarative render pipeline by renderGraph API
 
-Write a json like config for renderGraph, the rendergraph will handle all things about render procedure. Make multi pass rendering, add custom optimizer, tweaking effects, debug performance, more delightful than before.
+Write a json like config for renderGraph, the rendergraph will handle all things about render procedure. Auto support FBO reuse. Make multi pass rendering, add custom optimizer, tweaking effects, debug performance, more delightful than before.
 
 ### expressive shading abstraction by shaderGraph API
 
-We also use graph as the shader fragment linker. No more confusing #define #include. Make shader effect development productive. Provide good abstraction for shader and shader source.
+We also use graph as the shader fragment linker. Its a revolutionary improvement of composability in shader source and shader computation abstraction.  No more confusing #define #include. Make shader effect development productive and provide a sound abstraction in artgl  shading model.
 
 ### experimental WebAssembly accelerated scene render data computation 
 
@@ -25,7 +25,9 @@ Performance matters.
 
 ....
 
-## Sub projects
+## projects
+
+source: [https://github.com/mikialex/artgl](https://github.com/mikialex/artgl)
 
 This repo also contains sub projects: example/ and viewer/
 
@@ -38,6 +40,12 @@ This repo also contains sub projects: example/ and viewer/
 [viewer demo](https://mikialex.github.io/artgl/viewer/dist/#/)
 
 ## Posts(cn/zh)
+
+[https://mikialex.github.io/2019/08/11/fbo-reuse-in-rendergraph-artgl/](https://mikialex.github.io/2019/08/11/fbo-reuse-in-rendergraph-artgl/)
+
+[https://mikialex.github.io/2019/08/03/uniform-upload-design/](https://mikialex.github.io/2019/08/03/uniform-upload-design/)
+
+[https://mikialex.github.io/2019/07/16/graph-based-shadersource-management/](https://mikialex.github.io/2019/07/16/graph-based-shadersource-management/)
 
 [https://mikialex.github.io/2019/03/12/artgl-about/](https://mikialex.github.io/2019/03/12/artgl-about/)
 
@@ -55,92 +63,75 @@ Some old post maybe not meet the current design, just for reference;
 
 ### Shading API
 
-Decouple effect with another effect in shader, decorate shading with
-any other shading.
+Decorate shading with any other shading decorator. Provide uniform block with extendable shading provider.
 
 ```ts
+  ...
+  const pointLight = new PointLight();
+  pointLight.position = new Vector3(-1, 3, 3);
+  pointLight.color = new Vector3(0.9, 0.8, 0.5);
+  pointLight.radius = 10;
 
-const scene = new Scene();
-const light = new PointLight();
+  const ambient = new AmbientLight();
+  ambient.color = new Vector3(0.3, 0.3, 0.4);
 
-const shading = new Shading()
-  .decorate(new NormalShading())
-  .decorate(light);
+  const dirLight = new DirectionalLight();
+  dirLight.color = new Vector3(0.3, 0.6, 0.8);
+  dirLight.direction = new Vector3(1, 1, -1).normalize();
 
-scene.root.add(light)
+  const exposureController = new ExposureController();
 
-const mesh = new Mesh();
-mesh.geometry = new SphereGeometry();
-mesh.material = new Material();
-mesh.material.channel(Channel.Diffuse).load("../diff.png");
-mesh.shading = shading;
+  const phong = new PhongShading<DirectionalLight | PointLight>([dirLight, pointLight]);
 
-```
+  let shading = new Shading()
+    .decorate(phong)
+    .decorate(ambient)
+    .decorate(exposureController)
 
-### RenderGraph API
-
-```ts
-
-...
-const el = canvas;
-const engine = new RenderEngine(canvas);
-const graph = new RenderGraph(this.engine);
-
-// this may not a real example, just demo how it looks
-graph.setGraph({
-  renderTargets: [
-    {
-      name: RenderGraph.screenRoot,
-      from: () => 'CopyToScreen',
-    },
-    {
-      name: 'sceneResult',
-      from: () => 'SceneOrigin',
-    },
-    {
-      name: 'depthResult',
-      from: () => 'Depth',
-    },
-    ...
-  ],
-  passes: [
-    { // general scene origin
-      name: "SceneOrigin",
-      source: [this.scene],
-    },
-    { // depth
-      name: "Depth",
-      technique: depthTech,
-      source: [this.scene],
-    },
-    { // mix new results with old samples
-      name: "TAA",
-      inputs: () => {
-        return {
-          sceneResult: "sceneResult",
-          depthResult: "depthResult",
-          TAAHistoryOld: this.isEvenTick ? "TAAHistoryA" : "TAAHistoryB",
-        }
-      },
-      technique: TAATech,
-      source: [RenderGraph.quadSource],
-      enableColorClear: false,
-      beforePassExecute: () => {
-        this.engine.unJit();
-        const VPInv: Matrix4 = TAATech.uniforms.get('VPMatrixInverse').value;
-        const VP: Matrix4 = this.engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
-        VPInv.getInverse(VP, true);
-        TAATech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
-        TAATech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
-      },
-    }
-    ...
-  ]
-})
+  const planeMesh = new Mesh().g(planeGeo).s(shading)
+  root.addChild(planeMesh);
+  ...
 
 ```
 
 ### ShaderGraph API
+
+
+```ts
+export class PhongShading<T> extends BaseEffectShading<PhongShading<T>> {
+  constructor(lights: Array<Light<T>>) {
+    super();
+    this.lights = lights
+  }
+
+  decorate(graph: ShaderGraph): void {
+    graph.setFragmentRoot(
+      collectLightNodes<T>(this.lights,
+        (light) => {
+        return phongShading.make()
+        .input("lightDir", light.produceLightFragDir(graph))
+        .input("lightIntensity", light.produceLightIntensity(graph))
+        .input("surfaceNormal", graph.getVary(NormalFragVary))
+        .input("eyeDir", graph.getEyeDir())
+        .input("shininess", this.getPropertyUniform("shininess"))
+      })
+    )
+  }
+
+  foreachProvider(visitor: (p: ShaderUniformProvider) => any) {
+    visitor(this);
+    this.lights.forEach(light => {
+      visitor(light);
+    })
+  }
+
+  lights: Array<Light<T>>
+
+  @MapUniform("shininess")
+  shininess: number = 15;
+
+}
+```
 
 ```ts
 
@@ -217,4 +208,67 @@ export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
     )
   }
 }
+```
+
+### RenderGraph API
+
+```ts
+
+...
+const el = canvas;
+const engine = new RenderEngine(canvas);
+const graph = new RenderGraph(this.engine);
+
+// this may not a real example, just demo how it looks
+graph.setGraph({
+  renderTargets: [
+    {
+      name: RenderGraph.screenRoot,
+      from: () => 'CopyToScreen',
+    },
+    {
+      name: 'sceneResult',
+      from: () => 'SceneOrigin',
+    },
+    {
+      name: 'depthResult',
+      from: () => 'Depth',
+    },
+    ...
+  ],
+  passes: [
+    { // general scene origin
+      name: "SceneOrigin",
+      source: [this.scene],
+    },
+    { // depth
+      name: "Depth",
+      technique: depthTech,
+      source: [this.scene],
+    },
+    { // mix new results with old samples
+      name: "TAA",
+      inputs: () => {
+        return {
+          sceneResult: "sceneResult",
+          depthResult: "depthResult",
+          TAAHistoryOld: this.isEvenTick ? "TAAHistoryA" : "TAAHistoryB",
+        }
+      },
+      technique: TAATech,
+      source: [RenderGraph.quadSource],
+      enableColorClear: false,
+      beforePassExecute: () => {
+        this.engine.unJit();
+        const VPInv: Matrix4 = TAATech.uniforms.get('VPMatrixInverse').value;
+        const VP: Matrix4 = this.engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
+        VPInv.getInverse(VP, true);
+        TAATech.uniforms.get('VPMatrixInverse').setValueNeedUpdate();
+        TAATech.uniforms.get('u_sampleCount').setValue(this.sampleCount);
+      },
+    }
+    ...
+  ]
+})
+
 ```

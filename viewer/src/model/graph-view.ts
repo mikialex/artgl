@@ -105,3 +105,21 @@ export class LinesHUD {
     lines.forEach(line => line.draw(this, boardInfo));
   }
 }
+
+export class CanvasGraphUI{
+  el: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  
+  drawConnectionLine(startX: number, startY: number, endX: number, endY: number) {
+    
+  }
+
+  drawViewNode(view: ViewNode) {
+    
+  }
+
+  draw() {
+    
+  }
+}
+
