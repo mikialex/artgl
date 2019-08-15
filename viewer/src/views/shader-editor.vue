@@ -13,7 +13,7 @@
         :boardInfo="board" />
         <GraphView :board="board">
           <DAGNodeView
-            v-for="nodeView in nodes"
+            v-for="nodeView in viewNodes"
             :key="nodeView.node.uuid"
             :node="nodeView.node"
             :layout="nodeView.layout"

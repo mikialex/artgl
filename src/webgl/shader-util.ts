@@ -3,13 +3,7 @@ import { Matrix4, Vector3 } from "../math/index";
 import { Vector2 } from "../math/vector2";
 import { Vector4 } from "../math/vector4";
 
-export type GLData = number | Matrix4;
-
-export type float = number;
-// export type floatVec2 = Vector2;
-export type floatVec3 = Vector3;
-// export type floatVec4 = Vector4;
-export type int = number;
+export type GLData = number | Vector2 | Vector3 | Vector4 | Matrix4;
 
 export const enum GLDataType{
   float,

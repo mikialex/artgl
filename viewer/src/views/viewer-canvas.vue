@@ -37,8 +37,8 @@
       <button @click="screenshot" v-if="!isRunning" disabled>download screenshot</button>
       <button @click="inspectGraph" v-if="!showGraphViewer">inspectGraph</button>
       <button @click="closeGraphInspector" v-if="showGraphViewer">closeGraphViewer</button>
-      <button @click="toggleScenePanel">show scene panel</button>
-      <button @click="toggleConfigPanel">show config panel</button>
+      <button @click="toggleScenePanel">toggle scene panel</button>
+      <button @click="toggleConfigPanel">toggle config panel</button>
     </div>
   </div>
 </template>
@@ -83,17 +83,19 @@ export default class ViewerCanvas extends Vue {
   async toggleScenePanel(action?:boolean) {
     if(action !== undefined){
       this.$store.state.showScenePanel = action;
+    } else {
+      this.$store.state.showScenePanel = !this.$store.state.showScenePanel;
     }
-    this.$store.state.showScenePanel = !this.$store.state.showScenePanel;
     await this.$nextTick();
     GLApp.notifyResize();
   }
 
   async toggleConfigPanel(action?:boolean) {
     if(action !== undefined){
-      this.$store.state.showScenePanel = action;
+      this.$store.state.showConfigPanel = action;
+    } else{
+      this.$store.state.showConfigPanel = !this.$store.state.showConfigPanel;
     }
-    this.$store.state.showConfigPanel = !this.$store.state.showConfigPanel;
     await this.$nextTick();
     GLApp.notifyResize();
   }

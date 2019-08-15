@@ -97,6 +97,9 @@ export default function (root: SceneNode, app: Application): RenderConfig {
           exposureController.toneMappingWhitePoint = value;
           app.pipeline.resetSample();
         },
+        show: () => {
+          return exposureController.toneMapType===ToneMapType.Uncharted2ToneMapping
+        },
         editors: [
           {
             type: 'slider',
