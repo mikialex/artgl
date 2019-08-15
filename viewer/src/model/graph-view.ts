@@ -34,11 +34,13 @@ export function layoutGraph(
 ) {
 
   const horizonArray: Array<Array<DAGNode>> = [];
+  const positionMap: Map<DAGNode, number> = new Map();
   function removeItem(node: DAGNode) {
     horizonArray.forEach((row: DAGNode[]) => {
       const index = row.indexOf(node);
       if (index !== -1) {
         row.splice(index, 1)
+        positionMap.delete(node)
       }
     })
   }
@@ -50,12 +52,33 @@ export function layoutGraph(
     }
     removeItem(node);
     arr.push(node)
+    positionMap.set(node, horizonPosition)
 
     node.fromNodes.forEach(input => {
       addNode(input, horizonPosition + 1);
     })
   }
   addNode(rootNode, 0);
+
+  horizonArray.forEach(arr => {
+    arr.forEach(node => {
+      node.toNodes.forEach(n => {
+        const nPositon = positionMap.get(n);
+        const nodePosition = positionMap.get(node);
+        if (nodePosition <= nPositon) {
+          let arrToMove = horizonArray[nPositon + 1];
+          if (arrToMove === undefined) {
+            horizonArray[nPositon + 1] = [];
+            arr = horizonArray[nPositon + 1];
+          }
+          removeItem(node)
+          arrToMove.push(node)
+          positionMap.set(node, nPositon + 1)
+        }
+      })
+    })
+  })
+
   horizonArray.reverse().forEach((row, indexRow) => {
     row.forEach((item, indexY) => {
 
@@ -89,9 +112,13 @@ export class CanvasGraphUI{
   
   drawConnectionLine(startX: number, startY: number, endX: number, endY: number) {
     const ctx = this.ctx;
+    const xCenter = (startX + endX) / 2;
     ctx.beginPath();
-    ctx.moveTo(startX + this.boardInfo.transformX, startY + this.boardInfo.transformY);
-    ctx.lineTo(endX + this.boardInfo.transformX, endY + this.boardInfo.transformY);
+    ctx.moveTo(startX, startY);
+    ctx.bezierCurveTo(
+      xCenter, startY,
+      xCenter, endY,
+      endX, endY);
     ctx.stroke();
   }
 
@@ -100,16 +127,40 @@ export class CanvasGraphUI{
     node.fromNodes.forEach(n => {
       const nodeLayout = nodeLayoutMap.get(n);
       this.drawConnectionLine(
-        nodeLayout.absX, nodeLayout.absY,
+        nodeLayout.absX + 200, nodeLayout.absY,
         selfLayout.absX, selfLayout.absY
       );
     })
   }
 
   drawViewNodes(nodes: DAGNode[], nodeLayoutMap: Map<DAGNode, NodeLayout>) {
+    this.ctx.strokeStyle = "#580"
+    this.ctx.save(); 
+    this.ctx.translate(this.boardInfo.transformX, this.boardInfo.transformY);
     nodes.forEach(n => {
       this.drawViewNode(n, nodeLayoutMap)
     })
+    this.ctx.restore(); 
+  }
+
+  drawGrid() {
+    const ctx = this.ctx;
+    ctx.strokeStyle = "#ddd"
+    const gridGapSize = 50;
+
+    for (let i = 0; i < this.height; i += gridGapSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, i);
+      ctx.lineTo(this.width, i);
+      ctx.stroke();
+    }
+
+    for (let i = 0; i < this.width; i += gridGapSize) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, this.height);
+      ctx.stroke();
+    }
   }
 
 }

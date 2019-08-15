@@ -50,6 +50,7 @@ export default class LineHUDCanvas extends Vue {
   draw() {
     this.viewer.clear();
     this.viewer.drawViewNodes(this.nodes, this.nodesLayoutMap);
+    this.viewer.drawGrid();
     if (this.isRunning) {
       window.requestAnimationFrame(this.draw);
     }
