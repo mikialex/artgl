@@ -135,11 +135,14 @@ export class CanvasGraphUI{
 
   drawViewNode(node: DAGNode, nodeLayoutMap: Map<DAGNode, NodeLayout>) {
     const selfLayout = nodeLayoutMap.get(node);
-    node.fromNodes.forEach(n => {
+    const lineHeight = 20;
+    let index = 0;
+    node.fromNodes.forEach((n) => {
+      index++;
       const nodeLayout = nodeLayoutMap.get(n);
       this.drawConnectionLine(
-        nodeLayout.absX + 200, nodeLayout.absY,
-        selfLayout.absX, selfLayout.absY
+        nodeLayout.absX + 220, nodeLayout.absY + lineHeight / 2,
+        selfLayout.absX - 5, selfLayout.absY + lineHeight / 2 + index * lineHeight
       );
     })
 
@@ -187,3 +190,19 @@ export class CanvasGraphUI{
 
 }
 
+class UIElement{
+  draw() {
+    
+  }
+
+  pointerIn() {
+    
+  }
+
+  event
+
+}
+
+class UICircle extends UIElement{
+
+}
