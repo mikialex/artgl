@@ -42,7 +42,13 @@ export default class LineHUDCanvas extends Vue {
   }
 
   zoom(e:MouseWheelEvent){
-    this.boardInfo.scale += e.deltaY / 300;
+    const absX = (e.offsetX - this.boardInfo.transformX) * this.boardInfo.scale
+    const absY = (e.offsetY - this.boardInfo.transformY) * this.boardInfo.scale
+    console.log(absX, absY)
+    const deltaScale = e.deltaY / 300;
+    this.boardInfo.scale += deltaScale;
+    // this.boardInfo.transformX += absX * deltaScale
+    // this.boardInfo.transformY += absY * deltaScale
   }
 
   updateSize() {
