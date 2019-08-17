@@ -1,7 +1,8 @@
 <template>
   <div class="graph-viewer" tabindex="-1">
-    <div :style="{
-          transform
+    <div style="transform-origin: top left;"
+    :style="{
+          transform,
         }">
       <slot></slot>
     </div>
@@ -23,7 +24,7 @@ export default class GraphViewer extends Vue {
   @Prop({ required: true }) board: GraphBoardInfo;
 
   get transform() {
-    return `translate(${this.board.transformX}px, ${this.board.transformY}px)`;
+    return `translate(${this.board.transformX}px, ${this.board.transformY}px) scale(${this.board.scale})`;
   }
 
   showMove = false;

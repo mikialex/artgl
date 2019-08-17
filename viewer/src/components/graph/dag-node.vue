@@ -12,7 +12,7 @@
       @mousedown="startDrag"
       :style="{cursor: this.isDragging? 'grabbing': ''}"
     >
-      <span>{{node.constructor.name}}: {{node.uuid.slice(0,4)}}</span>
+      <!-- <span>{{node.constructor.name}}: {{node.uuid.slice(0,4)}}</span> -->
     </div>
 
     <!-- <div class="input-info">
@@ -30,7 +30,6 @@ import {
   NodeLayout,
   GraphBoardInfo,
   ViewNode,
-  getRightEnd
 } from "../../model/graph-view";
 import { findFirst } from "../../../../src/util/array";
 
@@ -100,8 +99,8 @@ export default class DAGNodeView extends Vue {
   }
 
   dragging(e: MouseEvent) {
-    this.layout.absX = this.originX + e.screenX - this.screenOriginX;
-    this.layout.absY = this.originY + e.screenY - this.screenOriginY;
+    this.layout.absX = this.originX + (e.screenX - this.screenOriginX) / this.boardInfo.scale;
+    this.layout.absY = this.originY + (e.screenY - this.screenOriginY) / this.boardInfo.scale;
     this.$emit("updateViewport", { node: this.node, layout: this.layout });
     this.$emit("updateLine", this.node)
   }
@@ -118,7 +117,7 @@ export default class DAGNodeView extends Vue {
 }
 
 .node-title {
-  background: #fff;
+  // background: #fff;
   height: 20px;
   display: flex;
   cursor: grab;

@@ -113,7 +113,8 @@ export default class ViewerCanvas extends Vue {
     width: 0,
     height: 0,
     transformX: 0,
-    transformY: 0
+    transformY: 0,
+    scale: 1
   };
 
   viewNodes: ViewNode[] = [];
@@ -172,12 +173,7 @@ export default class ViewerCanvas extends Vue {
     this.viewNodes = nodes.map(node => {
       return {
         node,
-        layout: {
-          absX: 0,
-          absY: 0,
-          width: 200,
-          height: 200
-        }
+        layout: new NodeLayout()
       };
     });
     this.showGraphViewer = true;

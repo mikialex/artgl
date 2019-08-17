@@ -1,5 +1,7 @@
 <template>
-  <canvas class="lines-hud"></canvas>
+  <canvas class="lines-hud"
+  @mousewheel="zoom"
+  ></canvas>
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
@@ -37,6 +39,10 @@ export default class LineHUDCanvas extends Vue {
 
   beforeDestroy() {
     this.isRunning = false;
+  }
+
+  zoom(e:MouseWheelEvent){
+    this.boardInfo.scale += e.deltaY / 300;
   }
 
   updateSize() {

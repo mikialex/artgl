@@ -1,26 +1,47 @@
 import { DAGNode } from '../../../src/core/dag-node';
-import { ShaderNode } from '../../../src/artgl';
+import { ShaderNode, ShaderFunctionNode } from '../../../src/artgl';
 
 export interface GraphBoardInfo {
   width: number,
   height: number,
   transformX: number,
   transformY: number,
+  scale: number
 }
 
-export interface NodeLayout {
-  absX: number,
-  absY: number,
-  width: number,
-  height: number,
-}
+export class NodeLayout {
+  static lineHeight = 20;
+  static headerHeight = 20;
 
-export function getRightEnd(layout: NodeLayout) {
-  return {
-    x: layout.absX + layout.width,
-    y: layout.absY + 10,
+  absX: number = 0;
+  absY: number = 0;
+  width: number = 200;
+  height: number = 100;
+
+  get outputPointX() {
+    return this.absX + this.width + 20;
   }
+  get outputPointY() {
+    return NodeLayout.headerHeight + this.absY + 10;
+  }
+
+  get inputPointsX() {
+    return this.absX - 10;
+  }
+
+  getNthInputNodeY(index:number) {
+    return NodeLayout.headerHeight +
+      this.absY + NodeLayout.lineHeight / 2
+      + index * NodeLayout.lineHeight
+  }
+
+  getNthInputSlotText(index: number) {
+    return NodeLayout.headerHeight +
+    this.absY + (index + 1) * NodeLayout.lineHeight -5
+  }
+
 }
+
 
 export interface ViewNode {
   node: DAGNode;
@@ -104,7 +125,6 @@ export class CanvasGraphUI{
   constructor(el: HTMLCanvasElement, boardInfo: GraphBoardInfo) {
     this.el = el;
     this.ctx = el.getContext('2d');
-    this.ctx.font = "16px Fira Code";
     this.boardInfo = boardInfo;
   }
 
@@ -143,18 +163,20 @@ export class CanvasGraphUI{
 
   drawViewNode(node: DAGNode, nodeLayoutMap: Map<DAGNode, NodeLayout>) {
     const selfLayout = nodeLayoutMap.get(node);
-    const lineHeight = 20;
     let index = 0;
-    node.fromNodes.forEach((n) => {
-      index++;
-      const nodeLayout = nodeLayoutMap.get(n);
-      this.drawConnectionLine(
-        nodeLayout.absX + 220, nodeLayout.absY + lineHeight / 2,
-        selfLayout.absX - 10, selfLayout.absY + lineHeight / 2 + index * lineHeight
-      );
-      this.drawCircle(selfLayout.absX - 10, selfLayout.absY + lineHeight / 2 + index * lineHeight, 7, "#685");
-    })
-    this.drawCircle(selfLayout.absX + 220, selfLayout.absY + 10, 10, "#8a5");
+
+    this.drawCircle(selfLayout.absX + 220, selfLayout.outputPointY, 10, "#8a5");
+    if (!(node instanceof ShaderFunctionNode)) {
+      node.fromNodes.forEach((n) => {
+        index++;
+        const nodeLayout = nodeLayoutMap.get(n);
+        this.drawConnectionLine(
+          nodeLayout.outputPointX, nodeLayout.outputPointY,
+          selfLayout.inputPointsX, selfLayout.getNthInputNodeY(index)
+        );
+        this.drawCircle(selfLayout.absX - 10, selfLayout.getNthInputNodeY(index), 7, "#685");
+      })
+    }
 
     const ctx = this.ctx;
     if (node instanceof ShaderNode) {
@@ -162,16 +184,32 @@ export class CanvasGraphUI{
       ctx.fillStyle = "#eee";
       ctx.fillRect(selfLayout.absX, selfLayout.absY, 200, 100)
       ctx.fillStyle = "#444";
-      ctx.fillText("Hello world =>", selfLayout.absX, selfLayout.absY);
+      ctx.fillText(node.constructor.name, selfLayout.absX, selfLayout.absY);
+      if (node instanceof ShaderFunctionNode) {
+        Object.keys(node.factory.define.inputs).forEach((key, index) => {
+          const fromNode = node.inputMap.get(key);
+          if (fromNode !== undefined) {
+            const fromNodeLayout = nodeLayoutMap.get(fromNode);
+            this.drawConnectionLine(
+              fromNodeLayout.outputPointX, fromNodeLayout.outputPointY,
+              selfLayout.inputPointsX, selfLayout.getNthInputNodeY(index)
+            );
+            ctx.fillText(key, selfLayout.absX, selfLayout.getNthInputSlotText(index));
+          }
+          this.drawCircle(selfLayout.absX - 10, selfLayout.getNthInputNodeY(index), 7, "#685");
+        })
+      }
       ctx.restore();
     }
   }
 
   drawViewNodes(nodes: DAGNode[], nodeLayoutMap: Map<DAGNode, NodeLayout>) {
     this.ctx.save();
+    this.ctx.font = "14px Fira Code";
     this.ctx.strokeStyle = "#aaa"
     this.ctx.lineWidth = 3;
     this.ctx.translate(this.boardInfo.transformX, this.boardInfo.transformY);
+    this.ctx.scale(this.boardInfo.scale, this.boardInfo.scale);
     nodes.forEach(n => {
       this.drawViewNode(n, nodeLayoutMap)
     })

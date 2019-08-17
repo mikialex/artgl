@@ -24,9 +24,9 @@ export class ShaderApplication {
     this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);
     this.orbitController.registerInteractor(this.engine.interactor);
     this.shader = new Shading().decorate(new NormalShading());
-    this.loadScene();
-    this.tick();
-    this.start();
+    // this.loadScene();
+    // this.tick();
+    // this.start();
 
     window.addEventListener('resize', this.onContainerResize);
     this.onContainerResize();

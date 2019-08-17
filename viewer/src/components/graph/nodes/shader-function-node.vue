@@ -1,6 +1,6 @@
 <template>
   <div>
-    {{node.factory.name}}
+    <!-- {{node.factory.name}} -->
   </div>
 </template>
 
