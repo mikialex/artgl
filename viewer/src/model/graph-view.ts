@@ -111,6 +111,14 @@ export class CanvasGraphUI{
   clear() {
     this.ctx.clearRect(0, 0, this.width, this.height);
   }
+
+  drawCircle(x: number, y: number, radius: number, color: string) {
+    const ctx = this.ctx;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI, true)
+    ctx.fill();
+  }
   
   drawConnectionLine(startX: number, startY: number, endX: number, endY: number) {
     const ctx = this.ctx;
@@ -142,9 +150,11 @@ export class CanvasGraphUI{
       const nodeLayout = nodeLayoutMap.get(n);
       this.drawConnectionLine(
         nodeLayout.absX + 220, nodeLayout.absY + lineHeight / 2,
-        selfLayout.absX - 5, selfLayout.absY + lineHeight / 2 + index * lineHeight
+        selfLayout.absX - 10, selfLayout.absY + lineHeight / 2 + index * lineHeight
       );
+      this.drawCircle(selfLayout.absX - 10, selfLayout.absY + lineHeight / 2 + index * lineHeight, 7, "#685");
     })
+    this.drawCircle(selfLayout.absX + 220, selfLayout.absY + 10, 10, "#8a5");
 
     const ctx = this.ctx;
     if (node instanceof ShaderNode) {
@@ -159,8 +169,8 @@ export class CanvasGraphUI{
 
   drawViewNodes(nodes: DAGNode[], nodeLayoutMap: Map<DAGNode, NodeLayout>) {
     this.ctx.save();
-    this.ctx.strokeStyle = "#555"
-    this.ctx.lineWidth = 2;
+    this.ctx.strokeStyle = "#aaa"
+    this.ctx.lineWidth = 3;
     this.ctx.translate(this.boardInfo.transformX, this.boardInfo.transformY);
     nodes.forEach(n => {
       this.drawViewNode(n, nodeLayoutMap)
