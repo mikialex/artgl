@@ -56,3 +56,18 @@ test('dag dep sort', () => {
   
 });
 
+test('dag graph contains cycle', () => {
+  const node1 = new DAGNode();
+  const node2 = new DAGNode();
+  const node3 = new DAGNode();
+  node1.connectTo(node2);
+  node2.connectTo(node3);
+  node3.connectTo(node1);
+
+  function tryCatchCycle() {
+    node1.generateDependencyOrderList()
+  }
+
+  expect(tryCatchCycle).toThrow('node graph contains cycles.');
+});
+
