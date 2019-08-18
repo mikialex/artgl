@@ -67,25 +67,22 @@ export class DAGNode {
       })
     }
 
-    while (allDepNodes.length > 0) {
-      allDepNodes = allDepNodes.filter(node => {
-        if (node.fulfillList.size === 0) {
-          resolveNext(node);
-          return false
-        }
-        return true;
+    const resolved: Set<DAGNode> = new Set();
+    while (resolved.size != allDepNodes.size) {
+        allDepNodes.forEach(node => {
+          if (resolved.has(node)) {
+            return;
+          }
+          if (node.fulfillList.size === 0) {
+            resolved.add(node);
+            resolveNext(node);
+          }
       });
-
-      preventEndlessCounter++;
-      if (preventEndlessCounter > 10000) {
-        throw 'generateDependencyOrderList failed, graph may contains loop.';
-      }
-
     }
     return result;
   }
 
-  traverseDFS(visitor: (node: DAGNode) => any) {
+  traverseDFS(visitor: (node: DAGNode) => void) {
     const visited: Set<DAGNode> = new Set();
     function visit(node: DAGNode) {
       if (!visited.has(node)) {
@@ -94,15 +91,18 @@ export class DAGNode {
         node.fromNodes.forEach(n => {
           visit(n);
         });
+        visited.delete(node);
+      } else {
+        throw 'node graph contains cycles.';
       }
     }
     visit(this);
   }
 
-  generateAllDependencyList(): DAGNode[] {
-    const result: DAGNode[] = [];
+  generateAllDependencyList(): Set<DAGNode>{
+    const result: Set<DAGNode> = new Set();
     this.traverseDFS((n) => {
-      result.push(n);
+      result.add(n);
     })
     return result;
   }
