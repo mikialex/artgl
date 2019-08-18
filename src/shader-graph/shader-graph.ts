@@ -1,15 +1,18 @@
 import { GLProgramConfig } from "../webgl/program";
 import { genFragShader, genVertexShader } from "./code-gen";
 import {
-  ShaderInputNode, ShaderTexture, ShaderFunctionNode,
+  ShaderInputNode, ShaderTextureNode, ShaderFunctionNode,
   ShaderAttributeInputNode, ShaderInnerUniformInputNode,
   ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode,
-  ShaderTextureFetchNode
 } from "./shader-node";
-import { attribute, constValue, MVPWorld } from "./node-maker";
+import { attribute, constValue, MVPWorld, texture, innerUniform } from "./node-maker";
 import { GLDataType } from "../webgl/shader-util";
 import { CommonAttribute } from "../webgl/attribute";
 import { Vector4 } from "../math";
+import { eyeDir } from "./built-in/transform";
+import { ChannelType } from "../core/material";
+import { GLTextureType } from "../webgl/uniform/uniform-texture";
+import { InnerSupportUniform } from '../webgl/uniform/uniform';
 
 
 export const UvFragVary = "v_uv"
@@ -88,8 +91,29 @@ export class ShaderGraph {
     return new ShaderVaryInputNode(key, ret.type);
   }
 
+  cachedInnerSupportEyeDir: ShaderNode
+  getEyeDir(): ShaderNode {
+    if (this.cachedInnerSupportEyeDir === undefined) {
+      this.cachedInnerSupportEyeDir = eyeDir.make()
+        .input("worldPosition", this.getVary(WorldPositionFragVary))
+        .input("cameraWorldPosition", innerUniform(InnerSupportUniform.CameraWorldPosition))
+    }
+    return this.cachedInnerSupportEyeDir
+  }
+
+  cachedReusedChannelNodes: Map<ChannelType, ShaderNode> = new Map();
+  getChannel(channelType: ChannelType): ShaderNode {
+    if (!this.cachedReusedChannelNodes.has(channelType)) {
+      this.cachedReusedChannelNodes.set(channelType,
+        texture(channelType, GLTextureType.texture2D))
+    }
+    return this.cachedReusedChannelNodes.get(channelType)
+  }
+
   reset(): ShaderGraph {
     this.varyings.clear();
+    this.cachedReusedChannelNodes.clear();
+    this.cachedInnerSupportEyeDir = undefined;
     this.setVertexRoot(MVPWorld());
     this.setFragmentRoot(constValue(new Vector4()))
     return this;
@@ -157,18 +181,14 @@ export class ShaderGraph {
         }
       });
 
-    const textureSet = new Set<ShaderTexture>();
-    nodes.filter(n => n instanceof ShaderTextureFetchNode)
-      .forEach((node: ShaderTextureFetchNode) => {
-        textureSet.add(node.source)
-      })
-    const textures = [];
-    textureSet.forEach(st => {
-      textures.push({
-        name: st.name,
-        type: st.type
-      })
-    })
+    const textures = inputNodes
+      .filter(node => node instanceof ShaderTextureNode)
+      .map((node: ShaderTextureNode) => {
+        return {
+          name: node.name,
+          type: node.textureType,
+        }
+      });
 
     const varyings = [];
     this.varyings.forEach((node, key) => {

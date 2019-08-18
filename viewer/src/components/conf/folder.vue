@@ -16,7 +16,7 @@
           v-if="Array.isArray(subConfig.value)" 
           :config="subConfig"/>
         <ConfigItem
-          v-else
+          v-else-if ="subConfig.show === undefined ? true : subConfig.show()"
           v-model="subConfig.value"
           :config="subConfig"/>
 

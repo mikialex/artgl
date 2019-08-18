@@ -1,4 +1,7 @@
-import { ShaderAttributeInputNode, ShaderCommonUniformInputNode, ShaderInnerUniformInputNode, ShaderTexture, ShaderNode, ShaderConstType, ShaderConstNode, ShaderCombineNode } from "./shader-node";
+import {
+  ShaderAttributeInputNode, ShaderCommonUniformInputNode, ShaderInnerUniformInputNode,
+  ShaderTextureNode, ShaderNode, ShaderConstType, ShaderConstNode, ShaderCombineNode
+} from "./shader-node";
 import { GLDataType } from "../webgl/shader-util";
 import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
 import { GLTextureType } from "../webgl/uniform/uniform-texture";
@@ -8,14 +11,13 @@ import { Vector3, Matrix4 } from "../math";
 import { Vector4 } from "../math/vector4";
 import { CommonAttribute } from "../webgl/attribute";
 
-// TODO simplify it
 export function attribute(name: string, type: GLDataType) {
   return new ShaderAttributeInputNode({ name, type });
 }
 
 export function texture(name: string, type?: GLTextureType) {
   const t = type !== undefined ? type : GLTextureType.texture2D;
-  return new ShaderTexture(name, t);
+  return new ShaderTextureNode(name, GLDataType.sampler2D, t);
 }
 
 export function uniform(name: string, type: GLDataType) {

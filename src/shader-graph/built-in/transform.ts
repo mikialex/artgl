@@ -1,5 +1,13 @@
 import { ShaderFunction } from "../shader-function";
 
+export const eyeDir = new ShaderFunction({
+  source: `
+  vec3 eyeDir (vec3 worldPosition, vec3 cameraWorldPosition){
+    return normalize(worldPosition - cameraWorldPosition);
+  }
+  `
+})
+
 export const DivW = new ShaderFunction({
   source: `
     vec3 DivW ( vec4 position){
@@ -78,6 +86,14 @@ export const getLastPixelNDC = new ShaderFunction({
 })
 
 export const dir3D = new ShaderFunction({
+  source: `
+  vec3 dir3D(vec3 from, vec3 to){
+    return normalize(to - from);
+  }
+  `
+})
+
+export const unitDir = new ShaderFunction({
   source: `
   vec3 randDir(float x, float y){
     float PI =  3.14159265; // TODO

@@ -6,7 +6,7 @@ import { DrawState } from "./draw-state";
 import { Face3 } from "../math/entity/face3";
 import { Line3 } from "../math/entity/line3";
 import { Vector3 } from "../math";
-import { Shading } from "./shading";
+import { Shading, ShaderUniformProvider, ShaderUniformDecorator } from "./shading";
 import { StandardGeometry } from "../geometry/standard-geometry";
 
 export class RenderRange {
@@ -27,12 +27,6 @@ export class RenderRange {
     this.start = start;
     this.count = count;
   }
-
-  // static getFullRangeFromGeometry(geometry: Geometry): RenderRange {
-  //   if (geometry.indexBuffer !== undefined) {
-  //     return geometry.indexBuffer.data.length;
-  //   }
-  // }
 
   start: number = 0;
   count: number = 0;
@@ -66,6 +60,7 @@ export class RenderObject extends SceneNode {
   material?: Material;
   geometry?: Geometry;
   shading?: Shading;
+  shadingParams: Map<ShaderUniformDecorator, ShaderUniformDecorator> = new Map();
   range?: RenderRange;
   state: DrawState =  new DrawState();
 

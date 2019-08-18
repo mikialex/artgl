@@ -1,6 +1,6 @@
 import {
   SphereGeometry, PlaneGeometry, AmbientLight, Mesh, SceneNode,
-  Shading, CubeGeometry, Vector3, DirectionalLight
+  Shading, CubeGeometry, Vector3, DirectionalLight, PhongShading
 } from '../../../src/artgl';
 import { PointLight } from '../../../src/light/point-light';
 import { ExposureController, ToneMapType } from '../../../src/shading/basic-lib/exposurer';
@@ -13,7 +13,7 @@ export default function (root: SceneNode, app: Application): RenderConfig {
   const cubeGeo = new CubeGeometry(5, 3, 4)
 
   const pointLight = new PointLight();
-  pointLight.position = new Vector3(0, 3, 0);
+  pointLight.position = new Vector3(-1, 3, 3);
   pointLight.color = new Vector3(0.9, 0.8, 0.5);
   pointLight.radius = 10;
 
@@ -21,19 +21,17 @@ export default function (root: SceneNode, app: Application): RenderConfig {
   ambient.color = new Vector3(0.3, 0.3, 0.4);
 
   const dirLight = new DirectionalLight();
-  dirLight.color = new Vector3(0.3, 0.6, 0.4);
+  dirLight.color = new Vector3(0.3, 0.6, 0.8);
   dirLight.direction = new Vector3(1, 1, -1).normalize();
 
   const exposureController = new ExposureController();
 
+  const phong = new PhongShading<DirectionalLight | PointLight>([dirLight, pointLight]);
+
   let shading = new Shading()
-    // .decorate(new NormalShading())
-    .decorate(pointLight)
+    .decorate(phong)
     .decorate(ambient)
-    .decorate(dirLight)
     .decorate(exposureController)
-  
-  console.log(exposureController)
 
   shading.afterShaderCompiled.add((config) => {
     console.log(config);
@@ -73,7 +71,7 @@ export default function (root: SceneNode, app: Application): RenderConfig {
     }
   }
 
-  return {
+  const exposureConfig = {
     name: 'exposureControl',
     value: [
       {
@@ -99,6 +97,9 @@ export default function (root: SceneNode, app: Application): RenderConfig {
           exposureController.toneMappingWhitePoint = value;
           app.pipeline.resetSample();
         },
+        show: () => {
+          return exposureController.toneMapType===ToneMapType.Uncharted2ToneMapping
+        },
         editors: [
           {
             type: 'slider',
@@ -120,6 +121,36 @@ export default function (root: SceneNode, app: Application): RenderConfig {
           app.pipeline.resetSample();
         },
       }
+    ]
+  }
+
+  const phongConfig = {
+    name: "phong",
+    value: [
+      {
+        name: 'shininess',
+        value: phong.shininess,
+        onChange: (value: number) => {
+          phong.shininess = value;
+          app.pipeline.resetSample();
+        },
+        editors: [
+          {
+            type: 'slider',
+            min: 0,
+            max: 100,
+            step: 1
+          },
+        ]
+      }
+    ]
+  }
+
+  return {
+    name: 'scene shading',
+    value: [
+      exposureConfig,
+      phongConfig
     ]
   }
 

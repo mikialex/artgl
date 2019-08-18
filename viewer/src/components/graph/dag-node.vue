@@ -12,7 +12,7 @@
       @mousedown="startDrag"
       :style="{cursor: this.isDragging? 'grabbing': ''}"
     >
-      <span>{{node.constructor.name}}: {{node.uuid.slice(0,4)}}</span>
+      <!-- <span>{{node.constructor.name}}: {{node.uuid.slice(0,4)}}</span> -->
     </div>
 
     <!-- <div class="input-info">
@@ -24,14 +24,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, InjectReactive } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 import { ShaderGraph, ShaderNode, DAGNode } from "../../../../src/artgl";
 import {
   NodeLayout,
   GraphBoardInfo,
   ViewNode,
-  ConnectionLine,
-  getRightEnd
 } from "../../model/graph-view";
 import { findFirst } from "../../../../src/util/array";
 
@@ -39,9 +37,6 @@ import { findFirst } from "../../../../src/util/array";
   components: {}
 })
 export default class DAGNodeView extends Vue {
-  @InjectReactive() nodes: ViewNode[];
-  @InjectReactive() lines: ConnectionLine[];
-
   @Prop({
     required: true
   })
@@ -62,42 +57,6 @@ export default class DAGNodeView extends Vue {
     default: true
   })
   editable: boolean;
-
-  getNodesLayout(node: DAGNode) {
-    return findFirst(this.nodes, vn => {
-      return vn.node === node;
-    }).layout;
-  }
-
-  getLines(): ConnectionLine[] {
-    return this.inputs.map(inputNode => {
-      const rightCenter = getRightEnd(this.getNodesLayout(inputNode));
-      const line = new ConnectionLine();
-      line.startX = rightCenter.x;
-      line.startY = rightCenter.y;
-      line.endX = this.layout.absX;
-      line.endY = this.layout.absY;
-      return line;
-    });
-  }
-
-  selfLines: ConnectionLine[] = [];
-  updateLine() {
-    this.selfLines.forEach(line => {
-      const position = this.lines.indexOf(line);
-      if (position !== -1) {
-        this.lines.splice(position, 1);
-      }
-    });
-    this.selfLines = this.getLines();
-    this.selfLines.forEach(line => {
-      this.lines.push(line);
-    });
-  }
-
-  mounted() {
-    this.updateLine();
-  }
 
   get inputs(): DAGNode[] {
     const results = [];
@@ -140,8 +99,8 @@ export default class DAGNodeView extends Vue {
   }
 
   dragging(e: MouseEvent) {
-    this.layout.absX = this.originX + e.screenX - this.screenOriginX;
-    this.layout.absY = this.originY + e.screenY - this.screenOriginY;
+    this.layout.absX = this.originX + (e.screenX - this.screenOriginX) / this.boardInfo.scale;
+    this.layout.absY = this.originY + (e.screenY - this.screenOriginY) / this.boardInfo.scale;
     this.$emit("updateViewport", { node: this.node, layout: this.layout });
     this.$emit("updateLine", this.node)
   }
@@ -158,7 +117,7 @@ export default class DAGNodeView extends Vue {
 }
 
 .node-title {
-  background: #fff;
+  // background: #fff;
   height: 20px;
   display: flex;
   cursor: grab;

@@ -23,9 +23,8 @@
 
 img{
   width: 600px;
-  opacity: 0.3;
+  // opacity: 0.3;
 }
-
 ul{
   margin-top:20px;
   >a{

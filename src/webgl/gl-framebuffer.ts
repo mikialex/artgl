@@ -1,27 +1,26 @@
 import { GLRenderer } from "./gl-renderer";
 import { Nullable } from "../type";
 import { PixelFormat } from "./const";
-import { Texture } from "../core/texture";
+import { Texture, TextureSource } from "../core/texture";
 import { RenderEngine } from "../engine/render-engine";
 
 
 
 export class FramebufferAttachTexture extends Texture {
-  width: number = 5;
-  height: number = 5;
-
-  upload(engine: RenderEngine): WebGLTexture {
-    return engine.renderer.textureManger.createTextureForRenderTarget(this);
+  constructor() {
+    super(TextureSource.forRenderTarget(1,1))
   }
+
+  isDataTexture: true = true;
 
   attach(engine: RenderEngine, framebuffer: GLFramebuffer, attachPoint: number) {
     engine.renderer.setRenderTarget(framebuffer);
 
     const gl = framebuffer.gl;
-    this.width = framebuffer.width;
-    this.height = framebuffer.height;
+    this.rawDataSource.width = framebuffer.width;
+    this.rawDataSource.height = framebuffer.height;
     this.releaseGraphics(engine);
-    const glTexture = this.upload(engine);
+    const glTexture = engine.renderer.textureManger.createTextureForRenderTarget(this);
     const attachmentPoint = GLAttachmentPoints[attachPoint];
     gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, glTexture, 0);
   }
@@ -40,6 +39,10 @@ function loadGLAttachmentPoints(gl: WebGLRenderingContext) {
 export type FramebufferReadBufferType = Uint8Array | Uint16Array | Float32Array;
 
 export class GLFramebuffer {
+  static buildFBOFormatKey(width: number, height: number, needDepth: boolean) {
+    return `${width}-${height}-${needDepth}`
+  }
+
   constructor(renderer: GLRenderer, name: string, width: number, height: number) {
     this.name = name;
     this.renderer = renderer;
@@ -48,6 +51,7 @@ export class GLFramebuffer {
     this.webglFrameBuffer = this.createGLFramebuffer();
     this.width = width;
     this.height = height;
+    this.updateFormatKey();
   }
   name: string;
   gl: WebGLRenderingContext;
@@ -56,11 +60,19 @@ export class GLFramebuffer {
   width: number;
   height: number;
 
+  _formatKey: string;
+
   enableDepth: boolean = true;
   webglDepthBuffer: Nullable<WebGLRenderbuffer> = null;
   webglFrameBuffer: WebGLFramebuffer;
 
   textureAttachedSlot: FramebufferAttachTexture[] = [];
+
+  private updateFormatKey() {
+    this._formatKey = GLFramebuffer.buildFBOFormatKey(
+      this.width, this.height, this.enableDepth
+    );
+  }
 
   createGLFramebuffer() {
     const buffer = this.gl.createFramebuffer();
@@ -100,6 +112,7 @@ export class GLFramebuffer {
 
     this.disposeAttachedDepthBuffer();
     this.createAttachDepthBuffer();
+    this.updateFormatKey();
 
   }
 

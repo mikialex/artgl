@@ -33,8 +33,6 @@ export class PBRShading extends BaseEffectShading<PBRShading | PointLight> {
 
 export class StandardShading extends BaseEffectShading<StandardShading> { 
 
-  
-
   decorate(graph: ShaderGraph): void {
     // graph
     //   .setFragmentRoot(
@@ -43,4 +41,6 @@ export class StandardShading extends BaseEffectShading<StandardShading> {
     //       .input()
     //   )
   }
+
+
 }

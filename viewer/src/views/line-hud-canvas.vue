@@ -1,29 +1,37 @@
 <template>
-  <canvas class="lines-hud"></canvas>
+  <canvas class="lines-hud"
+  @mousewheel="zoom"
+  ></canvas>
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { LinesHUD, ConnectionLine, GraphBoardInfo } from "../model/graph-view";
+import { GraphBoardInfo, CanvasGraphUI, NodeLayout } from "../model/graph-view";
+import { DAGNode } from "../../../src/artgl";
 
 @Component({
   components: {}
 })
 export default class LineHUDCanvas extends Vue {
-  HUD: LinesHUD;
+  viewer: CanvasGraphUI;
   isRunning: boolean = true;
-
-  @Prop({
-    required: true
-  })
-  lines: ConnectionLine[];
 
   @Prop({
     required: true
   })
   boardInfo: GraphBoardInfo;
 
+  @Prop({
+    required: true
+  })
+  nodes: DAGNode[];
+
+  @Prop({
+    required: true
+  })
+  nodesLayoutMap:  Map<DAGNode, NodeLayout>;
+
   mounted() {
-    this.HUD = new LinesHUD(this.$el as HTMLCanvasElement);
+    this.viewer = new CanvasGraphUI(this.$el as HTMLCanvasElement, this.boardInfo);
     window.addEventListener("resize", this.updateSize);
     window.requestAnimationFrame(this.draw);
     this.updateSize();
@@ -33,16 +41,28 @@ export default class LineHUDCanvas extends Vue {
     this.isRunning = false;
   }
 
+  zoom(e:MouseWheelEvent){
+    const absX = (e.offsetX - this.boardInfo.transformX) * this.boardInfo.scale
+    const absY = (e.offsetY - this.boardInfo.transformY) * this.boardInfo.scale
+    console.log(absX, absY)
+    const deltaScale = e.deltaY / 300;
+    this.boardInfo.scale += deltaScale;
+    // this.boardInfo.transformX += absX * deltaScale
+    // this.boardInfo.transformY += absY * deltaScale
+  }
+
   updateSize() {
     const el = this.$el as HTMLCanvasElement;
-    this.HUD.width = el.clientWidth;
-    this.HUD.height = el.clientHeight;
+    this.viewer.width = el.clientWidth;
+    this.viewer.height = el.clientHeight;
     el.width = el.clientWidth;
     el.height = el.clientHeight;
   }
 
   draw() {
-    this.HUD.draw(this.lines, this.boardInfo);
+    this.viewer.clear();
+    this.viewer.drawGrid();
+    this.viewer.drawViewNodes(this.nodes, this.nodesLayoutMap);
     if (this.isRunning) {
       window.requestAnimationFrame(this.draw);
     }

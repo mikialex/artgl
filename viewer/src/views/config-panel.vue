@@ -44,7 +44,7 @@ export default class ConfigPanel extends Vue {
 
 .config-wrap{
   overflow-y: scroll;
-  height: 100%;
+  height: calc(100% - 40px);
 }
 
 </style>

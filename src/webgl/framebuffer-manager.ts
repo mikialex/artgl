@@ -1,9 +1,8 @@
 import { GLFramebuffer } from "./gl-framebuffer";
 import { GLRenderer } from "./gl-renderer";
-import { GLReleasable } from '../type';
 import { RenderEngine } from "../engine/render-engine";
 
-export class GLFrameBufferManager implements GLReleasable{
+export class GLFrameBufferManager {
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
     this.gl = renderer.gl;
@@ -30,6 +29,10 @@ export class GLFrameBufferManager implements GLReleasable{
     return framebuffer;
   }
 
+  deleteFramebuffer(framebuffer: GLFramebuffer) {
+    this.framebuffers.delete(framebuffer.name);
+  }
+
   getFramebuffer(framebufferName: string) {
     return this.framebuffers.get(framebufferName);
   }
@@ -42,7 +45,7 @@ export class GLFrameBufferManager implements GLReleasable{
     return this.renderer.textureManger.getGLTexture(framebuffer.textureAttachedSlot[0]);
   }
 
-  releaseGL() {
-    
+  dispose() {
+    this.framebuffers.clear();
   }
 }

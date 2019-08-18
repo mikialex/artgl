@@ -6,16 +6,29 @@
         <button @click="addUniform">uniform</button>
         <button>attribute</button>
       </div>
-      <GraphView :board="board">
-        <DAGNodeView
-          v-for="nodeView in nodes"
-          :key="nodeView.node.uuid"
-          :node="nodeView.node"
-          :layout="nodeView.layout"
-          :boardInfo="board"
-          @updateViewport="updateViewport(nodeView)"
-        ></DAGNodeView>
-      </GraphView>
+      <div style="position: absolute; top:0px; width: 100%;height: 100%">
+        <LineHUDCanvas 
+        :nodes="nodes"
+        :nodesLayoutMap ="nodesLayoutMap"
+        :boardInfo="board" />
+        <GraphView :board="board">
+          <DAGNodeView
+            v-for="nodeView in viewNodes"
+            :key="nodeView.node.uuid"
+            :node="nodeView.node"
+            :layout="nodeView.layout"
+            :boardInfo="board"
+            @updateViewport="updateViewport(nodeView)"
+          >
+            <ShaderFunctionNodeView
+              v-if="isShaderFunctionNode(nodeView.node)"
+              :node="nodeView.node"
+              :layout="nodeView.layout"
+              @updateSize="updateViewport"
+            />
+          </DAGNodeView>
+        </GraphView>
+      </div>
     </div>
 
     <div class="viewer">
@@ -40,16 +53,31 @@ import {
   injectFragmentShaderHeaders,
   GLDataType
 } from "../../../src/webgl/shader-util";
-import { ShaderGraph, uniform, DAGNode } from "../../../src/artgl";
+import {
+  ShaderGraph,
+  uniform,
+  DAGNode,
+  TSSAOShading,
+  Shading
+} from "../../../src/artgl";
 import DAGNodeView from "../components/graph/dag-node.vue";
+import ShaderFunctionNodeView from "../components/graph/nodes/shader-function-node.vue";
 import GraphView from "../components/graph/graph-viewer.vue";
-import { ShaderNode } from "../../../src/shader-graph/shader-node";
-import { GraphBoardInfo, NodeLayout, ViewNode } from "../model/graph-view";
+import { ShaderNode, ShaderFunctionNode } from "../../../src/shader-graph/shader-node";
+import LineHUDCanvas from "./line-hud-canvas.vue";
+import {
+  GraphBoardInfo,
+  NodeLayout,
+  ViewNode,
+  layoutGraph
+} from "../model/graph-view";
 
 @Component({
   components: {
     DAGNodeView,
-    GraphView
+    GraphView,
+    LineHUDCanvas,
+    ShaderFunctionNodeView
   }
 })
 export default class ShaderEditor extends Vue {
@@ -61,10 +89,24 @@ export default class ShaderEditor extends Vue {
     width: 0,
     height: 0,
     transformX: 0,
-    transformY: 0
+    transformY: 0,
+    scale: 1,
   };
 
-  nodes: ViewNode[] = [];
+  viewNodes: ViewNode[] = [];
+
+  get nodes(){
+    return this.viewNodes.map(vn => vn.node)
+  }
+
+  get nodesLayoutMap(){
+    const map = new Map();
+    this.viewNodes.forEach(vn=>{
+      map.set(vn.node, vn.layout)
+    })
+    return map;
+  }
+
 
   mounted() {
     const canvas = this.$el.querySelector("#shader-editor-canvas");
@@ -74,14 +116,34 @@ export default class ShaderEditor extends Vue {
     this.board.width = canvas.clientWidth;
     this.board.height = canvas.clientHeight;
 
+    const tssaoShading = new TSSAOShading();
+    const tssaoShader = new Shading().decorate(tssaoShading);
+    tssaoShader.getProgramConfig();
+    this.viewNodes = tssaoShader.graph.nodes.map(node => {
+      return {
+        node,
+        layout: new NodeLayout()
+      };
+    });
+    this.layout(tssaoShader);
     // this.graphView = GraphView.createFromShaderGraph(ShaderApp.graph);
     console.log(this.graph);
   }
 
-  layout() {}
+  layout(tssaoShader: Shading) {
+    const map = {};
+    this.viewNodes.forEach(node => {
+      map[node.node.uuid] = node.layout;
+    });
+    layoutGraph(tssaoShader.graph.fragmentRoot, map);
+  }
 
   updateViewport(view: ViewNode) {
-    console.log("upd");
+    // console.log("upd");
+  }
+
+  isShaderFunctionNode(node) {
+    return node instanceof ShaderFunctionNode;
   }
 
   codeGen() {
@@ -91,14 +153,9 @@ export default class ShaderEditor extends Vue {
   }
 
   addUniform() {
-    this.nodes.push({
+    this.viewNodes.push({
       node: uniform("unnamed", GLDataType.float),
-      layout: {
-        absX: 0,
-        absY: 0,
-        width: 100,
-        height: 100
-      }
+      layout: new NodeLayout()
     });
   }
 

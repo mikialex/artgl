@@ -159,6 +159,10 @@ export class RenderEngine implements GLReleasable{
       this.camera.transform.matrix;
       this.camera.updateWorldMatrix(true);
       this.cameraMatrixReverse.getInverse(this.camera.worldMatrix, true);
+
+      // TODO this should cal world position
+      this.getGlobalUniform(InnerSupportUniform.CameraWorldPosition)
+        .setValue(this.camera.transform.position)
       needUpdateVP = true;
     }
 
@@ -186,12 +190,6 @@ export class RenderEngine implements GLReleasable{
     foreachRenderableInSource(source, (obj) => {
       this.renderObject(obj);
     })
-  }
-
-  renderObjects(objects: RenderObject[]) {
-    for (let i = 0; i < objects.length; i++) {
-      this.renderObject(objects[i]);
-    }
   }
 
   renderObject(object: RenderObject) {
@@ -275,7 +273,9 @@ export class RenderEngine implements GLReleasable{
     this.getGlobalUniform(InnerSupportUniform.MMatrix).setValue(object.worldMatrix);
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
 
-    shading._decorators.forEach(decorator => {
+    shading._decorators.forEach(defaultDecorator => {
+      const overrideDecorator = object.shadingParams.get(defaultDecorator)
+      const decorator = overrideDecorator === undefined ? defaultDecorator : overrideDecorator;
       decorator.foreachProvider(provider => {
         if (this.lastUploadedShaderUniformProvider.has(provider)
           && !provider.hasAnyUniformChanged
@@ -301,24 +301,18 @@ export class RenderEngine implements GLReleasable{
 
       // acquire texture from material
       if (material !== undefined) {
-        if (tex.channel === undefined) {
-          throw 'use texture in material / use material to render should set texture uniform channel type'
-        }
-        const texture = material.getChannelTexture(tex.channel);
+        const texture = material.getChannelTexture(tex.name);
         glTexture = texture.getGLTexture(this);
       } 
 
       // acquire texture from framebuffer
       if (glTexture === undefined) {
         const framebufferName = program.framebufferTextureMap[tex.name];
-        if (framebufferName === undefined) {
-          throw  `cant find framebuffer for tex ${tex.name}, please define before use`
-        }
         glTexture = this.renderer.framebufferManager.getFramebufferTexture(framebufferName);
       }
 
       if (glTexture === undefined) {
-        throw 'texture bind failed'
+        throw `texture <${tex.name}>bind failed, for framebuffer texture, setup program.framebufferTextureMap`
       }
       
       tex.useTexture(glTexture);

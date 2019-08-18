@@ -1,13 +1,17 @@
 <template>
   <div>
-    <h1>Examples</h1>
-
-    <div
-      v-for="example in examples"
-      :key="example.name"
-      class="example-entry"
-      @click="gotoExample(example.name)"
-    >{{example.name}}</div>
+    <div class="example-container">
+      <h1>Examples</h1>
+      <div
+        v-for="example in examples"
+        :key="example.name"
+        class="example-entry"
+        @click="gotoExample(example.name)"
+      >
+        <div class="example-cover"></div>
+        <div>{{example.name}}</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -21,12 +25,11 @@ export default class ConfigPanel extends Vue {
   $store: any;
   $router: any;
 
-  get examples(){
+  get examples() {
     return this.$store.state.examples;
   }
 
-  mounted() {
-  }
+  mounted() {}
 
   gotoExample(name) {
     console.log("goto");
@@ -46,7 +49,21 @@ export default class ConfigPanel extends Vue {
 .example-entry {
   display: inline-block;
   width: 300px;
+  height: 250px;
+  margin: 10px;
+}
+
+.example-cover {
+  width: 300px;
   height: 200px;
   border: 1px solid #aaa;
+  >span{
+
+  }
+}
+
+.example-container {
+  width: 80vw;
+  margin: auto;
 }
 </style>
