@@ -46,10 +46,9 @@ export class DAGNode {
     this.toNodes.delete(node);
   }
 
-  // TODO this should be optimized
-  generateDependencyOrderList(): DAGNode[] {
+  getTopologicalSortedList(): DAGNode[] {
     // get all possible depend node, and reset fulfill list
-    let allDepNodes = this.generateAllDependencyList();
+    let allDepNodes = this.getAllDependency();
     allDepNodes.forEach(node => {
       node.fulfillList.clear();
       node.fromNodes.forEach((n) => {
@@ -57,7 +56,6 @@ export class DAGNode {
       })
     })
 
-    let preventEndlessCounter = 1;
     const result: DAGNode[] = [];
 
     function resolveNext(node: DAGNode) {
@@ -99,7 +97,7 @@ export class DAGNode {
     visit(this);
   }
 
-  generateAllDependencyList(): Set<DAGNode>{
+  getAllDependency(): Set<DAGNode>{
     const result: Set<DAGNode> = new Set();
     this.traverseDFS((n) => {
       result.add(n);

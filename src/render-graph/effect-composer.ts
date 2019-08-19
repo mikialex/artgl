@@ -1,14 +1,15 @@
-import { RenderEngine, PassGraphNode, RenderGraph } from "../artgl";
+import { PassGraphNode, RenderGraph } from "../artgl";
 import { FrameBufferPool } from "./framebuffer-pool";
 import { RenderPass } from "./pass";
 import { RenderTargetNode } from "./node/render-target-node";
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
+import { RenderGraphBackendAdaptor } from "./backend-interface";
 
 /**
  * Responsible for rendergraph execution and optimization
  */
 export class EffectComposer {
-  constructor(engine: RenderEngine) {
+  constructor(engine: RenderGraphBackendAdaptor) {
     this.engine = engine;
     this.framebufferPool = new FrameBufferPool(this.engine);
 
@@ -17,7 +18,7 @@ export class EffectComposer {
     })
   }
 
-  private engine: RenderEngine;
+  private engine: RenderGraphBackendAdaptor;
   private passes: RenderPass[] = [];
 
   private nodeMap: Map<PassGraphNode, RenderPass> = new Map();
@@ -30,7 +31,7 @@ export class EffectComposer {
     return this.keptFramebuffer.get(node)
   }
 
-  render(engine: RenderEngine, graph: RenderGraph) {
+  render(engine: RenderGraphBackendAdaptor, graph: RenderGraph) {
     this.passes.forEach((pass, index) => {
       const output = pass.outputTarget;
       let framebuffer: GLFramebuffer = this.keptFramebuffer.get(output)

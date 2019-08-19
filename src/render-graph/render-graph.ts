@@ -1,9 +1,9 @@
 import { PassDefine, GraphDefine, RenderTargetDefine } from "./interface";
 import { PassGraphNode } from "./node/pass-graph-node";
 import { RenderTargetNode } from "./node/render-target-node";
-import { RenderEngine } from "../engine/render-engine";
 import { QuadSource } from './quad-source';
 import { EffectComposer } from "./effect-composer";
+import { RenderGraphBackendAdaptor } from "./backend-interface";
 
 export type RenderGraphNode = PassGraphNode | RenderTargetNode;
 
@@ -46,7 +46,7 @@ export class RenderGraph {
   /**
    * Update the pass queue from current graph configure
    */
-  update(engine: RenderEngine, composer: EffectComposer) {
+  update(engine: RenderGraphBackendAdaptor, composer: EffectComposer) {
     
     //updateNodesConnection
     this.passNodes.forEach(node => {
@@ -57,7 +57,7 @@ export class RenderGraph {
     });
 
     // create and update pass queue
-    const nodeQueue = this.screenNode.generateDependencyOrderList() as RenderGraphNode[];
+    const nodeQueue = this.screenNode.getTopologicalSortedList() as RenderGraphNode[];
     const passes = [];
     nodeQueue.forEach(node => {
       if (node instanceof PassGraphNode) {

@@ -50,7 +50,7 @@ test('dag dep sort', () => {
   node2.connectTo(node3);
   node1.connectTo(node3);
 
-  const list = node3.generateDependencyOrderList();
+  const list = node3.getTopologicalSortedList();
   expect(list.length).toBe(3);
   expect(list).toStrictEqual([node1, node2, node3])
   
@@ -65,7 +65,7 @@ test('dag graph contains cycle', () => {
   node3.connectTo(node1);
 
   function tryCatchCycle() {
-    node1.generateDependencyOrderList()
+    node1.getTopologicalSortedList()
   }
 
   expect(tryCatchCycle).toThrow('node graph contains cycles.');

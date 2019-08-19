@@ -3,12 +3,12 @@ import { RenderTargetDefine, DimensionType } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { GLFramebuffer } from "../../webgl/gl-framebuffer";
 import { MathUtil } from '../../math/util'
-import { RenderEngine } from "../../engine/render-engine";
 import { Nullable } from "../../type";
 import { Vector4 } from '../../math/vector4';
 import { PixelFormat } from "../../webgl/const";
 import { RenderPass } from "../pass";
 import { PassGraphNode } from "./pass-graph-node";
+import { RenderGraphBackendAdaptor } from "../backend-interface";
 
 export class RenderTargetNode extends DAGNode{
   constructor(define: RenderTargetDefine) {
@@ -90,7 +90,7 @@ export class RenderTargetNode extends DAGNode{
   }
 
   // update abs size info from given engine render size
-  updateSize(engine: RenderEngine) {
+  updateSize(engine: RenderGraphBackendAdaptor) {
     if (this.isScreenNode) {
       return;
     }
@@ -124,7 +124,7 @@ export class RenderTargetNode extends DAGNode{
   }
 
   // from updated graph structure, setup render pass
-  updatePass(engine: RenderEngine, pass: RenderPass) {
+  updatePass(engine: RenderGraphBackendAdaptor, pass: RenderPass) {
     this.updateSize(engine);
     pass.outputTarget = this;
   }

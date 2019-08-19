@@ -1,7 +1,7 @@
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
-import { RenderEngine } from "../engine/render-engine";
 import { generateUUID } from "../math";
 import { RenderTargetNode } from "./node/render-target-node";
+import { RenderGraphBackendAdaptor } from "./backend-interface";
 
 type formatKey = string;
 type FBOGeneratedName = string;
@@ -10,7 +10,7 @@ type FBOGeneratedName = string;
  * Proxy the fbo storage in rendergraph
  */
 export class FrameBufferPool {
-  constructor(engine: RenderEngine) {
+  constructor(engine: RenderGraphBackendAdaptor) {
     this.engine = engine;
 
     // when resize, clear all for convenience, TODO, optimize
@@ -20,7 +20,7 @@ export class FrameBufferPool {
     })
   }
 
-  private engine: RenderEngine;
+  private engine: RenderGraphBackendAdaptor;
 
   framebuffers: Map<FBOGeneratedName, GLFramebuffer> = new Map();
 

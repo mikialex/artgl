@@ -1,12 +1,11 @@
 import { GLFramebuffer } from "../webgl/gl-framebuffer";
-import { RenderEngine } from "../engine/render-engine";
 import { RenderGraph } from "./render-graph";
 import { PassDefine } from "./interface";
-import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
 import { Shading } from "../core/shading";
 import { RenderTargetNode } from "./node/render-target-node";
 import { PassGraphNode } from "./node/pass-graph-node";
+import { Vector4Like, RenderGraphBackendAdaptor } from "./backend-interface";
 
 export type uniformName = string;
 type framebufferName = string;
@@ -35,7 +34,7 @@ export class RenderPass{
   readonly define: PassDefine;
   public name: string;
 
-  private clearColor: Vector4;
+  private clearColor: Vector4Like;
   private enableDepthClear: boolean = true;
   private enableColorClear: boolean = true;
 
@@ -56,7 +55,7 @@ export class RenderPass{
     return this.outputTarget.isScreenNode;
   }
 
-  renderDebugResult(engine: RenderEngine, graph: RenderGraph, framebuffer: GLFramebuffer) {
+  renderDebugResult(engine: RenderGraphBackendAdaptor, graph: RenderGraph, framebuffer: GLFramebuffer) {
     const debugOutputViewport = this.outputTarget.debugViewPort;
     engine.renderFrameBuffer(framebuffer, debugOutputViewport)
     // this will cause no use draw TODO optimize
@@ -67,7 +66,7 @@ export class RenderPass{
     })
   } 
 
-  execute(engine: RenderEngine, graph: RenderGraph, framebuffer: GLFramebuffer) {
+  execute(engine: RenderGraphBackendAdaptor, graph: RenderGraph, framebuffer: GLFramebuffer) {
 
     this.checkIsValid();
     let outputTarget: GLFramebuffer;
