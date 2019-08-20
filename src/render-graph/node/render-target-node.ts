@@ -8,10 +8,10 @@ import { Vector4 } from '../../math/vector4';
 import { PixelFormat } from "../../webgl/const";
 import { RenderPass } from "../pass";
 import { PassGraphNode } from "./pass-graph-node";
-import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingDetermined } from "../backend-interface";
+import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingDetermined, ShadingConstrain } from "../backend-interface";
 
 export class RenderTargetNode<
-  ShadingType,
+  ShadingType extends ShadingConstrain,
   RenderableType extends ShadingDetermined<ShadingType>,
   FBOType extends NamedAndFormatKeyed
   > extends DAGNode{
@@ -71,9 +71,9 @@ export class RenderTargetNode<
   private fromGetter: () => Nullable<string>
   private from: string = null;
 
-  private _fromPassNode: Nullable<PassGraphNode<RenderableType, FBOType>> = null
+  private _fromPassNode: Nullable<PassGraphNode<ShadingType, RenderableType, FBOType>> = null
 
-  set fromPassNode(node: Nullable<PassGraphNode<RenderableType, FBOType>>) {
+  set fromPassNode(node: Nullable<PassGraphNode<ShadingType, RenderableType, FBOType>>) {
     if (node === null) {
       this._fromPassNode = node;
       this.clearAllFrom();
@@ -115,7 +115,7 @@ export class RenderTargetNode<
   }
 
   // update graph structure
-  updateDependNode(graph: RenderGraph<RenderableType, FBOType>) {
+  updateDependNode(graph: RenderGraph<ShadingType, RenderableType, FBOType>) {
     // disconnect depends pass node
     this.fromPassNode = null;
 
@@ -130,7 +130,7 @@ export class RenderTargetNode<
   // from updated graph structure, setup render pass
   updatePass(
     engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>,
-    pass: RenderPass<RenderableType, FBOType>
+    pass: RenderPass<ShadingType, RenderableType, FBOType>
   ) {
     this.updateSize(engine);
     pass.outputTarget = this;

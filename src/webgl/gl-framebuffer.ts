@@ -52,6 +52,10 @@ export class GLFramebuffer {
 
   _formatKey: string;
 
+  getFormatKey() {
+    return this._formatKey;
+  }
+
   enableDepth: boolean = true;
   webglDepthBuffer: Nullable<WebGLRenderbuffer> = null;
   webglFrameBuffer: WebGLFramebuffer;

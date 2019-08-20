@@ -22,6 +22,7 @@ import { Vector4 } from "../math/vector4";
 import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
 import { RenderGraphBackendAdaptor } from "../render-graph/backend-interface";
+import { Vector4Like } from "../math/interface";
 
 export interface RenderSource{
   resetSource(): void;
@@ -52,7 +53,7 @@ const quad = new QuadSource();
 
 export class RenderEngine implements
   GLReleasable,
-  RenderGraphBackendAdaptor<RenderObject, GLFramebuffer>
+  RenderGraphBackendAdaptor<Shading, RenderObject, GLFramebuffer>
 {
   constructor(el?: HTMLCanvasElement, ctxOptions?: any) {
     this.renderer = new GLRenderer(el, ctxOptions);
@@ -107,11 +108,6 @@ export class RenderEngine implements
       })
     }
   }
-
-
-  public overrideShading: Nullable<Shading> = null;
-  public defaultTechnique: Shading = new Shading().decorate(new NormalShading());
-
   ////
 
 
@@ -202,7 +198,7 @@ export class RenderEngine implements
     const program = this.connectShading(object);
 
     // prepare material
-    this.connectMaterial(object.material, program);
+    this.connectMaterial(object.material, object.shading,  program);
 
     // prepare geometry
     this.connectGeometry(object.geometry, program);
@@ -223,7 +219,7 @@ export class RenderEngine implements
     );
 
     this.overrideShading = copyShading;
-    this.overrideShading.getProgram(this).defineFrameBufferTextureDep(
+    this.overrideShading.defineFBOInput(
       framebuffer.name, 'copySource'
     );
     this.render(quad);
@@ -263,7 +259,7 @@ export class RenderEngine implements
     } else if (object.shading !== undefined) {
       shading = object.shading;
     } else {
-      shading = this.defaultTechnique;
+      shading = this.defaultShading;
     }
 
     // get program, refresh provider cache if changed
@@ -298,7 +294,7 @@ export class RenderEngine implements
     return program;
   }
 
-  private connectMaterial(material: Material, program: GLProgram) {
+  private connectMaterial(material: Material, shading: Shading, program: GLProgram) {
 
     program.forTextures((tex: GLTextureUniform) => {
       let glTexture: WebGLTexture | undefined;
@@ -311,7 +307,7 @@ export class RenderEngine implements
 
       // acquire texture from framebuffer
       if (glTexture === undefined) {
-        const framebufferName = program.framebufferTextureMap[tex.name];
+        const framebufferName = shading.framebufferTextureMap[tex.name];
         glTexture = this.renderer.framebufferManager.getFramebufferTexture(framebufferName);
       }
 
@@ -403,6 +399,65 @@ export class RenderEngine implements
   }
 
 
+  private overrideShading: Nullable<Shading> = null;
+  public defaultShading: Shading = new Shading().decorate(new NormalShading());
+  setOverrideShading(shading: Shading): void {
+    this.overrideShading = shading;
+  }
+  getOverrideShading(): Shading {
+    return this.overrideShading;
+  }
+
+
+
+  createFramebuffer(key: string, width: number, height: number, hasDepth: boolean): GLFramebuffer {
+    return this.renderer.framebufferManager.createFrameBuffer(key, width, height, hasDepth);
+  }
+  getFramebuffer(key: string): GLFramebuffer {
+    return this.renderer.framebufferManager.getFramebuffer(key);
+  }
+  deleteFramebuffer(fbo: GLFramebuffer): void {
+    this.renderer.framebufferManager.deleteFramebuffer(fbo);
+  }
+  setRenderTargetScreen(): void {
+    this.renderer.setRenderTargetScreen();
+  }
+  setRenderTarget(framebuffer: GLFramebuffer): void {
+    this.renderer.setRenderTarget(framebuffer);
+  }
+  renderBufferWidth(): number {
+    return this.renderer.width;
+  }
+  renderBufferHeight(): number {
+    return this.renderer.height;
+  }
+
+
+
+
+  setViewport(x: number, y: number, width: number, height: number): void {
+    this.renderer.state.setViewport(x, y, width, height);
+  }
+  setFullScreenViewPort(): void {
+    this.renderer.state.setViewport(0, 0, this.renderBufferWidth(), this.renderBufferHeight());
+  }
+  setClearColor(color: Vector4Like): void {
+    this.renderer.state.colorbuffer.setClearColor(color);
+  }
+  getClearColor(color: Vector4Like): Vector4Like {
+    return color.copy(this.renderer.state.colorbuffer.currentClearColor);
+  }
+  resetDefaultClearColor(): void {
+    this.renderer.state.colorbuffer.setClearColor({ x: 0.5, y: 0.5, z: 0.5, w: 0.5 });
+  }
+  clearColor(): void {
+    this.renderer.state.colorbuffer.clear();
+  }
+  clearDepth(): void {
+    this.renderer.state.depthbuffer.clear();
+  }
+
+
 
   //  GL resource acquisition
   private programShadingMap: Map<Shading, GLProgram> = new Map();
@@ -434,9 +489,7 @@ export class RenderEngine implements
 
 
 
-  downloadCurrentRender() {
-    downloadCanvasPNGImage(this.renderer.el, 'artgl-renderscreenshot');
-  }
+
 
   releaseGL() {
     this.renderer.releaseGL();

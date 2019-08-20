@@ -13,7 +13,7 @@ export interface NamedAndFormatKeyed {
 }
 
 export interface ShadingDetermined<ShadingType> {
-  shading: ShadingType
+  shading?: ShadingType
 }
 
 export interface RenderGraphBackendAdaptor<
@@ -43,7 +43,7 @@ export interface RenderGraphBackendAdaptor<
   setViewport(x: number, y: number, width: number, height: number): void;
   setFullScreenViewPort(): void;
   setClearColor(color: Vector4Like): void;
-  getClearColor(): Vector4Like;
+  getClearColor(color: Vector4Like): Vector4Like;
   resetDefaultClearColor(): void;
   clearColor(): void;
   clearDepth(): void;

@@ -8,6 +8,7 @@ import { RenderEngine } from "../engine/render-engine";
 import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
 import { uniformFromValue } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
+import { ShadingConstrain } from "../render-graph/backend-interface";
 
 export interface ShaderUniformDecorator {
   /**
@@ -35,7 +36,7 @@ export interface ShaderUniformProvider {
   propertyUniformNameMap: Map<propertyName, uniformName>;
 }
 
-export class Shading {
+export class Shading implements ShadingConstrain{
   uuid = generateUUID();
   graph: ShaderGraph = new ShaderGraph();
 
@@ -66,6 +67,7 @@ export class Shading {
     this._decoratorObs.forEach((obs, dec) => {
       dec.notifyNeedRedecorate.remove(obs);
     })
+    this.framebufferTextureMap = {};
     this._decoratorObs.clear();
     this._decoratorSlot.clear();
     this._decorators = [];
@@ -116,6 +118,11 @@ export class Shading {
       program = engine.createProgram(this);
     }
     return program;
+  }
+
+  framebufferTextureMap: { [index: string]: string } = {};
+  defineFBOInput(inputFramebufferName: string, uniformName: string): void {
+    this.framebufferTextureMap[uniformName] = inputFramebufferName;
   }
 
   disposeProgram(engine: RenderEngine): void {
