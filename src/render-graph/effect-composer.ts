@@ -2,13 +2,17 @@ import { PassGraphNode, RenderGraph } from "../artgl";
 import { FrameBufferPool } from "./framebuffer-pool";
 import { RenderPass } from "./pass";
 import { RenderTargetNode } from "./node/render-target-node";
-import { RenderGraphBackendAdaptor, NamedAndFormatKeyed } from "./backend-interface";
+import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingDetermined, ShadingConstrain } from "./backend-interface";
 
 /**
  * Responsible for rendergraph execution and optimization
  */
-export class EffectComposer<RenderableType, FBOType extends NamedAndFormatKeyed> {
-  constructor(engine: RenderGraphBackendAdaptor<RenderableType, FBOType>) {
+export class EffectComposer
+  <ShadingType extends ShadingConstrain,
+  RenderableType extends ShadingDetermined<ShadingType>,
+  FBOType extends NamedAndFormatKeyed>
+{
+  constructor(engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>) {
     this.engine = engine;
     this.framebufferPool = new FrameBufferPool(this.engine);
 
@@ -17,22 +21,26 @@ export class EffectComposer<RenderableType, FBOType extends NamedAndFormatKeyed>
     })
   }
 
-  private engine: RenderGraphBackendAdaptor<RenderableType, FBOType>;
-  private passes: RenderPass<RenderableType, FBOType>[] = [];
+  private engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>;
+  private passes: RenderPass<ShadingType, RenderableType, FBOType>[] = [];
 
-  private nodeMap: Map<PassGraphNode<RenderableType, FBOType>, RenderPass<RenderableType, FBOType>> = new Map();
-  private framebufferPool: FrameBufferPool<RenderableType, FBOType>;
+  private nodeMap: Map<
+    PassGraphNode<ShadingType, RenderableType, FBOType>,
+    RenderPass<ShadingType, RenderableType, FBOType>
+    > = new Map();
+  
+  private framebufferPool: FrameBufferPool<ShadingType, RenderableType, FBOType>;
 
-  private keptFramebuffer: Map<RenderTargetNode<RenderableType, FBOType>, FBOType> = new Map();
-  private framebufferDropList: RenderTargetNode<RenderableType, FBOType>[][] = [];
+  private keptFramebuffer: Map<RenderTargetNode<ShadingType, RenderableType, FBOType>, FBOType> = new Map();
+  private framebufferDropList: RenderTargetNode<ShadingType, RenderableType, FBOType>[][] = [];
 
-  getFramebuffer(node: RenderTargetNode<RenderableType, FBOType>) {
+  getFramebuffer(node: RenderTargetNode<ShadingType, RenderableType, FBOType>) {
     return this.keptFramebuffer.get(node)
   }
 
   render(
-    engine: RenderGraphBackendAdaptor<RenderableType, FBOType>,
-    graph: RenderGraph<RenderableType, FBOType>
+    engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>,
+    graph: RenderGraph<ShadingType, RenderableType, FBOType>
   ) {
     this.passes.forEach((pass, index) => {
       const output = pass.outputTarget;
@@ -67,7 +75,7 @@ export class EffectComposer<RenderableType, FBOType extends NamedAndFormatKeyed>
     });
   }
 
-  setPasses(passes: RenderPass<RenderableType, FBOType>[]) {
+  setPasses(passes: RenderPass<ShadingType, RenderableType, FBOType>[]) {
     this.passes = passes;
 
     // compute dropList
@@ -98,11 +106,11 @@ export class EffectComposer<RenderableType, FBOType extends NamedAndFormatKeyed>
 
   }
 
-  registerNode(node: PassGraphNode<RenderableType, FBOType>) {
+  registerNode(node: PassGraphNode<ShadingType, RenderableType, FBOType>) {
     if (this.nodeMap.has(node)) {
       return this.nodeMap.get(node);
     }
-    const pass = new RenderPass<RenderableType, FBOType>(node.define)
+    const pass = new RenderPass<ShadingType, RenderableType, FBOType>(node.define)
     this.nodeMap.set(node, pass);
     return pass;
   }
@@ -114,8 +122,8 @@ export class EffectComposer<RenderableType, FBOType extends NamedAndFormatKeyed>
     this.keptFramebuffer.clear();
   }
 
-  getPass(node: PassGraphNode<RenderableType, FBOType>)
-    : RenderPass<RenderableType, FBOType> {
+  getPass(node: PassGraphNode<ShadingType, RenderableType, FBOType>)
+    : RenderPass<ShadingType, RenderableType, FBOType> {
     return this.nodeMap.get(node);
   }
 

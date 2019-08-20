@@ -1,6 +1,11 @@
 import { Observable } from "../core/observable";
 import { Size, RenderSource } from "../engine/render-engine";
 import { Vector4Like } from "../math/interface";
+import { Nullable } from "../type";
+
+export interface ShadingConstrain {
+  defineFBOInput(inputFramebufferName: string, uniformName: string): void;
+}
 
 export interface NamedAndFormatKeyed {
   name: string,
@@ -12,7 +17,7 @@ export interface ShadingDetermined<ShadingType> {
 }
 
 export interface RenderGraphBackendAdaptor<
-  ShadingType,
+  ShadingType extends ShadingConstrain,
   RenderableType extends ShadingDetermined<ShadingType>,
   FBOType extends NamedAndFormatKeyed
   > {
@@ -22,7 +27,8 @@ export interface RenderGraphBackendAdaptor<
   render(source: RenderSource): void;
   renderFrameBuffer(framebuffer: FBOType, viewport: Vector4Like): void;
 
-  setOverrideShading(shading: ShadingType): void;
+  setOverrideShading(shading: Nullable<ShadingType>): void;
+  getOverrideShading(): Nullable<ShadingType>;
   
   createFramebuffer(key: string, width: number, height: number, hasDepth: boolean): FBOType;
   getFramebuffer(key: string): FBOType;
@@ -38,6 +44,7 @@ export interface RenderGraphBackendAdaptor<
   setFullScreenViewPort(): void;
   setClearColor(color: Vector4Like): void;
   getClearColor(): Vector4Like;
+  resetDefaultClearColor(): void;
   clearColor(): void;
   clearDepth(): void;
 }

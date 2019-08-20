@@ -1,6 +1,6 @@
 import { generateUUID } from "../math";
 import { RenderTargetNode } from "./node/render-target-node";
-import { RenderGraphBackendAdaptor, NamedAndFormatKeyed } from "./backend-interface";
+import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingDetermined, ShadingConstrain } from "./backend-interface";
 
 type formatKey = string;
 type FBOGeneratedName = string;
@@ -8,8 +8,12 @@ type FBOGeneratedName = string;
 /**
  * Proxy the fbo storage in rendergraph
  */
-export class FrameBufferPool<RenderableType, FBOType extends NamedAndFormatKeyed> {
-  constructor(engine: RenderGraphBackendAdaptor<RenderableType, FBOType>) {
+export class FrameBufferPool
+  <ShadingType extends ShadingConstrain,
+  RenderableType extends ShadingDetermined<ShadingType>,
+  FBOType extends NamedAndFormatKeyed>
+{
+  constructor(engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>) {
     this.engine = engine;
 
     // when resize, clear all for convenience, TODO, optimize
@@ -19,7 +23,7 @@ export class FrameBufferPool<RenderableType, FBOType extends NamedAndFormatKeyed
     })
   }
 
-  private engine: RenderGraphBackendAdaptor<RenderableType, FBOType>;
+  private engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>;
 
   framebuffers: Map<FBOGeneratedName, FBOType> = new Map();
 
@@ -36,7 +40,7 @@ export class FrameBufferPool<RenderableType, FBOType extends NamedAndFormatKeyed
   /**
    * get a GLFramebuffer from pool, if there is no fbo meet the config, create a new one, and pool it
    */
-  requestFramebuffer(node: RenderTargetNode<RenderableType, FBOType>) {
+  requestFramebuffer(node: RenderTargetNode<ShadingType, RenderableType, FBOType>) {
     const pooled = this.availableBuffers.get(node.formatKey);
     if (pooled !== undefined) {
       const result = pooled.pop();

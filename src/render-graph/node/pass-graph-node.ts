@@ -4,11 +4,16 @@ import { RenderGraph } from "../render-graph";
 import { RenderPass, uniformName } from "../pass";
 import { Nullable } from "../../type";
 import { RenderTargetNode } from "../exports";
-import { NamedAndFormatKeyed } from "../backend-interface";
+import { NamedAndFormatKeyed, ShadingDetermined, ShadingConstrain } from "../backend-interface";
 
-export class PassGraphNode<RenderableType, FBOType extends NamedAndFormatKeyed>
+export class PassGraphNode
+  <
+  ShadingType extends ShadingConstrain,
+  RenderableType extends ShadingDetermined<ShadingType>,
+  FBOType extends NamedAndFormatKeyed
+  >
   extends DAGNode {
-  constructor(define: PassDefine) {
+  constructor(define: PassDefine<ShadingType>) {
     super();
     this.name = define.name;
 
@@ -20,12 +25,12 @@ export class PassGraphNode<RenderableType, FBOType extends NamedAndFormatKeyed>
 
   }
   private inputsGetter: Nullable<() => PassInputMapInfo> = null
-  inputs: Map<uniformName, RenderTargetNode<RenderableType, FBOType>> = new Map();
+  inputs: Map<uniformName, RenderTargetNode<ShadingType, RenderableType, FBOType>> = new Map();
   readonly name: string;
-  readonly define: PassDefine;
+  readonly define: PassDefine<ShadingType>;
 
   // update graph structure
-  updateDependNode(graph: RenderGraph<RenderableType, FBOType>) {
+  updateDependNode(graph: RenderGraph<ShadingType, RenderableType, FBOType>) {
     // disconnect all depends node 
     this.clearAllFrom();
     this.inputs.clear();
@@ -46,7 +51,7 @@ export class PassGraphNode<RenderableType, FBOType extends NamedAndFormatKeyed>
   }
 
   // from updated graph structure, setup render pass
-  updatePass(pass: RenderPass<RenderableType, FBOType>) {
+  updatePass(pass: RenderPass<ShadingType, RenderableType, FBOType>) {
     pass.uniformNameFBOMap.clear();
     pass.framebuffersDepends.clear();
     pass.uniformRenderTargetNodeMap.clear();

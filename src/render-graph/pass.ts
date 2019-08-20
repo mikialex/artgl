@@ -1,17 +1,19 @@
 import { RenderGraph } from "./render-graph";
 import { PassDefine } from "./interface";
 import { Nullable } from "../type";
-import { Shading } from "../core/shading";
 import { RenderTargetNode } from "./node/render-target-node";
 import { PassGraphNode } from "./node/pass-graph-node";
-import { RenderGraphBackendAdaptor, NamedAndFormatKeyed } from "./backend-interface";
+import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingDetermined, ShadingConstrain } from "./backend-interface";
 import { Vector4Like } from "../math/interface";
 
 export type uniformName = string;
 type framebufferName = string;
 
-export class RenderPass<RenderableType, FBOType extends NamedAndFormatKeyed>{
-  constructor(define: PassDefine) {
+export class RenderPass<
+  ShadingType extends ShadingConstrain,
+  RenderableType extends ShadingDetermined<ShadingType>,
+  FBOType extends NamedAndFormatKeyed>{
+  constructor(define: PassDefine<ShadingType>) {
     this.define = define;
     this.name = define.name;
     if (define.shading !== undefined) {
@@ -31,7 +33,7 @@ export class RenderPass<RenderableType, FBOType extends NamedAndFormatKeyed>{
 
   }
 
-  readonly define: PassDefine;
+  readonly define: PassDefine<ShadingType>;
   public name: string;
 
   private clearColor: Vector4Like;
@@ -40,23 +42,23 @@ export class RenderPass<RenderableType, FBOType extends NamedAndFormatKeyed>{
 
   private afterPassExecute?: () => any;
   private beforePassExecute?: () => any;
-  
-  private overrideShading: Nullable<Shading> = null;
+
+  private overrideShading: Nullable<ShadingType> = null;
 
   uniformNameFBOMap: Map<uniformName, framebufferName> = new Map();
-  uniformRenderTargetNodeMap: Map<uniformName, RenderTargetNode<RenderableType, FBOType>> = new Map();
-  framebuffersDepends: Set<RenderTargetNode<RenderableType, FBOType>> = new Set();
+  uniformRenderTargetNodeMap: Map<uniformName, RenderTargetNode<ShadingType, RenderableType, FBOType>> = new Map();
+  framebuffersDepends: Set<RenderTargetNode<ShadingType, RenderableType, FBOType>> = new Set();
 
-  passNode: PassGraphNode<RenderableType, FBOType>
+  passNode: PassGraphNode<ShadingType, RenderableType, FBOType>
   // outputInfos
-  outputTarget: RenderTargetNode<RenderableType, FBOType>
+  outputTarget: RenderTargetNode<ShadingType, RenderableType, FBOType>
 
   get isOutputScreen() {
     return this.outputTarget.isScreenNode;
   }
 
   renderDebugResult(
-    engine: RenderGraphBackendAdaptor<RenderableType, FBOType>,
+    engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>,
     framebuffer: FBOType
   ) {
     const debugOutputViewport = this.outputTarget.debugViewPort;
@@ -67,11 +69,11 @@ export class RenderPass<RenderableType, FBOType extends NamedAndFormatKeyed>{
       const debugInputViewport = this.uniformRenderTargetNodeMap.get(uniformName).debugViewPort;
       engine.renderFrameBuffer(dependFramebuffer, debugInputViewport)
     })
-  } 
+  }
 
   execute(
-    engine: RenderGraphBackendAdaptor<RenderableType, FBOType>,
-    graph: RenderGraph<RenderableType, FBOType>,
+    engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>,
+    graph: RenderGraph<ShadingType, RenderableType, FBOType>,
     framebuffer: FBOType
   ) {
 
@@ -96,12 +98,12 @@ export class RenderPass<RenderableType, FBOType extends NamedAndFormatKeyed>{
       engine.setRenderTarget(outputTarget);
       engine.setViewport(0, 0, this.outputTarget.widthAbs, this.outputTarget.heightAbs);
     }
-    
+
     // input binding 
     if (this.overrideShading !== null) {
-      engine.overrideShading = this.overrideShading;
+      engine.setOverrideShading(this.overrideShading)
       this.uniformNameFBOMap.forEach((inputFramebufferName, uniformName) => {
-        (engine.overrideShading as Shading).getProgram(engine).defineFrameBufferTextureDep(
+        engine.getOverrideShading().defineFBOInput(
           inputFramebufferName, uniformName
         );
       })
@@ -134,12 +136,12 @@ export class RenderPass<RenderableType, FBOType extends NamedAndFormatKeyed>{
       this.afterPassExecute();
     }
 
-    engine.overrideShading = null;
-    engine.renderer.state.colorbuffer.resetDefaultClearColor();
+    engine.setOverrideShading(null);
+    engine.resetDefaultClearColor();
 
 
     if (graph.enableDebuggingView && !this.isOutputScreen) {
-      this.renderDebugResult(engine, graph, framebuffer);
+      this.renderDebugResult(engine, framebuffer);
     }
 
   }

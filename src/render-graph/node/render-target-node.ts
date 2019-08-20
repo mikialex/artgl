@@ -8,10 +8,11 @@ import { Vector4 } from '../../math/vector4';
 import { PixelFormat } from "../../webgl/const";
 import { RenderPass } from "../pass";
 import { PassGraphNode } from "./pass-graph-node";
-import { RenderGraphBackendAdaptor, NamedAndFormatKeyed } from "../backend-interface";
+import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingDetermined } from "../backend-interface";
 
 export class RenderTargetNode<
-  RenderableType,
+  ShadingType,
+  RenderableType extends ShadingDetermined<ShadingType>,
   FBOType extends NamedAndFormatKeyed
   > extends DAGNode{
   constructor(define: RenderTargetDefine) {
@@ -93,7 +94,7 @@ export class RenderTargetNode<
   }
 
   // update abs size info from given engine render size
-  updateSize(engine: RenderGraphBackendAdaptor<RenderableType, FBOType>) {
+  updateSize(engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>) {
     if (this.isScreenNode) {
       return;
     }
@@ -128,7 +129,7 @@ export class RenderTargetNode<
 
   // from updated graph structure, setup render pass
   updatePass(
-    engine: RenderGraphBackendAdaptor<RenderableType, FBOType>,
+    engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>,
     pass: RenderPass<RenderableType, FBOType>
   ) {
     this.updateSize(engine);
