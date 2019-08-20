@@ -1,4 +1,4 @@
-import { RenderSource } from "../engine/render-engine";
+import { RenderSource } from "./render-engine";
 import { Mesh } from "../object/mesh";
 import { PlaneGeometry } from "../geometry/geo-lib/plane-geometry";
 

@@ -200,7 +200,6 @@ export default class ViewerCanvas extends Vue {
   }
 
   screenshot() {
-    GLApp.engine.downloadCurrentRender();
   }
 }
 </script>

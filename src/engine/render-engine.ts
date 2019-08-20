@@ -13,16 +13,17 @@ import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
 import { UniformProxy } from "./uniform-proxy";
 import { Observable } from "../core/observable";
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
-import { QuadSource } from '../render-graph/quad-source';
-import { downloadCanvasPNGImage } from "../util/file-io";
+import { QuadSource } from './quad-source';
 import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/vao";
 import { Vector4 } from "../math/vector4";
 import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
+import { RenderGraphBackendAdaptor } from "../render-graph/backend-interface";
+import { Vector4Like } from "../math/interface";
 
-export interface RenderSource{
+export interface RenderSource {
   resetSource(): void;
   nextRenderable(): Nullable<RenderObject>;
   updateSource(): void;
@@ -40,7 +41,7 @@ export function foreachRenderableInSource(source: RenderSource, visitor: (obj: R
   } while (nextSource !== null);
 }
 
-export interface Size{
+export interface Size {
   width: number;
   height: number;
 }
@@ -49,7 +50,10 @@ export interface Size{
 const copyShading = new Shading().decorate(new CopyShading());
 const quad = new QuadSource();
 
-export class RenderEngine implements GLReleasable{
+export class RenderEngine implements
+  GLReleasable,
+  RenderGraphBackendAdaptor<Shading, RenderObject, GLFramebuffer>
+{
   constructor(el?: HTMLCanvasElement, ctxOptions?: any) {
     this.renderer = new GLRenderer(el, ctxOptions);
     // if we have a element param, use it as the default camera's param for convenience
@@ -62,7 +66,7 @@ export class RenderEngine implements GLReleasable{
     InnerUniformMap.forEach((des, key) => {
       this.globalUniforms.set(key, new UniformProxy(des.default))
     })
-    
+
     this.preferVAO = true;
   }
 
@@ -89,7 +93,7 @@ export class RenderEngine implements GLReleasable{
 
   // resize
   readonly resizeObservable: Observable<Size> = new Observable<Size>();
-  setSize(width:number, height: number) {
+  setSize(width: number, height: number) {
     if (this.renderer.setSize(width, height)) {
       this.resizeObservable.notifyObservers({
         width, height
@@ -103,11 +107,6 @@ export class RenderEngine implements GLReleasable{
       })
     }
   }
-
-
-  public overrideShading: Nullable<Shading> = null;
-  public defaultTechnique: Shading = new Shading().decorate(new NormalShading());
-
   ////
 
 
@@ -177,7 +176,7 @@ export class RenderEngine implements GLReleasable{
     } else {
       this.isCameraChanged = false;
     }
-   
+
   }
   ////
 
@@ -194,11 +193,13 @@ export class RenderEngine implements GLReleasable{
 
   renderObject(object: RenderObject) {
 
+    const shading = this.getUsedShading(object);
+
     // prepare technique
-    const program = this.connectShading(object);
+    const program = this.connectShading(object, shading);
 
     // prepare material
-    this.connectMaterial(object.material, program);
+    this.connectMaterial(object.material, shading, program);
 
     // prepare geometry
     this.connectGeometry(object.geometry, program);
@@ -219,7 +220,7 @@ export class RenderEngine implements GLReleasable{
     );
 
     this.overrideShading = copyShading;
-    this.overrideShading.getProgram(this).defineFrameBufferTextureDep(
+    this.overrideShading.defineFBOInput(
       framebuffer.name, 'copySource'
     );
     this.render(quad);
@@ -243,24 +244,13 @@ export class RenderEngine implements GLReleasable{
    */
   private globalUniforms: Map<InnerSupportUniform, UniformProxy> = new Map();
   getGlobalUniform(uniform: InnerSupportUniform): UniformProxy {
-    return this.globalUniforms.get(uniform) as UniformProxy 
+    return this.globalUniforms.get(uniform) as UniformProxy
   }
 
   private lastUploadedShaderUniformProvider: Set<ShaderUniformProvider> = new Set();
   private lastProgramRendered: GLProgram;
 
-
-  private connectShading(object: RenderObject): GLProgram {
-
-    // // get shading, check override, default situation
-    let shading: Shading;
-    if (this.overrideShading !== null) {
-      shading = this.overrideShading;
-    } else if (object.shading !== undefined) {
-      shading = object.shading;
-    } else {
-      shading = this.defaultTechnique;
-    }
+  private connectShading(object: RenderObject, shading: Shading): GLProgram {
 
     // get program, refresh provider cache if changed
     const program = shading.getProgram(this);
@@ -294,7 +284,7 @@ export class RenderEngine implements GLReleasable{
     return program;
   }
 
-  private connectMaterial(material: Material, program: GLProgram) {
+  private connectMaterial(material: Material, shading: Shading, program: GLProgram) {
 
     program.forTextures((tex: GLTextureUniform) => {
       let glTexture: WebGLTexture | undefined;
@@ -303,24 +293,24 @@ export class RenderEngine implements GLReleasable{
       if (material !== undefined) {
         const texture = material.getChannelTexture(tex.name);
         glTexture = texture.getGLTexture(this);
-      } 
+      }
 
       // acquire texture from framebuffer
       if (glTexture === undefined) {
-        const framebufferName = program.framebufferTextureMap[tex.name];
+        const framebufferName = shading.framebufferTextureMap[tex.name];
         glTexture = this.renderer.framebufferManager.getFramebufferTexture(framebufferName);
       }
 
       if (glTexture === undefined) {
         throw `texture <${tex.name}>bind failed, for framebuffer texture, setup program.framebufferTextureMap`
       }
-      
+
       tex.useTexture(glTexture);
     })
   }
 
   private connectGeometry(geometry: Geometry, program: GLProgram) {
-    
+
     // check index buffer and update program.indexUINT
     if (program.useIndexDraw) {
       if (geometry.indexBuffer === null) {
@@ -399,6 +389,77 @@ export class RenderEngine implements GLReleasable{
   }
 
 
+  private overrideShading: Nullable<Shading> = null;
+  public defaultShading: Shading = new Shading().decorate(new NormalShading());
+  setOverrideShading(shading: Shading): void {
+    this.overrideShading = shading;
+  }
+  getOverrideShading(): Shading {
+    return this.overrideShading;
+  }
+  private getUsedShading(object: RenderObject) {
+    // // get shading, check override, default situation
+    let shading: Shading;
+    if (this.overrideShading !== null) {
+      shading = this.overrideShading;
+    } else if (object.shading !== undefined) {
+      shading = object.shading;
+    } else {
+      shading = this.defaultShading;
+    }
+    return shading;
+  }
+
+
+
+  createFramebuffer(key: string, width: number, height: number, hasDepth: boolean): GLFramebuffer {
+    return this.renderer.framebufferManager.createFrameBuffer(key, width, height, hasDepth);
+  }
+  getFramebuffer(key: string): GLFramebuffer {
+    return this.renderer.framebufferManager.getFramebuffer(key);
+  }
+  deleteFramebuffer(fbo: GLFramebuffer): void {
+    this.renderer.framebufferManager.deleteFramebuffer(fbo);
+  }
+  setRenderTargetScreen(): void {
+    this.renderer.setRenderTargetScreen();
+  }
+  setRenderTarget(framebuffer: GLFramebuffer): void {
+    this.renderer.setRenderTarget(framebuffer);
+  }
+  renderBufferWidth(): number {
+    return this.renderer.width;
+  }
+  renderBufferHeight(): number {
+    return this.renderer.height;
+  }
+
+
+
+
+  setViewport(x: number, y: number, width: number, height: number): void {
+    this.renderer.state.setViewport(x, y, width, height);
+  }
+  setFullScreenViewPort(): void {
+    this.renderer.state.setViewport(0, 0, this.renderBufferWidth(), this.renderBufferHeight());
+  }
+  setClearColor(color: Vector4Like): void {
+    this.renderer.state.colorbuffer.setClearColor(color);
+  }
+  getClearColor(color: Vector4Like): Vector4Like {
+    return color.copy(this.renderer.state.colorbuffer.currentClearColor);
+  }
+  resetDefaultClearColor(): void {
+    this.renderer.state.colorbuffer.resetDefaultClearColor();
+  }
+  clearColor(): void {
+    this.renderer.state.colorbuffer.clear();
+  }
+  clearDepth(): void {
+    this.renderer.state.depthbuffer.clear();
+  }
+
+
 
   //  GL resource acquisition
   private programShadingMap: Map<Shading, GLProgram> = new Map();
@@ -406,7 +467,7 @@ export class RenderEngine implements GLReleasable{
     return this.programShadingMap.get(shading);
   }
 
-  createProgram(shading: Shading): GLProgram  {
+  createProgram(shading: Shading): GLProgram {
     const program = this.renderer.createProgram(shading.getProgramConfig());
     this.programShadingMap.set(shading, program);
     return program;
@@ -430,9 +491,7 @@ export class RenderEngine implements GLReleasable{
 
 
 
-  downloadCurrentRender() {
-    downloadCanvasPNGImage(this.renderer.el, 'artgl-renderscreenshot');
-  }
+
 
   releaseGL() {
     this.renderer.releaseGL();

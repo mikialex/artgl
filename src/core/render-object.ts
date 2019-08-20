@@ -6,7 +6,7 @@ import { DrawState } from "./draw-state";
 import { Face3 } from "../math/entity/face3";
 import { Line3 } from "../math/entity/line3";
 import { Vector3 } from "../math";
-import { Shading, ShaderUniformProvider, ShaderUniformDecorator } from "./shading";
+import { Shading, ShaderUniformDecorator } from "./shading";
 import { StandardGeometry } from "../geometry/standard-geometry";
 
 export class RenderRange {

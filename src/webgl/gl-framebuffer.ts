@@ -1,28 +1,18 @@
 import { GLRenderer } from "./gl-renderer";
-import { Nullable } from "../type";
+import { Nullable, GLReleasable } from "../type";
 import { PixelFormat } from "./const";
 import { Texture, TextureSource } from "../core/texture";
-import { RenderEngine } from "../engine/render-engine";
 
 
-
-export class FramebufferAttachTexture extends Texture {
+export class FramebufferAttachTexture extends Texture implements GLReleasable {
   constructor() {
     super(TextureSource.forRenderTarget(1,1))
   }
 
   isDataTexture: true = true;
 
-  attach(engine: RenderEngine, framebuffer: GLFramebuffer, attachPoint: number) {
-    engine.renderer.setRenderTarget(framebuffer);
-
-    const gl = framebuffer.gl;
-    this.rawDataSource.width = framebuffer.width;
-    this.rawDataSource.height = framebuffer.height;
-    this.releaseGraphics(engine);
-    const glTexture = engine.renderer.textureManger.createTextureForRenderTarget(this);
-    const attachmentPoint = GLAttachmentPoints[attachPoint];
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, glTexture, 0);
+  releaseGL(renderer: GLRenderer) {
+    renderer.textureManger.deleteGLTexture(this);
   }
 
 }
@@ -62,6 +52,10 @@ export class GLFramebuffer {
 
   _formatKey: string;
 
+  getFormatKey() {
+    return this._formatKey;
+  }
+
   enableDepth: boolean = true;
   webglDepthBuffer: Nullable<WebGLRenderbuffer> = null;
   webglFrameBuffer: WebGLFramebuffer;
@@ -90,7 +84,19 @@ export class GLFramebuffer {
     return buffer;
   }
 
-  resize(engine: RenderEngine, width: number, height: number) {
+  attach(texture: FramebufferAttachTexture, attachPoint: number) {
+    this.renderer.setRenderTarget(this);
+
+    const gl = this.gl;
+    texture.rawDataSource.width = this.width;
+    texture.rawDataSource.height = this.height;
+    texture.releaseGL(this.renderer);
+    const glTexture = this.renderer.textureManger.createTextureForRenderTarget(texture);
+    const attachmentPoint = GLAttachmentPoints[attachPoint];
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, glTexture, 0);
+  }
+
+  resize(width: number, height: number) {
 
     if (this.width === width && this.height === height) {
       return;
@@ -106,7 +112,7 @@ export class GLFramebuffer {
 
     this.textureAttachedSlot.forEach((text, index) => {
       if (text) {
-        text.attach(engine, this, index);
+        this.attach(text, index);
       }
     })
 
@@ -116,12 +122,12 @@ export class GLFramebuffer {
 
   }
 
-  createAttachTexture(engine: RenderEngine,attachPoint: number) {
+  createAttachTexture(attachPoint: number) {
     if (this.textureAttachedSlot[attachPoint] !== undefined) {
       throw 'framebuffer has attached texture'
     }
     const attachTexture = new FramebufferAttachTexture();
-    attachTexture.attach(engine, this, attachPoint);
+    this.attach(attachTexture, attachPoint);
     this.textureAttachedSlot[attachPoint] = attachTexture;
 
   }

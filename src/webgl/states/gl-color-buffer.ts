@@ -1,5 +1,6 @@
 import { GLRenderer } from "../gl-renderer";
 import { Vector4 } from "../../math/vector4";
+import { Vector4Like } from "../../math/interface";
 
 export class GLColorBuffer{
   static defaultClearColor = new Vector4(0.8, 0.8, 0.8, 1);
@@ -40,7 +41,7 @@ export class GLColorBuffer{
 
   // TODO premultiplied alpha
   currentClearColor: Vector4 = new Vector4();
-  setClearColor(newColor: Vector4, premultipliedAlpha?: boolean) {
+  setClearColor(newColor: Vector4Like, premultipliedAlpha?: boolean) {
     if (!newColor.equals(this.currentClearColor)) {
       this.currentClearColor.copy(newColor);
       this.gl.clearColor(newColor.x, newColor.y, newColor.z, newColor.w);

@@ -1,6 +1,5 @@
 import { GLFramebuffer } from "./gl-framebuffer";
 import { GLRenderer } from "./gl-renderer";
-import { RenderEngine } from "../engine/render-engine";
 
 export class GLFrameBufferManager {
   constructor(renderer: GLRenderer) {
@@ -12,13 +11,13 @@ export class GLFrameBufferManager {
 
   private framebuffers: Map<string, GLFramebuffer> = new Map();
 
-  createFrameBuffer(engine: RenderEngine, name: string, width: number, height: number, enableDepth: boolean): GLFramebuffer{
+  createFrameBuffer(name: string, width: number, height: number, enableDepth: boolean): GLFramebuffer{
     if (this.framebuffers.has(name)) {
       throw 'duplicate framebuffer key name';
     }
 
     const framebuffer = new GLFramebuffer(this.renderer, name, width, height);
-    framebuffer.createAttachTexture(engine, 0);
+    framebuffer.createAttachTexture(0);
     framebuffer.enableDepth = enableDepth;
     if (enableDepth) {
       framebuffer.createAttachDepthBuffer();

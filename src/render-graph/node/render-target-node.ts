@@ -3,14 +3,18 @@ import { RenderTargetDefine, DimensionType } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { GLFramebuffer } from "../../webgl/gl-framebuffer";
 import { MathUtil } from '../../math/util'
-import { RenderEngine } from "../../engine/render-engine";
 import { Nullable } from "../../type";
 import { Vector4 } from '../../math/vector4';
 import { PixelFormat } from "../../webgl/const";
 import { RenderPass } from "../pass";
 import { PassGraphNode } from "./pass-graph-node";
+import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingDetermined, ShadingConstrain } from "../backend-interface";
 
-export class RenderTargetNode extends DAGNode{
+export class RenderTargetNode<
+  ShadingType extends ShadingConstrain = any,
+  RenderableType extends ShadingDetermined<ShadingType> = any,
+  FBOType extends NamedAndFormatKeyed = any
+  > extends DAGNode{
   constructor(define: RenderTargetDefine) {
     super();
     this.name = define.name;
@@ -67,9 +71,9 @@ export class RenderTargetNode extends DAGNode{
   private fromGetter: () => Nullable<string>
   private from: string = null;
 
-  private _fromPassNode: Nullable<PassGraphNode> = null
+  private _fromPassNode: Nullable<PassGraphNode<ShadingType, RenderableType, FBOType>> = null
 
-  set fromPassNode(node: Nullable<PassGraphNode>) {
+  set fromPassNode(node: Nullable<PassGraphNode<ShadingType, RenderableType, FBOType>>) {
     if (node === null) {
       this._fromPassNode = node;
       this.clearAllFrom();
@@ -90,7 +94,7 @@ export class RenderTargetNode extends DAGNode{
   }
 
   // update abs size info from given engine render size
-  updateSize(engine: RenderEngine) {
+  updateSize(engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>) {
     if (this.isScreenNode) {
       return;
     }
@@ -99,11 +103,11 @@ export class RenderTargetNode extends DAGNode{
     let height: number;
     // decide initial size and create resize observer
     if (define.format.dimensionType === DimensionType.fixed) {
-      width = define.format.width !== undefined ? define.format.width : engine.renderer.width;
-      height = define.format.height !== undefined ? define.format.height : engine.renderer.height;
+      width = define.format.width !== undefined ? define.format.width : engine.renderBufferWidth();
+      height = define.format.height !== undefined ? define.format.height : engine.renderBufferHeight();
     } else { //  === DimensionType.bindRenderSize
-      width = Math.max(5, engine.renderer.width * this.autoWidthRatio);
-      height = Math.max(5, engine.renderer.height * this.autoHeightRatio);
+      width = Math.max(5, engine.renderBufferWidth() * this.autoWidthRatio);
+      height = Math.max(5, engine.renderBufferHeight() * this.autoHeightRatio);
     }
     this.widthAbs = Math.max(5, width);
     this.heightAbs = Math.max(5, height);
@@ -111,7 +115,7 @@ export class RenderTargetNode extends DAGNode{
   }
 
   // update graph structure
-  updateDependNode(graph: RenderGraph) {
+  updateDependNode(graph: RenderGraph<ShadingType, RenderableType, FBOType>) {
     // disconnect depends pass node
     this.fromPassNode = null;
 
@@ -124,7 +128,10 @@ export class RenderTargetNode extends DAGNode{
   }
 
   // from updated graph structure, setup render pass
-  updatePass(engine: RenderEngine, pass: RenderPass) {
+  updatePass(
+    engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>,
+    pass: RenderPass<ShadingType, RenderableType, FBOType>
+  ) {
     this.updateSize(engine);
     pass.outputTarget = this;
   }

@@ -1,6 +1,7 @@
 import { DataObject, ArrayFlattenable, VectorDataObject } from "./index";
 import { Matrix4 } from "./matrix4";
 import { Quaternion } from "./quaternion";
+import { Vector4Like } from "./interface";
 
 export class Vector4
   implements
@@ -25,7 +26,7 @@ export class Vector4
     return new Vector4(this.x, this.y, this.z, this.w);
   }
 
-  copy(v: Vector4) {
+  copy(v: Vector4Like) {
     this.x = v.x;
     this.y = v.y;
     this.z = v.z;
@@ -33,7 +34,7 @@ export class Vector4
     return this;
   }
 
-  equals(v: Vector4) {
+  equals(v: Vector4Like) {
     return ((v.x === this.x) && (v.y === this.y) && (v.z === this.z) && (v.w === this.w));
   }
 

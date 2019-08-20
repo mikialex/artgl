@@ -17,7 +17,7 @@ export function genFragShader(graph: ShaderGraph): string {
   builder.addIndent()
 
   const evaluatedNode = new Map<ShaderNode, varRecord>();
-  const nodeDependList = graph.fragmentRoot.generateDependencyOrderList() as ShaderNode[];
+  const nodeDependList = graph.fragmentRoot.getTopologicalSortedList() as ShaderNode[];
   const fragResult = codeGenGraph(nodeDependList, "gl_FragColor", evaluatedNode);
   builder.writeBlock(fragResult.code)
   pushListToMap(evaluatedNode, fragResult.varList)
@@ -40,7 +40,7 @@ export function genVertexShader(graph: ShaderGraph): string {
   builder.addIndent()
 
   const evaluatedNode = new Map<ShaderNode, varRecord>();
-  const nodeDependList = graph.vertexRoot.generateDependencyOrderList() as ShaderNode[];
+  const nodeDependList = graph.vertexRoot.getTopologicalSortedList() as ShaderNode[];
   const vertexResult = codeGenGraph(nodeDependList, "gl_Position", evaluatedNode)
   pushListToMap(evaluatedNode, vertexResult.varList)
   builder.writeBlock(vertexResult.code)
@@ -48,7 +48,7 @@ export function genVertexShader(graph: ShaderGraph): string {
   builder.emptyLine()
 
   graph.varyings.forEach((varyNode, key) => {
-    const varyDependList = varyNode.generateDependencyOrderList() as ShaderNode[];
+    const varyDependList = varyNode.getTopologicalSortedList() as ShaderNode[];
     const varyResult = codeGenGraph(varyDependList, key, evaluatedNode);
     pushListToMap(evaluatedNode, varyResult.varList)
     builder.writeBlock(varyResult.code)

@@ -15,8 +15,8 @@ export class RenderPipeline{
   engine: RenderEngine;
   config: RenderConfig;
 
-  graph: RenderGraph = new RenderGraph();
-  composer: EffectComposer;
+  graph: RenderGraph<any, any, any> = new RenderGraph();
+  composer: EffectComposer<any, any, any>;
 
   enableTAA = true;
   taaShading = new TAAShading()
