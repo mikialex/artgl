@@ -11,9 +11,9 @@ import { PassGraphNode } from "./pass-graph-node";
 import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingDetermined, ShadingConstrain } from "../backend-interface";
 
 export class RenderTargetNode<
-  ShadingType extends ShadingConstrain,
-  RenderableType extends ShadingDetermined<ShadingType>,
-  FBOType extends NamedAndFormatKeyed
+  ShadingType extends ShadingConstrain = any,
+  RenderableType extends ShadingDetermined<ShadingType> = any,
+  FBOType extends NamedAndFormatKeyed = any
   > extends DAGNode{
   constructor(define: RenderTargetDefine) {
     super();

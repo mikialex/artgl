@@ -14,7 +14,6 @@ import { UniformProxy } from "./uniform-proxy";
 import { Observable } from "../core/observable";
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
 import { QuadSource } from './quad-source';
-import { downloadCanvasPNGImage } from "../util/file-io";
 import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/vao";
@@ -24,7 +23,7 @@ import { Interactor } from "../interact/interactor";
 import { RenderGraphBackendAdaptor } from "../render-graph/backend-interface";
 import { Vector4Like } from "../math/interface";
 
-export interface RenderSource{
+export interface RenderSource {
   resetSource(): void;
   nextRenderable(): Nullable<RenderObject>;
   updateSource(): void;
@@ -42,7 +41,7 @@ export function foreachRenderableInSource(source: RenderSource, visitor: (obj: R
   } while (nextSource !== null);
 }
 
-export interface Size{
+export interface Size {
   width: number;
   height: number;
 }
@@ -67,7 +66,7 @@ export class RenderEngine implements
     InnerUniformMap.forEach((des, key) => {
       this.globalUniforms.set(key, new UniformProxy(des.default))
     })
-    
+
     this.preferVAO = true;
   }
 
@@ -94,7 +93,7 @@ export class RenderEngine implements
 
   // resize
   readonly resizeObservable: Observable<Size> = new Observable<Size>();
-  setSize(width:number, height: number) {
+  setSize(width: number, height: number) {
     if (this.renderer.setSize(width, height)) {
       this.resizeObservable.notifyObservers({
         width, height
@@ -177,7 +176,7 @@ export class RenderEngine implements
     } else {
       this.isCameraChanged = false;
     }
-   
+
   }
   ////
 
@@ -194,11 +193,13 @@ export class RenderEngine implements
 
   renderObject(object: RenderObject) {
 
+    const shading = this.getUsedShading(object);
+
     // prepare technique
-    const program = this.connectShading(object);
+    const program = this.connectShading(object, shading);
 
     // prepare material
-    this.connectMaterial(object.material, object.shading,  program);
+    this.connectMaterial(object.material, shading, program);
 
     // prepare geometry
     this.connectGeometry(object.geometry, program);
@@ -243,24 +244,13 @@ export class RenderEngine implements
    */
   private globalUniforms: Map<InnerSupportUniform, UniformProxy> = new Map();
   getGlobalUniform(uniform: InnerSupportUniform): UniformProxy {
-    return this.globalUniforms.get(uniform) as UniformProxy 
+    return this.globalUniforms.get(uniform) as UniformProxy
   }
 
   private lastUploadedShaderUniformProvider: Set<ShaderUniformProvider> = new Set();
   private lastProgramRendered: GLProgram;
 
-
-  private connectShading(object: RenderObject): GLProgram {
-
-    // // get shading, check override, default situation
-    let shading: Shading;
-    if (this.overrideShading !== null) {
-      shading = this.overrideShading;
-    } else if (object.shading !== undefined) {
-      shading = object.shading;
-    } else {
-      shading = this.defaultShading;
-    }
+  private connectShading(object: RenderObject, shading: Shading): GLProgram {
 
     // get program, refresh provider cache if changed
     const program = shading.getProgram(this);
@@ -303,7 +293,7 @@ export class RenderEngine implements
       if (material !== undefined) {
         const texture = material.getChannelTexture(tex.name);
         glTexture = texture.getGLTexture(this);
-      } 
+      }
 
       // acquire texture from framebuffer
       if (glTexture === undefined) {
@@ -314,13 +304,13 @@ export class RenderEngine implements
       if (glTexture === undefined) {
         throw `texture <${tex.name}>bind failed, for framebuffer texture, setup program.framebufferTextureMap`
       }
-      
+
       tex.useTexture(glTexture);
     })
   }
 
   private connectGeometry(geometry: Geometry, program: GLProgram) {
-    
+
     // check index buffer and update program.indexUINT
     if (program.useIndexDraw) {
       if (geometry.indexBuffer === null) {
@@ -407,6 +397,18 @@ export class RenderEngine implements
   getOverrideShading(): Shading {
     return this.overrideShading;
   }
+  private getUsedShading(object: RenderObject) {
+    // // get shading, check override, default situation
+    let shading: Shading;
+    if (this.overrideShading !== null) {
+      shading = this.overrideShading;
+    } else if (object.shading !== undefined) {
+      shading = object.shading;
+    } else {
+      shading = this.defaultShading;
+    }
+    return shading;
+  }
 
 
 
@@ -448,7 +450,7 @@ export class RenderEngine implements
     return color.copy(this.renderer.state.colorbuffer.currentClearColor);
   }
   resetDefaultClearColor(): void {
-    this.renderer.state.colorbuffer.setClearColor({ x: 0.5, y: 0.5, z: 0.5, w: 0.5 });
+    this.renderer.state.colorbuffer.resetDefaultClearColor();
   }
   clearColor(): void {
     this.renderer.state.colorbuffer.clear();
@@ -465,7 +467,7 @@ export class RenderEngine implements
     return this.programShadingMap.get(shading);
   }
 
-  createProgram(shading: Shading): GLProgram  {
+  createProgram(shading: Shading): GLProgram {
     const program = this.renderer.createProgram(shading.getProgramConfig());
     this.programShadingMap.set(shading, program);
     return program;

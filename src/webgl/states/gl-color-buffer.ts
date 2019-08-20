@@ -1,6 +1,6 @@
 import { GLRenderer } from "../gl-renderer";
 import { Vector4 } from "../../math/vector4";
-import { Vector4Like } from "../../render-graph/backend-interface";
+import { Vector4Like } from "../../math/interface";
 
 export class GLColorBuffer{
   static defaultClearColor = new Vector4(0.8, 0.8, 0.8, 1);
