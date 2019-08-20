@@ -13,7 +13,7 @@ import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
 import { UniformProxy } from "./uniform-proxy";
 import { Observable } from "../core/observable";
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
-import { QuadSource } from '../render-graph/quad-source';
+import { QuadSource } from './quad-source';
 import { downloadCanvasPNGImage } from "../util/file-io";
 import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
@@ -21,6 +21,7 @@ import { VAOCreateCallback } from "../webgl/vao";
 import { Vector4 } from "../math/vector4";
 import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
+import { RenderGraphBackendAdaptor } from "../render-graph/backend-interface";
 
 export interface RenderSource{
   resetSource(): void;
@@ -49,7 +50,10 @@ export interface Size{
 const copyShading = new Shading().decorate(new CopyShading());
 const quad = new QuadSource();
 
-export class RenderEngine implements GLReleasable{
+export class RenderEngine implements
+  GLReleasable,
+  RenderGraphBackendAdaptor<RenderObject, GLFramebuffer>
+{
   constructor(el?: HTMLCanvasElement, ctxOptions?: any) {
     this.renderer = new GLRenderer(el, ctxOptions);
     // if we have a element param, use it as the default camera's param for convenience

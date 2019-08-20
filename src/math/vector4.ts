@@ -1,7 +1,7 @@
 import { DataObject, ArrayFlattenable, VectorDataObject } from "./index";
 import { Matrix4 } from "./matrix4";
 import { Quaternion } from "./quaternion";
-import { Vector4Like } from "../render-graph/backend-interface";
+import { Vector4Like } from "./interface";
 
 export class Vector4
   implements

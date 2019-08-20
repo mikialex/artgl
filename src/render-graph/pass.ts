@@ -1,16 +1,16 @@
-import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { RenderGraph } from "./render-graph";
 import { PassDefine } from "./interface";
 import { Nullable } from "../type";
 import { Shading } from "../core/shading";
 import { RenderTargetNode } from "./node/render-target-node";
 import { PassGraphNode } from "./node/pass-graph-node";
-import { Vector4Like, RenderGraphBackendAdaptor } from "./backend-interface";
+import { RenderGraphBackendAdaptor, NamedAndFormatKeyed } from "./backend-interface";
+import { Vector4Like } from "../math/interface";
 
 export type uniformName = string;
 type framebufferName = string;
 
-export class RenderPass{
+export class RenderPass<RenderableType, FBOType extends NamedAndFormatKeyed>{
   constructor(define: PassDefine) {
     this.define = define;
     this.name = define.name;
@@ -44,50 +44,57 @@ export class RenderPass{
   private overrideShading: Nullable<Shading> = null;
 
   uniformNameFBOMap: Map<uniformName, framebufferName> = new Map();
-  uniformRenderTargetNodeMap: Map<uniformName, RenderTargetNode> = new Map();
-  framebuffersDepends: Set<RenderTargetNode> = new Set();
+  uniformRenderTargetNodeMap: Map<uniformName, RenderTargetNode<RenderableType, FBOType>> = new Map();
+  framebuffersDepends: Set<RenderTargetNode<RenderableType, FBOType>> = new Set();
 
-  passNode: PassGraphNode
+  passNode: PassGraphNode<RenderableType, FBOType>
   // outputInfos
-  outputTarget: RenderTargetNode
+  outputTarget: RenderTargetNode<RenderableType, FBOType>
 
   get isOutputScreen() {
     return this.outputTarget.isScreenNode;
   }
 
-  renderDebugResult(engine: RenderGraphBackendAdaptor, graph: RenderGraph, framebuffer: GLFramebuffer) {
+  renderDebugResult(
+    engine: RenderGraphBackendAdaptor<RenderableType, FBOType>,
+    framebuffer: FBOType
+  ) {
     const debugOutputViewport = this.outputTarget.debugViewPort;
     engine.renderFrameBuffer(framebuffer, debugOutputViewport)
     // this will cause no use draw TODO optimize
     this.uniformNameFBOMap.forEach((inputFramebufferName, uniformName) => {
-      const dependFramebuffer = engine.renderer.framebufferManager.getFramebuffer(inputFramebufferName);
+      const dependFramebuffer = engine.getFramebuffer(inputFramebufferName);
       const debugInputViewport = this.uniformRenderTargetNodeMap.get(uniformName).debugViewPort;
       engine.renderFrameBuffer(dependFramebuffer, debugInputViewport)
     })
   } 
 
-  execute(engine: RenderGraphBackendAdaptor, graph: RenderGraph, framebuffer: GLFramebuffer) {
+  execute(
+    engine: RenderGraphBackendAdaptor<RenderableType, FBOType>,
+    graph: RenderGraph<RenderableType, FBOType>,
+    framebuffer: FBOType
+  ) {
 
     this.checkIsValid();
-    let outputTarget: GLFramebuffer;
+    let outputTarget: FBOType;
 
     // setup viewport and render target
     if (this.isOutputScreen) {
-      engine.renderer.setRenderTargetScreen();
+      engine.setRenderTargetScreen();
       if (graph.enableDebuggingView) {
         const debugViewPort = graph.screenNode.debugViewPort;
-        engine.renderer.state.setViewport(
+        engine.setViewport(
           debugViewPort.x, debugViewPort.y,
           debugViewPort.z, debugViewPort.w
         );
 
       } else {
-        engine.renderer.state.setFullScreenViewPort();
+        engine.setFullScreenViewPort();
       }
     } else {
       outputTarget = framebuffer;
-      engine.renderer.setRenderTarget(outputTarget);
-      engine.renderer.state.setViewport(0, 0, this.outputTarget.widthAbs, this.outputTarget.heightAbs);
+      engine.setRenderTarget(outputTarget);
+      engine.setViewport(0, 0, this.outputTarget.widthAbs, this.outputTarget.heightAbs);
     }
     
     // input binding 
@@ -103,13 +110,13 @@ export class RenderPass{
     // clear setting
     if (this.enableColorClear) {
       if (this.clearColor !== undefined) {
-        engine.renderer.state.colorbuffer.setClearColor(this.clearColor);
+        engine.setClearColor(this.clearColor);
       }
-      engine.renderer.state.colorbuffer.clear();
+      engine.clearColor();
     }
     if (this.enableDepthClear) {
       if (!this.isOutputScreen && this.outputTarget.enableDepth) {
-        engine.renderer.state.depthbuffer.clear();
+        engine.clearDepth();
       }
     }
 

@@ -1,7 +1,6 @@
-import { GLFramebuffer } from "../webgl/gl-framebuffer";
 import { generateUUID } from "../math";
 import { RenderTargetNode } from "./node/render-target-node";
-import { RenderGraphBackendAdaptor } from "./backend-interface";
+import { RenderGraphBackendAdaptor, NamedAndFormatKeyed } from "./backend-interface";
 
 type formatKey = string;
 type FBOGeneratedName = string;
@@ -9,8 +8,8 @@ type FBOGeneratedName = string;
 /**
  * Proxy the fbo storage in rendergraph
  */
-export class FrameBufferPool {
-  constructor(engine: RenderGraphBackendAdaptor) {
+export class FrameBufferPool<RenderableType, FBOType extends NamedAndFormatKeyed> {
+  constructor(engine: RenderGraphBackendAdaptor<RenderableType, FBOType>) {
     this.engine = engine;
 
     // when resize, clear all for convenience, TODO, optimize
@@ -20,15 +19,15 @@ export class FrameBufferPool {
     })
   }
 
-  private engine: RenderGraphBackendAdaptor;
+  private engine: RenderGraphBackendAdaptor<RenderableType, FBOType>;
 
-  framebuffers: Map<FBOGeneratedName, GLFramebuffer> = new Map();
+  framebuffers: Map<FBOGeneratedName, FBOType> = new Map();
 
-  availableBuffers: Map<formatKey, GLFramebuffer[]> = new Map();
+  availableBuffers: Map<formatKey, FBOType[]> = new Map();
 
   clearAll() {
     this.framebuffers.forEach(buffer => {
-      this.engine.renderer.framebufferManager.deleteFramebuffer(buffer)
+      this.engine.deleteFramebuffer(buffer)
     })
     this.framebuffers.clear();
     this.availableBuffers.clear();
@@ -37,7 +36,7 @@ export class FrameBufferPool {
   /**
    * get a GLFramebuffer from pool, if there is no fbo meet the config, create a new one, and pool it
    */
-  requestFramebuffer(node: RenderTargetNode) {
+  requestFramebuffer(node: RenderTargetNode<RenderableType, FBOType>) {
     const pooled = this.availableBuffers.get(node.formatKey);
     if (pooled !== undefined) {
       const result = pooled.pop();
@@ -48,8 +47,8 @@ export class FrameBufferPool {
     }
     
     const FBOName = generateUUID();
-    const newFBO = this.engine.renderer.framebufferManager.createFrameBuffer(
-      this.engine, FBOName, node.widthAbs, node.heightAbs, node.enableDepth);
+    const newFBO = this.engine.createFramebuffer(
+      FBOName, node.widthAbs, node.heightAbs, node.enableDepth);
     
     this.framebuffers.set(FBOName, newFBO);
 
@@ -59,15 +58,15 @@ export class FrameBufferPool {
   /**
    * return a framebuffer that maybe request before, which will be pooling and reused 
    */
-  returnFramebuffer(framebuffer: GLFramebuffer) {
+  returnFramebuffer(framebuffer: FBOType) {
     if (!this.framebuffers.has(framebuffer.name)) {
       throw 'cant return a framebuffer not belong to this pool'
     }
 
-    let poolList = this.availableBuffers.get(framebuffer._formatKey);
+    let poolList = this.availableBuffers.get(framebuffer.getFormatKey());
     if (poolList === undefined) {
       poolList = [];
-      this.availableBuffers.set(framebuffer._formatKey, poolList);
+      this.availableBuffers.set(framebuffer.getFormatKey(), poolList);
     }
     poolList.push(framebuffer)
   }

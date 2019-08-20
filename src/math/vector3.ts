@@ -2,6 +2,7 @@ import { Quaternion } from './quaternion';
 import { Matrix4 } from '../math';
 import { Spherical } from './Spherical';
 import { DataObject, VectorDataObject, ArrayFlattenable } from './index';
+import { Vector3Like } from './interface';
 
 export class Vector3
   implements
@@ -33,14 +34,14 @@ export class Vector3
     return this;
   }
 
-  copy(v: Vector3): Vector3 {
+  copy(v: Vector3Like): Vector3 {
     this.x = v.x;
     this.y = v.y;
     this.z = v.z;
     return this;
   }
 
-  equals(v: Vector3) {
+  equals(v: Vector3Like) {
     return ((v.x === this.x) && (v.y === this.y)) && (v.z === this.z);
   }
 

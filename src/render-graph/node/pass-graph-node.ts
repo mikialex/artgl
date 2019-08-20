@@ -4,8 +4,10 @@ import { RenderGraph } from "../render-graph";
 import { RenderPass, uniformName } from "../pass";
 import { Nullable } from "../../type";
 import { RenderTargetNode } from "../exports";
+import { NamedAndFormatKeyed } from "../backend-interface";
 
-export class PassGraphNode extends DAGNode {
+export class PassGraphNode<RenderableType, FBOType extends NamedAndFormatKeyed>
+  extends DAGNode {
   constructor(define: PassDefine) {
     super();
     this.name = define.name;
@@ -18,12 +20,12 @@ export class PassGraphNode extends DAGNode {
 
   }
   private inputsGetter: Nullable<() => PassInputMapInfo> = null
-  inputs: Map<uniformName, RenderTargetNode> = new Map();
+  inputs: Map<uniformName, RenderTargetNode<RenderableType, FBOType>> = new Map();
   readonly name: string;
   readonly define: PassDefine;
 
   // update graph structure
-  updateDependNode(graph: RenderGraph) {
+  updateDependNode(graph: RenderGraph<RenderableType, FBOType>) {
     // disconnect all depends node 
     this.clearAllFrom();
     this.inputs.clear();
@@ -44,7 +46,7 @@ export class PassGraphNode extends DAGNode {
   }
 
   // from updated graph structure, setup render pass
-  updatePass(pass: RenderPass) {
+  updatePass(pass: RenderPass<RenderableType, FBOType>) {
     pass.uniformNameFBOMap.clear();
     pass.framebuffersDepends.clear();
     pass.uniformRenderTargetNodeMap.clear();

@@ -2,14 +2,13 @@ import { PassGraphNode, RenderGraph } from "../artgl";
 import { FrameBufferPool } from "./framebuffer-pool";
 import { RenderPass } from "./pass";
 import { RenderTargetNode } from "./node/render-target-node";
-import { GLFramebuffer } from "../webgl/gl-framebuffer";
-import { RenderGraphBackendAdaptor } from "./backend-interface";
+import { RenderGraphBackendAdaptor, NamedAndFormatKeyed } from "./backend-interface";
 
 /**
  * Responsible for rendergraph execution and optimization
  */
-export class EffectComposer {
-  constructor(engine: RenderGraphBackendAdaptor) {
+export class EffectComposer<RenderableType, FBOType extends NamedAndFormatKeyed> {
+  constructor(engine: RenderGraphBackendAdaptor<RenderableType, FBOType>) {
     this.engine = engine;
     this.framebufferPool = new FrameBufferPool(this.engine);
 
@@ -18,23 +17,26 @@ export class EffectComposer {
     })
   }
 
-  private engine: RenderGraphBackendAdaptor;
-  private passes: RenderPass[] = [];
+  private engine: RenderGraphBackendAdaptor<RenderableType, FBOType>;
+  private passes: RenderPass<RenderableType, FBOType>[] = [];
 
-  private nodeMap: Map<PassGraphNode, RenderPass> = new Map();
-  private framebufferPool: FrameBufferPool;
+  private nodeMap: Map<PassGraphNode<RenderableType, FBOType>, RenderPass<RenderableType, FBOType>> = new Map();
+  private framebufferPool: FrameBufferPool<RenderableType, FBOType>;
 
-  private keptFramebuffer: Map<RenderTargetNode, GLFramebuffer> = new Map();
-  private framebufferDropList: RenderTargetNode[][] = [];
+  private keptFramebuffer: Map<RenderTargetNode<RenderableType, FBOType>, FBOType> = new Map();
+  private framebufferDropList: RenderTargetNode<RenderableType, FBOType>[][] = [];
 
-  getFramebuffer(node: RenderTargetNode) {
+  getFramebuffer(node: RenderTargetNode<RenderableType, FBOType>) {
     return this.keptFramebuffer.get(node)
   }
 
-  render(engine: RenderGraphBackendAdaptor, graph: RenderGraph) {
+  render(
+    engine: RenderGraphBackendAdaptor<RenderableType, FBOType>,
+    graph: RenderGraph<RenderableType, FBOType>
+  ) {
     this.passes.forEach((pass, index) => {
       const output = pass.outputTarget;
-      let framebuffer: GLFramebuffer = this.keptFramebuffer.get(output)
+      let framebuffer: FBOType = this.keptFramebuffer.get(output)
 
       if (framebuffer === undefined) {
         framebuffer = this.framebufferPool.requestFramebuffer(output)
@@ -65,7 +67,7 @@ export class EffectComposer {
     });
   }
 
-  setPasses(passes: RenderPass[]) {
+  setPasses(passes: RenderPass<RenderableType, FBOType>[]) {
     this.passes = passes;
 
     // compute dropList
@@ -96,11 +98,11 @@ export class EffectComposer {
 
   }
 
-  registerNode(node: PassGraphNode) {
+  registerNode(node: PassGraphNode<RenderableType, FBOType>) {
     if (this.nodeMap.has(node)) {
       return this.nodeMap.get(node);
     }
-    const pass = new RenderPass(node.define)
+    const pass = new RenderPass<RenderableType, FBOType>(node.define)
     this.nodeMap.set(node, pass);
     return pass;
   }
@@ -112,7 +114,8 @@ export class EffectComposer {
     this.keptFramebuffer.clear();
   }
 
-  getPass(node: PassGraphNode): RenderPass {
+  getPass(node: PassGraphNode<RenderableType, FBOType>)
+    : RenderPass<RenderableType, FBOType> {
     return this.nodeMap.get(node);
   }
 

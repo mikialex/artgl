@@ -1,22 +1,23 @@
 import { PassDefine, GraphDefine, RenderTargetDefine } from "./interface";
 import { PassGraphNode } from "./node/pass-graph-node";
 import { RenderTargetNode } from "./node/render-target-node";
-import { QuadSource } from './quad-source';
+import { QuadSource } from '../engine/quad-source';
 import { EffectComposer } from "./effect-composer";
-import { RenderGraphBackendAdaptor } from "./backend-interface";
+import { RenderGraphBackendAdaptor, NamedAndFormatKeyed } from "./backend-interface";
 
-export type RenderGraphNode = PassGraphNode | RenderTargetNode;
+export type RenderGraphNode<RenderableType, FBOType extends NamedAndFormatKeyed> =
+  PassGraphNode<RenderableType, FBOType> | RenderTargetNode<RenderableType, FBOType>;
 
-export class RenderGraph {
+export class RenderGraph<RenderableType, FBOType extends NamedAndFormatKeyed> {
 
   static screenRoot: string = 'artgl-rendergraph-screen-rt';
   static quadSource = new QuadSource();
 
   enableDebuggingView: boolean = false;
 
-  screenNode: RenderTargetNode;
-  renderTargetNodes: Map<string, RenderTargetNode> = new Map();
-  passNodes: Map<string, PassGraphNode> = new Map();
+  screenNode: RenderTargetNode<RenderableType, FBOType>;
+  renderTargetNodes: Map<string, RenderTargetNode<RenderableType, FBOType>> = new Map();
+  passNodes: Map<string, PassGraphNode<RenderableType, FBOType>> = new Map();
 
   get nodes() {
     const nodes = [];
@@ -46,7 +47,10 @@ export class RenderGraph {
   /**
    * Update the pass queue from current graph configure
    */
-  update(engine: RenderGraphBackendAdaptor, composer: EffectComposer) {
+  update(
+    engine: RenderGraphBackendAdaptor<RenderableType, FBOType>,
+    composer: EffectComposer<RenderableType, FBOType>
+  ) {
     
     //updateNodesConnection
     this.passNodes.forEach(node => {
@@ -57,7 +61,7 @@ export class RenderGraph {
     });
 
     // create and update pass queue
-    const nodeQueue = this.screenNode.getTopologicalSortedList() as RenderGraphNode[];
+    const nodeQueue = this.screenNode.getTopologicalSortedList() as RenderGraphNode<RenderableType, FBOType>[];
     const passes = [];
     nodeQueue.forEach(node => {
       if (node instanceof PassGraphNode) {
@@ -77,7 +81,7 @@ export class RenderGraph {
   private constructPassGraph(passesDefine: PassDefine[]) {
     passesDefine.forEach(define => {
       if (!this.passNodes.has(define.name)) {
-        const node = new PassGraphNode(define);
+        const node = new PassGraphNode<RenderableType, FBOType>(define);
         this.passNodes.set(define.name, node);
       } else {
         throw 'duplicate pass define found'
@@ -85,16 +89,16 @@ export class RenderGraph {
     })
   }
 
-  getRenderTargetDependence(name: string): RenderTargetNode {
+  getRenderTargetDependence(name: string): RenderTargetNode<RenderableType, FBOType> {
     return this.renderTargetNodes.get(name);
   }
 
-  getRenderPassDependence(name: string): PassGraphNode {
+  getRenderPassDependence(name: string): PassGraphNode<RenderableType, FBOType> {
     return this.passNodes.get(name);
   }
 
   getRootScreenTargetNode() {
-    let screenNode;
+    let screenNode: RenderTargetNode<RenderableType, FBOType>;
     this.renderTargetNodes.forEach(node => {
       if (node.isScreenNode) {
         screenNode = node;
@@ -108,7 +112,7 @@ export class RenderGraph {
       if (this.renderTargetNodes.has(define.name)) {
         throw 'render graph build error, duplicate texture key name found '
       }
-      const renderTargetNode = new RenderTargetNode(define);
+      const renderTargetNode = new RenderTargetNode<RenderableType, FBOType>(define);
       if (define.name === RenderGraph.screenRoot) {
         if (this.screenNode !== undefined) {
           throw "duplicate screen root node"
