@@ -9,11 +9,10 @@ import { Material } from "../core/material";
 import { GLTextureUniform } from "../webgl/uniform/uniform-texture";
 import { PerspectiveCamera } from "../camera/perspective-camera";
 import { Nullable, GLReleasable } from "../type";
-import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
-import { UniformProxy } from "./uniform-proxy";
+import { GlobalUniforms, createAllInnerSupportUniformProxy } from "./uniform-proxy";
 import { Observable } from "../core/observable";
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
-import { QuadSource } from './quad-source';
+import { QuadSource, RenderSource, foreachRenderableInSource } from './render-source';
 import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/vao";
@@ -22,24 +21,6 @@ import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
 import { RenderGraphBackendAdaptor } from "../render-graph/backend-interface";
 import { Vector4Like } from "../math/interface";
-
-export interface RenderSource {
-  resetSource(): void;
-  nextRenderable(): Nullable<RenderObject>;
-  updateSource(): void;
-}
-
-export function foreachRenderableInSource(source: RenderSource, visitor: (obj: RenderObject) => any) {
-  source.updateSource();
-  source.resetSource();
-  let nextSource: RenderObject | null = null;
-  do {
-    nextSource = source.nextRenderable();
-    if (nextSource !== null) {
-      visitor(nextSource);
-    }
-  } while (nextSource !== null);
-}
 
 export interface Size {
   width: number;
@@ -63,9 +44,7 @@ export class RenderEngine implements
 
     this.interactor = new Interactor(el);
 
-    InnerUniformMap.forEach((des, key) => {
-      this.globalUniforms.set(key, new UniformProxy(des.default))
-    })
+    this.globalUniforms = createAllInnerSupportUniformProxy();
 
     this.preferVAO = true;
   }
@@ -133,11 +112,11 @@ export class RenderEngine implements
     this.jitterPMatrix.elements[8] += ((2 * Math.random() - 1) / this.renderer.width);
     this.jitterPMatrix.elements[9] += ((2 * Math.random() - 1) / this.renderer.height);
     this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.cameraMatrixReverse);
-    this.getGlobalUniform(InnerSupportUniform.VPMatrix).setValue(this.jitterVPMatrix);
+    this.globalUniforms.VPMatrix.setValue(this.jitterVPMatrix);
   }
 
   unJit() {
-    this.getGlobalUniform(InnerSupportUniform.VPMatrix).setValue(this.VPMatrix);
+    this.globalUniforms.VPMatrix.setValue(this.VPMatrix);
   }
 
   /**
@@ -160,17 +139,16 @@ export class RenderEngine implements
       this.cameraMatrixReverse.getInverse(this.camera.worldMatrix, true);
 
       // TODO this should cal world position
-      this.getGlobalUniform(InnerSupportUniform.CameraWorldPosition)
-        .setValue(this.camera.transform.position)
+      this.globalUniforms.CameraWorldPosition.setValue(this.camera.transform.position)
       needUpdateVP = true;
     }
 
     this.LastVPMatrix.copy(this.VPMatrix);
-    this.getGlobalUniform(InnerSupportUniform.LastVPMatrix).setValue(this.LastVPMatrix);
+    this.globalUniforms.LastVPMatrix.setValue(this.LastVPMatrix);
 
     if (needUpdateVP) {
       this.VPMatrix.multiplyMatrices(this.ProjectionMatrix, this.cameraMatrixReverse);
-      this.getGlobalUniform(InnerSupportUniform.VPMatrix).setValue(this.VPMatrix);
+      this.globalUniforms.VPMatrix.setValue(this.VPMatrix);
       needUpdateVP = false;
       this.isCameraChanged = true;
     } else {
@@ -238,14 +216,8 @@ export class RenderEngine implements
    * Engine will update these values and auto bind them to
    * program that you will draw as needed
    *
-   * @private
-   * @type {Map<InnerSupportUniform, UniformProxy>}
-   * @memberof RenderEngine
    */
-  private globalUniforms: Map<InnerSupportUniform, UniformProxy> = new Map();
-  getGlobalUniform(uniform: InnerSupportUniform): UniformProxy {
-    return this.globalUniforms.get(uniform) as UniformProxy
-  }
+  readonly globalUniforms: GlobalUniforms
 
   private lastUploadedShaderUniformProvider: Set<ShaderUniformProvider> = new Set();
   private lastProgramRendered: GLProgram;
@@ -260,7 +232,7 @@ export class RenderEngine implements
 
     this.renderer.useProgram(program);
 
-    this.getGlobalUniform(InnerSupportUniform.MMatrix).setValue(object.worldMatrix);
+    this.globalUniforms.MMatrix.setValue(object.worldMatrix);
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
 
     shading._decorators.forEach(defaultDecorator => {

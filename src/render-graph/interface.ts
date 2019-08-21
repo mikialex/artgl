@@ -1,8 +1,8 @@
 import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
-import { RenderSource } from "../engine/render-engine";
 import { PixelFormat } from "../webgl/const";
 import { ShadingConstrain } from "./backend-interface";
+import { RenderSource } from "../engine/render-source";
 export interface GraphDefine<ShadingType extends ShadingConstrain> {
   passes: PassDefine<ShadingType>[],
   renderTargets: RenderTargetDefine[];

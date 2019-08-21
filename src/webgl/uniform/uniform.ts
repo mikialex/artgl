@@ -4,6 +4,7 @@ import { GLDataType } from "../shader-util";
 import { Matrix4 } from "../../math/matrix4";
 import { GLRenderer } from '../gl-renderer';
 import { Vector3 } from '../../math';
+import { GlobalUniforms } from "../../engine/uniform-proxy";
 
 export type uniformUploadType = number | Float32Array | number[]
 export type flattenerType= (value: any, receiveData: uniformUploadType) => uniformUploadType;
@@ -11,29 +12,24 @@ export type setterType= (gl: WebGLRenderingContext, location: WebGLUniformLocati
 export type copierType = (newValue: uniformUploadType, target: uniformUploadType) => uniformUploadType;
 export type differType= (newValue: uniformUploadType, oldValue: uniformUploadType) => boolean;
 
-export const enum InnerSupportUniform{
-  MMatrix,
-  VPMatrix,
-  CameraWorldPosition,
-  LastVPMatrix
-}
+export type InnerSupportUniform = keyof GlobalUniforms
 
 export interface InnerUniformMapDescriptor{
   name: string,
   mapInner: InnerSupportUniform,     
 }
 
-export const InnerUniformMap: Map<InnerSupportUniform, UniformDescriptor> = new Map();
-InnerUniformMap.set(InnerSupportUniform.MMatrix, {
+export const InnerUniformMap: Map<keyof GlobalUniforms, UniformDescriptor> = new Map();
+InnerUniformMap.set("MMatrix", {
   name: 'MMatrix', type: GLDataType.Mat4, default: new Matrix4()
 })
-InnerUniformMap.set(InnerSupportUniform.VPMatrix, {
+InnerUniformMap.set("VPMatrix", {
   name: 'VPMatrix', type: GLDataType.Mat4, default: new Matrix4()
 })
-InnerUniformMap.set(InnerSupportUniform.LastVPMatrix, {
+InnerUniformMap.set("LastVPMatrix", {
   name: 'LastVPMatrix', type: GLDataType.Mat4, default: new Matrix4()
 })
-InnerUniformMap.set(InnerSupportUniform.CameraWorldPosition, {
+InnerUniformMap.set("CameraWorldPosition", {
   name: 'CameraWorldPosition', type: GLDataType.floatVec3, default: new Vector3()
 })
 

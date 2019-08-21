@@ -1,6 +1,6 @@
 import { SceneNode } from "./scene-node";
 import { RenderObject } from "../core/render-object";
-import { RenderSource } from "../engine/render-engine";
+import { RenderSource } from "../engine/render-source";
 import { RenderList } from "../engine/render-list";
 
 /**

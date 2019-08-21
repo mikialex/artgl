@@ -54,7 +54,7 @@ export class TAAShading extends BaseEffectShading<TAAShading> {
               .input("uv", graph.getVary(UvFragVary))
           )
           .input("VPMatrixInverse", this.getPropertyUniform("VPMatrixInverse"))
-          .input("LastVPMatrix", innerUniform(InnerSupportUniform.LastVPMatrix))
+          .input("LastVPMatrix", innerUniform("LastVPMatrix"))
       )
     )
 

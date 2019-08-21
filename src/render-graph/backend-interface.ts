@@ -1,7 +1,8 @@
 import { Observable } from "../core/observable";
-import { Size, RenderSource } from "../engine/render-engine";
+import { Size } from "../engine/render-engine";
 import { Vector4Like } from "../math/interface";
 import { Nullable } from "../type";
+import { RenderSource } from "../engine/render-source";
 
 export interface ShadingConstrain {
   defineFBOInput(inputFramebufferName: string, uniformName: string): void;

@@ -69,10 +69,10 @@ export function constValue(value: any) {
 
 export function MVPWorld() {
   return VPTransform.make()
-    .input("VPMatrix", innerUniform(InnerSupportUniform.VPMatrix))
+    .input("VPMatrix", innerUniform("VPMatrix"))
     .input("position",
       MTransform.make()
-        .input('MMatrix', innerUniform(InnerSupportUniform.MMatrix))
+        .input('MMatrix', innerUniform("MMatrix"))
         .input('position', attribute(CommonAttribute.position, GLDataType.floatVec3))
     )
 }

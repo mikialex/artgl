@@ -8,7 +8,6 @@ export * from "./webgl/const";
 // artgl engine layer
 export { RenderEngine } from "./engine/render-engine";
 export { Framer } from "./engine/framer";
-export { InnerSupportUniform } from './webgl/uniform/uniform';
 
 export * from "./core/render-object";
 export { Mesh } from "./object/mesh";

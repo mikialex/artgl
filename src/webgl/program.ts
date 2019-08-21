@@ -2,7 +2,7 @@ import { GLRenderer } from "./gl-renderer";
 import { GLShader, ShaderType } from "./shader";
 import { generateUUID } from "../math/uuid";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
-import { GLUniform, UniformDescriptor, getInnerUniformDescriptor, InnerUniformMapDescriptor, InnerSupportUniform } from "./uniform/uniform";
+import { GLUniform, UniformDescriptor, getInnerUniformDescriptor, InnerUniformMapDescriptor } from "./uniform/uniform";
 import { AttributeDescriptor, GLAttribute } from "./attribute";
 import { Nullable } from "../type";
 import { GLTextureUniform, TextureDescriptor } from "./uniform/uniform-texture";
@@ -202,7 +202,7 @@ export class GLProgram{
 
   updateInnerGlobalUniforms(engine: RenderEngine) {
     this.globalUniforms.forEach(uni => {
-      uni.set(engine.getGlobalUniform(uni.innerGlobal as InnerSupportUniform).value)
+      uni.set(engine.globalUniforms[uni.innerGlobal].value)
     })
   }
 

@@ -1,7 +1,7 @@
 import { PassDefine, GraphDefine, RenderTargetDefine } from "./interface";
 import { PassGraphNode } from "./node/pass-graph-node";
 import { RenderTargetNode } from "./node/render-target-node";
-import { QuadSource } from '../engine/quad-source';
+import { QuadSource } from '../engine/render-source';
 import { EffectComposer } from "./effect-composer";
 import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingConstrain, ShadingDetermined } from "./backend-interface";
 

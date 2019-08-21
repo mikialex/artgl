@@ -1,7 +1,7 @@
 import { Vector3, Matrix4 } from "../math/index";
 import { Nullable } from "../type";
 import { Ray } from "../math/entity/ray";
-import { RenderSource, foreachRenderableInSource } from "../engine/render-engine";
+import { RenderSource, foreachRenderableInSource } from "../engine/render-source";
 import { RenderObject } from "./render-object";
 
 

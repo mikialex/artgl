@@ -1,7 +1,7 @@
 import {
   RenderGraph, TAAShading,
   TSSAOShading, TSSAOBlendShading, Matrix4,
-  InnerSupportUniform, DepthShading, Scene, RenderEngine, Shading
+  DepthShading, Scene, RenderEngine, Shading
 } from "../../src/artgl";
 import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
@@ -136,7 +136,7 @@ export class RenderPipeline{
           enableColorClear: false,
           beforePassExecute: () => {
             this.engine.unJit();
-            const VP: Matrix4 = this.engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
+            const VP: Matrix4 = this.engine.globalUniforms.VPMatrix.value
             this.taaShading.VPMatrixInverse = this.taaShading.VPMatrixInverse.getInverse(VP, true); // TODO maybe add watch
             this.taaShading.sampleCount = this.sampleCount;
           },
@@ -153,7 +153,7 @@ export class RenderPipeline{
           source: [RenderGraph.quadSource],
           enableColorClear: false,
           beforePassExecute: () => {
-            const VP: Matrix4 = this.engine.getGlobalUniform(InnerSupportUniform.VPMatrix).value
+            const VP: Matrix4 = this.engine.globalUniforms.VPMatrix.value
             this.tssaoShading.VPMatrixInverse = this.tssaoShading.VPMatrixInverse.getInverse(VP, true);
             this.tssaoShading.sampleCount = this.sampleCount;
           },
