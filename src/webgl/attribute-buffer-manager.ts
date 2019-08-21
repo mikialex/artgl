@@ -8,7 +8,7 @@ export class GLAttributeBufferDataManager implements GLReleasable {
   readonly renderer: GLRenderer;
   private buffers: WeakMap<ArrayBuffer, WebGLBuffer> = new WeakMap();
 
-  getGLBuffer(arraybuffer: ArrayBuffer): WebGLBuffer {
+  getGLBuffer(arraybuffer: ArrayBuffer) {
     return this.buffers.get(arraybuffer);
   }
 
@@ -35,6 +35,9 @@ export class GLAttributeBufferDataManager implements GLReleasable {
     }
     const gl = this.renderer.gl;
     const buffer = this.buffers.get(data);
+    if (buffer === undefined) {
+      return 
+    }
     gl.deleteBuffer(buffer);
     this.buffers.delete(data);
   }
@@ -44,7 +47,7 @@ export class GLAttributeBufferDataManager implements GLReleasable {
       return this.createBuffer(data, useForIndex);
     }
     this.disposeBuffer(data);
-    this.createBuffer(data, useForIndex);
+    return this.createBuffer(data, useForIndex);
   }
 
   releaseGL() {

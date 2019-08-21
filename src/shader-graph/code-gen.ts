@@ -102,14 +102,17 @@ function genTempVarExpFromShaderNode(
   ctx: varRecord[],
   preEvaluatedList: Map<ShaderNode, varRecord>
 ): string {
-  function findRecordFromEvaluatedNode(node: ShaderNode) {
-    let record: varRecord;
+  function findRecordFromEvaluatedNode(node: ShaderNode): varRecord {
+    let record;
     if (preEvaluatedList.has(node)) {
       record = preEvaluatedList.get(node)
     } else {
       record = findFirst(ctx, varRc => {
         return varRc.refedNode === node
       })
+    }
+    if (record === undefined) {
+      throw "_var_miss"
     }
     return record;
   }
@@ -133,11 +136,7 @@ function genTempVarExpFromShaderNode(
   }
 
   function getParamKeyFromVarList(node: ShaderNode): string {
-    const record = findRecordFromEvaluatedNode(node);
-    if (record === undefined) {
-      throw "_var_miss"
-    }
-    return genRecordVar(record);
+    return genRecordVar(findRecordFromEvaluatedNode(node));
   }
 
   let record = findRecordFromEvaluatedNode(node)

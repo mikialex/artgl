@@ -9,6 +9,7 @@ import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
 import { uniformFromValue } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
 import { ShadingConstrain } from "../render-graph/backend-interface";
+import { Light } from "./light";
 
 export interface ShaderUniformDecorator {
   /**
@@ -219,17 +220,27 @@ export abstract class BaseEffectShading<T>
   nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
   
   getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
-    if (this.nodeCreated.has(name as string)) {
-      return this.nodeCreated.get(name as string);
-    }
-    const uniformName = this.propertyUniformNameMap.get(name as string);
-    const value = this[name as string];
-    if (value === undefined) {
-      throw "uniform value not given"
-    }
-    const node = uniformFromValue(uniformName, value);
-    this.nodeCreated.set(name as string, node);
-    return node;
+    return getPropertyUniform(this, name)
   }
 
+}
+
+export function getPropertyUniform<T, K extends BaseEffectShading<any> | Light<any>>(env: K, name: keyof T) {
+  const uniformNode = env.nodeCreated.get(name as string);
+  if (uniformNode !== undefined) {
+    return uniformNode;
+  }
+  const uniformName = env.propertyUniformNameMap.get(name as string);
+
+  if (uniformName === undefined) {
+    throw `${name} uniform name not found, maybe forget uniform decorator`
+  }
+
+  const value = (env as unknown as T)[name];
+  if (value === undefined) {
+    throw "uniform value not given"
+  }
+  const node = uniformFromValue(uniformName, value);
+  env.nodeCreated.set(name as string, node);
+  return node;
 }

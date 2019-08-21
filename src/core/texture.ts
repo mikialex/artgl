@@ -170,11 +170,12 @@ export class Texture implements GraphicResourceReleasable {
     return this;
   }
 
-  useCustomMipMap(engine, sources: TextureSource[]) {
+  useCustomMipMap(engine: RenderEngine, sources: TextureSource[]) {
     if (this.hasMipMapExist) {
       throw "this texture has mipmap upload, clear before use"
     }
-    engine.renderer.textureManger.uploadWebGLMipMap();
+    // TODO
+    // engine.renderer.textureManger.uploadWebGLMipMap();
     sources.forEach(source => this._mipmapArray.push(source));
     return this;
   }

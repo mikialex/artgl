@@ -32,7 +32,7 @@ export class Observer<T> {
 export class Observable<T> {
   private _observers = new Array<Observer<T>>();
 
-  private _onObserverAdded: Nullable<(observer: Observer<T>) => void>;
+  private _onObserverAdded: Nullable<(observer: Observer<T>) => void> = null;
 
   /**
    * Creates a new observable

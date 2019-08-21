@@ -1,6 +1,6 @@
 import { BaseEffectShading, MapUniform, ShaderUniformProvider } from "../../core/shading";
 import { ShaderGraph, NormalFragVary } from "../../shader-graph/shader-graph";
-import { Light, collectLight, collectLightNodes } from "../../core/light";
+import { Light, collectLightNodes } from "../../core/light";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 
 const phongShading = new ShaderFunction({

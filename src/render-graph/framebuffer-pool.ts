@@ -40,10 +40,10 @@ export class FrameBufferPool
   /**
    * get a GLFramebuffer from pool, if there is no fbo meet the config, create a new one, and pool it
    */
-  requestFramebuffer(node: RenderTargetNode<ShadingType, RenderableType, FBOType>) {
+  requestFramebuffer(node: RenderTargetNode<ShadingType, RenderableType, FBOType>): FBOType {
     const pooled = this.availableBuffers.get(node.formatKey);
     if (pooled !== undefined) {
-      const result = pooled.pop();
+      const result = pooled.pop()!;
       if (pooled.length === 0) {
         this.availableBuffers.delete(node.formatKey);
       }

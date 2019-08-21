@@ -89,7 +89,7 @@ export class GLRenderer implements GLReleasable {
     return program;
   }
 
-  getProgram(storeId: string): GLProgram {
+  getProgram(storeId: string) {
     return this.programManager.getProgram(storeId);
   }
 

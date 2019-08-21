@@ -65,7 +65,7 @@ export class Scene implements RenderSource {
     this.root.traverse((node) => {
       node.scene = null;
     });
-    this.root = null;
+    this.root = new SceneNode();
   }
 
 }

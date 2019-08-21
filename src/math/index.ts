@@ -13,8 +13,8 @@ export interface DataObject<T>{
 }
 
 export interface ArrayFlattenable<T>{
-  fromArray: (array?: number[], offset?: number) => void;
-  toArray: (array?: number[], offset?: number) => void;
+  fromArray: (array: number[], offset?: number) => T;
+  toArray: (array: number[], offset?: number) => number[];
 }
 
 export interface VectorDataObject<T>{

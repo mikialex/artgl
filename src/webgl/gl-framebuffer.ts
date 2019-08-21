@@ -17,11 +17,11 @@ export class FramebufferAttachTexture extends Texture implements GLReleasable {
 
 }
 
-const GLAttachmentPoints = [];
+const GLAttachmentPoints: number[] = [];
 function loadGLAttachmentPoints(gl: WebGLRenderingContext) {
   if (GLAttachmentPoints.length === 0) {
     for (let i = 0; i < 32; i++) {
-      GLAttachmentPoints[i] = gl['COLOR_ATTACHMENT' + i];
+      GLAttachmentPoints[i] = (gl as any)['COLOR_ATTACHMENT' + i];
     }
   }
 }
@@ -50,7 +50,7 @@ export class GLFramebuffer {
   width: number;
   height: number;
 
-  _formatKey: string;
+  _formatKey: string = "??";
 
   getFormatKey() {
     return this._formatKey;
@@ -58,7 +58,7 @@ export class GLFramebuffer {
 
   enableDepth: boolean = true;
   webglDepthBuffer: Nullable<WebGLRenderbuffer> = null;
-  webglFrameBuffer: WebGLFramebuffer;
+  webglFrameBuffer: Nullable<WebGLFramebuffer>;
 
   textureAttachedSlot: FramebufferAttachTexture[] = [];
 

@@ -107,7 +107,7 @@ export class ShaderVaryInputNode extends ShaderInputNode {
 
 export class ShaderInnerUniformInputNode extends ShaderInputNode {
   constructor(uni: InnerUniformMapDescriptor) {
-    super(uni.name, InnerUniformMap.get(uni.mapInner).type)
+    super(uni.name, InnerUniformMap[uni.mapInner].type)
     this.mapInner = uni.mapInner;
   }
   mapInner: InnerSupportUniform
@@ -118,7 +118,7 @@ export class ShaderAttributeInputNode extends ShaderInputNode {
     super(des.name, des.type);
   }
 
-  isInstance: boolean;
+  isInstance: boolean = false;
   makeInstance() {
     this.isInstance = true;
     return this;

@@ -1,7 +1,7 @@
 import { SceneNode } from "../scene/scene-node";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { uniformFromValue, constValue } from "../shader-graph/node-maker";
-import { ShaderUniformProvider, ShaderUniformDecorator } from "./shading";
+import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, getPropertyUniform } from "./shading";
 import { ShaderCommonUniformInputNode, ShaderNode } from "../shader-graph/shader-node";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { Observable } from "./observable";
@@ -41,26 +41,18 @@ export abstract class Light<T> extends SceneNode
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable()
 
-  hasAnyUniformChanged: boolean;
+  hasAnyUniformChanged: boolean = true;
 
   uniforms: Map<string, any>;
 
   propertyUniformNameMap: Map<string, string>;
 
   nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
+
   getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
-    if (this.nodeCreated.has(name as string)) {
-      return this.nodeCreated.get(name as string);
-    }
-    const uniformName = this.propertyUniformNameMap.get(name as string);
-    const value = this[name as string];
-    if (value === undefined) {
-      throw "uniform value not given"
-    }
-    const node = uniformFromValue(uniformName, value);
-    this.nodeCreated.set(name as string, node);
-    return node;
+    return getPropertyUniform(this, name)
   }
+  
 }
 
 export const collectLight = new ShaderFunction({

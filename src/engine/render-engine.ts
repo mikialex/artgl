@@ -27,7 +27,6 @@ export interface Size {
   height: number;
 }
 
-
 const copyShading = new Shading().decorate(new CopyShading());
 const quad = new QuadSource();
 

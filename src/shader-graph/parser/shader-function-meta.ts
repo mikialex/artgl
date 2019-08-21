@@ -63,7 +63,7 @@ export function getParamList(input: string) {
   const unbrace = para.substring(1, para.length - 1)
 
   const split = unbrace.split(',').filter(char => char.trim() !== "");
-  const result = {};
+  const result: {[index: string]: GLDataType} = {};
   split.forEach(item => {
     const { name, type } = getOneParam(item)
     result[name] = type
