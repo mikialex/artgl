@@ -2,7 +2,6 @@ import { SceneNode } from "./scene-node";
 import { RenderObject } from "../core/render-object";
 import { RenderSource } from "../engine/render-engine";
 import { RenderList } from "../engine/render-list";
-import { GeometryLoader } from "../core/loader";
 
 /**
  * scene data management
@@ -15,33 +14,10 @@ export class Scene implements RenderSource {
   root: SceneNode = new SceneNode();
   
 
-  objectList: RenderList = new RenderList();
-  // mark scene structure changed between frame render
-  isFrameStructureChange: boolean = true;
-  isFrameTransformChange: boolean = true;
-  isFrameVisibleChange: boolean = true;
-  get isFrameChange(){
-    return this.isFrameStructureChange || this.isFrameTransformChange || this.isFrameVisibleChange
-  }
-  onRemoveList: Set<SceneNode> = new Set();
-  onAddList: Set<SceneNode> = new Set();
-
-  addNode(object: SceneNode) {
-    this.onRemoveList.delete(object);
-    this.onAddList.add(object);
-    this.isFrameStructureChange = true;
-  }
-
-  removeNode(object: SceneNode) {
-    this.onAddList.delete(object);
-    this.onRemoveList.add(object);
-    this.isFrameStructureChange = true;
-  }
+  private objectList: RenderList = new RenderList();
 
   updateSource() {
-    if (this.isFrameStructureChange) {
-      this.updateObjectList();
-    }
+    this.updateObjectList();
   }
 
   resetSource() {
@@ -53,26 +29,21 @@ export class Scene implements RenderSource {
   }
 
   updateObjectList() { 
-    // TODO optimize
     this.objectList.reset();
-    this.onRemoveList.clear();
-    this.onAddList.clear();
     this.root.traverse((node) => {
       node.scene = this;
-      if (this.isFrameStructureChange || this.isFrameTransformChange) {
-        if (node.parent !== null) {
-          node._worldMatrix.multiplyMatrices(node.parent._worldMatrix, node.transform.matrix);
-        } else {
-          node._worldMatrix.copy(node.transform.matrix);
-        }
+
+      // TODO optimize 
+      if (node.parent !== null) {
+        node._worldMatrix.multiplyMatrices(node.parent._worldMatrix, node.transform.matrix);
+      } else {
+        node._worldMatrix.copy(node.transform.matrix);
       }
+
       if (node instanceof RenderObject) {
         this.objectList.addRenderItem(node);
       }
     });
-    this.isFrameStructureChange = false;
-    this.isFrameTransformChange = false;
-    this.isFrameVisibleChange = false;
 
   }
 
@@ -85,7 +56,6 @@ export class Scene implements RenderSource {
       throw 'node has set to scene, abort';
     }
     this.root = node;
-    this.isFrameStructureChange = true;
   }
 
   disposeRootNode() {
@@ -96,10 +66,6 @@ export class Scene implements RenderSource {
       node.scene = null;
     });
     this.root = null;
-  }
-
-  registGeometryLoader(loader: GeometryLoader) {
-    
   }
 
 }

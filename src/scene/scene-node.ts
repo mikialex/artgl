@@ -24,32 +24,15 @@ export class SceneNode {
 
   readonly transform: Transformation = new Transformation();
   _worldMatrix = new Matrix4();
-  _worldMatrixUpdateFrameId: number = 0;
   get worldMatrix() {
     return this._worldMatrix;
   }
 
-  _visible: boolean = true;
-  _visibleNet: Boolean = true;
-  _visibleUpdateFrameId: number = 0;
-  set visible(value: boolean) {
-    this._visible = value;
-    if (this.scene !== null) {
-      this.scene.isFrameVisibleChange = true;
-    }
-  };
-  get visible() {
-    return this._visible;
-  }
+  visible: boolean = true;
 
   addChild(node: SceneNode): SceneNode {
     if (node === this) {
       throw 'Cant add a scene node to it self';
-    }
-
-    if (this.scene !== null) {
-      this.scene.isFrameStructureChange = true;
-      this.scene.addNode(node);
     }
 
     if (node.parent !== null) {
@@ -61,10 +44,6 @@ export class SceneNode {
   }
 
   removeChild(node: SceneNode): SceneNode {
-    if (this.scene !== null) {
-      this.scene.isFrameStructureChange = true;
-      this.scene.removeNode(node);
-    }
 
     let index = this.children.indexOf(node);
     if (index !== - 1) {

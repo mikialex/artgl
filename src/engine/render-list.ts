@@ -43,9 +43,8 @@ export class RenderList {
     this.list = [];
   }
 
-  sort(){
-    
+  sort(sorter: (a: RenderObject, b: RenderObject)=> number){
+    this.list.sort(sorter);
   }
-
 
 }

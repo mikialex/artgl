@@ -54,7 +54,7 @@ export class RenderPipeline{
     this.tickNum++;
 
     this.engine.connectCamera();
-    if (this.engine.isCameraChanged || scene.isFrameChange) {
+    if (this.engine.isCameraChanged) {
       this.sampleCount = 0;
     } else {
       if (this.enableTAA) {

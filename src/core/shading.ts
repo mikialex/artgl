@@ -217,6 +217,7 @@ export abstract class BaseEffectShading<T>
   uniforms: Map<string, any>;
 
   nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
+  
   getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
     if (this.nodeCreated.has(name as string)) {
       return this.nodeCreated.get(name as string);

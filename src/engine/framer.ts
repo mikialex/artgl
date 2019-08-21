@@ -28,7 +28,7 @@ export class Framer{
     }
   }
   
-  active = false;
+  active = false; 
   private tickId?: number;
 
   run() {
