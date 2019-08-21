@@ -1,22 +1,29 @@
 <template>
-  <div>
-    <h1>{{example.name}}</h1>
-    <div>
-      <!-- <pre>{{example.build.toString()}}</pre> -->
+  <div class="example-detail">
+
+    <div class="example-viewer">
+
+      <div>
+        <h1>{{example.name}}</h1>
+      </div>
+
+      <div>
+        <canvas></canvas>
+      </div>
+
+      <div v-if="exampleHasBuild">
+        <button @click="start" v-if="!isRunning">start</button>
+        <button @click="step" v-if="!isRunning">step</button>
+        <button @click="stop" v-if="isRunning">stop</button>
+      </div>
+      <div v-else>example is in building</div>
     </div>
-    <div>
-      <canvas></canvas>
-    </div>
-    <div v-if="exampleHasBuild">
-      <button @click="start" v-if="!isRunning">start</button>
-      <button @click="step" v-if="!isRunning">step</button>
-      <button @click="stop" v-if="isRunning">stop</button>
-    </div>
-    <div v-else>example is in building</div>
 
     <div v-if="config">
+      <h3>example config</h3>
       <Config :config="config" />
     </div>
+
   </div>
 </template>
 
@@ -37,8 +44,8 @@ export default class ConfigPanel extends Vue {
   $route: any;
 
   config: RenderConfig = {
-    name: 'example config',
-    type: 'folder',
+    name: "example config",
+    type: "folder",
     value: []
   };
 
@@ -72,11 +79,11 @@ export default class ConfigPanel extends Vue {
 
   async mounted() {
     bridge.reset();
-    
+
     await this.example.build(bridge);
 
-    if(bridge.testConfig !== undefined){
-      this.config.value.push(bridge.testConfig)
+    if (bridge.testConfig !== undefined) {
+      this.config.value.push(bridge.testConfig);
     }
 
     this.exampleHasBuild = true;
@@ -86,9 +93,24 @@ export default class ConfigPanel extends Vue {
 
 
 <style lang="scss" scoped>
-canvas {
-  width: 800px;
-  height: 600px;
-  border: 1px solid #aaa;
+
+.example-detail{
+  border-top: 1px solid #eee;
+  width: 100%;
+  height: calc( 100vh - 40px);
+
+  display: flex;
+
+}
+
+.example-viewer{
+  flex-grow: 1;
+    height: 100%;
+
+  canvas{
+    width: 100%;
+    height: 100%;
+    border: 1px solid #aaa;
+  }
 }
 </style>

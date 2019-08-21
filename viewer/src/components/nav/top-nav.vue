@@ -29,12 +29,18 @@ export default class TopNav extends Vue {
   height: 40px;
   display: flex;
   align-items: center;
+  border-bottom: 1px solid rgba(0,0,0,0.4);
+  background: #44444a;
   > img {
     height: 25px;
     padding: 10px;
-    opacity: 0.4;
+    opacity: 0.5;
+    cursor: pointer;
     &:hover {
-      opacity: 0.6;
+      opacity: 0.7;
+    }
+    &:active {
+      opacity: 1;
     }
   }
 }
@@ -50,19 +56,27 @@ h3 {
 }
 
 a {
+  display: flex;
+  align-items: center;
+  height: 40px;
   font-size: 14px;
   text-decoration: none;
-  padding: 5px;
-  color: #444;
-  border-radius: 2px;
-  background: #eee;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  color: rgb(235, 235, 235);
   margin: 3px;
   &:hover {
-    background: #ddd;
+    background: #333;
+  }
+  &:active {
+    background: #222;
   }
 }
 
 .current {
+  color: #fff;
+  background: #333;
   font-weight: bold;
 }
 </style>

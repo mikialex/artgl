@@ -6,10 +6,12 @@
         v-for="example in examples"
         :key="example.name"
         class="example-entry"
-        @click="gotoExample(example.name)"
       >
-        <div class="example-cover"></div>
-        <div>{{example.name}}</div>
+        <div 
+        class="example-cover"
+        @click="gotoExample(example.name)"
+        ></div>
+        <span>{{example.name}}</span>
       </div>
     </div>
   </div>
@@ -56,9 +58,15 @@ export default class ConfigPanel extends Vue {
 .example-cover {
   width: 300px;
   height: 200px;
-  border: 1px solid #aaa;
-  >span{
+  background: #fff;
+  transition: 200ms;
+  cursor: pointer;
+  &:hover{
+    transform: scale(1.1);
+  }
 
+  >span{
+    margin: 3px;
   }
 }
 
