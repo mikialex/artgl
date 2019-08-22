@@ -25,7 +25,7 @@ export function genFragShader(graph: ShaderGraph): string {
   builder.reduceIndent()
   builder.writeLine("}")
   const mainCode = builder.output();
-  
+
   const includedCode = genShaderFunctionDepend(evaluatedNode);
 
   return includedCode + mainCode
@@ -58,13 +58,13 @@ export function genVertexShader(graph: ShaderGraph): string {
   builder.reduceIndent()
   builder.writeLine("}")
   const mainCode = builder.output();
-  
+
   const includedCode = genShaderFunctionDepend(evaluatedNode);
 
   return includedCode + mainCode
 }
 
-function pushListToMap(map:Map<ShaderNode, varRecord>, list:varRecord[]) {
+function pushListToMap(map: Map<ShaderNode, varRecord>, list: varRecord[]) {
   list.forEach(item => {
     if (!map.has(item.refedNode)) {
       map.set(item.refedNode, item)
@@ -102,17 +102,14 @@ function genTempVarExpFromShaderNode(
   ctx: varRecord[],
   preEvaluatedList: Map<ShaderNode, varRecord>
 ): string {
-  function findRecordFromEvaluatedNode(node: ShaderNode): varRecord {
-    let record;
+  function findRecordFromEvaluatedNode(node: ShaderNode) {
+    let record: varRecord | undefined;
     if (preEvaluatedList.has(node)) {
       record = preEvaluatedList.get(node)
     } else {
       record = findFirst(ctx, varRc => {
         return varRc.refedNode === node
       })
-    }
-    if (record === undefined) {
-      throw "_var_miss"
     }
     return record;
   }
@@ -136,7 +133,11 @@ function genTempVarExpFromShaderNode(
   }
 
   function getParamKeyFromVarList(node: ShaderNode): string {
-    return genRecordVar(findRecordFromEvaluatedNode(node));
+    const record = findRecordFromEvaluatedNode(node);
+    if (record === undefined) {
+      throw "_var_miss"
+    }
+    return genRecordVar(record);
   }
 
   let record = findRecordFromEvaluatedNode(node)
@@ -199,9 +200,9 @@ function codeGenGraph(
   rootOutputName: string,
   preEvaluatedList: Map<ShaderNode, varRecord>
 ): {
-    code: string,
-    varList: varRecord[]
-  } {
+  code: string,
+  varList: varRecord[]
+} {
   const builder = new CodeBuilder()
   builder.reset();
 

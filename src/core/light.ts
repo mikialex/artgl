@@ -1,7 +1,7 @@
 import { SceneNode } from "../scene/scene-node";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { uniformFromValue, constValue } from "../shader-graph/node-maker";
-import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform } from "./shading";
+import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, checkCreate } from "./shading";
 import { ShaderCommonUniformInputNode, ShaderNode } from "../shader-graph/shader-node";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { Observable } from "./observable";
@@ -13,8 +13,10 @@ export abstract class Light<T> extends SceneNode
   implements ShaderUniformProvider, ShaderUniformDecorator {
   constructor() {
     super();
-    this.uniforms = new Map();
-    this.propertyUniformNameMap = new Map();
+
+    this.uniforms = checkCreate((this as any).uniforms, new Map());
+    this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
+    this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
   }
 
   decorate(decorated: ShaderGraph): void {

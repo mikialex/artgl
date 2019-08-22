@@ -40,6 +40,7 @@ export class RenderPass<
   public name: string;
 
   private clearColor: Vector4Like = new Vector4(1, 1, 1, 1);
+  private beforeClearColor: Vector4Like = new Vector4(1, 1, 1, 1);
   private enableDepthClear: boolean = true;
   private enableColorClear: boolean = true;
 
@@ -127,11 +128,11 @@ export class RenderPass<
       })
     }
 
+
+    engine.getClearColor(this.beforeClearColor);
     // clear setting
     if (this.enableColorClear) {
-      if (this.clearColor !== undefined) {
-        engine.setClearColor(this.clearColor);
-      }
+      engine.setClearColor(this.clearColor);
       engine.clearColor();
     }
     if (this.enableDepthClear) {
@@ -155,7 +156,7 @@ export class RenderPass<
     }
 
     engine.setOverrideShading(null);
-    engine.resetDefaultClearColor();
+    engine.setClearColor(this.beforeClearColor);
 
 
     if (graph.enableDebuggingView && !this.isOutputScreen) {

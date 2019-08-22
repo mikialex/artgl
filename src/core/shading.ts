@@ -188,12 +188,20 @@ export function MapUniform(remapName: string) {
   };
 }
 
+export function checkCreate(testValue: any, inputValue: any) {
+  if (testValue === undefined) {
+    return inputValue
+  } else {
+    return testValue
+  }
+}
+
 export abstract class BaseEffectShading<T>
   implements ShaderUniformProvider, ShaderUniformDecorator {
   constructor() {
-    this.uniforms = new Map();
-    this.propertyUniformNameMap = new Map();
-    this.notifyNeedRedecorate = new Observable()
+    this.uniforms = checkCreate((this as any).uniforms, new Map());
+    this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
+    this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
   }
 
   abstract decorate(graph: ShaderGraph): void;

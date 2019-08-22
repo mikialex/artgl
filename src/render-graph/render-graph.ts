@@ -122,9 +122,6 @@ export class RenderGraph<
       }
       const renderTargetNode = new RenderTargetNode<ShadingType, RenderableType, FBOType>(define);
       if (define.name === RenderGraph.screenRoot) {
-        if (this.screenNode !== undefined) {
-          throw "duplicate screen root node"
-        }
         this.screenNode = renderTargetNode
       }
       this.renderTargetNodes.set(define.name, renderTargetNode);

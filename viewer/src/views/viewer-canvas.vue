@@ -70,16 +70,24 @@ import { Vector4, DAGNode } from "../../../src/artgl";
 export default class ViewerCanvas extends Vue {
   $viewer?: Application
 
-  isRunning: boolean = this.$viewer!.framer.active;
+  isRunning: boolean = false;
   $store: any;
 
   mounted(){
+    const canvas = this.$el.querySelector('#viewer-canvas') as HTMLCanvasElement;
+    Vue.prototype.$viewer = new Application(canvas)
+    this.isRunning = this.$viewer!.framer.active;
     if(document.body.clientWidth > 600){
       this.toggleConfigPanel(true);
     }
     if(document.body.clientWidth > 1000){
       this.toggleScenePanel(true);
     }
+  }
+
+  beforeDestroy(){
+    Vue.prototype.$viewer.unintialize();
+    Vue.prototype.$viewer = undefined;
   }
 
   async toggleScenePanel(action?:boolean) {

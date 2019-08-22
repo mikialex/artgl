@@ -26,8 +26,6 @@ export default class Viewer extends Vue {
   $viewer?: Application
   
   mounted(){
-    const canvas = this.$el.querySelector('#viewer-canvas') as HTMLCanvasElement;
-    Vue.prototype.$viewer = new Application(canvas)
     this.appConf = this.$viewer!.pipeline.config!;
   }
 
@@ -36,12 +34,6 @@ export default class Viewer extends Vue {
     type: 'folder',
     value: []
   };
-
-  
-  beforeDestroy(){
-    Vue.prototype.$viewer.unintialize();
-    Vue.prototype.$viewer = undefined;
-  }
 
 }
 </script>

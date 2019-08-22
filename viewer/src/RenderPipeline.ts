@@ -1,7 +1,7 @@
 import {
   RenderGraph, TAAShading,
   TSSAOShading, TSSAOBlendShading, Matrix4,
-  DepthShading, Scene, RenderEngine, Shading
+  DepthShading, Scene, RenderEngine, Shading, Vector4
 } from "../../src/artgl";
 import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
@@ -116,6 +116,7 @@ export class RenderPipeline{
         { // general scene origin
           name: "SceneOrigin",
           source: [scene],
+          clearColor: new Vector4(0, 0, 0, 1)
         },
         { // depth
           name: "Depth",
