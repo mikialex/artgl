@@ -2,7 +2,7 @@ import { Framer } from "../../src/artgl";
 import { RenderConfig } from '../../viewer/src/components/conf/interface';
 
 export interface TestBridge{
-  screenShotCompareElement(element: HTMLElement, goldenPath: string);
+  screenShotCompareElement(element: HTMLElement, goldenPath: string): Promise<void>;
 
   framer: Framer
   testConfig?: RenderConfig

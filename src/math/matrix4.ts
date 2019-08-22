@@ -337,9 +337,8 @@ export class Matrix4
     return this;
   }
 
-  toArray(array: number[], offset: number) {
+  toArray(array: number[], offset?: number) {
 
-    if (array === undefined) array = [];
     if (offset === undefined) offset = 0;
 
     var te = this.elements;

@@ -47,7 +47,7 @@ export default class Editors extends Vue {
     this.$emit('input', value);
   }
 
-  useEditor(index){
+  useEditor(index: number){
     this.currentEditor = index;
   }
 

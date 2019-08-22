@@ -8,7 +8,7 @@ import { GlobalUniforms } from "../../engine/uniform-proxy";
 import { Nullable } from "../../type";
 
 export type uniformUploadType = number | Float32Array | number[]
-export type flattenerType = (value: any, receiveData: uniformUploadType) => uniformUploadType;
+export type flattenerType = (value: any, receiveData?: uniformUploadType) => uniformUploadType;
 export type setterType = (gl: WebGLRenderingContext, location: WebGLUniformLocation, data: uniformUploadType) => void
 export type copierType = (newValue: uniformUploadType, target: uniformUploadType) => uniformUploadType;
 export type differType = (newValue: uniformUploadType, oldValue: uniformUploadType) => boolean;
@@ -95,8 +95,8 @@ export class GLUniform {
   private location: Nullable<WebGLUniformLocation>;
   innerGlobal?: InnerSupportUniform;
   value: any;
-  private lastReceiveData: uniformUploadType;
-  private receiveData: uniformUploadType;
+  private lastReceiveData?: uniformUploadType;
+  private receiveData?: uniformUploadType;
   private setter: setterType;
   private flattener: flattenerType
   private differ: differType;

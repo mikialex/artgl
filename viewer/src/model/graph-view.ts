@@ -85,8 +85,8 @@ export function layoutGraph(
   horizonArray.forEach(arr => {
     arr.forEach(node => {
       node.toNodes.forEach(n => {
-        const nPositon = positionMap.get(n);
-        const nodePosition = positionMap.get(node);
+        const nPositon = positionMap.get(n)!;
+        const nodePosition = positionMap.get(node)!;
         if (nodePosition <= nPositon) {
           let arrToMove = horizonArray[nPositon + 1];
           if (arrToMove === undefined) {
@@ -119,12 +119,12 @@ export class CanvasGraphUI{
   el: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   boardInfo: GraphBoardInfo;
-  width: number;
-  height: number;
+  width: number = 0;
+  height: number = 0;
 
   constructor(el: HTMLCanvasElement, boardInfo: GraphBoardInfo) {
     this.el = el;
-    this.ctx = el.getContext('2d');
+    this.ctx = el.getContext('2d')!;
     this.boardInfo = boardInfo;
   }
 
@@ -162,14 +162,14 @@ export class CanvasGraphUI{
   }
 
   drawViewNode(node: DAGNode, nodeLayoutMap: Map<DAGNode, NodeLayout>) {
-    const selfLayout = nodeLayoutMap.get(node);
+    const selfLayout = nodeLayoutMap.get(node)!;
     let index = 0;
 
     this.drawCircle(selfLayout.absX + 220, selfLayout.outputPointY, 10, "#8a5");
     if (!(node instanceof ShaderFunctionNode)) {
       node.fromNodes.forEach((n) => {
         index++;
-        const nodeLayout = nodeLayoutMap.get(n);
+        const nodeLayout = nodeLayoutMap.get(n)!;
         this.drawConnectionLine(
           nodeLayout.outputPointX, nodeLayout.outputPointY,
           selfLayout.inputPointsX, selfLayout.getNthInputNodeY(index)
@@ -189,7 +189,7 @@ export class CanvasGraphUI{
         Object.keys(node.factory.define.inputs).forEach((key, index) => {
           const fromNode = node.inputMap.get(key);
           if (fromNode !== undefined) {
-            const fromNodeLayout = nodeLayoutMap.get(fromNode);
+            const fromNodeLayout = nodeLayoutMap.get(fromNode)!;
             this.drawConnectionLine(
               fromNodeLayout.outputPointX, fromNodeLayout.outputPointY,
               selfLayout.inputPointsX, selfLayout.getNthInputNodeY(index)
@@ -235,22 +235,5 @@ export class CanvasGraphUI{
       ctx.stroke();
     }
   }
-
-}
-
-class UIElement{
-  draw() {
-    
-  }
-
-  pointerIn() {
-    
-  }
-
-  event
-
-}
-
-class UICircle extends UIElement{
 
 }

@@ -3,8 +3,8 @@ import { GLTextureTypeRaw } from "../const";
 import { GLParamList } from "../gl-info";
 
 interface textureBindInfo {
-  type: GLTextureTypeRaw,
-  texture: WebGLTexture
+  type?: GLTextureTypeRaw,
+  texture?: WebGLTexture
 }
 
 /**

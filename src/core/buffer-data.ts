@@ -53,7 +53,7 @@ export class BufferData{
     this.data = data;
   }
 
-  getGLAttribute(engine: RenderEngine): WebGLBuffer {
+  getGLAttribute(engine: RenderEngine) {
     return engine.getGLAttributeBuffer(this);
   }
 

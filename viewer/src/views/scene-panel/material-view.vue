@@ -1,19 +1,13 @@
 <template>
   <div class="material-view">
-    <div v-if="materiallist.length===0">
-      no material found
-    </div>
-    <div v-for="material in materiallist"
-    :key="material.uuid"
-    > 
-      <span>
-        {{material.name}}-{{material.uuid.slice(0, 6)}}
-      </span>
-      
+    <div v-if="materiallist.length===0">no material found</div>
+    <div v-for="material in materiallist" :key="material.uuid">
+      <span>{{material.name}}-{{material.uuid.slice(0, 6)}}</span>
+
       <div class="channel-detail" v-if="expandDetail">
         <!-- <ChannelEditor v-for ="bufferinfo in material.xxx"
         :key="bufferinfo.name"
-         /> -->
+        />-->
       </div>
     </div>
   </div>
@@ -30,20 +24,19 @@ import ChannelEditor from "./channel-editor.vue";
   }
 })
 export default class materialViewPanel extends Vue {
-  @Prop() view: SceneView
+  @Prop() view?: SceneView;
 
   expandDetail = true;
 
-  get materiallist(){
-    const list = [];
-    this.view.materials.forEach(mat =>{
+  get materiallist() {
+    const list: any = [];
+    this.view!.materials.forEach(mat => {
       list.push(mat);
-    })
+    });
     return list;
   }
 }
 </script>
 
 <style scoped lang="scss">
-
 </style>
