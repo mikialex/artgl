@@ -59,10 +59,11 @@ import { RenderView } from "../../model/render-view";
 import GeometryViewPanel from './geometry-view.vue';
 import MaterialViewPanel from './material-view.vue';
 import ObjectPanel from "../object-panel/object-panel.vue";
-import { GLApp } from "../../application";
 import NodeView from "./scene-node-view.vue";
 import { Observer } from "../../../../src/core/observable";
 import { RenderEngine } from "../../../../src/artgl";
+import { Nullable } from "../../../../src/type";
+import { Application } from "../../application";
 
 @Component({
   components: {
@@ -73,42 +74,43 @@ import { RenderEngine } from "../../../../src/artgl";
   }
 })
 export default class ScenePanel extends Vue {
-  sceneView: SceneView = null;
-  renderView: RenderView = null;
-  afterObs:Observer<RenderEngine>
+  sceneView: Nullable<SceneView> = null;
+  renderView: Nullable<RenderView> = null;
+  afterObs: Nullable<Observer<RenderEngine>> = null;
+  $viewer?: Application
 
   nav = ['hierarchy', 'technique','geometry','material'];
   currentNav = 'hierarchy'
   $store: any;
 
   sync() {
-    this.sceneView = SceneView.create(GLApp.scene);
-    this.renderView = RenderView.create(GLApp.engine);
+    this.sceneView = SceneView.create(this.$viewer!.scene);
+    this.renderView = RenderView.create(this.$viewer!.engine);
     if(this.afterObs){
-      GLApp.afterRender.remove(this.afterObs);
+      this.$viewer!.afterRender.remove(this.afterObs);
     }
-    this.afterObs = GLApp.afterRender.add((engine:RenderEngine)=>{
-      this.renderView.updateFrameInfo(engine);
+    this.afterObs = this.$viewer!.afterRender.add((engine:RenderEngine)=>{
+      this.renderView!.updateFrameInfo(engine);
     });
   }
 
   async hide(){
     this.$store.state.showScenePanel = false;
     await this.$nextTick()
-    GLApp.notifyResize();
+    this.$viewer!.notifyResize();
   }
 
   beforeDestroy(){
     if(this.afterObs){
-      GLApp.afterRender.remove(this.afterObs);
+      this.$viewer!.afterRender.remove(this.afterObs);
     }
   }
 
-  async catchChange(info) {
+  async catchChange(info: any) {
     if (info.type === "delete") {
-      SceneView.deleteNode(info.id, GLApp.scene);
+      SceneView.deleteNode(info.id, this.$viewer!.scene);
     } else if (info.type === "load") {
-      await SceneView.loadObj(info.id, GLApp.scene);
+      await SceneView.loadObj(info.id, this.$viewer!.scene);
     } else {
       console.log("unkown change");
       console.log(info);

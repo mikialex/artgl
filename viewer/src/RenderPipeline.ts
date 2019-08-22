@@ -13,7 +13,7 @@ export class RenderPipeline{
     this.composer = new EffectComposer(engine);
   }
   engine: RenderEngine;
-  config: RenderConfig;
+  config?: RenderConfig;
 
   graph: RenderGraph<any, any, any> = new RenderGraph();
   composer: EffectComposer<any, any, any>;
@@ -42,7 +42,7 @@ export class RenderPipeline{
   }
 
   getFramebufferByName(name: string) {
-    const node = this.graph.getRenderTargetDependence(name);
+    const node = this.graph.getRenderTargetDependence(name)!;
     const fbo = this.composer.getFramebuffer(node);
     if (fbo === undefined) {
       console.warn(`fbo ${name} has been optimized, to make it available, set keep content always true in render target node config`)
