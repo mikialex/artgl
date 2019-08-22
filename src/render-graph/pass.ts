@@ -78,7 +78,7 @@ export class RenderPass<
     engine.renderFrameBuffer(framebuffer, debugOutputViewport)
     // this will cause no use draw TODO optimize
     this.uniformNameFBOMap.forEach((inputFramebufferName, uniformName) => {
-      const dependFramebuffer = engine.getFramebuffer(inputFramebufferName);
+      const dependFramebuffer = engine.getFramebuffer(inputFramebufferName)!;
       const debugInputViewport = this.uniformRenderTargetNodeMap.get(uniformName)!.debugViewPort;
       engine.renderFrameBuffer(dependFramebuffer, debugInputViewport)
     })
@@ -101,7 +101,7 @@ export class RenderPass<
     if (this.isOutputScreen) {
       engine.setRenderTargetScreen();
       if (graph.enableDebuggingView) {
-        const debugViewPort = graph.screenNode.debugViewPort;
+        const debugViewPort = graph.screenNode!.debugViewPort;
         engine.setViewport(
           debugViewPort.x, debugViewPort.y,
           debugViewPort.z, debugViewPort.w

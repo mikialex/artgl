@@ -9,7 +9,7 @@ export function downloadCanvasPNGImage(canvas: HTMLCanvasElement, name: string) 
   link.click();
 }
 
-async function getStringContentFromFile(file) {
+async function getStringContentFromFile(file: Blob) {
   const reader = new FileReader();
   return new Promise<string>(function (resolve, _) {
     reader.onload = function (e) {
@@ -20,11 +20,11 @@ async function getStringContentFromFile(file) {
   });
 }
 
-export function openFile() {
+export function openFile(): Promise<Blob> {
   return new Promise((resolve) => {
     const input = document.createElement('input');
     input.setAttribute('type', 'file');
-    const func = (e) => {
+    const func = (e: any) => {
       resolve(e.target.files[0])
     }
     input.addEventListener('change', func);

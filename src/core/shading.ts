@@ -83,7 +83,7 @@ export class Shading implements ShadingConstrain{
 
     const obs = decorator.notifyNeedRedecorate.add((_deco) => {
       this._needRebuildShader = true;
-    })
+    })!
     this._decoratorObs.set(decorator, obs);
 
     this._decoratorSlot.add(decorator)
@@ -100,14 +100,13 @@ export class Shading implements ShadingConstrain{
   }
 
   getProgramConfig() {
-
     if (this._needRebuildShader) {
       this.build();
       this._programConfigCache = this.graph.compile();
       this.afterShaderCompiled.notifyObservers(this._programConfigCache)
       this._needRebuildShader = false;
     }
-    return this._programConfigCache;
+    return this._programConfigCache!;
   }
 
   getProgram(engine: RenderEngine): GLProgram {
@@ -137,11 +136,11 @@ export function MarkNeedRedecorate() {
     if (target.notifyNeedRedecorate === undefined) {
       target.notifyNeedRedecorate = new Observable();
     }
-    let val = target[key];
+    let val = (target as any)[key];
     const getter = () => {
       return val;
     };
-    const setter = (value) => {
+    const setter = (value: any) => {
       const oldValue = val;
       val = value;
       if (oldValue !== value) {
@@ -168,11 +167,11 @@ export function MapUniform(remapName: string) {
       target.propertyUniformNameMap = new Map();
     }
 
-    let val = target[key];
+    let val = (target as any)[key];
     const getter = () => {
       return val;
     };
-    const setter = (value) => {
+    const setter = (value: any) => {
       target.uniforms.set(remapName, value);
       target.hasAnyUniformChanged = true;
       val = value;
@@ -192,17 +191,9 @@ export function MapUniform(remapName: string) {
 export abstract class BaseEffectShading<T>
   implements ShaderUniformProvider, ShaderUniformDecorator {
   constructor() {
-    // need check if has initialized by decorator
-    if (this.uniforms === undefined) {
-      this.uniforms = new Map();
-    }
-    if (this.propertyUniformNameMap === undefined) {
-      this.propertyUniformNameMap = new Map();
-    }
-
-    if (this.notifyNeedRedecorate === undefined) {
-      this.notifyNeedRedecorate = new Observable()
-    }
+    this.uniforms = new Map();
+    this.propertyUniformNameMap = new Map();
+    this.notifyNeedRedecorate = new Observable()
   }
 
   abstract decorate(graph: ShaderGraph): void;

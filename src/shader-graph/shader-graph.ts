@@ -1,4 +1,4 @@
-import { GLProgramConfig } from "../webgl/program";
+import { GLProgramConfig, VaryingDescriptor } from "../webgl/program";
 import { genFragShader, genVertexShader } from "./code-gen";
 import {
   ShaderInputNode, ShaderTextureNode, ShaderFunctionNode,
@@ -12,6 +12,7 @@ import { Vector4 } from "../math";
 import { eyeDir } from "./built-in/transform";
 import { ChannelType } from "../core/material";
 import { GLTextureType } from "../webgl/uniform/uniform-texture";
+import { Nullable } from "../type";
 
 
 export const UvFragVary = "v_uv"
@@ -24,8 +25,8 @@ export class ShaderGraph {
     this.reset();
   }
 
-  fragmentRoot: ShaderNode;
-  vertexRoot: ShaderNode;
+  fragmentRoot: ShaderNode = constValue(new Vector4());
+  vertexRoot: ShaderNode = constValue(new Vector4());
   varyings: Map<string, ShaderNode> = new Map();
 
   setFragmentRoot(root: ShaderNode): ShaderGraph {
@@ -54,11 +55,13 @@ export class ShaderGraph {
     return this;
   }
 
-  private declareFragNormal(): ShaderGraph {
+  private declareFragNormal(): ShaderNode {
     if (this.varyings.has(NormalFragVary)) {
-      return this;
+      return this.varyings.get(NormalFragVary)!;
     }
-    return this.setVary(NormalFragVary, attribute(CommonAttribute.normal, GLDataType.floatVec3))
+    const node = attribute(CommonAttribute.normal, GLDataType.floatVec3);
+    this.setVary(NormalFragVary, node)
+    return node;
   }
 
   declareFragUV(): ShaderGraph {
@@ -82,17 +85,17 @@ export class ShaderGraph {
     if (ret === undefined) {
       if (key === NormalFragVary) {
         this.declareFragNormal();
-        ret =  this.varyings.get(key);
+        ret = this.varyings.get(key);
       } else {
         throw 'cant get vary'
       }
     }
-    return new ShaderVaryInputNode(key, ret.type);
+    return new ShaderVaryInputNode(key, ret!.type);
   }
 
-  cachedInnerSupportEyeDir: ShaderNode
+  cachedInnerSupportEyeDir: Nullable<ShaderNode> = null;
   getEyeDir(): ShaderNode {
-    if (this.cachedInnerSupportEyeDir === undefined) {
+    if (this.cachedInnerSupportEyeDir === null) {
       this.cachedInnerSupportEyeDir = eyeDir.make()
         .input("worldPosition", this.getVary(WorldPositionFragVary))
         .input("cameraWorldPosition", innerUniform("CameraWorldPosition"))
@@ -106,13 +109,13 @@ export class ShaderGraph {
       this.cachedReusedChannelNodes.set(channelType,
         texture(channelType, GLTextureType.texture2D))
     }
-    return this.cachedReusedChannelNodes.get(channelType)
+    return this.cachedReusedChannelNodes.get(channelType)!
   }
 
   reset(): ShaderGraph {
     this.varyings.clear();
     this.cachedReusedChannelNodes.clear();
-    this.cachedInnerSupportEyeDir = undefined;
+    this.cachedInnerSupportEyeDir = null;
     this.setVertexRoot(MVPWorld());
     this.setFragmentRoot(constValue(new Vector4()))
     return this;
@@ -154,7 +157,7 @@ export class ShaderGraph {
       n => n instanceof ShaderInputNode
     );
 
-    const attributes = inputNodes
+    const attributes = (inputNodes as ShaderAttributeInputNode[]) 
       .filter(node => node instanceof ShaderAttributeInputNode)
       .map((node: ShaderAttributeInputNode) => {
         return {
@@ -162,7 +165,8 @@ export class ShaderGraph {
           type: node.type,
         }
       });
-    const uniforms = inputNodes
+
+    const uniforms = (inputNodes as ShaderCommonUniformInputNode[]) 
       .filter(node => node instanceof ShaderCommonUniformInputNode)
       .map((node: ShaderCommonUniformInputNode) => {
         return {
@@ -171,7 +175,7 @@ export class ShaderGraph {
           default: node.defaultValue
         }
       });
-    const uniformsIncludes = inputNodes
+    const uniformsIncludes =  (inputNodes as ShaderInnerUniformInputNode[]) 
       .filter(node => node instanceof ShaderInnerUniformInputNode)
       .map((node: ShaderInnerUniformInputNode) => {
         return {
@@ -180,7 +184,7 @@ export class ShaderGraph {
         }
       });
 
-    const textures = inputNodes
+    const textures =  (inputNodes as ShaderTextureNode[]) 
       .filter(node => node instanceof ShaderTextureNode)
       .map((node: ShaderTextureNode) => {
         return {
@@ -189,7 +193,7 @@ export class ShaderGraph {
         }
       });
 
-    const varyings = [];
+    const varyings: VaryingDescriptor[] = [];
     this.varyings.forEach((node, key) => {
       varyings.push({
         name: key,

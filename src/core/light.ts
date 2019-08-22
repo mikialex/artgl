@@ -1,7 +1,7 @@
 import { SceneNode } from "../scene/scene-node";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { uniformFromValue, constValue } from "../shader-graph/node-maker";
-import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, getPropertyUniform } from "./shading";
+import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform } from "./shading";
 import { ShaderCommonUniformInputNode, ShaderNode } from "../shader-graph/shader-node";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { Observable } from "./observable";
@@ -13,13 +13,8 @@ export abstract class Light<T> extends SceneNode
   implements ShaderUniformProvider, ShaderUniformDecorator {
   constructor() {
     super();
-    // need check if has initialized by decorator
-    if (this.uniforms === undefined) {
-      this.uniforms = new Map();
-    }
-    if (this.propertyUniformNameMap === undefined) {
-      this.propertyUniformNameMap = new Map();
-    }
+    this.uniforms = new Map();
+    this.propertyUniformNameMap = new Map();
   }
 
   decorate(decorated: ShaderGraph): void {
@@ -35,9 +30,9 @@ export abstract class Light<T> extends SceneNode
     return visitor(this);
   }
 
-  abstract produceLightFragDir(_graph: ShaderGraph): ShaderNode 
+  abstract produceLightFragDir(_graph: ShaderGraph): ShaderNode
 
-  abstract produceLightIntensity(_graph: ShaderGraph): ShaderNode 
+  abstract produceLightIntensity(_graph: ShaderGraph): ShaderNode
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable()
 
@@ -52,7 +47,7 @@ export abstract class Light<T> extends SceneNode
   getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
     return getPropertyUniform(this, name)
   }
-  
+
 }
 
 export const collectLight = new ShaderFunction({
@@ -68,7 +63,7 @@ export const collectLight = new ShaderFunction({
 export function collectLightNodes<T>(
   lights: Light<T>[],
   lightNodeMaker: (light: Light<T>) => ShaderNode) {
-  
+
   let root: ShaderNode = constValue(new Vector3());
   lights.forEach(light => {
     const lightNode = lightNodeMaker(light);

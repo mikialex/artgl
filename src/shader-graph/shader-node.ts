@@ -43,7 +43,7 @@ export class ShaderFunctionNode extends ShaderNode {
     this.factory = factory;
   }
 
-  meaningfulName: string
+  meaningfulName: string = ""
   factory: ShaderFunction
   inputMap: Map<string, ShaderNode> = new Map();
 
