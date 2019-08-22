@@ -2,8 +2,9 @@ import { GLDataType } from "../shader-util";
 import { Matrix4, Vector3 } from "../../math/index";
 import { Vector2 } from "../../math/vector2";
 import { Vector4 } from "../../math/vector4";
+import { flattenerType, copierType, differType } from "./uniform";
 
-export function findUniformSetter(type: GLDataType) {
+export function findUniformSetter(type: GLDataType): any {
   switch (type) {
     case GLDataType.float: return setValue1f;
     case GLDataType.floatVec2: return setValue2fv;
@@ -67,32 +68,32 @@ function copyArray(newVal: number[], target: number[]) {
 }
 
 
-export function findUniformDiffer(type: GLDataType) {
+export function findUniformDiffer(type: GLDataType): differType {
   if (type === GLDataType.float || type === GLDataType.int) {
-    return differNumber
+    return differNumber as differType
   } else {
-    return differArray
+    return differArray as differType
   }
 }
 
-export function findUniformCopier(type: GLDataType) {
+export function findUniformCopier(type: GLDataType): copierType {
   if (type === GLDataType.float || type === GLDataType.int) {
-    return copyNumber
+    return copyNumber as copierType
   } else {
-    return copyArray
+    return copyArray as copierType
   }
 }
 
-export function findUniformFlattener(type: GLDataType) {
+export function findUniformFlattener(type: GLDataType): flattenerType {
   switch (type) {
     case GLDataType.float: return (v: number) => v;
-    case GLDataType.floatVec2: return Vector2.flatten;
-    case GLDataType.floatVec3: return Vector3.flatten;
-    case GLDataType.floatVec4: return Vector4.flatten;
+    case GLDataType.floatVec2: return Vector2.flatten as flattenerType;
+    case GLDataType.floatVec3: return Vector3.flatten as flattenerType;
+    case GLDataType.floatVec4: return Vector4.flatten as flattenerType;
 
     case GLDataType.Mat2: throw 'not support yet'; // _MAT2
     case GLDataType.Mat3: throw 'not support yet' // _MAT3
-    case GLDataType.Mat4: return Matrix4.flatten // _MAT4
+    case GLDataType.Mat4: return Matrix4.flatten as flattenerType // _MAT4
 
     // case 0x8b5e: case 0x8d66: return setValueT1; // SAMPLER_2D, SAMPLER_EXTERNAL_OES
     // case 0x8b60: return setValueT6; // SAMPLER_CUBE

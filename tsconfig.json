@@ -9,7 +9,7 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
-    "strict": false,
+    "strict": true,
     "lib": [
       "es6",
       "dom"

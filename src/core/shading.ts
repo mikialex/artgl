@@ -9,6 +9,7 @@ import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
 import { uniformFromValue } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
 import { ShadingConstrain } from "../render-graph/backend-interface";
+import { Light } from "./light";
 
 export interface ShaderUniformDecorator {
   /**
@@ -82,7 +83,7 @@ export class Shading implements ShadingConstrain{
 
     const obs = decorator.notifyNeedRedecorate.add((_deco) => {
       this._needRebuildShader = true;
-    })
+    })!
     this._decoratorObs.set(decorator, obs);
 
     this._decoratorSlot.add(decorator)
@@ -99,14 +100,13 @@ export class Shading implements ShadingConstrain{
   }
 
   getProgramConfig() {
-
     if (this._needRebuildShader) {
       this.build();
       this._programConfigCache = this.graph.compile();
       this.afterShaderCompiled.notifyObservers(this._programConfigCache)
       this._needRebuildShader = false;
     }
-    return this._programConfigCache;
+    return this._programConfigCache!;
   }
 
   getProgram(engine: RenderEngine): GLProgram {
@@ -136,11 +136,11 @@ export function MarkNeedRedecorate() {
     if (target.notifyNeedRedecorate === undefined) {
       target.notifyNeedRedecorate = new Observable();
     }
-    let val = target[key];
+    let val = (target as any)[key];
     const getter = () => {
       return val;
     };
-    const setter = (value) => {
+    const setter = (value: any) => {
       const oldValue = val;
       val = value;
       if (oldValue !== value) {
@@ -167,11 +167,11 @@ export function MapUniform(remapName: string) {
       target.propertyUniformNameMap = new Map();
     }
 
-    let val = target[key];
+    let val = (target as any)[key];
     const getter = () => {
       return val;
     };
-    const setter = (value) => {
+    const setter = (value: any) => {
       target.uniforms.set(remapName, value);
       target.hasAnyUniformChanged = true;
       val = value;
@@ -188,20 +188,20 @@ export function MapUniform(remapName: string) {
   };
 }
 
+export function checkCreate(testValue: any, inputValue: any) {
+  if (testValue === undefined) {
+    return inputValue
+  } else {
+    return testValue
+  }
+}
+
 export abstract class BaseEffectShading<T>
   implements ShaderUniformProvider, ShaderUniformDecorator {
   constructor() {
-    // need check if has initialized by decorator
-    if (this.uniforms === undefined) {
-      this.uniforms = new Map();
-    }
-    if (this.propertyUniformNameMap === undefined) {
-      this.propertyUniformNameMap = new Map();
-    }
-
-    if (this.notifyNeedRedecorate === undefined) {
-      this.notifyNeedRedecorate = new Observable()
-    }
+    this.uniforms = checkCreate((this as any).uniforms, new Map());
+    this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
+    this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
   }
 
   abstract decorate(graph: ShaderGraph): void;
@@ -219,17 +219,27 @@ export abstract class BaseEffectShading<T>
   nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
   
   getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
-    if (this.nodeCreated.has(name as string)) {
-      return this.nodeCreated.get(name as string);
-    }
-    const uniformName = this.propertyUniformNameMap.get(name as string);
-    const value = this[name as string];
-    if (value === undefined) {
-      throw "uniform value not given"
-    }
-    const node = uniformFromValue(uniformName, value);
-    this.nodeCreated.set(name as string, node);
-    return node;
+    return getPropertyUniform(this, name)
   }
 
+}
+
+export function getPropertyUniform<T, K extends BaseEffectShading<any> | Light<any>>(env: K, name: keyof T) {
+  const uniformNode = env.nodeCreated.get(name as string);
+  if (uniformNode !== undefined) {
+    return uniformNode;
+  }
+  const uniformName = env.propertyUniformNameMap.get(name as string);
+
+  if (uniformName === undefined) {
+    throw `${name} uniform name not found, maybe forget uniform decorator`
+  }
+
+  const value = (env as unknown as T)[name];
+  if (value === undefined) {
+    throw "uniform value not given"
+  }
+  const node = uniformFromValue(uniformName, value);
+  env.nodeCreated.set(name as string, node);
+  return node;
 }

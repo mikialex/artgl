@@ -41,7 +41,7 @@ export class OrbitController extends Controller {
 
 
   public registerInteractor(interactor: Interactor) {
-    if (this.interactor !== undefined) {
+    if (this.interactor !== null) {
       this.interactor.unbindControllerAllListener(this);
     }
     this.interactor = interactor;

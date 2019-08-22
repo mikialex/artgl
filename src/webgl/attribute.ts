@@ -33,7 +33,9 @@ export class GLAttribute {
     if (descriptor.asInstance === true) {
       program.useInstance = true;
       this.asInstance = descriptor.asInstance
-      this.instanceDivisor = descriptor.instanceDivisor
+      if (descriptor.instanceDivisor !== undefined) {
+        this.instanceDivisor = descriptor.instanceDivisor
+      }
     }
   }
   
@@ -45,7 +47,7 @@ export class GLAttribute {
   readonly isActive: boolean;
 
   readonly asInstance: boolean = false;
-  readonly instanceDivisor: number;
+  readonly instanceDivisor: number = 1;
 
   useBuffer(buffer: WebGLBuffer) {
     if (!this.isActive) {

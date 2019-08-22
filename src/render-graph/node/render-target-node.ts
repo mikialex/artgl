@@ -27,8 +27,8 @@ export class RenderTargetNode<
       return
     }
 
-    if (define.keepContent === undefined) {
-      define.keepContent = () => false;
+    if (define.keepContent !== undefined) {
+      this.keepContent = define.keepContent;
     }
 
     // set a default format config
@@ -59,6 +59,8 @@ export class RenderTargetNode<
 
   debugViewPort: Vector4 = new Vector4(0, 0, 200, 200);
 
+  keepContent: () => boolean  = () => false;
+
   autoWidthRatio: number = 0;
   autoHeightRatio: number = 0;
   enableDepth: boolean = false;
@@ -69,7 +71,7 @@ export class RenderTargetNode<
   formatKey: string = "";
 
   private fromGetter: () => Nullable<string>
-  private from: string = null;
+  private from: Nullable<string> = null;
 
   private _fromPassNode: Nullable<PassGraphNode<ShadingType, RenderableType, FBOType>> = null
 
@@ -102,7 +104,7 @@ export class RenderTargetNode<
     let width: number;
     let height: number;
     // decide initial size and create resize observer
-    if (define.format.dimensionType === DimensionType.fixed) {
+    if (define.format && define.format.dimensionType === DimensionType.fixed) {
       width = define.format.width !== undefined ? define.format.width : engine.renderBufferWidth();
       height = define.format.height !== undefined ? define.format.height : engine.renderBufferHeight();
     } else { //  === DimensionType.bindRenderSize
@@ -122,7 +124,7 @@ export class RenderTargetNode<
     this.from = this.fromGetter();
 
     if (this.from !== null) {
-      const passNode = graph.getRenderPassDependence(this.from);
+      const passNode = graph.getRenderPassDependence(this.from)!;
       this.fromPassNode = passNode;
     }
   }

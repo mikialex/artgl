@@ -4,6 +4,8 @@ import { RenderTargetNode } from "./node/render-target-node";
 import { QuadSource } from '../engine/render-source';
 import { EffectComposer } from "./effect-composer";
 import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingConstrain, ShadingDetermined } from "./backend-interface";
+import { RenderPass } from "./pass";
+import { Nullable } from "../type";
 
 export type RenderGraphNode
   <
@@ -26,12 +28,12 @@ export class RenderGraph<
 
   enableDebuggingView: boolean = false;
 
-  screenNode: RenderTargetNode<ShadingType, RenderableType, FBOType>;
+  screenNode: Nullable<RenderTargetNode<ShadingType, RenderableType, FBOType>> = null;
   renderTargetNodes: Map<string, RenderTargetNode<ShadingType, RenderableType, FBOType>> = new Map();
   passNodes: Map<string, PassGraphNode<ShadingType, RenderableType, FBOType>> = new Map();
 
   get nodes() {
-    const nodes = [];
+    const nodes: RenderGraphNode<ShadingType, RenderableType, FBOType>[] = [];
     this.passNodes.forEach(node => {
       nodes.push(node);
     })
@@ -72,9 +74,9 @@ export class RenderGraph<
     });
 
     // create and update pass queue
-    const nodeQueue = this.screenNode.getTopologicalSortedList() as
+    const nodeQueue = this.screenNode!.getTopologicalSortedList() as
       RenderGraphNode<ShadingType, RenderableType, FBOType>[];
-    const passes = [];
+    const passes: RenderPass<ShadingType, RenderableType, FBOType>[] = [];
     nodeQueue.forEach(node => {
       if (node instanceof PassGraphNode) {
         const pass = composer.registerNode(node);
@@ -82,7 +84,7 @@ export class RenderGraph<
         passes.push(pass);
       } else if (node instanceof RenderTargetNode) {
         if (node.fromPassNode !== null) {
-          const pass = composer.getPass(node.fromPassNode);
+          const pass = composer.getPass(node.fromPassNode)!;
           node.updatePass(engine, pass)
         }
       }
@@ -101,22 +103,16 @@ export class RenderGraph<
     })
   }
 
-  getRenderTargetDependence(name: string): RenderTargetNode<ShadingType, RenderableType, FBOType> {
+  getRenderTargetDependence(name: string) {
     return this.renderTargetNodes.get(name);
   }
 
-  getRenderPassDependence(name: string): PassGraphNode<ShadingType, RenderableType, FBOType> {
+  getRenderPassDependence(name: string) {
     return this.passNodes.get(name);
   }
 
   getRootScreenTargetNode() {
-    let screenNode: RenderTargetNode<ShadingType, RenderableType, FBOType>;
-    this.renderTargetNodes.forEach(node => {
-      if (node.isScreenNode) {
-        screenNode = node;
-      }
-    })
-    return screenNode;
+    return this.screenNode;
   }
 
   private allocateRenderTargetNodes(textsDefine: RenderTargetDefine[]) {
@@ -126,15 +122,12 @@ export class RenderGraph<
       }
       const renderTargetNode = new RenderTargetNode<ShadingType, RenderableType, FBOType>(define);
       if (define.name === RenderGraph.screenRoot) {
-        if (this.screenNode !== undefined) {
-          throw "duplicate screen root node"
-        }
         this.screenNode = renderTargetNode
       }
       this.renderTargetNodes.set(define.name, renderTargetNode);
     })
 
-    if (this.screenNode === undefined) {
+    if (this.screenNode === null) {
       throw "screen root not found"
     }
   }

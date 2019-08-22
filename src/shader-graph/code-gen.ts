@@ -25,7 +25,7 @@ export function genFragShader(graph: ShaderGraph): string {
   builder.reduceIndent()
   builder.writeLine("}")
   const mainCode = builder.output();
-  
+
   const includedCode = genShaderFunctionDepend(evaluatedNode);
 
   return includedCode + mainCode
@@ -58,13 +58,13 @@ export function genVertexShader(graph: ShaderGraph): string {
   builder.reduceIndent()
   builder.writeLine("}")
   const mainCode = builder.output();
-  
+
   const includedCode = genShaderFunctionDepend(evaluatedNode);
 
   return includedCode + mainCode
 }
 
-function pushListToMap(map:Map<ShaderNode, varRecord>, list:varRecord[]) {
+function pushListToMap(map: Map<ShaderNode, varRecord>, list: varRecord[]) {
   list.forEach(item => {
     if (!map.has(item.refedNode)) {
       map.set(item.refedNode, item)
@@ -103,7 +103,7 @@ function genTempVarExpFromShaderNode(
   preEvaluatedList: Map<ShaderNode, varRecord>
 ): string {
   function findRecordFromEvaluatedNode(node: ShaderNode) {
-    let record: varRecord;
+    let record: varRecord | undefined;
     if (preEvaluatedList.has(node)) {
       record = preEvaluatedList.get(node)
     } else {
@@ -200,9 +200,9 @@ function codeGenGraph(
   rootOutputName: string,
   preEvaluatedList: Map<ShaderNode, varRecord>
 ): {
-    code: string,
-    varList: varRecord[]
-  } {
+  code: string,
+  varList: varRecord[]
+} {
   const builder = new CodeBuilder()
   builder.reset();
 

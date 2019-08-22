@@ -27,13 +27,13 @@ import { SceneView, GeometryView } from "../../model/scene-view";
   }
 })
 export default class GeometryViewPanel extends Vue {
-  @Prop() view: SceneView
+  @Prop() view?: SceneView
 
   expandDetail = true;
 
   get geometrylist(){
-    const list = [];
-    this.view.geometries.forEach(geo =>{
+    const list: any = [];
+    this.view!.geometries.forEach(geo =>{
       list.push(geo);
     })
     return list;

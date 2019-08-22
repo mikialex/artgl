@@ -1,23 +1,11 @@
 
 import {
-  RenderEngine, Mesh, Interactor, OrbitController, Shading,
+  RenderEngine, Mesh, OrbitController, Shading,
   ShaderGraph, PerspectiveCamera, Scene, NormalShading, SphereGeometry
 } from '../../src/artgl';
 
 export class ShaderApplication {
-
-  canvas: HTMLCanvasElement;
-  graph: ShaderGraph = new ShaderGraph();
-  scene: Scene = new Scene();
-
-  shader: Shading;
-  mesh: Mesh;
-  orbitController: OrbitController;
-
-  engine: RenderEngine;
-
-
-  init(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.engine = new RenderEngine(canvas);
     this.engine.camera.transform.position.set(20, 10, 10)
@@ -31,6 +19,17 @@ export class ShaderApplication {
     window.addEventListener('resize', this.onContainerResize);
     this.onContainerResize();
   }
+
+  canvas: HTMLCanvasElement;
+  graph: ShaderGraph = new ShaderGraph();
+  scene: Scene = new Scene();
+
+  shader: Shading;
+  mesh: Mesh = new Mesh();
+  orbitController: OrbitController;
+
+  engine: RenderEngine;
+
 
   updateShader() {
     // const newConf = this.graph.compile();
@@ -68,11 +67,6 @@ export class ShaderApplication {
     this.engine.render(this.scene);
   }
 
-  uninit() {
-    this.canvas = null;
-    this.engine = null;
-  }
-
   private onContainerResize = () => {
     const width = this.canvas.offsetWidth;
     const height = this.canvas.offsetHeight;
@@ -82,6 +76,3 @@ export class ShaderApplication {
 
 
 }
-
-
-export let ShaderApp: ShaderApplication = new ShaderApplication();

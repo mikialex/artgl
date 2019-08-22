@@ -10,17 +10,7 @@ import { Raycaster } from '../../src/core/raycaster';
 export const STATIC_SERVER = "http://localhost:3000/"
 
 export class Application {
-  pipeline: RenderPipeline;
-  engine: RenderEngine;
-  framer: Framer = new Framer();
-  el: HTMLCanvasElement;
-  hasInitialized: boolean = false;
-  scene: Scene = new Scene();
-  orbitController: OrbitController;
-  raycaster: Raycaster = new Raycaster();
-  backgroundColor: Vector4 = new Vector4();
-
-  initialize(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement) {
     this.el = canvas;
     this.engine = new RenderEngine(canvas);
     this.pipeline = new RenderPipeline(this.engine);
@@ -36,13 +26,20 @@ export class Application {
     this.framer.setFrame(this.render);
   }
 
+  pipeline: RenderPipeline;
+  engine: RenderEngine;
+  framer: Framer = new Framer();
+  el: HTMLCanvasElement;
+  hasInitialized: boolean = false;
+  scene: Scene = new Scene();
+  orbitController: OrbitController;
+  raycaster: Raycaster = new Raycaster();
+  backgroundColor: Vector4 = new Vector4();
+
   unintialize() {
     window.removeEventListener('resize', this.onContainerResize);
-    this.engine = null;
-    this.pipeline = null;
     this.framer.stop();
-    this.framer.setFrame(null);
-    this.el = null;
+    this.framer.setFrame(() => { });
   }
 
   private onContainerResize = () => {
@@ -107,7 +104,7 @@ export class Application {
   createScene(scene: Scene): Scene {
     const config = hierarchyBallBuilder(scene.root, this);
     // this.loadOBJFromURL();
-    this.pipeline.config.value.push(config);
+    this.pipeline.config!.value.push(config);
     return scene;
   }
 
@@ -122,5 +119,3 @@ export class Application {
   }
 
 }
-
-export let GLApp: Application = new Application();

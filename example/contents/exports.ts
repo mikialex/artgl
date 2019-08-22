@@ -10,7 +10,7 @@ declare global {
   interface Window {
     artglExamples: Example[],
     HeadlessTestBridge: ConstructorTypeOf<HeadlessTestBridge>;
-    screenShotCompareElement(element: HTMLElement, goldenPath: string);
+    screenShotCompareElement(element: HTMLElement, goldenPath: string): Promise<void>;
   }
 }
 

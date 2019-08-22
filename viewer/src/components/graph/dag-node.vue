@@ -40,44 +40,44 @@ export default class DAGNodeView extends Vue {
   @Prop({
     required: true
   })
-  node: DAGNode;
+  node?: DAGNode;
 
   @Prop({
     required: true
   })
-  layout: NodeLayout;
+  layout?: NodeLayout;
 
   @Prop({
     required: true
   })
-  boardInfo: GraphBoardInfo;
+  boardInfo?: GraphBoardInfo;
 
   @Prop({
     required: false,
     default: true
   })
-  editable: boolean;
+  editable?: boolean;
 
   get inputs(): DAGNode[] {
-    const results = [];
-    this.node.fromNodes.forEach(value => {
+    const results: any = [];
+    this.node!.fromNodes.forEach(value => {
       results.push(value);
     });
     return results;
   }
 
   get viewPositionX() {
-    return this.layout.absX + "px";
+    return this.layout!.absX + "px";
   }
   get viewPositionY() {
-    return this.layout.absY + "px";
+    return this.layout!.absY + "px";
   }
 
   get viewWidth() {
-    return this.layout.width + "px";
+    return this.layout!.width + "px";
   }
   get viewHeight() {
-    return this.layout.height + "px";
+    return this.layout!.height + "px";
   }
 
   isDragging: boolean = false;
@@ -87,8 +87,8 @@ export default class DAGNodeView extends Vue {
   screenOriginY = 0;
   startDrag(e: MouseEvent) {
     this.isDragging = true;
-    this.originX = this.layout.absX;
-    this.originY = this.layout.absY;
+    this.originX = this.layout!.absX;
+    this.originY = this.layout!.absY;
     this.screenOriginX = e.screenX;
     this.screenOriginY = e.screenY;
     window.addEventListener("mousemove", this.dragging);
@@ -99,8 +99,8 @@ export default class DAGNodeView extends Vue {
   }
 
   dragging(e: MouseEvent) {
-    this.layout.absX = this.originX + (e.screenX - this.screenOriginX) / this.boardInfo.scale;
-    this.layout.absY = this.originY + (e.screenY - this.screenOriginY) / this.boardInfo.scale;
+    this.layout!.absX = this.originX + (e.screenX - this.screenOriginX) / this.boardInfo!.scale;
+    this.layout!.absY = this.originY + (e.screenY - this.screenOriginY) / this.boardInfo!.scale;
     this.$emit("updateViewport", { node: this.node, layout: this.layout });
     this.$emit("updateLine", this.node)
   }

@@ -13,8 +13,8 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 @Component
 export default class SelectEditor extends Vue {
-  @Prop({ required: true }) value: number;
-  @Prop({ required: true }) list: string[];
+  @Prop({ required: true }) value?: number;
+  @Prop({ required: true }) list?: string[];
 
   get _value() {
     return this.value;

@@ -54,9 +54,9 @@ export class TextureSource {
     data.height = height;
     return data;
   }
-  source: TexImageSource | ArrayBufferView = null
-  width: number;
-  height: number;
+  source: Nullable<TexImageSource | ArrayBufferView> = null
+  width: number = 1;
+  height: number = 1;
 }
 
 /**
@@ -80,9 +80,10 @@ export class Texture implements GraphicResourceReleasable {
   private _POTResizedSource: Nullable<TextureSource> = null;
   get rawDataSource() { return this._dataSource }
   get potDataSource() { return this._POTResizedSource }
-  get renderUsedDataSource() {
+  get renderUsedDataSource(): TextureSource {
     if (this.potDataSource !== null) {
-      return this._POTResizedSource
+      // TODO create pot
+      return this._POTResizedSource!
     } else {
       return this.rawDataSource
     }
@@ -170,11 +171,12 @@ export class Texture implements GraphicResourceReleasable {
     return this;
   }
 
-  useCustomMipMap(engine, sources: TextureSource[]) {
+  useCustomMipMap(engine: RenderEngine, sources: TextureSource[]) {
     if (this.hasMipMapExist) {
       throw "this texture has mipmap upload, clear before use"
     }
-    engine.renderer.textureManger.uploadWebGLMipMap();
+    // TODO
+    // engine.renderer.textureManger.uploadWebGLMipMap();
     sources.forEach(source => this._mipmapArray.push(source));
     return this;
   }

@@ -3,8 +3,8 @@ import { GLTextureTypeRaw } from "../const";
 import { GLParamList } from "../gl-info";
 
 interface textureBindInfo {
-  type: GLTextureTypeRaw,
-  texture: WebGLTexture
+  type?: GLTextureTypeRaw,
+  texture?: WebGLTexture
 }
 
 /**
@@ -20,11 +20,11 @@ export class GLTextureSlot {
     this.maxSupport = renderer.glInfo.getParameter(GLParamList.MAX_TEXTURE_SIZE);
     generateTextureSlotMap(this.maxSupport, this.gl);
   }
-  readonly renderer;
-  readonly gl;
-  readonly maxSupport;
+  readonly renderer: GLRenderer;
+  readonly gl: WebGLRenderingContext;
+  readonly maxSupport: number;
 
-  private currentTextureSlot = null;
+  private currentTextureSlot: number = 0;
   private currentBindTextures: textureBindInfo[] = [];
 
   activeTexture(slot: number) {
@@ -56,7 +56,7 @@ export class GLTextureSlot {
     this.slotIndex = 0;
   }
 
-  findSlot(webglTexture: WebGLTexture): number {
+  findSlot(_webglTexture: WebGLTexture): number {
     let slot = this.slotIndex;
     if (this.slotIndex > this.maxSupport) {
       throw 'texture use exceed max texture support'
@@ -78,6 +78,6 @@ const textureSlotMap: number[] = [];
 function generateTextureSlotMap(maxTextureSlotSupport: number, gl: WebGLRenderingContext) {
   for (let i = 0; i < maxTextureSlotSupport; i++) {
     const name = `TEXTURE${i}`;
-    textureSlotMap[i] = gl[name];
+    textureSlotMap[i] = (gl as any)[name];
   }
 }

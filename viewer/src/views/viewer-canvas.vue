@@ -45,7 +45,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { GLApp } from "../application";
+import { Application } from "../application";
 import GraphView from "../components/graph/graph-viewer.vue";
 import DAGNodeView from "../components/graph/dag-node.vue";
 import LineHUDCanvas from "./line-hud-canvas.vue";
@@ -68,16 +68,26 @@ import { Vector4, DAGNode } from "../../../src/artgl";
   }
 })
 export default class ViewerCanvas extends Vue {
-  isRunning: boolean = GLApp.framer.active;
+  $viewer?: Application
+
+  isRunning: boolean = false;
   $store: any;
 
   mounted(){
+    const canvas = this.$el.querySelector('#viewer-canvas') as HTMLCanvasElement;
+    Vue.prototype.$viewer = new Application(canvas)
+    this.isRunning = this.$viewer!.framer.active;
     if(document.body.clientWidth > 600){
       this.toggleConfigPanel(true);
     }
     if(document.body.clientWidth > 1000){
       this.toggleScenePanel(true);
     }
+  }
+
+  beforeDestroy(){
+    Vue.prototype.$viewer.unintialize();
+    Vue.prototype.$viewer = undefined;
   }
 
   async toggleScenePanel(action?:boolean) {
@@ -87,7 +97,7 @@ export default class ViewerCanvas extends Vue {
       this.$store.state.showScenePanel = !this.$store.state.showScenePanel;
     }
     await this.$nextTick();
-    GLApp.notifyResize();
+    this.$viewer!.notifyResize();
   }
 
   async toggleConfigPanel(action?:boolean) {
@@ -97,12 +107,12 @@ export default class ViewerCanvas extends Vue {
       this.$store.state.showConfigPanel = !this.$store.state.showConfigPanel;
     }
     await this.$nextTick();
-    GLApp.notifyResize();
+    this.$viewer!.notifyResize();
   }
 
   pick(e: MouseEvent) {
-    const canvas = this.$el.querySelector("canvas");
-    GLApp.pickColor(
+    const canvas = this.$el.querySelector("canvas")!;
+    this.$viewer!.pickColor(
       e.offsetX / canvas.clientWidth, 
       (canvas.clientHeight - e.offsetY) / canvas.clientHeight
     );
@@ -131,11 +141,11 @@ export default class ViewerCanvas extends Vue {
     return map;
   }
 
-  updateViewport({ node, layout }) {
+  updateViewport({ node, layout }: {node: DAGNode, layout: NodeLayout}) {
     if (node instanceof RenderTargetNode) {
       const viewport = new Vector4();
-      const l = layout as NodeLayout;
-      const n = node as RenderTargetNode;
+      const l = layout;
+      const n = node;
       viewport.set(
         l.absX + this.board.transformX,
         this.board.height - l.absY - l.height - this.board.transformY,
@@ -154,22 +164,22 @@ export default class ViewerCanvas extends Vue {
   }
 
   layout() {
-    const map = {};
+    const map: any = {};
     this.viewNodes.forEach(node => {
       map[node.node.uuid] = node.layout;
     });
-    layoutGraph(GLApp.pipeline.graph.screenNode, map);
+    layoutGraph(this.$viewer!.pipeline.graph.screenNode!, map);
     this.updateAllViewport();
     
   }
 
-  isRenderTargetNode(node) {
+  isRenderTargetNode(node: DAGNode) {
     return node instanceof RenderTargetNode;
   }
 
   inspectGraph() {
-    GLApp.pipeline.graph.enableDebuggingView = true;
-    const nodes = GLApp.pipeline.graph.nodes;
+    this.$viewer!.pipeline.graph.enableDebuggingView = true;
+    const nodes = this.$viewer!.pipeline.graph.nodes;
     this.viewNodes = nodes.map(node => {
       return {
         node,
@@ -181,22 +191,22 @@ export default class ViewerCanvas extends Vue {
   }
 
   closeGraphInspector() {
-    GLApp.pipeline.graph.enableDebuggingView = false;
+    this.$viewer!.pipeline.graph.enableDebuggingView = false;
     this.showGraphViewer = false;
   }
 
   run() {
-    GLApp.run();
+    this.$viewer!.run();
     this.isRunning = true;
   }
 
   stop() {
-    GLApp.stop();
+    this.$viewer!.stop();
     this.isRunning = false;
   }
 
   step() {
-    GLApp.step();
+    this.$viewer!.step();
   }
 
   screenshot() {

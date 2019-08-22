@@ -43,8 +43,8 @@ export class EffectComposer
     graph: RenderGraph<ShadingType, RenderableType, FBOType>
   ) {
     this.passes.forEach((pass, index) => {
-      const output = pass.outputTarget;
-      let framebuffer: FBOType = this.keptFramebuffer.get(output)
+      const output = pass.outputTarget!;
+      let framebuffer: FBOType = this.keptFramebuffer.get(output)!
 
       if (framebuffer === undefined) {
         framebuffer = this.framebufferPool.requestFramebuffer(output)
@@ -68,7 +68,7 @@ export class EffectComposer
       this.keptFramebuffer.set(output, framebuffer);
 
       this.framebufferDropList[index].forEach(target => {
-        this.framebufferPool.returnFramebuffer(this.keptFramebuffer.get(target))
+        this.framebufferPool.returnFramebuffer(this.keptFramebuffer.get(target)!)
         this.keptFramebuffer.delete(target)
       })
 
@@ -85,14 +85,14 @@ export class EffectComposer
     }
 
     passes.forEach((pass, index) => {
-      this.nodeMap.set(pass.passNode, pass);
+      this.nodeMap.set(pass.passNode!, pass);
 
-      const targetCreated = pass.outputTarget;
+      const targetCreated = pass.outputTarget!;
       if (targetCreated.isScreenNode) {
         return;
       }
 
-      if (targetCreated.define.keepContent()) {
+      if (targetCreated.keepContent()) {
         return;
       }
       for (let i = passes.length - 1; i > index; i--) {
@@ -106,9 +106,11 @@ export class EffectComposer
 
   }
 
-  registerNode(node: PassGraphNode<ShadingType, RenderableType, FBOType>) {
-    if (this.nodeMap.has(node)) {
-      return this.nodeMap.get(node);
+  registerNode(node: PassGraphNode<ShadingType, RenderableType, FBOType>)
+    : RenderPass<ShadingType, RenderableType, FBOType> {
+    const p = this.nodeMap.get(node);
+    if (p !== undefined) {
+      return p;
     }
     const pass = new RenderPass<ShadingType, RenderableType, FBOType>(node.define)
     this.nodeMap.set(node, pass);
@@ -122,8 +124,7 @@ export class EffectComposer
     this.keptFramebuffer.clear();
   }
 
-  getPass(node: PassGraphNode<ShadingType, RenderableType, FBOType>)
-    : RenderPass<ShadingType, RenderableType, FBOType> {
+  getPass(node: PassGraphNode<ShadingType, RenderableType, FBOType>) {
     return this.nodeMap.get(node);
   }
 

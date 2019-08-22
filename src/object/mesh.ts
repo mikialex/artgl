@@ -25,6 +25,10 @@ export class Mesh extends RenderObject
   }
 
   raycast(raycaster: Raycaster, results: RayCastResult[]): RayCastResult[] {
+    if (this.geometry === undefined) {
+      return results;
+    }
+
     inverse.getInverse(this.worldMatrix, false)
     const localRay = raycaster.getLocalRay(inverse);
     const hitPosition = new Vector3();
@@ -33,7 +37,7 @@ export class Mesh extends RenderObject
     sphere.copy(this.geometry.boundingSphere);
     sphere.applyMatrix4(this.worldMatrix);
     if (!raycaster.worldRay.ifIntersectSphere(sphere)) {
-      return;
+      return results;
     }
 
     // have to check face
@@ -52,6 +56,8 @@ export class Mesh extends RenderObject
       }
 
     }, this.range)
+
+    return results;
   }
 
   raycastIfHit(raycaster: Raycaster): boolean {

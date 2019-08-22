@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { ShaderApp } from "../shader-application";
+import { ShaderApplication } from "../shader-application";
 import {
   injectFragmentShaderHeaders,
   GLDataType
@@ -71,6 +71,7 @@ import {
   ViewNode,
   layoutGraph
 } from "../model/graph-view";
+import { Nullable } from "../../../src/type";
 
 @Component({
   components: {
@@ -82,7 +83,7 @@ import {
 })
 export default class ShaderEditor extends Vue {
   showCode: boolean = false;
-  graph: ShaderGraph = null;
+  graph: Nullable<ShaderGraph> = null;
   codeGenResult: string = "";
 
   board: GraphBoardInfo = {
@@ -107,11 +108,12 @@ export default class ShaderEditor extends Vue {
     return map;
   }
 
+  $shaderApp?: ShaderApplication
 
   mounted() {
-    const canvas = this.$el.querySelector("#shader-editor-canvas");
-    ShaderApp.init(canvas as HTMLCanvasElement);
-    this.graph = ShaderApp.shader.graph;
+    const canvas = this.$el.querySelector("#shader-editor-canvas") as HTMLCanvasElement;
+    Vue.prototype.$shaderApp = new ShaderApplication(canvas);
+    this.graph = this.$shaderApp!.shader.graph;
 
     this.board.width = canvas.clientWidth;
     this.board.height = canvas.clientHeight;
@@ -131,7 +133,7 @@ export default class ShaderEditor extends Vue {
   }
 
   layout(tssaoShader: Shading) {
-    const map = {};
+    const map: any = {};
     this.viewNodes.forEach(node => {
       map[node.node.uuid] = node.layout;
     });
@@ -142,7 +144,7 @@ export default class ShaderEditor extends Vue {
     // console.log("upd");
   }
 
-  isShaderFunctionNode(node) {
+  isShaderFunctionNode(node: DAGNode) {
     return node instanceof ShaderFunctionNode;
   }
 
@@ -160,15 +162,15 @@ export default class ShaderEditor extends Vue {
   }
 
   updateTechnique() {
-    ShaderApp.updateShader();
+    this.$shaderApp!.updateShader();
   }
 
   start() {
-    ShaderApp.start();
+    this.$shaderApp!.start();
   }
 
   end() {
-    ShaderApp.canvasRun = false;
+    this.$shaderApp!.canvasRun = false;
   }
 }
 </script>

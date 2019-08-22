@@ -18,7 +18,7 @@ export interface ShaderFunctionParsedDefine{
 }
 
 
-const functionNamesRecord = {};
+const functionNamesRecord: { [index: string]: number } = {};
 
 /**
  *  Define a shader function node factory

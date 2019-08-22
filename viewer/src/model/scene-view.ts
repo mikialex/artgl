@@ -13,9 +13,9 @@ interface BufferView{
   dataByteSize: number;
 }
 export class GeometryView{
-  uuid: string;
-  name: string;
-  buffers: BufferView[]
+  uuid: string = "";
+  name: string = "";
+  buffers: BufferView[] = []
   static create(geometry: Geometry): GeometryView {
     const view = new GeometryView();
     view.uuid = geometry.uuid;
@@ -43,8 +43,8 @@ export class GeometryView{
 }
 
 export class MaterialView{
-  uuid: string;
-  name: string;
+  uuid: string = "";
+  name: string = "";
   static create(material: Material): MaterialView {
     const view = new MaterialView();
     view.uuid = material.uuid;
@@ -65,7 +65,7 @@ export class MaterialView{
 }
 
 export class SceneView{
-  root: SceneNodeView
+  root: SceneNodeView = new SceneNodeView();
   geometries: Map<string, GeometryView> = new Map();
   materials: Map<string, MaterialView> = new Map();
   
@@ -96,7 +96,7 @@ export class SceneView{
   }
 
   static deleteNode(id: string, scene: Scene) {
-    const result = scene.root.findSubNode(id);
+    const result = scene.root.findSubNode(id)!;
     if (result === undefined) {
       return;
     }
@@ -108,7 +108,7 @@ export class SceneView{
   }
 
   static async loadObj(id: string, scene: Scene) {
-    const node = scene.root.findSubNode(id);
+    const node = scene.root.findSubNode(id)!;
     if (node === undefined) {
       return;
     }
@@ -126,7 +126,7 @@ export class SceneView{
 
 export class SceneNodeView{
   position = new Vector3();
-  uuid: string;
+  uuid: string = "";
   type = 'node';
   
   children: SceneNodeView[] = [];

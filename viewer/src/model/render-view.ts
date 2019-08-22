@@ -1,10 +1,10 @@
 import { RenderEngine } from '../../../src/artgl';
 
 export class RenderView{
-  compiledPrograms: number;
-  programSwitchCount: number;
-  uniformUpload: number;
-  drawcall: number;
+  compiledPrograms: number = 0;
+  programSwitchCount: number = 0;
+  uniformUpload: number = 0;
+  drawcall: number = 0;
 
   faceDraw: number = 0;
   vertexDraw: number = 0;

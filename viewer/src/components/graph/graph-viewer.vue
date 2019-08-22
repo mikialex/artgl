@@ -21,25 +21,25 @@ import { GraphBoardInfo } from "../../model/graph-view";
   components: {}
 })
 export default class GraphViewer extends Vue {
-  @Prop({ required: true }) board: GraphBoardInfo;
+  @Prop({ required: true }) board?: GraphBoardInfo;
 
   get transform() {
-    return `translate(${this.board.transformX}px, ${this.board.transformY}px) scale(${this.board.scale})`;
+    return `translate(${this.board!.transformX}px, ${this.board!.transformY}px) scale(${this.board!.scale})`;
   }
 
   showMove = false;
 
   isDragging = false;
-  originTransformX: number;
-  originTransformY: number;
-  screenOriginX: number;
-  screenOriginY: number;
-  startDrag(e) {
+  originTransformX: number = 0;
+  originTransformY: number = 0;
+  screenOriginX: number = 0;
+  screenOriginY: number = 0;
+  startDrag(e: MouseEvent) {
     this.isDragging = true;
     this.screenOriginX = e.screenX;
     this.screenOriginY = e.screenY;
-    this.originTransformX = this.board.transformX;
-    this.originTransformY = this.board.transformY;
+    this.originTransformX = this.board!.transformX;
+    this.originTransformY = this.board!.transformY;
     window.addEventListener("mousemove", this.dragging);
     window.addEventListener("mouseup", e => {
       this.isDragging = false;
@@ -47,10 +47,10 @@ export default class GraphViewer extends Vue {
     });
   }
 
-  dragging(e) {
-    this.board.transformX =
+  dragging(e: MouseEvent) {
+    this.board!.transformX =
       this.originTransformX + e.screenX - this.screenOriginX;
-    this.board.transformY =
+    this.board!.transformY =
       this.originTransformY + e.screenY - this.screenOriginY;
     this.$emit("updateAllViewport");
   }
@@ -81,8 +81,8 @@ export default class GraphViewer extends Vue {
   }
 
   updateBoard() {
-    this.board.width = this.$el.clientWidth;
-    this.board.height = this.$el.clientHeight;
+    this.board!.width = this.$el.clientWidth;
+    this.board!.height = this.$el.clientHeight;
     this.$emit("updateAllViewport");
   }
 }

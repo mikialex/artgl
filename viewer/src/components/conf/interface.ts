@@ -6,6 +6,6 @@ export interface RenderConfig {
     type?: string,
     selectItem?: string[];
   },
-  onChange?
-  editors?
+  onChange?: Function
+  editors?: any
 }

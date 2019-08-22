@@ -34,34 +34,34 @@ import { SceneNodeView } from '../../model/scene-view';
   name:'scene-node-view'
 })
 export default class BooleanEditor extends Vue {
-  @Prop() view: SceneNodeView;
+  @Prop() view?: SceneNodeView;
 
   showMenu = false;
 
   get clampId(){
-    return this.view.uuid.slice(0, 6);
+    return this.view!.uuid.slice(0, 6);
   }
   isExpand:boolean = true;
 
   get hasChildren(){
-    return this.view.children.length;
+    return this.view!.children.length;
   }
 
   emitLoadObj(){
     this.emitChange({
       type: 'load',
-      id: this.view.uuid
+      id: this.view!.uuid
     })
   }
 
   emitDelete(){
     this.emitChange({
       type: 'delete',
-      id: this.view.uuid
+      id: this.view!.uuid
     })
   }
 
-  emitChange(info){
+  emitChange(info: any){
     this.$emit('nodeChange', info);
     this.showMenu = false;
   }
