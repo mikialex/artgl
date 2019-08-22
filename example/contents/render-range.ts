@@ -8,7 +8,7 @@ export default async function test(testBridge: TestBridge) {
 
   //==>
 
-  let canvas = document.querySelector('canvas');
+  let canvas = document.querySelector('canvas')!;
   const engine = new RenderEngine(canvas);
 
   const scene = new Scene();
