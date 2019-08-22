@@ -2,7 +2,9 @@
   <div class="config-panel">
     <div class="panel-title">
       Render configuration
-      <button @click="hide">hide</button>
+      <span>
+        <font-awesome-icon icon="minus-square"  @click="hide"/>
+      </span>
     </div>
     <div class="config-wrap">
       <Config :config="appConfig" />
@@ -35,9 +37,22 @@ export default class ConfigPanel extends Vue {
 
 <style scoped lang="scss">
 .panel-title {
+  display: flex;
   font-weight: bold;
   padding: 5px;
   font-size: 14px;
+  justify-content: space-between;
+  align-content: center;
+  >span{
+    font-size: 16px;
+    cursor: pointer;
+    &:hover{
+      color: rgb(53, 149, 238);
+    }
+    &:active{
+      color: rgb(13, 87, 156);
+    }
+  }
 }
 
 .config-panel {
