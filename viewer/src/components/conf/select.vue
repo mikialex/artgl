@@ -1,10 +1,7 @@
 <template>
   <div class="select-editor">
     <select v-model="_value">
-      <option 
-      v-for="item in list"
-      :key="item"
-      >{{item}}</option>
+      <option v-for="item in list" :key="item">{{item}}</option>
     </select>
   </div>
 </template>

@@ -8,14 +8,21 @@
       </div>
       <!-- <button @click="showMenu = true">*</button> -->
 
+      <font-awesome-icon class="down" icon="caret-square-down" @click="showEdit = true" />
       <font-awesome-icon class="down" icon="caret-square-down" @click="showMenu = true" />
     </div>
+
     <div class="menu" v-if="showMenu">
       <!-- <button>edit</button> -->
-      <button @click="deleteNode" v-if="isRoot">delete</button>
-      <button @click="loadObj">load obj</button>
+      <div @click="deleteNode" v-if="!isRoot">delete</div>
+      <div @click="loadObj">load obj</div>
     </div>
     <div class="mask" v-if="showMenu" @click="showMenu = false"></div>
+
+    <SceneNodeEditor 
+    v-if="showEdit"
+    :node="node"/>
+
     <div class="children" v-if="isExpand">
       <scene-node-view v-for="child in node.children" :key="child.uuid" :node="child" />
     </div>
@@ -25,6 +32,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { loadStringFromFile } from "../../../../src/util/file-io";
+import SceneNodeEditor from "./scene-node-editor.vue";
 import {
   OBJLoader,
   Mesh,
@@ -33,7 +41,10 @@ import {
   NormalShading
 } from "../../../../src/artgl";
 @Component({
-  name: "scene-node-view"
+  name: "scene-node-view",
+  components:{
+    SceneNodeEditor
+  }
 })
 export default class BooleanEditor extends Vue {
   @Prop({
@@ -42,6 +53,7 @@ export default class BooleanEditor extends Vue {
   node?: SceneNode;
 
   showMenu = false;
+  showEdit = false;
 
   get clampId() {
     return this.node!.uuid.slice(0, 6);
@@ -113,12 +125,30 @@ export default class BooleanEditor extends Vue {
 
 .menu {
   position: absolute;
-  right: 0px;
+  right: 20px;
   width: 150px;
-  height: 50px;
   background: #fff;
   z-index: 2;
-  box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.096);
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.301);
+  > div{
+    height: 25px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    user-select: none;
+
+    cursor: pointer;
+    &:hover {
+      background: rgb(80, 162, 218);
+      color: #fff;
+    }
+    &:active {
+      background: rgb(52, 105, 139);
+      color: #fff;
+    }
+    
+  }
 }
 
 .mask {
