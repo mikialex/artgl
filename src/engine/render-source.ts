@@ -2,44 +2,42 @@
 import { Mesh } from "../object/mesh";
 import { PlaneGeometry } from "../geometry/geo-lib/plane-geometry";
 import { RenderObject } from "../core/render-object";
-import { Nullable } from "../type";
 
 export interface RenderSource {
   resetSource(): void;
-  nextRenderable(): Nullable<RenderObject>;
+  nextRenderable(render: (object: RenderObject) => void): boolean;
   updateSource(): void;
 }
 
 export function foreachRenderableInSource(source: RenderSource, visitor: (obj: RenderObject) => any) {
   source.updateSource();
   source.resetSource();
-  let nextSource: RenderObject | null = null;
+  let hasNextSource: boolean = false;
   do {
-    nextSource = source.nextRenderable();
-    if (nextSource !== null) {
-      visitor(nextSource);
-    }
-  } while (nextSource !== null);
+    hasNextSource = source.nextRenderable(visitor);
+  } while (hasNextSource);
 }
 
 const quadMesh = new Mesh();
 const geometry = new PlaneGeometry(2, 2, 1, 1);
 quadMesh.geometry = geometry;
-export class QuadSource implements RenderSource{
+
+export class QuadSource implements RenderSource {
   hasRendered: boolean = false;
 
   resetSource() {
     this.hasRendered = false;
   }
 
-  nextRenderable() {
+  nextRenderable(render: (object: RenderObject) => void) {
     if (this.hasRendered) {
-      return null
+      return false
     }
     this.hasRendered = true;
-    return quadMesh
+    render(quadMesh);
+    return true
   }
 
-  updateSource() {}
+  updateSource() { }
 
 }

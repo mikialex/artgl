@@ -23,6 +23,7 @@ export class Scene implements RenderSource {
   _geometries: Set<Geometry> = new Set();
   _materials: Set<Material> = new Set();
   _shadings: Set<Shading> = new Set();
+  selectionSet: Set<RenderObject> = new Set();
 
   updateSource() {
     this.updateObjectList();
@@ -32,8 +33,14 @@ export class Scene implements RenderSource {
     this.objectList.resetCursor();
   }
 
-  nextRenderable() {
-    return this.objectList.next();
+  nextRenderable(render: (object: RenderObject) => void) {
+    const nextObject = this.objectList.next();
+    if (nextObject === null) {
+      return false;
+    } else {
+      render(nextObject);
+      return true;
+    }
   }
 
   addRenderable(node: RenderObject) {
@@ -58,6 +65,7 @@ export class Scene implements RenderSource {
     if (node.shading !== undefined) {
       this._shadings.delete(node.shading);
     }
+    this.selectionSet.delete(node);
   }
 
   updateObjectList() {
@@ -77,6 +85,9 @@ export class Scene implements RenderSource {
       }
 
       if (node instanceof RenderObject) {
+        if (this.selectionSet.has(node)) {
+          return
+        }
         this.objectList.addRenderItem(node);
       }
     });
@@ -92,6 +103,7 @@ export class Scene implements RenderSource {
       throw 'node has set to scene, abort';
     }
     this.root = node;
+    node.scene = this;
   }
 
   disposeRootNode() {
