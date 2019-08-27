@@ -3,37 +3,37 @@
     <div v-for="geometry in geometrylist"
     :key="geometry.uuid"
     > 
-    <span>
-      {{geometry.name}}-{{geometry.uuid.slice(0, 6)}}
-    </span>
+      <span>
+        {{geometry.name}}-{{geometry.uuid.slice(0, 6)}}
+      </span>
       
-      <div class="buffer-detail" v-if="expandDetail">
+      <!-- <div class="buffer-detail" v-if="expandDetail">
         <div v-for ="bufferinfo in geometry.buffers"
         :key="bufferinfo.name"
         >
         {{bufferinfo.name}} - {{Math.ceil(bufferinfo.dataByteSize / 1024 * 10)/ 10}}KB
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { SceneView, GeometryView } from "../../model/scene-view";
+import { Scene } from "../../../../src/artgl";
 
 @Component({
   components: {
   }
 })
 export default class GeometryViewPanel extends Vue {
-  @Prop() view?: SceneView
+  @Prop() scene!: Scene
 
   expandDetail = true;
 
   get geometrylist(){
     const list: any = [];
-    this.view!.geometries.forEach(geo =>{
+    this.scene._geometries.forEach(geo =>{
       list.push(geo);
     })
     return list;

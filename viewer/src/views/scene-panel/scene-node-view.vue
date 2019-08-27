@@ -8,12 +8,11 @@
       </div>
       <!-- <button @click="showMenu = true">*</button> -->
 
-      <font-awesome-icon class="down" icon="caret-square-down" @click="showEdit = true" />
-      <font-awesome-icon class="down" icon="caret-square-down" @click="showMenu = true" />
+      <font-awesome-icon class="icon" icon="cog"  @click="showEdit = !showEdit"/>
+      <font-awesome-icon class="icon" icon="caret-square-down" @click="showMenu = true" />
     </div>
 
     <div class="menu" v-if="showMenu">
-      <!-- <button>edit</button> -->
       <div @click="deleteNode" v-if="!isRoot">delete</div>
       <div @click="loadObj">load obj</div>
     </div>
@@ -92,16 +91,17 @@ export default class BooleanEditor extends Vue {
   font-size: 13px;
   position: relative;
   border-top: 1px solid rgb(234, 234, 234);
+  width: 300px;
 }
 
 .title {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   height: 30px;
 
   &:hover {
-    > .down {
+    > .icon {
+      color: #888;
       margin-right: 8px;
       font-size: 16px;
       opacity: 1;
@@ -109,7 +109,7 @@ export default class BooleanEditor extends Vue {
     background: #eee;
   }
 
-  > .down {
+  > .icon {
     opacity: 0;
     margin-right: 8px;
     font-size: 16px;

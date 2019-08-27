@@ -17,8 +17,8 @@
     </nav>
     <div class="view-wrap" v-if="sceneView">
       <NodeView v-if="currentNav === 'hierarchy'" :node="sceneView.root" />
-      <GeometryViewPanel v-if="currentNav === 'geometry'" :view="sceneView" />
-      <MaterialViewPanel v-if="currentNav === 'material'" :view="sceneView" />
+      <GeometryViewPanel v-if="currentNav === 'geometry'" :scene="sceneView" />
+      <MaterialViewPanel v-if="currentNav === 'material'" :scene="sceneView" />
     </div>
     <div class="render-info">
       <div class="panel-title">RenderInfo</div>
@@ -37,7 +37,6 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { SceneView } from "../../model/scene-view";
 import { RenderView } from "../../model/render-view";
 import GeometryViewPanel from "./geometry-view.vue";
 import MaterialViewPanel from "./material-view.vue";
@@ -120,7 +119,7 @@ export default class ScenePanel extends Vue {
 
 .view-wrap {
   height: calc(100% - 200px);
-  overflow-y: scroll;
+  overflow: scroll;
   border: 1px solid #ddd;
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="vector3-editor">
+  <div class="euler-editor">
     <span>{{config.xName}}:</span>
     <input type="number" v-model="x" />
     <span>{{config.yName}}:</span>
@@ -11,10 +11,10 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { Vector3 } from "../../../../src/math";
+import { Euler } from "../../../../src/math";
 @Component
-export default class Vector3Editor extends Vue {
-  @Prop({ required: true }) value!: Vector3;
+export default class EulerEditor extends Vue {
+  @Prop({ required: true }) value!: Euler;
   @Prop({
     default: () => {
       return {
@@ -58,7 +58,7 @@ export default class Vector3Editor extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.vector3-editor {
+.euler-editor {
   > input {
     width: 50px;
   }

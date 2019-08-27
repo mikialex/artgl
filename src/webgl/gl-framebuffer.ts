@@ -2,6 +2,7 @@ import { GLRenderer } from "./gl-renderer";
 import { Nullable, GLReleasable } from "../type";
 import { PixelFormat } from "./const";
 import { Texture, TextureSource } from "../core/texture";
+import { texture } from "../shader-graph/node-maker";
 
 
 export class FramebufferAttachTexture extends Texture implements GLReleasable {
@@ -173,6 +174,11 @@ export class GLFramebuffer {
   }
 
   dispose() {
+    this.textureAttachedSlot.forEach(texture => {
+      if (texture !== undefined) {
+        texture.releaseGL(this.renderer);
+      }
+    })
     this.textureAttachedSlot = [];
     this.disposeAttachedDepthBuffer();
     this.gl.deleteFramebuffer(this.webglFrameBuffer);

@@ -1,7 +1,7 @@
 import { Matrix4, generateUUID } from "../math/index";
-import { Scene } from "./scene";
 import { Nullable } from "../type";
 import { Transformation } from "./transformation";
+import { Scene, RenderObject } from "../artgl";
 
 interface TreeNode{
   children: TreeNode[];
@@ -35,6 +35,18 @@ export class SceneNode {
       throw 'Cant add a scene node to it self';
     }
 
+    node.traverse(n => {
+      if (n.scene !== null) {
+        throw 'this node belongs to another scene, remove first'
+      }
+      n.scene = this.scene;
+      if (this.scene !== null) {
+        if (n instanceof RenderObject) {
+          this.scene.addRenderable(n);
+        }
+      }
+    })
+
     if (node.parent !== null) {
       node.parent.removeChild(node);
     }
@@ -45,6 +57,15 @@ export class SceneNode {
 
   removeChild(node: SceneNode): SceneNode {
 
+    node.traverse(n => {
+      if (this.scene !== null) {
+        if (n instanceof RenderObject) {
+          this.scene.removeRenderable(n);
+        }
+      }
+      n.scene = null;
+    })
+
     let index = this.children.indexOf(node);
     if (index !== - 1) {
       node.parent = null;
@@ -53,7 +74,7 @@ export class SceneNode {
     return this;
   }
 
-  traverse(fn: (sceneNode: SceneNode) => any): SceneNode  {
+  traverse(fn: (sceneNode: SceneNode) => boolean | void): SceneNode  {
     function visit(node: SceneNode) {
       if (fn(node) !== false) {
         for (let i = 0; i < node.children.length; i++) {

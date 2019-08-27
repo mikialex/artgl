@@ -29,6 +29,7 @@ export class GLFrameBufferManager {
   }
 
   deleteFramebuffer(framebuffer: GLFramebuffer) {
+    framebuffer.dispose();
     this.framebuffers.delete(framebuffer.name);
   }
 
