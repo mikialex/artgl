@@ -34,7 +34,6 @@ export default class ConfigPanel extends Vue {
   mounted() {}
 
   gotoExample(name: string) {
-    console.log("goto");
     this.$store.state.viewExample = name;
     this.$router.push({
       name: "example",

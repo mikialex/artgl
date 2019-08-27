@@ -1,6 +1,7 @@
 <template>
   <div class="top-nav">
-    <img src="../../assets/art.svg" @click="gotoHome" alt />
+    <h1 @click="gotoHome">ARTGL</h1>
+    <!-- <img src="../../assets/art.svg" @click="gotoHome" alt /> -->
     <div class="current-project">
       <router-link active-class="current" to="/viewer">Viewer</router-link>
       <router-link active-class="current" to="/shader">Composer</router-link>
@@ -29,19 +30,20 @@ export default class TopNav extends Vue {
   height: 40px;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid rgba(0,0,0,0.4);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
   background: #44444a;
-  > img {
-    height: 25px;
-    padding: 10px;
-    opacity: 0.5;
-    cursor: pointer;
-    &:hover {
-      opacity: 0.7;
-    }
-    &:active {
-      opacity: 1;
-    }
+}
+
+h1 {
+  font-size: 20px;
+  color: #eee;
+  cursor: pointer;
+  margin: 6px;
+  &:hover {
+    color: #fff;
+  }
+  &:active {
+    color: #eee;
   }
 }
 

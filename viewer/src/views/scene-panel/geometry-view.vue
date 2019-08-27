@@ -8,7 +8,7 @@
       </span>
       
       <!-- <div class="buffer-detail" v-if="expandDetail">
-        <div v-for ="bufferinfo in geometry.buffers"
+        <div v-for ="bufferinfo in geometry._bufferDatum"
         :key="bufferinfo.name"
         >
         {{bufferinfo.name}} - {{Math.ceil(bufferinfo.dataByteSize / 1024 * 10)/ 10}}KB

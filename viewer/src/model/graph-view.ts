@@ -205,7 +205,7 @@ export class CanvasGraphUI{
 
   drawViewNodes(nodes: DAGNode[], nodeLayoutMap: Map<DAGNode, NodeLayout>) {
     this.ctx.save();
-    this.ctx.font = "14px Fira Code";
+    this.ctx.font = "14px";
     this.ctx.strokeStyle = "#aaa"
     this.ctx.lineWidth = 3;
     this.ctx.translate(this.boardInfo.transformX, this.boardInfo.transformY);
