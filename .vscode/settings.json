@@ -5,6 +5,8 @@
     "ARTGL",
     "Interactor",
     "Renderable",
-    "drawcall"
+    "drawcall",
+    "phong",
+    "wireframe"
   ]
 }
