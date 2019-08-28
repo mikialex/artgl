@@ -9,7 +9,8 @@ import {
 } from "./shader-node";
 
 
-export function genFragShader(graph: ShaderGraph): string {
+export function genFragShader(graph: ShaderGraph)
+  : { results: string, needDerivative: boolean } {
   const builder = new CodeBuilder()
   builder.reset();
 
@@ -26,9 +27,9 @@ export function genFragShader(graph: ShaderGraph): string {
   builder.writeLine("}")
   const mainCode = builder.output();
 
-  const includedCode = genShaderFunctionDepend(evaluatedNode);
+  const { functionsStr, needDerivative } = genShaderFunctionDepend(evaluatedNode);
 
-  return includedCode + mainCode
+  return { results: functionsStr + mainCode, needDerivative };
 }
 
 
@@ -59,7 +60,7 @@ export function genVertexShader(graph: ShaderGraph): string {
   builder.writeLine("}")
   const mainCode = builder.output();
 
-  const includedCode = genShaderFunctionDepend(evaluatedNode);
+  const includedCode = genShaderFunctionDepend(evaluatedNode).functionsStr;
 
   return includedCode + mainCode
 }
@@ -73,7 +74,9 @@ function pushListToMap(map: Map<ShaderNode, varRecord>, list: varRecord[]) {
 }
 
 
-function genShaderFunctionDepend(nodes: Map<ShaderNode, varRecord>): string {
+function genShaderFunctionDepend(nodes: Map<ShaderNode, varRecord>)
+  : { functionsStr: string, needDerivative: boolean } {
+  let needDerivative = false;
   let functionsStr = "\n";
   const dependFunctions = new Set<ShaderFunction>();
   nodes.forEach((_record, node) => {
@@ -84,10 +87,12 @@ function genShaderFunctionDepend(nodes: Map<ShaderNode, varRecord>): string {
 
   const resolvedFunction = new Set<ShaderFunction>();
   dependFunctions.forEach(func => {
-    functionsStr += func.genShaderFunctionIncludeCode(resolvedFunction)
+    const ret = func.genShaderFunctionIncludeCode(resolvedFunction);
+    needDerivative = needDerivative || ret.needDerivative
+    functionsStr += ret.result
     functionsStr += "\n"
   })
-  return functionsStr
+  return { functionsStr, needDerivative }
 }
 
 // temp1 = asd(12 + d);

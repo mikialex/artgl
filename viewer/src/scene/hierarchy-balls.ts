@@ -10,7 +10,7 @@ import { ArrowGeometry } from '../../../src/geometry/geo-lib/arrow-geometry';
 import { createBarycentricBufferForStandardGeometry} from '../../../src/geometry/geo-util/barycentric'
 
 export default function (root: SceneNode, app: Application): RenderConfig {
-  const sphereGeo = new SphereGeometry(1, 10, 10);
+  const sphereGeo = new SphereGeometry(1, 40, 40);
   createBarycentricBufferForStandardGeometry(sphereGeo);
   const planeGeo = new PlaneGeometry(10, 10, 10, 10);
   createBarycentricBufferForStandardGeometry(planeGeo);

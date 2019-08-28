@@ -24,6 +24,7 @@ export interface GLProgramConfig {
   fragmentShaderString: string;
   autoInjectHeader: boolean;
   useIndex?: boolean;
+  needDerivative?: boolean;
 }
 
 function fulfillProgramConfig(config: GLProgramConfig){

@@ -3,10 +3,15 @@
   "editor.tabSize": 2,
   "cSpell.words": [
     "ARTGL",
+    "Cineon",
     "Interactor",
+    "Reinhard",
     "Renderable",
     "drawcall",
+    "fwidth",
     "phong",
+    "smoothstep",
+    "varyings",
     "wireframe"
   ]
 }
