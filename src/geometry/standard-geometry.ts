@@ -18,6 +18,8 @@ export class StandardGeometry extends Geometry {
     super();
   }
 
+  indexBuffer: BufferData = BufferData.u32Index([]);
+
   static create(index: number[], position: number[], normal: number[], uv: number[]): StandardGeometry {
     return new StandardGeometry().create(index, position, normal, uv)
   }

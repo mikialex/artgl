@@ -30,10 +30,10 @@ export class BufferData{
 
   foreach(
     visitor: (data: BufferDataType, index: number, stride: number, countIndex: number) => any,
-    start?:number, end?: number
+    start:number = 0, end: number = Number.MAX_VALUE
   ) {
-    const s = Math.max(0, start);
     const e = Math.max(this.count, end);
+    const s = Math.min(Math.max(0, start), e);
     for (let i = s; i < e; i ++) {
       visitor(this.data, i * this.stride, this.stride, i);
     }
@@ -53,7 +53,7 @@ export class BufferData{
     this.data = data;
   }
 
-  getGLAttribute(engine: RenderEngine): WebGLBuffer {
+  getGLAttribute(engine: RenderEngine) {
     return engine.getGLAttributeBuffer(this);
   }
 

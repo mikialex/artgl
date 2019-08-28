@@ -6,6 +6,7 @@ import { RenderRange } from "./render-object";
 import { Face3 } from "../math/entity/face3";
 import { Line3 } from "../math/entity/line3";
 import { Vector3 } from "../math/vector3";
+import { Nullable } from "../type";
 
 /**
  * geometry define what to draw
@@ -29,8 +30,8 @@ export abstract class Geometry {
   }
 
   _bufferDatum: { [index: string]: BufferData } = {};
-  _indexBuffer: BufferData;
-  
+  _indexBuffer: Nullable<BufferData> = null;
+
   getBuffer(name: string) {
     return this._bufferDatum[name];
   }
@@ -45,7 +46,7 @@ export abstract class Geometry {
     return this._indexBuffer;
   }
 
-  set indexBuffer(value: BufferData) {
+  set indexBuffer(value: Nullable<BufferData>) {
     this._indexBuffer = value;
     this._bufferArraysChange = true;
   }
@@ -110,8 +111,8 @@ export abstract class Geometry {
   abstract shape(): void;
 
   abstract foreachFace(visitor: (face: Face3) => any, range?: RenderRange): any;
-  abstract foreachLineSegment(visitor:  (face: Line3) => any, range?: RenderRange): any;
-  abstract foreachVertex(visitor:  (face: Vector3) => any, range?: RenderRange): any;
+  abstract foreachLineSegment(visitor: (face: Line3) => any, range?: RenderRange): any;
+  abstract foreachVertex(visitor: (face: Vector3) => any, range?: RenderRange): any;
 
 }
 

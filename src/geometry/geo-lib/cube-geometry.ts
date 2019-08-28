@@ -26,17 +26,18 @@ export class CubeGeometry extends StandardGeometry {
 
   shape() {
 
-    const indices = [];
-    const vertices = [];
-    const normals = [];
-    const uvs = [];
+    const indices: number[] = [];
+    const vertices: number[] = [];
+    const normals: number[] = [];
+    const uvs: number[] = [];
 
     let numberOfVertices = 0;
 
+    type Vector3Property = "x" | "y" | "z";
     function buildPlane(
-      u: string,
-      v: string,
-      w: string,
+      u: Vector3Property,
+      v: Vector3Property,
+      w: Vector3Property,
       udir: number,
       vdir: number,
       width: number,

@@ -1,29 +1,37 @@
 <template>
   <div class="example-detail">
-
     <div class="example-viewer">
+      <div class="example-title">
+        <h1>{{example.title}}</h1>
 
-      <div>
-        <h1>{{example.name}}</h1>
+        <div>
+          <button>view code</button>
+
+          <button  @click="showConfig = !showConfig"
+          >config panel
+            <font-awesome-icon
+            v-if="showConfig"
+             icon="minus-square" />
+          </button>
+
+          <div class="config-panel"
+          v-if="config && showConfig">
+            <Config :config="config" />
+          </div>
+        </div>
       </div>
 
-      <div>
+      <div class="canvas-wrap">
         <canvas></canvas>
+        <div v-if="!exampleHasBuild">example is in building</div>
       </div>
 
-      <div v-if="exampleHasBuild">
-        <button @click="start" v-if="!isRunning">start</button>
-        <button @click="step" v-if="!isRunning">step</button>
-        <button @click="stop" v-if="isRunning">stop</button>
+      <div v-if="exampleHasBuild" class="control-panel">
+        <font-awesome-icon icon="play" @click="start" v-if="!isRunning" />
+        <font-awesome-icon icon="stop" @click="stop" v-if="isRunning" />
+        <font-awesome-icon icon="step-forward" @click="step" v-if="!isRunning" />
       </div>
-      <div v-else>example is in building</div>
     </div>
-
-    <div v-if="config">
-      <h3>example config</h3>
-      <Config :config="config" />
-    </div>
-
   </div>
 </template>
 
@@ -42,6 +50,8 @@ export default class ConfigPanel extends Vue {
   $store: any;
   $router: any;
   $route: any;
+
+  showConfig: boolean = true;
 
   config: RenderConfig = {
     name: "example config",
@@ -93,24 +103,59 @@ export default class ConfigPanel extends Vue {
 
 
 <style lang="scss" scoped>
-
-.example-detail{
+.example-detail {
   border-top: 1px solid #eee;
   width: 100%;
-  height: calc( 100vh - 40px);
+  height: calc(100vh - 40px);
 
   display: flex;
-
 }
 
-.example-viewer{
+.example-viewer {
   flex-grow: 1;
-    height: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
-  canvas{
-    width: 100%;
-    height: 100%;
-    border: 1px solid #aaa;
+.canvas-wrap {
+  flex-grow: 1;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+
+  border: 1px solid #aaa;
+}
+
+.example-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  > h1 {
+    margin: 5px;
   }
+  border-bottom: #eee;
+
+  button{
+    height: 30px;
+    margin:3px;
+    background: #444;
+    border:0px;
+    border-radius: 3px;
+    color: #fff;
+  }
+}
+
+.config-panel{
+  position: absolute;
+  right:0px;
+  bottom:-50%;
+}
+
+.control-panel {
+  min-height: 25px;
 }
 </style>

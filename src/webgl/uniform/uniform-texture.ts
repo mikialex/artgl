@@ -34,7 +34,7 @@ export class GLTextureUniform{
   private gl: WebGLRenderingContext;
   private slotManager: GLTextureSlot;
   private renderer: GLRenderer;
-  private location: WebGLUniformLocation;
+  private location: Nullable<WebGLUniformLocation>;
   isActive: boolean;
 
 

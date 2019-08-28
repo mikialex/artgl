@@ -32,7 +32,7 @@ export interface RenderGraphBackendAdaptor<
   getOverrideShading(): Nullable<ShadingType>;
   
   createFramebuffer(key: string, width: number, height: number, hasDepth: boolean): FBOType;
-  getFramebuffer(key: string): FBOType;
+  getFramebuffer(key: string): FBOType | undefined;
   deleteFramebuffer(fbo: FBOType): void;
 
   setRenderTargetScreen(): void;

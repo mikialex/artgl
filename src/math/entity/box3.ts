@@ -2,7 +2,7 @@ import { Vector3 } from "../vector3";
 
 export class Box3 {
   constructor(min?: Vector3, max?: Vector3) {
-    if (min !== undefined) {
+    if (min !== undefined && max !== undefined) {
       this.min.copy(min);
       this.max.copy(max);
     }

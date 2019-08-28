@@ -47,6 +47,9 @@ export class GLTextureManager implements GLReleasable{
 
   deleteGLTexture(texture: Texture) {
     const glTexture = this.getGLTexture(texture);
+    if (glTexture === undefined) {
+      return 
+    }
     this.renderer.gl.deleteTexture(glTexture);
     this.textures.delete(texture);
   }

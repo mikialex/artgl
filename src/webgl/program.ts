@@ -202,7 +202,7 @@ export class GLProgram{
 
   updateInnerGlobalUniforms(engine: RenderEngine) {
     this.globalUniforms.forEach(uni => {
-      uni.set(engine.globalUniforms[uni.innerGlobal].value)
+      uni.set(engine.globalUniforms[uni.innerGlobal!].value)
     })
   }
 

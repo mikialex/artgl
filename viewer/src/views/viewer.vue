@@ -14,8 +14,8 @@ import ConfigPanel from './config-panel.vue'
 import ScenePanel from './scene-panel/scene-panel.vue'
 import ObjectPanel from './object-panel/object-panel.vue'
 import ViewerCanvas from './viewer-canvas.vue'
-import {GLApp} from '../application';
 import { RenderConfig } from '../components/conf/interface';
+import { Application } from '../application';
 
 @Component({
   components:{
@@ -23,10 +23,10 @@ import { RenderConfig } from '../components/conf/interface';
   }
 })
 export default class Viewer extends Vue {
+  $viewer?: Application
+  
   mounted(){
-    const canvas = this.$el.querySelector('#viewer-canvas') as HTMLCanvasElement;
-    GLApp.initialize(canvas);
-    this.appConf = GLApp.pipeline.config;
+    this.appConf = this.$viewer!.pipeline.config!;
   }
 
   appConf: RenderConfig = {
@@ -34,11 +34,6 @@ export default class Viewer extends Vue {
     type: 'folder',
     value: []
   };
-
-  
-  beforeDestroy(){
-    GLApp.unintialize();
-  }
 
 }
 </script>

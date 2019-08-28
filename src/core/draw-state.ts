@@ -38,7 +38,7 @@ export class DrawState {
     const depthBuffer = renderer.state.depthbuffer;
     depthBuffer.enableTest = this.depthTest
     depthBuffer.setFunc(this.depthFunc)
-    depthBuffer.setMask(this.depthWrite)
+    depthBuffer.enableWrite = this.depthWrite;
 
     const colorBuffer = renderer.state.colorbuffer;
     colorBuffer.setColorMask(

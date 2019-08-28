@@ -4,12 +4,13 @@ import { DepthFunction } from "../const";
 export class GLDepthBuffer {
   constructor(renderer: GLRenderer) {
     this.gl = renderer.gl;
+    this.currentDepthFunc = this.gl.LEQUAL
     this.resetDefault();
   }
 
-  currentDepthMask = null;
-  currentDepthFunc = null;
-  currentDepthClear = null;
+  // TODO reset or init set
+  currentDepthMask = false;
+  currentDepthFunc: number;
 
   readonly gl: WebGLRenderingContext;
 
@@ -33,13 +34,19 @@ export class GLDepthBuffer {
 
   resetDefault() {
     this.enableTest = true;
+    this.enableWrite = true;
+    this.setFunc(DepthFunction.LessEqualDepth)
   }
 
-  setMask(value: boolean) {
+  set enableWrite(value: boolean) {
     if (this.currentDepthMask !== value) {
       this.gl.depthMask(value);
       this.currentDepthMask = value;
     }
+  }
+
+  get enableWrite() {
+    return this.currentDepthMask;
   }
 
   setFunc(depthFunc: DepthFunction) {

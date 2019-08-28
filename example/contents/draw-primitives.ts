@@ -8,7 +8,7 @@ export default async function test(testBridge: TestBridge) {
 
   //==>
 
-  let canvas = document.querySelector('canvas');
+  let canvas = document.querySelector('canvas')!;
   const engine = new RenderEngine(canvas);
 
   const scene = new Scene();
@@ -36,8 +36,8 @@ export default async function test(testBridge: TestBridge) {
 
   function draw() {
     engine.connectCamera();
-    engine.renderer.state.colorbuffer.setClearColor(new Vector4(0.9, 0.9, 0.9, 1.0))
-    engine.renderer.state.colorbuffer.clear()
+    engine.setClearColor(new Vector4(0.9, 0.9, 0.9, 1.0))
+    engine.clearColor();
     engine.render(scene);
   }
 

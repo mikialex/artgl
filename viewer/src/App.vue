@@ -26,7 +26,7 @@ get showTopNav(){
 
 <style lang="scss">
 #app {
-  font-family: 'Fira Code', 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: 'Lexend Deca', 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
@@ -34,7 +34,7 @@ get showTopNav(){
 }
 
 button, a {
-  font-family: 'Fira Code', 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: 'Lexend Deca', 'Avenir', Helvetica, Arial, sans-serif;
 }
 
 /* width */

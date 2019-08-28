@@ -31,9 +31,8 @@ export class GLInfo {
     this.gl = gl;
     this.createAllExtension();
     this.getAllParams();
-    if (this.getExtension(GLExtList.OES_element_index_uint) !== undefined) {
-      this.supportUintIndexDraw = true;
-    }
+    this.supportUintIndexDraw = this.getExtension(GLExtList.OES_element_index_uint) !== undefined;
+    
   }
   private gl: WebGLRenderingContext
   private extensions: { [index: string]: any } = {}

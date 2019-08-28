@@ -42,7 +42,7 @@ export function uniformFromValue(name: string, value: any) {
 
 export function innerUniform(type: InnerSupportUniform) {
   return new ShaderInnerUniformInputNode({
-    name: 'inner' + InnerUniformMap.get(type).name,
+    name: 'inner' + InnerUniformMap[type].name,
     mapInner: type,
   })
 }

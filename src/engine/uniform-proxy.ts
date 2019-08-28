@@ -42,9 +42,9 @@ export interface GlobalUniforms {
 
 export function createAllInnerSupportUniformProxy(): GlobalUniforms {
   return {
-    MMatrix: new UniformProxy(InnerUniformMap.get("MMatrix").default),
-    VPMatrix: new UniformProxy(InnerUniformMap.get("VPMatrix").default),
-    CameraWorldPosition: new UniformProxy(InnerUniformMap.get("CameraWorldPosition").default),
-    LastVPMatrix: new UniformProxy(InnerUniformMap.get("LastVPMatrix").default),
+    MMatrix: new UniformProxy(InnerUniformMap.MMatrix.default),
+    VPMatrix: new UniformProxy(InnerUniformMap.VPMatrix.default),
+    CameraWorldPosition: new UniformProxy(InnerUniformMap.CameraWorldPosition.default),
+    LastVPMatrix: new UniformProxy(InnerUniformMap.LastVPMatrix.default),
   }
 }

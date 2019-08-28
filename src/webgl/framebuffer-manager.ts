@@ -29,6 +29,7 @@ export class GLFrameBufferManager {
   }
 
   deleteFramebuffer(framebuffer: GLFramebuffer) {
+    framebuffer.dispose();
     this.framebuffers.delete(framebuffer.name);
   }
 
@@ -36,7 +37,7 @@ export class GLFrameBufferManager {
     return this.framebuffers.get(framebufferName);
   }
 
-  getFramebufferTexture(framebufferName: string): WebGLTexture{
+  getFramebufferTexture(framebufferName: string){
     const framebuffer = this.framebuffers.get(framebufferName);
     if (framebuffer === undefined) {
       throw `cant find framebuffer ${framebufferName}`

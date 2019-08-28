@@ -1,7 +1,7 @@
 import { SceneNode } from "../scene/scene-node";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { uniformFromValue, constValue } from "../shader-graph/node-maker";
-import { ShaderUniformProvider, ShaderUniformDecorator } from "./shading";
+import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, checkCreate } from "./shading";
 import { ShaderCommonUniformInputNode, ShaderNode } from "../shader-graph/shader-node";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { Observable } from "./observable";
@@ -13,13 +13,10 @@ export abstract class Light<T> extends SceneNode
   implements ShaderUniformProvider, ShaderUniformDecorator {
   constructor() {
     super();
-    // need check if has initialized by decorator
-    if (this.uniforms === undefined) {
-      this.uniforms = new Map();
-    }
-    if (this.propertyUniformNameMap === undefined) {
-      this.propertyUniformNameMap = new Map();
-    }
+
+    this.uniforms = checkCreate((this as any).uniforms, new Map());
+    this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
+    this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
   }
 
   decorate(decorated: ShaderGraph): void {
@@ -35,32 +32,24 @@ export abstract class Light<T> extends SceneNode
     return visitor(this);
   }
 
-  abstract produceLightFragDir(_graph: ShaderGraph): ShaderNode 
+  abstract produceLightFragDir(_graph: ShaderGraph): ShaderNode
 
-  abstract produceLightIntensity(_graph: ShaderGraph): ShaderNode 
+  abstract produceLightIntensity(_graph: ShaderGraph): ShaderNode
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable()
 
-  hasAnyUniformChanged: boolean;
+  hasAnyUniformChanged: boolean = true;
 
   uniforms: Map<string, any>;
 
   propertyUniformNameMap: Map<string, string>;
 
   nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
+
   getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
-    if (this.nodeCreated.has(name as string)) {
-      return this.nodeCreated.get(name as string);
-    }
-    const uniformName = this.propertyUniformNameMap.get(name as string);
-    const value = this[name as string];
-    if (value === undefined) {
-      throw "uniform value not given"
-    }
-    const node = uniformFromValue(uniformName, value);
-    this.nodeCreated.set(name as string, node);
-    return node;
+    return getPropertyUniform(this, name)
   }
+
 }
 
 export const collectLight = new ShaderFunction({
@@ -76,7 +65,7 @@ export const collectLight = new ShaderFunction({
 export function collectLightNodes<T>(
   lights: Light<T>[],
   lightNodeMaker: (light: Light<T>) => ShaderNode) {
-  
+
   let root: ShaderNode = constValue(new Vector3());
   lights.forEach(light => {
     const lightNode = lightNodeMaker(light);

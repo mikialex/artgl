@@ -27,7 +27,6 @@ export interface Size {
   height: number;
 }
 
-
 const copyShading = new Shading().decorate(new CopyShading());
 const quad = new QuadSource();
 
@@ -35,7 +34,7 @@ export class RenderEngine implements
   GLReleasable,
   RenderGraphBackendAdaptor<Shading, RenderObject, GLFramebuffer>
 {
-  constructor(el?: HTMLCanvasElement, ctxOptions?: any) {
+  constructor(el: HTMLCanvasElement, ctxOptions?: any) {
     this.renderer = new GLRenderer(el, ctxOptions);
     // if we have a element param, use it as the default camera's param for convenience
     if (el !== undefined) {
@@ -171,18 +170,22 @@ export class RenderEngine implements
 
   renderObject(object: RenderObject) {
 
+    if (object.geometry === undefined) {
+      return;
+    }
+
     const shading = this.getUsedShading(object);
 
     // prepare technique
     const program = this.connectShading(object, shading);
 
     // prepare material
-    this.connectMaterial(object.material, shading, program);
+    this.connectMaterial(shading, program, object.material);
 
     // prepare geometry
-    this.connectGeometry(object.geometry, program);
+    this.connectGeometry(program, object.geometry);
 
-    this.connectRange(object.range, program, object.geometry)
+    this.connectRange(program, object.geometry, object.range)
 
     object.state.syncGL(this.renderer)
 
@@ -220,7 +223,7 @@ export class RenderEngine implements
   readonly globalUniforms: GlobalUniforms
 
   private lastUploadedShaderUniformProvider: Set<ShaderUniformProvider> = new Set();
-  private lastProgramRendered: GLProgram;
+  private lastProgramRendered: Nullable<GLProgram> = null;
 
   private connectShading(object: RenderObject, shading: Shading): GLProgram {
 
@@ -256,7 +259,7 @@ export class RenderEngine implements
     return program;
   }
 
-  private connectMaterial(material: Material, shading: Shading, program: GLProgram) {
+  private connectMaterial(shading: Shading, program: GLProgram, material?: Material, ) {
 
     program.forTextures((tex: GLTextureUniform) => {
       let glTexture: WebGLTexture | undefined;
@@ -281,7 +284,7 @@ export class RenderEngine implements
     })
   }
 
-  private connectGeometry(geometry: Geometry, program: GLProgram) {
+  private connectGeometry(program: GLProgram, geometry: Geometry) {
 
     // check index buffer and update program.indexUINT
     if (program.useIndexDraw) {
@@ -317,7 +320,7 @@ export class RenderEngine implements
         throw `program needs an attribute named ${att.name}, but cant find in geometry data`;
       }
       let glBuffer = this.getGLAttributeBuffer(bufferData);
-      if (glBuffer === undefined && bufferData.dataChanged) {
+      if (glBuffer === undefined || bufferData.dataChanged) {
         glBuffer = this.createOrUpdateAttributeBuffer(bufferData, false);
         bufferData.dataChanged = false;
       }
@@ -326,6 +329,9 @@ export class RenderEngine implements
 
     if (program.useIndexDraw) {
       const geometryIndexBuffer = geometry.indexBuffer;
+      if (geometryIndexBuffer === null) {
+        throw "index draw need index buffer"
+      }
       let glBuffer = this.getGLAttributeBuffer(geometryIndexBuffer);
       if (glBuffer === undefined) {
         glBuffer = this.createOrUpdateAttributeBuffer(geometryIndexBuffer, true);
@@ -335,7 +341,7 @@ export class RenderEngine implements
 
     // create vao
     if (this._vaoEnabled) {
-      if (vaoUnbindCallback !== undefined) {
+      if (vaoUnbindCallback! !== undefined) {
         vaoUnbindCallback.unbind();
         geometry._markBufferArrayHasUpload();
         this.renderer.vaoManager.useVAO(vaoUnbindCallback.vao)
@@ -343,7 +349,7 @@ export class RenderEngine implements
     }
   }
 
-  private connectRange(range: RenderRange, program: GLProgram, geometry: Geometry) {
+  private connectRange(program: GLProgram, geometry: Geometry, range?: RenderRange) {
     let start = 0;
     let count = 0;
     if (range === undefined) {
@@ -366,7 +372,7 @@ export class RenderEngine implements
   setOverrideShading(shading: Shading): void {
     this.overrideShading = shading;
   }
-  getOverrideShading(): Shading {
+  getOverrideShading(): Nullable<Shading> {
     return this.overrideShading;
   }
   private getUsedShading(object: RenderObject) {
@@ -387,7 +393,7 @@ export class RenderEngine implements
   createFramebuffer(key: string, width: number, height: number, hasDepth: boolean): GLFramebuffer {
     return this.renderer.framebufferManager.createFrameBuffer(key, width, height, hasDepth);
   }
-  getFramebuffer(key: string): GLFramebuffer {
+  getFramebuffer(key: string): GLFramebuffer | undefined {
     return this.renderer.framebufferManager.getFramebuffer(key);
   }
   deleteFramebuffer(fbo: GLFramebuffer): void {
@@ -435,7 +441,7 @@ export class RenderEngine implements
 
   //  GL resource acquisition
   private programShadingMap: Map<Shading, GLProgram> = new Map();
-  getProgram(shading: Shading): GLProgram {
+  getProgram(shading: Shading) {
     return this.programShadingMap.get(shading);
   }
 
@@ -453,7 +459,7 @@ export class RenderEngine implements
     }
   }
 
-  getGLAttributeBuffer(bufferData: BufferData): WebGLBuffer {
+  getGLAttributeBuffer(bufferData: BufferData) {
     return this.renderer.attributeBufferManager.getGLBuffer(bufferData.data.buffer as ArrayBuffer);
   }
 

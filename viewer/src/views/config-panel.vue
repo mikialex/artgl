@@ -2,49 +2,65 @@
   <div class="config-panel">
     <div class="panel-title">
       Render configuration
-      <button @click="hide">hide</button>
+      <span>
+        <font-awesome-icon icon="minus-square"  @click="hide"/>
+      </span>
     </div>
     <div class="config-wrap">
-      <Config :config="appConfig"/>
+      <Config :config="appConfig" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import Config from '../components/conf/config.vue';
-import { GLApp } from '../application';
+import { Component, Prop, Vue } from "vue-property-decorator";
+import Config from "../components/conf/config.vue";
+import { RenderConfig } from "../components/conf/interface";
+import { Application } from "../application";
 @Component({
-  components:{
+  components: {
     Config
   }
 })
 export default class ConfigPanel extends Vue {
-  @Prop() appConfig;
+  @Prop() appConfig?: RenderConfig;
   $store: any;
+  $viewer?: Application;
 
-  async hide(){
+  async hide() {
     this.$store.state.showConfigPanel = false;
-    await this.$nextTick()
-    GLApp.notifyResize();
+    await this.$nextTick();
+    this.$viewer!.notifyResize();
   }
 }
 </script>
 
 <style scoped lang="scss">
-.panel-title{
+.panel-title {
+  display: flex;
   font-weight: bold;
   padding: 5px;
   font-size: 14px;
+  justify-content: space-between;
+  align-content: center;
+  >span{
+    font-size: 16px;
+    cursor: pointer;
+    &:hover{
+      color: rgb(53, 149, 238);
+    }
+    &:active{
+      color: rgb(13, 87, 156);
+    }
+  }
 }
 
-.config-panel{
+.config-panel {
   border: 1px solid #ddd;
 }
 
-.config-wrap{
+.config-wrap {
   overflow-y: scroll;
   height: calc(100% - 40px);
 }
-
 </style>

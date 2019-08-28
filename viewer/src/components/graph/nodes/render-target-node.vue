@@ -18,16 +18,16 @@ export default class RenderTargetNodeView extends Vue {
   @Prop({
     required: true
   })
-  node: RenderTargetNode;
+  node?: RenderTargetNode;
 
   @Prop({
     required: true
   })
-  layout: NodeLayout;
+  layout?: NodeLayout;
   
   actualSize() {
-    this.layout.width = this.node.widthAbs / 2 / window.devicePixelRatio;
-    this.layout.height = this.node.heightAbs / 2 / window.devicePixelRatio;
+    this.layout!.width = this.node!.widthAbs / 2 / window.devicePixelRatio;
+    this.layout!.height = this.node!.heightAbs / 2 / window.devicePixelRatio;
     this.$emit("updateSize", {
       node: this.node,
       layout: this.layout,
@@ -35,8 +35,8 @@ export default class RenderTargetNodeView extends Vue {
   }
 
   defaultSize() {
-    this.layout.width = 200;
-    this.layout.height = 200;
+    this.layout!.width = 200;
+    this.layout!.height = 200;
     this.$emit("updateSize", {
       node: this.node,
       layout: this.layout,

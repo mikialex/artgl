@@ -5,6 +5,7 @@ import { RenderTargetNode } from "./node/render-target-node";
 import { PassGraphNode } from "./node/pass-graph-node";
 import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingDetermined, ShadingConstrain } from "./backend-interface";
 import { Vector4Like } from "../math/interface";
+import { Vector4 } from "../math";
 
 export type uniformName = string;
 type framebufferName = string;
@@ -24,7 +25,9 @@ export class RenderPass<
       this.overrideShading = overrideShading;
     }
 
-    this.clearColor = define.clearColor;
+    if (define.clearColor !== undefined) {
+      this.clearColor = define.clearColor;
+    }
     this.enableColorClear = define.enableColorClear === undefined ? true : define.enableColorClear
     this.enableDepthClear = define.enableDepthClear === undefined ? true : define.enableDepthClear
 
@@ -36,7 +39,8 @@ export class RenderPass<
   readonly define: PassDefine<ShadingType>;
   public name: string;
 
-  private clearColor: Vector4Like;
+  private clearColor: Vector4Like = new Vector4(1, 1, 1, 1);
+  private beforeClearColor: Vector4Like = new Vector4(1, 1, 1, 1);
   private enableDepthClear: boolean = true;
   private enableColorClear: boolean = true;
 
@@ -49,11 +53,18 @@ export class RenderPass<
   uniformRenderTargetNodeMap: Map<uniformName, RenderTargetNode<ShadingType, RenderableType, FBOType>> = new Map();
   framebuffersDepends: Set<RenderTargetNode<ShadingType, RenderableType, FBOType>> = new Set();
 
-  passNode: PassGraphNode<ShadingType, RenderableType, FBOType>
+  passNode: Nullable<PassGraphNode<ShadingType, RenderableType, FBOType>> = null;
   // outputInfos
-  outputTarget: RenderTargetNode<ShadingType, RenderableType, FBOType>
+  outputTarget: Nullable<RenderTargetNode<ShadingType, RenderableType, FBOType>> = null;
+
+  get hasNodePrepared() {
+    return this.passNode !== null && this.outputTarget !== null;
+  }
 
   get isOutputScreen() {
+    if (this.outputTarget === null) {
+      return false;
+    }
     return this.outputTarget.isScreenNode;
   }
 
@@ -61,12 +72,15 @@ export class RenderPass<
     engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>,
     framebuffer: FBOType
   ) {
-    const debugOutputViewport = this.outputTarget.debugViewPort;
+    if (!this.hasNodePrepared) {
+      throw `pass is not prepared, passNode or TargetNode not provided`
+    }
+    const debugOutputViewport = this.outputTarget!.debugViewPort;
     engine.renderFrameBuffer(framebuffer, debugOutputViewport)
     // this will cause no use draw TODO optimize
     this.uniformNameFBOMap.forEach((inputFramebufferName, uniformName) => {
-      const dependFramebuffer = engine.getFramebuffer(inputFramebufferName);
-      const debugInputViewport = this.uniformRenderTargetNodeMap.get(uniformName).debugViewPort;
+      const dependFramebuffer = engine.getFramebuffer(inputFramebufferName)!;
+      const debugInputViewport = this.uniformRenderTargetNodeMap.get(uniformName)!.debugViewPort;
       engine.renderFrameBuffer(dependFramebuffer, debugInputViewport)
     })
   }
@@ -77,6 +91,10 @@ export class RenderPass<
     framebuffer: FBOType
   ) {
 
+    if (!this.hasNodePrepared) {
+      throw `pass is not prepared, passNode or TargetNode not provided`
+    }
+
     this.checkIsValid();
     let outputTarget: FBOType;
 
@@ -84,7 +102,7 @@ export class RenderPass<
     if (this.isOutputScreen) {
       engine.setRenderTargetScreen();
       if (graph.enableDebuggingView) {
-        const debugViewPort = graph.screenNode.debugViewPort;
+        const debugViewPort = graph.screenNode!.debugViewPort;
         engine.setViewport(
           debugViewPort.x, debugViewPort.y,
           debugViewPort.z, debugViewPort.w
@@ -96,28 +114,29 @@ export class RenderPass<
     } else {
       outputTarget = framebuffer;
       engine.setRenderTarget(outputTarget);
-      engine.setViewport(0, 0, this.outputTarget.widthAbs, this.outputTarget.heightAbs);
+      engine.setViewport(0, 0, this.outputTarget!.widthAbs, this.outputTarget!.heightAbs);
     }
 
     // input binding 
-    if (this.overrideShading !== null) {
-      engine.setOverrideShading(this.overrideShading)
+    const overrideShading = this.overrideShading;
+    if (overrideShading !== null) {
+      engine.setOverrideShading(overrideShading);
       this.uniformNameFBOMap.forEach((inputFramebufferName, uniformName) => {
-        engine.getOverrideShading().defineFBOInput(
+        overrideShading.defineFBOInput(
           inputFramebufferName, uniformName
         );
       })
     }
 
+
+    engine.getClearColor(this.beforeClearColor);
     // clear setting
     if (this.enableColorClear) {
-      if (this.clearColor !== undefined) {
-        engine.setClearColor(this.clearColor);
-      }
+      engine.setClearColor(this.clearColor);
       engine.clearColor();
     }
     if (this.enableDepthClear) {
-      if (!this.isOutputScreen && this.outputTarget.enableDepth) {
+      if (!this.isOutputScreen && this.outputTarget!.enableDepth) {
         engine.clearDepth();
       }
     }
@@ -137,7 +156,7 @@ export class RenderPass<
     }
 
     engine.setOverrideShading(null);
-    engine.resetDefaultClearColor();
+    engine.setClearColor(this.beforeClearColor);
 
 
     if (graph.enableDebuggingView && !this.isOutputScreen) {
@@ -150,11 +169,14 @@ export class RenderPass<
     if (this.isOutputScreen) {
       return
     }
-    const target = this.outputTarget.name;
+    if (!this.hasNodePrepared) {
+      throw `pass is not prepared, passNode or TargetNode not provided`
+    }
+    const target = this.outputTarget!.name;
     this.uniformNameFBOMap.forEach(input => {
       if (input === target) {
         throw `you cant output to the render target which is depend on: 
-Duplicate target: ${this.outputTarget.name};`
+Duplicate target: ${this.outputTarget!.name};`
       }
     })
   }

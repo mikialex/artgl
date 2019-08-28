@@ -33,8 +33,7 @@ export default class ConfigPanel extends Vue {
 
   mounted() {}
 
-  gotoExample(name) {
-    console.log("goto");
+  gotoExample(name: string) {
     this.$store.state.viewExample = name;
     this.$router.push({
       name: "example",
@@ -58,7 +57,7 @@ export default class ConfigPanel extends Vue {
 .example-cover {
   width: 300px;
   height: 200px;
-  background: #fff;
+  background: #eee;
   transition: 200ms;
   cursor: pointer;
   &:hover{

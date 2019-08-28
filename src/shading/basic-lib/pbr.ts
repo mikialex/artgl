@@ -13,11 +13,11 @@ const normalShading = new ShaderFunction({
 
 export class PBRShading extends BaseEffectShading<PBRShading | PointLight> {
 
-  pointLight: PointLight
+  // pointLight: PointLight
 
-  registerProvider() {
-    return [this, this.pointLight];
-  }
+  // registerProvider() {
+  //   return [this, this.pointLight];
+  // }
 
 
   decorate(graph: ShaderGraph): void {

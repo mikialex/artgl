@@ -2,44 +2,63 @@
 import { Mesh } from "../object/mesh";
 import { PlaneGeometry } from "../geometry/geo-lib/plane-geometry";
 import { RenderObject } from "../core/render-object";
-import { Nullable } from "../type";
 
+/**
+ * Every meaningful draw system like scene should produce drawcall as need.
+ * These drawcall maybe sorted, or stored in different container data structure
+ * Impl this interface, that use a iterator to collect sorted, prepared drawcall
+ * from a given draw system. We call this type RenderSource
+ */
 export interface RenderSource {
+
+  /**
+   * When sometimes iterator need reset to first
+   */
   resetSource(): void;
-  nextRenderable(): Nullable<RenderObject>;
+
+
+  /**
+   * Outside will continuously call this until return false to render all 
+   * drawcall.  A render callback is passed, RenderSource can use temp renderObject
+   * to impl scene level override mechanism. or do something before or after every drawcall
+   */
+  nextRenderable(render: (object: RenderObject) => void): boolean;
+
+  /**
+   * A RenderSource maybe need update, to refresh drawcall generation
+   */
   updateSource(): void;
 }
 
 export function foreachRenderableInSource(source: RenderSource, visitor: (obj: RenderObject) => any) {
   source.updateSource();
   source.resetSource();
-  let nextSource: RenderObject | null = null;
+  let hasNextSource: boolean = false;
   do {
-    nextSource = source.nextRenderable();
-    if (nextSource !== null) {
-      visitor(nextSource);
-    }
-  } while (nextSource !== null);
+    hasNextSource = source.nextRenderable(visitor);
+  } while (hasNextSource);
 }
 
 const quadMesh = new Mesh();
 const geometry = new PlaneGeometry(2, 2, 1, 1);
 quadMesh.geometry = geometry;
-export class QuadSource implements RenderSource{
+
+export class QuadSource implements RenderSource {
   hasRendered: boolean = false;
 
   resetSource() {
     this.hasRendered = false;
   }
 
-  nextRenderable() {
+  nextRenderable(render: (object: RenderObject) => void) {
     if (this.hasRendered) {
-      return null
+      return false
     }
     this.hasRendered = true;
-    return quadMesh
+    render(quadMesh);
+    return true
   }
 
-  updateSource() {}
+  updateSource() { }
 
 }

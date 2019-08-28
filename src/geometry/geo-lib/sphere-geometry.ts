@@ -4,12 +4,12 @@ import { StandardGeometry } from '../standard-geometry';
 
 
 export class SphereGeometry extends StandardGeometry {
-  constructor(radius?: number, widthSegments?: number, heightSegments?: number,
+  constructor(radius?: number, widthSegments: number = 8, heightSegments: number = 6,
     phiStart?: number, phiLength?: number, thetaStart?: number, thetaLength?: number) {
     super();
     this.radius = radius !== undefined ? radius : 1;
-    this.widthSegments = Math.max(3, Math.floor(widthSegments) || 8);
-    this.heightSegments = Math.max(2, Math.floor(heightSegments) || 6);
+    this.widthSegments = Math.max(3, Math.floor(widthSegments));
+    this.heightSegments = Math.max(2, Math.floor(heightSegments));
     this.phiStart = phiStart !== undefined ? phiStart : 0;
     this.phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
     this.thetaStart = thetaStart !== undefined ? thetaStart : 0;

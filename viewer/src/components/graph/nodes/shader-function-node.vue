@@ -16,12 +16,12 @@ export default class ShaderFunctionNodeView extends Vue {
   @Prop({
     required: true
   })
-  node: ShaderFunctionNode;
+  node?: ShaderFunctionNode;
 
   @Prop({
     required: true
   })
-  layout: NodeLayout;
+  layout?: NodeLayout;
   
 }
 </script>

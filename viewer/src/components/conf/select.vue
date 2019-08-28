@@ -1,10 +1,7 @@
 <template>
   <div class="select-editor">
     <select v-model="_value">
-      <option 
-      v-for="item in list"
-      :key="item"
-      >{{item}}</option>
+      <option v-for="item in list" :key="item">{{item}}</option>
     </select>
   </div>
 </template>
@@ -13,8 +10,8 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 @Component
 export default class SelectEditor extends Vue {
-  @Prop({ required: true }) value: number;
-  @Prop({ required: true }) list: string[];
+  @Prop({ required: true }) value?: number;
+  @Prop({ required: true }) list?: string[];
 
   get _value() {
     return this.value;
