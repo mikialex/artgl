@@ -76,7 +76,7 @@ import { Vector4, DAGNode } from "../../../src/artgl";
   }
 })
 export default class ViewerCanvas extends Vue {
-  $viewer?: Application;
+  $viewer!: Application;
 
   isRunning: boolean = false;
   $store: any;
@@ -86,7 +86,7 @@ export default class ViewerCanvas extends Vue {
       "#viewer-canvas"
     ) as HTMLCanvasElement;
     Vue.prototype.$viewer = new Application(canvas);
-    this.isRunning = this.$viewer!.framer.active;
+    this.isRunning = this.$viewer.framer.active;
     if (document.body.clientWidth > 600) {
       this.toggleConfigPanel(true);
     }
@@ -110,7 +110,7 @@ export default class ViewerCanvas extends Vue {
       this.$store.state.showScenePanel = !this.$store.state.showScenePanel;
     }
     await this.$nextTick();
-    this.$viewer!.notifyResize();
+    this.$viewer.notifyResize();
   }
 
   async toggleConfigPanel(action?: boolean) {
@@ -120,12 +120,12 @@ export default class ViewerCanvas extends Vue {
       this.$store.state.showConfigPanel = !this.$store.state.showConfigPanel;
     }
     await this.$nextTick();
-    this.$viewer!.notifyResize();
+    this.$viewer.notifyResize();
   }
 
   pick(e: MouseEvent) {
     const canvas = this.$el.querySelector("canvas")!;
-    this.$viewer!.pickColor(
+    this.$viewer.pickColor(
       e.offsetX / canvas.clientWidth,
       (canvas.clientHeight - e.offsetY) / canvas.clientHeight
     );
@@ -181,7 +181,7 @@ export default class ViewerCanvas extends Vue {
     this.viewNodes.forEach(node => {
       map[node.node.uuid] = node.layout;
     });
-    layoutGraph(this.$viewer!.pipeline.graph.screenNode!, map);
+    layoutGraph(this.$viewer.pipeline.graph.screenNode!, map);
     this.updateAllViewport();
   }
 
@@ -190,8 +190,8 @@ export default class ViewerCanvas extends Vue {
   }
 
   inspectGraph() {
-    this.$viewer!.pipeline.graph.enableDebuggingView = true;
-    const nodes = this.$viewer!.pipeline.graph.nodes;
+    this.$viewer.pipeline.graph.enableDebuggingView = true;
+    const nodes = this.$viewer.pipeline.graph.nodes;
     this.viewNodes = nodes.map(node => {
       return {
         node,
@@ -203,22 +203,22 @@ export default class ViewerCanvas extends Vue {
   }
 
   closeGraphInspector() {
-    this.$viewer!.pipeline.graph.enableDebuggingView = false;
+    this.$viewer.pipeline.graph.enableDebuggingView = false;
     this.showGraphViewer = false;
   }
 
   run() {
-    this.$viewer!.run();
+    this.$viewer.run();
     this.isRunning = true;
   }
 
   stop() {
-    this.$viewer!.stop();
+    this.$viewer.stop();
     this.isRunning = false;
   }
 
   step() {
-    this.$viewer!.step();
+    this.$viewer.step();
   }
 }
 </script>

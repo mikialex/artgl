@@ -5,6 +5,7 @@ import { Geometry } from "../core/geometry";
 import { Material } from "../core/material";
 import { Shading } from "../core/shading";
 import { SceneNode, RenderObject } from "../artgl";
+import { PureShading } from "../shading/basic-lib/pure";
 
 /**
  * scene data management
@@ -19,12 +20,14 @@ export class Scene implements RenderSource {
   }
   root: SceneNode = new SceneNode();
 
-  private objectList: RenderList = new RenderList();
+  private renderList: RenderList = new RenderList();
   _geometries: Set<Geometry> = new Set();
   _materials: Set<Material> = new Set();
   _shadings: Set<Shading> = new Set();
   _allRenderable: Set<RenderObject> = new Set();
+
   selectionSet: Set<RenderObject> = new Set();
+  selectShading: Shading = new Shading().decorate(new PureShading());
 
   select(object: RenderObject) {
     if (this._allRenderable.has(object)) {
@@ -39,14 +42,22 @@ export class Scene implements RenderSource {
   }
 
   resetSource() {
-    this.objectList.resetCursor();
+    this.renderList.resetCursor();
   }
 
   nextRenderable(render: (object: RenderObject) => void) {
-    const nextObject = this.objectList.next();
+    const nextObject = this.renderList.next();
     if (nextObject === null) {
       return false;
     } else {
+      // for selection highlight
+      if (this.selectionSet.has(nextObject)) {
+        let originShading = nextObject.shading;
+        nextObject.shading = this.selectShading;
+        render(nextObject);
+        nextObject.shading = originShading;
+        return true;
+      }
       render(nextObject);
       return true;
     }
@@ -62,6 +73,7 @@ export class Scene implements RenderSource {
     if (node.shading !== undefined) {
       this._shadings.add(node.shading);
     }
+    this._allRenderable.add(node);
   }
 
   removeRenderable(node: RenderObject) {
@@ -75,10 +87,11 @@ export class Scene implements RenderSource {
       this._shadings.delete(node.shading);
     }
     this.selectionSet.delete(node);
+    this._allRenderable.delete(node);
   }
 
   updateObjectList() {
-    this.objectList.reset();
+    this.renderList.reset();
     this.root.traverse((node) => {
       node.scene = this;
 
@@ -97,7 +110,7 @@ export class Scene implements RenderSource {
         if (this.selectionSet.has(node)) {
           return
         }
-        this.objectList.addRenderItem(node);
+        this.renderList.addRenderItem(node);
       }
     });
 

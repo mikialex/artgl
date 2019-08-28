@@ -25,7 +25,7 @@ export class Material {
   setChannelColor(channel: ChannelName, color: Vector3) {
     let channelTexture = this.channels.get(channel);
     if (channelTexture === undefined) {
-      channelTexture = generateTextureToPureColor(color);
+      channelTexture = generateTextureTFromPureColor(color);
     } else {
       updateTextureToPureColor(channelTexture, color);
     }
@@ -45,7 +45,7 @@ export class Material {
 
 }
 
-function generateTextureToPureColor(color: Vector3): Texture {
+function generateTextureTFromPureColor(color: Vector3): Texture {
   const R = Math.floor(color.x * 256);
   const G = Math.floor(color.y * 256);
   const B = Math.floor(color.z * 256);

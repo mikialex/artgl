@@ -1,8 +1,18 @@
 type TypeArray = Float32Array | Uint8Array | Uint16Array | Uint32Array
 
 class AutoGrowTypedArray<T extends TypeArray>{
+  constructor(constructor: any, length?: number) {
+    if (length === undefined) {
+      this.buffer = new constructor(AutoGrowTypedArray.initialLength)
+    } else {
+      this.buffer = new constructor(length)
+    }
+    this.ctor = constructor;
+  }
+
   static initialLength = 1000;
   buffer: T;
+  ctor: any;
 
   get capacity() {
     return this.buffer.length;
@@ -13,16 +23,18 @@ class AutoGrowTypedArray<T extends TypeArray>{
     return this._realLength;
   }
 
-  constructor(constructor: any, length?: number) {
-    if (length === undefined) {
-      this.buffer = new constructor(AutoGrowTypedArray.initialLength)
-    } else {
-      this.buffer = new constructor(length)
-    }
+  grow() {
+    const newBuffer = new this.ctor();
+    newBuffer.set(this.buffer, 0, this._realLength);
+    this.buffer = newBuffer;
   }
 
   push(value: number) {
-
+    if (this.capacity === this._realLength) {
+      this.grow();
+    }
+    this._realLength++;
+    this.buffer[this._realLength] = value;
   }
 }
 
