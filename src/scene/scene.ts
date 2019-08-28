@@ -23,7 +23,16 @@ export class Scene implements RenderSource {
   _geometries: Set<Geometry> = new Set();
   _materials: Set<Material> = new Set();
   _shadings: Set<Shading> = new Set();
+  _allRenderable: Set<RenderObject> = new Set();
   selectionSet: Set<RenderObject> = new Set();
+
+  select(object: RenderObject) {
+    if (this._allRenderable.has(object)) {
+      this.selectionSet.add(object);
+    } else {
+      throw "this object is not in this scene"
+    }
+  }
 
   updateSource() {
     this.updateObjectList();

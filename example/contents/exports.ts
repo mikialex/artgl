@@ -15,17 +15,22 @@ declare global {
 }
 
 interface Example{
-  name: string, 
+  name: string,  // show in url
+  title: string, // show in title
+  description?: string, // des text
   build: Function
 }
 
 export const examples: Example[] = [
   {
     name: "primitive",
+    title: "Primitive type",
+    description: "Different draw mode, mesh / line / points",
     build: testDrawPrimitive
   },
   {
-    name: "render range",
+    name: "render-range",
+    title: "Use RenderRange",
     build: renderRange
   },
 ];

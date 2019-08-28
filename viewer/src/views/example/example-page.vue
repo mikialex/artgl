@@ -57,7 +57,7 @@ export default class ConfigPanel extends Vue {
 .example-cover {
   width: 300px;
   height: 200px;
-  background: #fff;
+  background: #eee;
   transition: 200ms;
   cursor: pointer;
   &:hover{
