@@ -1,29 +1,22 @@
 <template>
   <div class="material-view">
     <div v-if="materiallist.length===0">no material found</div>
-    <div v-for="material in materiallist" :key="material.uuid">
-      <!-- <span>{{material.name}}-{{material.uuid.slice(0, 6)}}</span> -->
-
-      <div class="channel-detail" v-if="expandDetail">
-        <!-- <ChannelEditor v-for ="bufferinfo in material.xxx"
-        :key="bufferinfo.name"
-        />-->
-      </div>
-    </div>
+    <MaterialPanel v-for="material in materiallist" :key="material.uuid" />
+    <button>add new material</button>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import ChannelEditor from "./channel-editor.vue";
 import { Scene } from "../../../../src/artgl";
+import MaterialPanel from "./material.vue";
 
 @Component({
   components: {
-    ChannelEditor
+    MaterialPanel
   }
 })
-export default class materialViewPanel extends Vue {
+export default class MaterialViewPanel extends Vue {
   @Prop() scene!: Scene;
 
   expandDetail = true;

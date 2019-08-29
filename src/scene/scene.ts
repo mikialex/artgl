@@ -7,6 +7,37 @@ import { Shading } from "../core/shading";
 import { SceneNode, RenderObject } from "../artgl";
 import { PureShading } from "../shading/basic-lib/pure";
 
+class RefCountMap<T>{
+  map: Map<T, number> = new Map();
+
+  add(item: T) {
+    let old = this.map.get(item)
+    if (old !== undefined) {
+      this.map.set(item, old++);
+    } else {
+      this.map.set(item, 1);
+    }
+  }
+
+  delete(item: T) {
+    let old = this.map.get(item)
+    if (old !== undefined) {
+      if (old === 1) {
+        this.map.delete(item);
+      } else {
+        this.map.set(item, old--);
+      }
+    }
+  }
+
+  forEach(visitor: (item: T) => any) {
+    this.map.forEach((_value, key) => {
+      visitor(key);
+    })
+  }
+
+}
+
 /**
  * scene data management
  * contains full scene tree, and other scene data
@@ -21,9 +52,9 @@ export class Scene implements RenderSource {
   root: SceneNode = new SceneNode();
 
   private renderList: RenderList = new RenderList();
-  _geometries: Set<Geometry> = new Set();
-  _materials: Set<Material> = new Set();
-  _shadings: Set<Shading> = new Set();
+  _geometries: RefCountMap<Geometry> = new RefCountMap();
+  _materials: RefCountMap<Material> = new RefCountMap();
+  _shadings: RefCountMap<Shading> = new RefCountMap();
   _allRenderable: Set<RenderObject> = new Set();
 
   selectionSet: Set<RenderObject> = new Set();
