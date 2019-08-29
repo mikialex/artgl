@@ -46,7 +46,7 @@ export class BarycentricWireFrame extends BaseEffectShading<BarycentricWireFrame
   barycentricLine_threshold: number = 0.01;
 
   @MarkNeedRedecorate()
-  useScreenSpace: boolean = true;
+  useScreenSpace: boolean = false;
 
   getWireFrameType(graph: ShaderGraph) {
     if (this.useScreenSpace) {

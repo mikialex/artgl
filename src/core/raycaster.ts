@@ -89,6 +89,16 @@ export class Raycaster {
   }
 
   pickFirst(source: RenderSource, preFilter?: (obj: RenderObject) => boolean) {
-
+    // TODO use pre exist 
+    return this.pick(source, preFilter).map(re => {
+      const hitWorldPosition = re.hitLocalPosition.applyMatrix4(re.object.worldMatrix);
+      return {
+        cameraDistance: this.worldRay.origin.distanceTo(hitWorldPosition),
+        hitWorldPosition,
+        object: re.object
+      }
+    }).sort((a, b) => {
+      return b.cameraDistance - a.cameraDistance
+    }).pop();
   }
 }

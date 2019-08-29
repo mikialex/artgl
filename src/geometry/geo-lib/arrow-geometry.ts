@@ -1,5 +1,5 @@
 import { StandardGeometry } from "../standard-geometry";
-import { Vector3 } from "../../math";
+import { Vector3 } from '../../math';
 
 export class ArrowGeometry extends StandardGeometry {
   constructor() {
@@ -20,7 +20,7 @@ export class ArrowGeometry extends StandardGeometry {
     const index = [];
 
     for (let i = 0; i < this.segments; i++) {
-      const theta = Math.PI * 2 / i;
+      const theta = i * (Math.PI * 2 / this.segments);
       position.push(Math.sin(theta) * this.bottomRadius, 0, Math.cos(theta) * this.bottomRadius);
       normal.push(0, -1, 0);
       uv.push(0, 0, 0);
@@ -35,8 +35,10 @@ export class ArrowGeometry extends StandardGeometry {
       index.push(count - 1)
       index.push(this.segments)
     }
+    index.push(0)
+    index.push(this.segments - 1)
+    index.push(this.segments)
 
-    
     this.create(index, position, normal, uv);
   }
 

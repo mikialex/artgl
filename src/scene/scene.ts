@@ -60,6 +60,10 @@ export class Scene implements RenderSource {
   selectionSet: Set<RenderObject> = new Set();
   selectShading: Shading = new Shading().decorate(new PureShading());
 
+  clearSelect() {
+    this.selectionSet.clear();
+  }
+
   select(object: RenderObject) {
     if (this._allRenderable.has(object)) {
       this.selectionSet.add(object);
@@ -82,13 +86,13 @@ export class Scene implements RenderSource {
       return false;
     } else {
       // for selection highlight
-      if (this.selectionSet.has(nextObject)) {
-        let originShading = nextObject.shading;
-        nextObject.shading = this.selectShading;
-        render(nextObject);
-        nextObject.shading = originShading;
-        return true;
-      }
+      // if (this.selectionSet.has(nextObject)) {
+      //   let originShading = nextObject.shading;
+      //   nextObject.shading = this.selectShading;
+      //   render(nextObject);
+      //   nextObject.shading = originShading;
+      //   return true;
+      // }
       render(nextObject);
       return true;
     }
@@ -138,9 +142,6 @@ export class Scene implements RenderSource {
       }
 
       if (node instanceof RenderObject) {
-        if (this.selectionSet.has(node)) {
-          return
-        }
         this.renderList.addRenderItem(node);
       }
     });

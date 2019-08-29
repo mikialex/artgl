@@ -1,6 +1,9 @@
 <template>
   <div class="canvas-wrap">
-    <canvas id="viewer-canvas" @click="pick"></canvas>
+    <canvas id="viewer-canvas" 
+    @mousedown="canvasMouseDown"
+    @mouseup="canvasMouseUp"
+    ></canvas>
     <div v-if="!isRunning" class="stop-notation">STOPPED</div>
 
     <div class="graph-viewer-wrap" v-if="showGraphViewer">
@@ -123,9 +126,23 @@ export default class ViewerCanvas extends Vue {
     this.$viewer.notifyResize();
   }
 
+
+  lastDownPositionX: number = 0;
+  lastDownPositionY: number = 0;
+  canvasMouseDown(e: MouseEvent){
+    this.lastDownPositionX = e.screenX;
+    this.lastDownPositionY = e.screenY;
+  }
+
+  canvasMouseUp(e: MouseEvent){
+    if(e.screenX === this.lastDownPositionX && e.screenY === this.lastDownPositionY){
+      this.pick(e);
+    }
+  }
+
   pick(e: MouseEvent) {
     const canvas = this.$el.querySelector("canvas")!;
-    this.$viewer.pickColor(
+    this.$viewer.pick(
       e.offsetX / canvas.clientWidth,
       (canvas.clientHeight - e.offsetY) / canvas.clientHeight
     );
