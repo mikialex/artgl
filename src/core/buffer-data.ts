@@ -5,23 +5,23 @@ export type BufferDataType = Float32Array | Uint16Array | Uint32Array;
  * BufferData is a container for webglBuffer.
  * Provided some convenient methods for data manipulating
  */
-export class BufferData{
-  static f3(data: number[]): BufferData {
+export class BufferData<T extends BufferDataType = BufferDataType>{
+  static f3(data: number[]): BufferData<Float32Array> {
     return new BufferData(new Float32Array(data), 3)
   }
-  static f2(data: number[]): BufferData {
+  static f2(data: number[]): BufferData<Float32Array> {
     return new BufferData(new Float32Array(data), 2)
   }
-  static u32Index(data: number[]): BufferData {
+  static u32Index(data: number[]): BufferData<Uint32Array> {
     return new BufferData(new Uint32Array(data), 1)
   }
 
-  constructor(data: BufferDataType, stride: number) {
+  constructor(data: T, stride: number) {
     this.data = data;
     this.stride = stride;
   }
-  data: BufferDataType;
-  stride: number = 1;
+  data: T;
+  readonly stride: number;
   dataChanged = true;
 
   get count() {
@@ -48,7 +48,7 @@ export class BufferData{
     return this.data[index * this.stride + offset];
   }
 
-  setData(data: BufferDataType) {
+  setData(data: T) {
     this.dataChanged = true;
     this.data = data;
   }

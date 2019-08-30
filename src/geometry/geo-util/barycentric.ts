@@ -4,7 +4,7 @@ import { BufferData } from "../../artgl";
 import { expandStandardGeometryToNoneReusedFaceData } from "./expand";
 
 // https://segmentfault.com/a/1190000016175828
-export function generateBarycentricBuffer(position: Float32Array, index: Uint16Array) {
+export function generateBarycentricBuffer(position: Float32Array, index: Uint32Array) {
   const barycentricBuffer = new Float32Array(position.length);
   for (let i = 0; i < index.length / 3; i++) {
     const id = i * 3;
@@ -28,11 +28,16 @@ export function generateBarycentricBuffer(position: Float32Array, index: Uint16A
   return barycentricBuffer;
 }
 
-export function createBarycentricBufferForStandardGeometry(geometry: StandardGeometry) {
-  expandStandardGeometryToNoneReusedFaceData(geometry);
+export function createBarycentricBufferForStandardGeometry(
+  geometry: StandardGeometry,
+  isVertexReused?: boolean,
+) {
+  if (isVertexReused === undefined || isVertexReused === true) {
+    expandStandardGeometryToNoneReusedFaceData(geometry);
+  }
   const buffer = generateBarycentricBuffer(
     geometry.position.data as Float32Array,
-    geometry.indexBuffer.data as Uint16Array
+    geometry.indexBuffer.data as Uint32Array
   )
 
   geometry.setBuffer(CommonAttribute.baryCentric, new BufferData(buffer, 3))
