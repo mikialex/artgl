@@ -82,6 +82,9 @@ export function injectVertexShaderHeaders(config: GLProgramConfig, shaderText: s
 
 export function injectFragmentShaderHeaders(config: GLProgramConfig, shaderText: string) {
   let injectText = '';
+  if (config.needDerivative === true) {
+    injectText += '#extension GL_OES_standard_derivatives : enable\n';
+  }
   injectText += 'precision highp float;\n';
   injectText += generateUniformString(config);
   injectText += generateVaryingString(config);

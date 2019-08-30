@@ -1,39 +1,59 @@
 <template>
   <div class="material-view">
-    <div v-if="materiallist.length===0">no material found</div>
-    <div v-for="material in materiallist" :key="material.uuid">
-      <!-- <span>{{material.name}}-{{material.uuid.slice(0, 6)}}</span> -->
-
-      <div class="channel-detail" v-if="expandDetail">
-        <!-- <ChannelEditor v-for ="bufferinfo in material.xxx"
-        :key="bufferinfo.name"
-        />-->
-      </div>
-    </div>
+    <div v-if="appMaterials.length===0">no material found</div>
+    <MaterialPanel 
+    v-for="material in appMaterials" 
+    :key="material.uuid" 
+    :material="material" 
+    @deleteSelf="deleteMaterial(material)"
+    />
+    <button @click="newMaterial">add new material</button>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import ChannelEditor from "./channel-editor.vue";
-import { Scene } from "../../../../src/artgl";
+import { Scene, Material } from "../../../../src/artgl";
+import MaterialPanel from "./material.vue";
+import { Application } from "../../application";
 
 @Component({
   components: {
-    ChannelEditor
+    MaterialPanel
   }
 })
-export default class materialViewPanel extends Vue {
+export default class MaterialViewPanel extends Vue {
   @Prop() scene!: Scene;
 
-  expandDetail = true;
+  $viewer!: Application;
 
-  get materiallist() {
-    const list: any = [];
-    this.scene._materials.forEach(mat => {
-      list.push(mat);
-    });
-    return list;
+  expandDetail = true;
+  appMaterials: Material[] = [];
+
+  mounted() {
+    this.appMaterials = this.$viewer.materials;
+  }
+
+  get materialList() {
+    // const materialSet = new Set();
+    // this.scene._materials.forEach(mat => {
+    //   materialSet.add(mat);
+    // });
+    // this.$viewer.materials.forEach(mat =>{
+    //   materialSet
+    // })
+    // return Array.from(materialSet);
+    return this.$viewer.materials;
+  }
+
+  newMaterial() {
+    this.$viewer.materials.push(new Material());
+    console.log(this.$viewer);
+    console.log(this.$viewer.materials);
+  }
+
+  deleteMaterial(material: Material) {
+    this.appMaterials = this.appMaterials.filter(mat => mat !== material);
   }
 }
 </script>

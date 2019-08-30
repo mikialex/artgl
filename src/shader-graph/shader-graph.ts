@@ -122,11 +122,13 @@ export class ShaderGraph {
   }
 
   compile(): GLProgramConfig {
+    const {results, needDerivative } = this.compileFragSource();
     return {
       ...this.collectInputs(),
       vertexShaderString: this.compileVertexSource(),
-      fragmentShaderString: this.compileFragSource(),
+      fragmentShaderString: results,
       autoInjectHeader: true,
+      needDerivative
     };
   }
 
@@ -208,7 +210,8 @@ export class ShaderGraph {
     return genVertexShader(this);
   }
 
-  compileFragSource(): string {
+  compileFragSource()
+  : { results: string, needDerivative: boolean } {
     return genFragShader(this);
   }
 

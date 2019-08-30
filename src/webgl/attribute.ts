@@ -8,6 +8,7 @@ export const enum CommonAttribute {
   normal = 'normal',
   color = 'color',
   uv = 'uv',
+  baryCentric = 'baryCentric'
 }
 
 export interface AttributeDescriptor {

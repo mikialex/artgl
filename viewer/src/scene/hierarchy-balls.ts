@@ -1,16 +1,21 @@
 import {
   SphereGeometry, PlaneGeometry, AmbientLight, Mesh, SceneNode,
-  Shading, CubeGeometry, Vector3, DirectionalLight, PhongShading
+  Shading, CubeGeometry, Vector3, DirectionalLight, PhongShading, BarycentricWireFrame
 } from '../../../src/artgl';
 import { PointLight } from '../../../src/light/point-light';
 import { ExposureController, ToneMapType } from '../../../src/shading/basic-lib/exposurer';
 import { RenderConfig } from '@/components/conf/interface';
 import { Application } from '../application';
+import { ArrowGeometry } from '../../../src/geometry/geo-lib/arrow-geometry';
+import { createBarycentricBufferForStandardGeometry} from '../../../src/geometry/geo-util/barycentric'
 
 export default function (root: SceneNode, app: Application): RenderConfig {
   const sphereGeo = new SphereGeometry(1, 40, 40);
+  createBarycentricBufferForStandardGeometry(sphereGeo);
   const planeGeo = new PlaneGeometry(10, 10, 10, 10);
+  createBarycentricBufferForStandardGeometry(planeGeo);
   const cubeGeo = new CubeGeometry(5, 3, 4)
+  createBarycentricBufferForStandardGeometry(cubeGeo);
 
   const pointLight = new PointLight();
   pointLight.position = new Vector3(-1, 3, 3);
@@ -26,16 +31,24 @@ export default function (root: SceneNode, app: Application): RenderConfig {
 
   const exposureController = new ExposureController();
 
+  const wireframe = new BarycentricWireFrame();
+
   const phong = new PhongShading<DirectionalLight | PointLight>([dirLight, pointLight]);
 
   let shading = new Shading()
     .decorate(phong)
     .decorate(ambient)
     .decorate(exposureController)
+    .decorate(wireframe)
 
   shading.afterShaderCompiled.add((config) => {
     console.log(config);
   })
+
+  const arrowGeo = new ArrowGeometry()
+  createBarycentricBufferForStandardGeometry(arrowGeo);
+  const arrow = new Mesh().g(arrowGeo).s(shading)
+  root.addChild(arrow);
 
   const planeMesh = new Mesh().g(planeGeo).s(shading)
   root.addChild(planeMesh);

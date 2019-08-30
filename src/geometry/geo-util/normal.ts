@@ -1,4 +1,5 @@
-import { Vector3 } from "../math/index";
+import { StandardGeometry } from "../standard-geometry";
+import { Vector3 } from "../../math";
 
 const v1 = new Vector3();
 const v2 = new Vector3();
@@ -32,4 +33,12 @@ export function generateNormalFromPosition(vertices: Float32Array): Float32Array
   }
 
   return normals;
+}
+
+export function recalculateNormalByFaceForStandardGeometry(
+  geo: StandardGeometry
+): StandardGeometry {
+  const newNormal = generateNormalFromPosition(geo.position.data)
+  geo.normal.setData(newNormal);
+  return geo;
 }

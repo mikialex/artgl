@@ -2,7 +2,7 @@ import { Geometry } from "../core/geometry";
 import { Vector3 } from "../math/vector3";
 import { Vector2 } from "../math/vector2";
 import { loadStringFromFile } from "../util/file-io";
-import { generateNormalFromPosition } from "../util/normal-generation";
+import { generateNormalFromPosition } from "../geometry/geo-util/normal";
 import { StandardGeometry } from "../geometry/standard-geometry";
 import { GeometryLoader } from "../core/loader";
 

@@ -4,12 +4,13 @@ import { parseShaderFunctionMetaInfo } from "./parser/shader-function-meta";
 import { CodeBuilder } from "./util/code-builder";
 
 export interface ShaderFunctionDefine {
-  source: string, 
+  source: string,
   description?: string;
+  needDerivative?: boolean;
   dependFunction?: ShaderFunction[];
 }
 
-export interface ShaderFunctionParsedDefine{
+export interface ShaderFunctionParsedDefine {
   name: string;
   description?: string;
   source: string;
@@ -27,10 +28,12 @@ const functionNamesRecord: { [index: string]: number } = {};
  * @export
  * @class ShaderFunction
  */
-export class ShaderFunction{
+export class ShaderFunction {
   constructor(define: ShaderFunctionDefine) {
 
     this.define = parseShaderFunctionMetaInfo(define);
+
+    this.needDerivative = define.needDerivative === true
 
     this.name = this.define.name;
     const record = functionNamesRecord[this.define.name];
@@ -48,6 +51,7 @@ export class ShaderFunction{
 
   readonly name: string;
   readonly define: ShaderFunctionParsedDefine
+  readonly needDerivative: boolean;
 
   dependShaderFunction: ShaderFunction[] = [];
 
@@ -56,13 +60,18 @@ export class ShaderFunction{
     return node;
   }
 
-  genShaderFunctionIncludeCode(resolvedFunction: Set<ShaderFunction>): string {
+  genShaderFunctionIncludeCode(resolvedFunction: Set<ShaderFunction>)
+    : { result: string, needDerivative: boolean } {
+    let needDerivative = this.needDerivative;
+
     const builder = new CodeBuilder()
     builder.reset();
 
     this.dependShaderFunction.forEach(func => {
       if (!resolvedFunction.has(func)) {
-        builder.writeBlock(func.genShaderFunctionIncludeCode(resolvedFunction));
+        const result = func.genShaderFunctionIncludeCode(resolvedFunction);
+        builder.writeBlock(result.result);
+        needDerivative = needDerivative || result.needDerivative;
         resolvedFunction.add(func)
       }
     })
@@ -84,13 +93,13 @@ export class ShaderFunction{
     if (define.description !== undefined) {
       builder.writeCommentBlock(define.description)
     }
-  
+
     builder.writeLine(`${varType} ${define.name}(${functionInputs}){`)
     builder.addIndent()
     builder.writeBlock(this.replaceFunctionCalls(define.source))
     builder.reduceIndent()
     builder.writeLine("}")
-    return builder.output();
+    return { result: builder.output(), needDerivative };
   }
 
   // TODO maybe need check cycle depend

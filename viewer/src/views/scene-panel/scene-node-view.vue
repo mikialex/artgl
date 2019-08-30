@@ -1,15 +1,20 @@
 <template>
   <div class="node-view">
-    <div class="title">
+    <div class="node-title">
       <div :class="{'expandable': hasChildren}" @click="isExpand = !isExpand">
         <span v-if="hasChildren && !isExpand">+</span>
         <span v-if="hasChildren && isExpand">=</span>
         {{node.constructor.name}} - {{clampId}}
       </div>
-      <!-- <button @click="showMenu = true">*</button> -->
-
-      <font-awesome-icon class="icon" icon="cog"  @click="showEdit = !showEdit"/>
-      <font-awesome-icon class="icon" icon="caret-square-down" @click="showMenu = true" />
+      <!-- I dont know why need this TODO -->
+      <span class="icon">
+        <span class="icon-item">
+          <font-awesome-icon icon="cog" @click="showEdit = !showEdit" />
+        </span>
+        <span class="icon-item">
+          <font-awesome-icon icon="caret-square-down" @click="showMenu = true" />
+        </span>
+      </span>
     </div>
 
     <div class="menu" v-if="showMenu">
@@ -18,9 +23,7 @@
     </div>
     <div class="mask" v-if="showMenu" @click="showMenu = false"></div>
 
-    <SceneNodeEditor 
-    v-if="showEdit"
-    :node="node"/>
+    <SceneNodeEditor v-if="showEdit" :node="node" />
 
     <div class="children" v-if="isExpand">
       <scene-node-view v-for="child in node.children" :key="child.uuid" :node="child" />
@@ -41,7 +44,7 @@ import {
 } from "../../../../src/artgl";
 @Component({
   name: "scene-node-view",
-  components:{
+  components: {
     SceneNodeEditor
   }
 })
@@ -94,7 +97,7 @@ export default class BooleanEditor extends Vue {
   width: 300px;
 }
 
-.title {
+.node-title {
   display: flex;
   align-items: center;
   height: 30px;
@@ -102,8 +105,6 @@ export default class BooleanEditor extends Vue {
   &:hover {
     > .icon {
       color: #888;
-      margin-right: 8px;
-      font-size: 16px;
       opacity: 1;
     }
     background: #eee;
@@ -111,15 +112,18 @@ export default class BooleanEditor extends Vue {
 
   > .icon {
     opacity: 0;
-    margin-right: 8px;
+    margin: 8px;
     font-size: 16px;
-    cursor: pointer;
-    &:hover {
-      color: rgb(53, 149, 238);
-    }
-    &:active {
-      color: rgb(13, 87, 156);
-    }
+  }
+}
+
+.icon-item {
+  cursor: pointer;
+  &:hover {
+    color: rgb(53, 149, 238);
+  }
+  &:active {
+    color: rgb(13, 87, 156);
   }
 }
 
@@ -130,7 +134,7 @@ export default class BooleanEditor extends Vue {
   background: #fff;
   z-index: 2;
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.301);
-  > div{
+  > div {
     height: 25px;
     border-bottom: 1px solid #eee;
     display: flex;
@@ -147,7 +151,6 @@ export default class BooleanEditor extends Vue {
       background: rgb(52, 105, 139);
       color: #fff;
     }
-    
   }
 }
 

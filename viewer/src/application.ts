@@ -1,6 +1,6 @@
 import {
   RenderEngine, Mesh, PerspectiveCamera, OrbitController,
-  OBJLoader, Scene, Observable, Framer, Vector4
+  OBJLoader, Scene, Observable, Framer, Vector4, Material, Geometry, Shading
 } from '../../src/artgl';
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
@@ -15,10 +15,9 @@ export class Application {
     this.engine = new RenderEngine(canvas);
     this.pipeline = new RenderPipeline(this.engine);
     this.pipeline.build(this.scene);
-    this.engine.camera.transform.position.set(20, 10, 10)
+    this.engine.camera.transform.position.set(5, 5, 5)
     this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);
     this.orbitController.registerInteractor(this.engine.interactor);
-    this.hasInitialized = true;
     this.createScene(this.scene);
 
     window.addEventListener('resize', this.onContainerResize);
@@ -30,8 +29,13 @@ export class Application {
   engine: RenderEngine;
   framer: Framer = new Framer();
   el: HTMLCanvasElement;
-  hasInitialized: boolean = false;
+
   scene: Scene = new Scene();
+  
+  materials: Material[] = [];
+  geometries: Geometry[] = [];
+  shadings: Shading[] = [];
+
   orbitController: OrbitController;
   raycaster: Raycaster = new Raycaster();
   backgroundColor: Vector4 = new Vector4();
@@ -70,10 +74,19 @@ export class Application {
 
   }
 
-  pickColor(x: number, y: number) {
-    const f = this.pipeline.getFramebufferByName("sceneResult");
+  pick(x: number, y: number) {
+
+    this.raycaster.update(this.engine.camera as PerspectiveCamera, x * 2 - 1, y * 2 - 1);
+    const resultCast = this.raycaster.pickFirst(this.scene);
+    if (resultCast !== undefined) {
+      this.pipeline.resetSample();
+      this.scene.select(resultCast.object);
+    }
+    console.log(resultCast);
+
     return;
     // TODO
+    const f = this.pipeline.getFramebufferByName("sceneResult");
     const result = new Uint8Array(10);
     f.readPixels(
       x * this.engine.renderer.width,
@@ -81,9 +94,6 @@ export class Application {
       1, 1, result);
     console.log(`${result[0]}`)
 
-    this.raycaster.update(this.engine.camera as PerspectiveCamera, x * 2 - 1, y * 2 - 1);
-    const resultCast = this.raycaster.pick(this.scene);
-    console.log(resultCast);
     // console.log(resultCast.map(re => re.object.geometry.constructor.name));
   }
 

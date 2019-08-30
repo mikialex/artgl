@@ -59,7 +59,7 @@ export default class ScenePanel extends Vue {
   sceneView: Nullable<Scene> = null;
   renderView: Nullable<RenderView> = null;
   afterObs: Nullable<Observer<RenderEngine>> = null;
-  $viewer?: Application;
+  $viewer!: Application;
 
   nav = ["hierarchy", "shading", "geometry", "material"];
   currentNav = "hierarchy";
@@ -67,12 +67,12 @@ export default class ScenePanel extends Vue {
 
   mounted() {
     setTimeout(() => {
-      this.sceneView = this.$viewer!.scene;
-      this.renderView = RenderView.create(this.$viewer!.engine);
+      this.sceneView = this.$viewer.scene;
+      this.renderView = RenderView.create(this.$viewer.engine);
       if (this.afterObs) {
-        this.$viewer!.afterRender.remove(this.afterObs);
+        this.$viewer.afterRender.remove(this.afterObs);
       }
-      this.afterObs = this.$viewer!.afterRender.add((engine: RenderEngine) => {
+      this.afterObs = this.$viewer.afterRender.add((engine: RenderEngine) => {
         this.renderView!.updateFrameInfo(engine);
       });
     }, 1);
@@ -81,12 +81,12 @@ export default class ScenePanel extends Vue {
   async hide() {
     this.$store.state.showScenePanel = false;
     await this.$nextTick();
-    this.$viewer!.notifyResize();
+    this.$viewer.notifyResize();
   }
 
   beforeDestroy() {
     if (this.afterObs) {
-      this.$viewer!.afterRender.remove(this.afterObs);
+      this.$viewer.afterRender.remove(this.afterObs);
     }
   }
 }
