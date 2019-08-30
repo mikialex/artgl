@@ -1,6 +1,6 @@
 import {
   RenderEngine, Mesh, PerspectiveCamera, OrbitController,
-  OBJLoader, Scene, Observable, Framer, Vector4
+  OBJLoader, Scene, Observable, Framer, Vector4, Material, Geometry, Shading
 } from '../../src/artgl';
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
@@ -18,7 +18,6 @@ export class Application {
     this.engine.camera.transform.position.set(5, 5, 5)
     this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);
     this.orbitController.registerInteractor(this.engine.interactor);
-    this.hasInitialized = true;
     this.createScene(this.scene);
 
     window.addEventListener('resize', this.onContainerResize);
@@ -30,8 +29,13 @@ export class Application {
   engine: RenderEngine;
   framer: Framer = new Framer();
   el: HTMLCanvasElement;
-  hasInitialized: boolean = false;
+
   scene: Scene = new Scene();
+  
+  materials: Material[] = [];
+  geometries: Geometry[] = [];
+  shadings: Shading[] = [];
+
   orbitController: OrbitController;
   raycaster: Raycaster = new Raycaster();
   backgroundColor: Vector4 = new Vector4();

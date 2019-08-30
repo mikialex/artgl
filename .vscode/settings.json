@@ -7,10 +7,12 @@
     "Interactor",
     "Reinhard",
     "Renderable",
+    "colorbuffer",
     "drawcall",
     "fwidth",
     "phong",
     "smoothstep",
+    "unintialize",
     "varyings",
     "wireframe"
   ]
