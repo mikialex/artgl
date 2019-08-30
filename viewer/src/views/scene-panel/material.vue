@@ -6,7 +6,11 @@
     </div>
 
     <div class="detail">
-      <ChannelEditor v-for="channel in channels" :key="channel.name" />
+      <ChannelEditor 
+      v-for="channel in channels" 
+      :key="channel.name" 
+      @deleteSelf="deleteChannel(channel.name)"
+      />
       <button @click="addChannel">add Channel</button>
     </div>
     <button @click="deleteSelf">delete</button>
@@ -31,12 +35,24 @@ export default class MaterialPanel extends Vue {
 
   get channels() {
     const a = this.channelUpdate;
+    const results =[];
+    this.material._channels.forEach((value,key) =>{
+      results.push({
+        name: key, 
+        value
+      })
+    })
     return Array.from(this.material._channels);
   }
 
   addChannel() {
     this.channelUpdate++;
     this.material.setChannelColor("test" + Math.random(), new Vector3());
+  }
+
+  deleteChannel(channelName: string){
+    console.log(channelName)
+    this.material.deleteChannel(channelName);
   }
 
   deleteSelf(){

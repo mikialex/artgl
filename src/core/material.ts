@@ -63,6 +63,10 @@ export class Material {
     return texture;
   }
 
+  deleteChannel(channelName: string) {
+    this._channels.delete(channelName);
+  }
+
 }
 
 function generateTextureFromPureColor(color: Vector3): Texture {

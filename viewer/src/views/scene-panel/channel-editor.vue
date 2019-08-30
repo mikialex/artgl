@@ -2,13 +2,16 @@
   <div class="channel">
     <img src="" alt="">
     <button>upload</button>
+    <button @click="deleteChannel">deleteChannel</button>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 export default class ChannelEditor extends Vue {
-
+  deleteChannel = () => {
+    this.$emit('deleteSelf');
+  }
 }
 
 </script>
