@@ -4,10 +4,10 @@ import { RenderList } from "../engine/render-list";
 import { Geometry } from "../core/geometry";
 import { Material } from "../core/material";
 import { Shading } from "../core/shading";
-import { SceneNode, RenderObject } from "../artgl";
+import { SceneNode, RenderObject, RenderEngine } from "../artgl";
 import { PureShading } from "../shading/basic-lib/pure";
 import { RefCountMap } from "../util/ref-count-map";
-
+import { BackGround, PureColorBackGround } from "./background";
 
 /**
  * scene data management
@@ -31,6 +31,8 @@ export class Scene implements RenderSource {
   selectionSet: Set<RenderObject> = new Set();
   selectShading: Shading = new Shading().decorate(new PureShading());
 
+  background: BackGround = new PureColorBackGround();
+
   clearSelect() {
     this.selectionSet.clear();
   }
@@ -43,30 +45,19 @@ export class Scene implements RenderSource {
     }
   }
 
-  updateSource() {
+  visitAllRenderObject(visitor: (item: RenderObject) => any) {
     this.updateObjectList();
+    this.renderList.forEach(item => {
+      visitor(item);
+    })
   }
 
-  resetSource() {
-    this.renderList.resetCursor();
-  }
+  render(engine: RenderEngine) {
+    this.background.render(engine);
 
-  nextRenderable(render: (object: RenderObject) => void) {
-    const nextObject = this.renderList.next();
-    if (nextObject === null) {
-      return false;
-    } else {
-      // for selection highlight
-      // if (this.selectionSet.has(nextObject)) {
-      //   let originShading = nextObject.shading;
-      //   nextObject.shading = this.selectShading;
-      //   render(nextObject);
-      //   nextObject.shading = originShading;
-      //   return true;
-      // }
-      render(nextObject);
-      return true;
-    }
+    this.visitAllRenderObject((item) => {
+      engine.renderObject(item);
+    })
   }
 
   addRenderable(node: RenderObject) {
