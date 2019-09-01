@@ -1,5 +1,9 @@
 import { Vector4 } from "../math";
 import { RenderEngine } from "../engine/render-engine";
+import { Shading } from "../core/shading";
+import { SkyShading } from "../shading/basic-lib/sky";
+import { SphereGeometry } from "../geometry/geo-lib/sphere-geometry";
+import { Mesh } from "../object/mesh";
 
 export abstract class BackGround{
   abstract render(engine: RenderEngine): void;
@@ -16,9 +20,17 @@ export class PureColorBackGround extends BackGround{
   }
 }
 
-// export class SkyBackGround extends BackGround {
-  
-// }
+const domeSphere = new SphereGeometry()
+const domeMesh = new Mesh().g(domeSphere)
+
+export class SkyBackGround extends BackGround {
+  skyShading = new Shading().decorate(new SkyShading())
+
+
+  render(engine: RenderEngine) {
+    engine.renderObject(domeMesh);
+  }
+}
 
 
 

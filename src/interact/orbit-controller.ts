@@ -83,7 +83,7 @@ export class OrbitController extends Controller {
       Math.abs(this.sphericalDelta.polar) > 0.0001 ||
       Math.abs(this.sphericalDelta.radius) > 0.0001 ||
       Math.abs(this.zooming - 1) > 0.0001 ||
-      this.panOffset.mag() > 0.0001
+      this.panOffset.mag() > 0.0000001
     ) {
       this.needUpdate = true;
     }
