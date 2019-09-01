@@ -1,6 +1,6 @@
 import {
   SphereGeometry, PlaneGeometry, AmbientLight, Mesh, SceneNode,
-  Shading, CubeGeometry, Vector3, DirectionalLight, PhongShading, BarycentricWireFrame
+  Shading, CubeGeometry, Vector3, DirectionalLight, PhongShading, BarycentricWireFrame, ProgressiveDof, MVPWorld
 } from '../../../src/artgl';
 import { PointLight } from '../../../src/light/point-light';
 import { ExposureController, ToneMapType } from '../../../src/shading/basic-lib/exposurer';
@@ -36,10 +36,12 @@ export default function (root: SceneNode, app: Application): RenderConfig {
   const phong = new PhongShading<DirectionalLight | PointLight>([dirLight, pointLight]);
 
   let shading = new Shading()
+    .decorate(app.pipeline.dof)
     .decorate(phong)
     .decorate(ambient)
     .decorate(exposureController)
     .decorate(wireframe)
+
 
   shading.afterShaderCompiled.add((config) => {
     console.log(config);
@@ -159,11 +161,50 @@ export default function (root: SceneNode, app: Application): RenderConfig {
     ]
   }
 
+  const dofConfig = {
+    name: "progressive dof",
+    value: [
+      {
+        name: 'focusLength',
+        value: app.pipeline.dof.focusLength,
+        onChange: (value: number) => {
+          app.pipeline.dof.focusLength = value;
+          app.pipeline.resetSample();
+        },
+        editors: [
+          {
+            type: 'slider',
+            min: 0,
+            max: 50,
+            step: 0.001
+          },
+        ]
+      },
+      // {
+      //   name: 'coc radius',
+      //   value: app.pipeline.dof.coc.x,
+      //   onChange: (value: number) => {
+      //     app.pipeline.dof.focusLength = value;
+      //     app.pipeline.resetSample();
+      //   },
+      //   editors: [
+      //     {
+      //       type: 'slider',
+      //       min: 0,
+      //       max: 50,
+      //       step: 0.001
+      //     },
+      //   ]
+      // }
+    ]
+  }
+
   return {
     name: 'scene shading',
     value: [
       exposureConfig,
-      phongConfig
+      phongConfig,
+      dofConfig
     ]
   }
 

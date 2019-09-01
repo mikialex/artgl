@@ -1,6 +1,6 @@
 import {
   RenderEngine, Mesh, PerspectiveCamera, OrbitController,
-  OBJLoader, Scene, Observable, Framer, Vector4, Material, Geometry, Shading
+  OBJLoader, Scene, Observable, Framer, Vector4, Material, Geometry, Shading, ProgressiveDof
 } from '../../src/artgl';
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
@@ -59,7 +59,6 @@ export class Application {
     this.onContainerResize();
   }
 
-  sampleCount = 0;
   beforeRender: Observable<RenderEngine> = new Observable();
   afterRender: Observable<RenderEngine> = new Observable();
   render = () => {
@@ -79,6 +78,7 @@ export class Application {
     this.raycaster.update(this.engine.camera as PerspectiveCamera, x * 2 - 1, y * 2 - 1);
     const resultCast = this.raycaster.pickFirst(this.scene);
     if (resultCast !== undefined) {
+      this.pipeline.dof.focusLength = resultCast.cameraDistance;
       this.pipeline.resetSample();
       this.scene.select(resultCast.object);
     }

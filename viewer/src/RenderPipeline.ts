@@ -1,14 +1,15 @@
 import {
   RenderGraph, TAAShading,
   TSSAOShading, TSSAOBlendShading, Matrix4,
-  DepthShading, Scene, RenderEngine, Shading, Vector4
+  DepthShading, Scene, RenderEngine, Shading, Vector4, ProgressiveDof
 } from "../../src/artgl";
 import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
 import { createConf } from './conf';
+import { Vector2 } from '../../src/math/vector2';
 
 export class RenderPipeline{
-  constructor(engine: RenderEngine) {
+  constructor(engine: RenderEngine, ) {
     this.engine = engine;
     this.composer = new EffectComposer(engine);
   }
@@ -28,9 +29,13 @@ export class RenderPipeline{
 
   composeShading = new TSSAOBlendShading()
   composeShader: Shading = new Shading().decorate(this.composeShading);
-  depthShader = new Shading().decorate(new DepthShading());
+  dof = new ProgressiveDof();
+  depthShader = new Shading().decorate(new DepthShading()).decorate(this.dof);
 
   private sampleCount: number = 0;
+  getSampleCount() {
+    return this.sampleCount;
+  }
 
   resetSample() {
     this.sampleCount = 0;
@@ -52,6 +57,10 @@ export class RenderPipeline{
 
   render(scene: Scene) {
     this.tickNum++;
+
+    if (this.sampleCount >= 2) {
+      this.dof.coc = new Vector2(Math.random() - 1, Math.random() - 1).multiplyScalar(0.1)// todo, fix change watch
+    }
 
     this.engine.connectCamera();
     if (this.engine.isCameraChanged) {
