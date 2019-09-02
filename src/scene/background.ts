@@ -4,6 +4,7 @@ import { Shading } from "../core/shading";
 import { SkyShading } from "../shading/basic-lib/sky";
 import { SphereGeometry } from "../geometry/geo-lib/sphere-geometry";
 import { Mesh } from "../object/mesh";
+import { CullSide } from "../webgl/const";
 
 export abstract class BackGround{
   abstract render(engine: RenderEngine): void;
@@ -25,6 +26,13 @@ const domeSphere = new SphereGeometry()
 export class SkyBackGround extends BackGround {
   skyShading = new Shading().decorate(new SkyShading())
   domeMesh = new Mesh().g(domeSphere).s(this.skyShading)
+
+  constructor() {
+    super();
+    this.domeMesh.transform.scale.setAll(100);
+    this.domeMesh.updateWorldMatrix();
+    this.domeMesh.state.cullSide = CullSide.CullFaceNone
+  }
 
   render(engine: RenderEngine) {
     engine.renderObject(this.domeMesh);

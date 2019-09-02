@@ -24,6 +24,13 @@ export class ProgressiveDof extends BaseEffectShading<ProgressiveDof> {
   @MapUniform("dof_coc")
   coc = new Vector2();
 
+  updateSample() {
+    this.coc = new Vector2(Math.random() - 1, Math.random() - 1)
+      .normalize().multiplyScalar(this.blurRadius)// todo, fix change watch
+  }
+
+  blurRadius = 0.005
+
   @MapUniform("dof_focus")
   focusLength = 0;
 

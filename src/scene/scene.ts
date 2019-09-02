@@ -7,7 +7,7 @@ import { Shading } from "../core/shading";
 import { SceneNode, RenderObject, RenderEngine } from "../artgl";
 import { PureShading } from "../shading/basic-lib/pure";
 import { RefCountMap } from "../util/ref-count-map";
-import { BackGround, PureColorBackGround } from "./background";
+import { BackGround, PureColorBackGround, SkyBackGround } from "./background";
 
 /**
  * scene data management
@@ -31,7 +31,7 @@ export class Scene implements RenderSource {
   selectionSet: Set<RenderObject> = new Set();
   selectShading: Shading = new Shading().decorate(new PureShading());
 
-  background: BackGround = new PureColorBackGround();
+  background: BackGround = new SkyBackGround();
 
   clearSelect() {
     this.selectionSet.clear();

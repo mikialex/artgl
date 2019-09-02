@@ -6,7 +6,6 @@ import {
 import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
 import { createConf } from './conf';
-import { Vector2 } from '../../src/math/vector2';
 
 export class RenderPipeline{
   constructor(engine: RenderEngine, ) {
@@ -59,7 +58,7 @@ export class RenderPipeline{
     this.tickNum++;
 
     if (this.sampleCount >= 2) {
-      this.dof.coc = new Vector2(Math.random() - 1, Math.random() - 1).multiplyScalar(0.1)// todo, fix change watch
+      this.dof.updateSample();
     }
 
     this.engine.connectCamera();
