@@ -1,15 +1,18 @@
 import { BaseEffectShading, MapUniform } from "../../core/shading";
-import { ShaderGraph } from "../../shader-graph/shader-graph";
+import { ShaderGraph, WorldPositionFragVary } from "../../shader-graph/shader-graph";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { Vector3 } from "../../math";
 
-  
+
 const rayleighPhase = new ShaderFunction({
   source: `
   float rayleighPhase( float cosTheta ) {
+
+    // 3.0 / ( 16.0 * pi )
+    const float THREE_OVER_SIXTEENPI = 0.05968310365946075;
+
     return THREE_OVER_SIXTEENPI * ( 1.0 + pow( cosTheta, 2.0 ) );
   }
-
   `
 })
 
@@ -17,10 +20,12 @@ const hgPhase = new ShaderFunction({
   source: `
   float hgPhase( float cosTheta, float g ) {
   	float g2 = pow( g, 2.0 );
-  	float inverse = 1.0 / pow( 1.0 - 2.0 * g * cosTheta + g2, 1.5 );
+    float inverse = 1.0 / pow( 1.0 - 2.0 * g * cosTheta + g2, 1.5 );
+    
+    // 1.0 / ( 4.0 * pi )
+    const float ONE_OVER_FOURPI = 0.07957747154594767;
   	return ONE_OVER_FOURPI * ( ( 1.0 - g2 ) * inverse );
   }
-
   `
 })
 
@@ -30,14 +35,11 @@ const skyColor = new ShaderFunction({
     `
     vec4 skyColor(
       vec3 worldPosition,
-      vec3 cameraPos,
       vec3 sunDirection,
-      float mieZenithLength,
-      float rayleighZenithLength,
       float mieDirectionalG,
-      ){
+    ){
 
-        const vec3 cameraPos = vec3( 0.0, 0.0, 0.0 );
+    const vec3 cameraPos = vec3( 0.0, 0.0, 0.0 );
 
     // constants for atmospheric scattering
     const float pi = 3.141592653589793238462643383279502884197169;
@@ -53,16 +55,11 @@ const skyColor = new ShaderFunction({
     // 66 arc seconds -> degrees, and the cosine of that
     const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;
 
-    // 3.0 / ( 16.0 * pi )
-    const float THREE_OVER_SIXTEENPI = 0.05968310365946075;
-    // 1.0 / ( 4.0 * pi )
-    const float ONE_OVER_FOURPI = 0.07957747154594767;
 
-
-    	float zenithAngle = acos( max( 0.0, dot( up, normalize( worldPosition - cameraPos ) ) ) );
-    	float inverse = 1.0 / ( cos( zenithAngle ) + 0.15 * pow( 93.885 - ( ( zenithAngle * 180.0 ) / pi ), -1.253 ) );
-    	float sR = rayleighZenithLength * inverse;
-    	float sM = mieZenithLength * inverse;
+    float zenithAngle = acos( max( 0.0, dot( up, normalize( worldPosition - cameraPos ) ) ) );
+    float inverse = 1.0 / ( cos( zenithAngle ) + 0.15 * pow( 93.885 - ( ( zenithAngle * 180.0 ) / pi ), -1.253 ) );
+    float sR = rayleighZenithLength * inverse;
+    float sM = mieZenithLength * inverse;
 
     // combined extinction factor
     	vec3 Fex = exp( -( vBetaR * sR + vBetaM * sM ) );
@@ -97,20 +94,8 @@ const skyColor = new ShaderFunction({
     `
 })
 
-const t = new ShaderFunction({
-  source: 
-    `
-    vec3 totalMie( float T ) {
-    	float c = ( 0.2 * T ) * 10E-18;
-    	return 0.434 * c * MieConst;
-    }
-    `
-})
-
-
 const sunIntensity = new ShaderFunction({
   source: `
-
   float sunIntensity( vec3 sunDirection, vec3 up ) {
     float zenithAngleCos =  dot( sunDirection, up );
   	zenithAngleCos = clamp( zenithAngleCos, -1.0, 1.0 );
@@ -121,37 +106,83 @@ const sunIntensity = new ShaderFunction({
 
 const sunFade = new ShaderFunction({
   source: `
-
   float sunIntensity( vec3 sunPosition) {
     return 1.0 - clamp( 1.0 - exp( ( sunPosition.y / 450000.0 ) ), 0.0, 1.0 );
   }
   `
 })
 
+const vBetaR = new ShaderFunction({
+  source: `
+  vec3 vBetaR(
+    float rayleigh,
+    float sunFade,
+  ){
+    float rayleighCoefficient = rayleigh - ( 1.0 * ( 1.0 - vSunfade ) );
+    return totalRayleigh * rayleighCoefficient;
+  }
+  `
+})
+
+const vBetaM = new ShaderFunction({
+  source: `
+  vec3 vBetaM(
+    float turbidity,
+    float mieCoefficient,
+  ){
+    float c = ( 0.2 * turbidity ) * 10E-18;
+    float totalMie =  0.434 * c * MieConst;
+    return mieCoefficient * totalMie;
+  }
+  `
+})
 
 export class SkyShading extends BaseEffectShading<SkyShading> {
   constructor() {
     super();
   }
 
-  sunPosition = new Vector3(1,1,1).normalize() //need normalized
+  @MapUniform("sunPosition")
+  sunPosition = new Vector3(1, 1, 1).normalize() //need normalized
+
+  @MapUniform("rayleigh")
+  rayleigh = 2
+
+  @MapUniform("turbidity")
+  turbidity = 10
+
+  @MapUniform("mieCoefficient")
+  mieCoefficient = 0.005
+
+  // luminance = 1
+
+  @MapUniform("mieDirectionalG")
+  mieDirectionalG = 0.8
 
   decorate(graph: ShaderGraph): void {
     const sunPosition = this.getPropertyUniform('sunPosition');
-
+    const sunFadeResult = sunFade.make().input("sunPosition", sunPosition);
     graph
       .setVary("vSunDirection", sunPosition)
       .setVary("vSunE", sunIntensity.make())
-      .setVary("vSunFade",
-        sunFade.make().input("sunPosition", sunPosition)
+      .setVary("vSunFade",sunFadeResult)
+      .setVary("vBetaR",
+        vBetaR.make()
+        .input("rayleigh", this.getPropertyUniform("rayleigh"))
+        .input("sunFade", sunFadeResult)
+      )
+      .setVary("vBetaM",
+        vBetaM.make()
+        .input("turbidity", this.getPropertyUniform("turbidity"))
+        .input("mieCoefficient", this.getPropertyUniform("mieCoefficient"))
       )
       .setFragmentRoot(
         skyColor.make()
+        .input("worldPosition", graph.getVary(WorldPositionFragVary))
+        .input("sunDirection", graph.getVary("vSunDirection"))
+        .input("mieDirectionalG", this.getPropertyUniform('mieDirectionalG'))
+
       )
   }
-
-
-  @MapUniform("shininess")
-  shininess: number = 15;
 
 }

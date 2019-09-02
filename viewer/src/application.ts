@@ -38,8 +38,7 @@ export class Application {
 
   orbitController: OrbitController;
   raycaster: Raycaster = new Raycaster();
-  backgroundColor: Vector4 = new Vector4();
-
+  
   unintialize() {
     window.removeEventListener('resize', this.onContainerResize);
     this.framer.stop();
@@ -65,7 +64,6 @@ export class Application {
     this.beforeRender.notifyObservers(this.engine);
     this.orbitController.update();
 
-    this.engine.renderer.state.colorbuffer.setClearColor(this.backgroundColor);
     this.pipeline.render(this.scene);
 
     this.afterRender.notifyObservers(this.engine);

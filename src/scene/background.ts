@@ -21,14 +21,13 @@ export class PureColorBackGround extends BackGround{
 }
 
 const domeSphere = new SphereGeometry()
-const domeMesh = new Mesh().g(domeSphere)
 
 export class SkyBackGround extends BackGround {
   skyShading = new Shading().decorate(new SkyShading())
-
+  domeMesh = new Mesh().g(domeSphere).s(this.skyShading)
 
   render(engine: RenderEngine) {
-    engine.renderObject(domeMesh);
+    engine.renderObject(this.domeMesh);
   }
 }
 
