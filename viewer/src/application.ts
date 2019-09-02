@@ -1,11 +1,12 @@
 import {
   RenderEngine, Mesh, PerspectiveCamera, OrbitController,
-  OBJLoader, Scene, Observable, Framer, Vector4, Material, Geometry, Shading
+  OBJLoader, Scene, Observable, Framer, Vector4, Material, Geometry, Shading, ProgressiveDof
 } from '../../src/artgl';
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
 import { RenderPipeline } from './RenderPipeline';
 import { Raycaster } from '../../src/core/raycaster';
+import { BackGround, PureColorBackGround, SkyBackGround } from '../../src/scene/background';
 
 export const STATIC_SERVER = "http://localhost:3000/"
 
@@ -31,6 +32,11 @@ export class Application {
   el: HTMLCanvasElement;
 
   scene: Scene = new Scene();
+
+  backgrounds: BackGround[] = [
+    new PureColorBackGround(),
+    new SkyBackGround(),
+  ]
   
   materials: Material[] = [];
   geometries: Geometry[] = [];
@@ -38,8 +44,7 @@ export class Application {
 
   orbitController: OrbitController;
   raycaster: Raycaster = new Raycaster();
-  backgroundColor: Vector4 = new Vector4();
-
+  
   unintialize() {
     window.removeEventListener('resize', this.onContainerResize);
     this.framer.stop();
@@ -51,22 +56,17 @@ export class Application {
     const height = this.el.offsetHeight;
     this.engine.setSize(width, height);
     (this.engine.camera as PerspectiveCamera).aspect = width / height;
-
-    // this.taaTech.uniforms.get('screenPixelXStep').setValue(1 / (2 * window.devicePixelRatio * width));
-    // this.taaTech.uniforms.get('screenPixelYStep').setValue(1 / (2 * window.devicePixelRatio * height));
   }
   notifyResize() {
     this.onContainerResize();
   }
 
-  sampleCount = 0;
   beforeRender: Observable<RenderEngine> = new Observable();
   afterRender: Observable<RenderEngine> = new Observable();
   render = () => {
     this.beforeRender.notifyObservers(this.engine);
     this.orbitController.update();
 
-    this.engine.renderer.state.colorbuffer.setClearColor(this.backgroundColor);
     this.pipeline.render(this.scene);
 
     this.afterRender.notifyObservers(this.engine);
@@ -79,6 +79,7 @@ export class Application {
     this.raycaster.update(this.engine.camera as PerspectiveCamera, x * 2 - 1, y * 2 - 1);
     const resultCast = this.raycaster.pickFirst(this.scene);
     if (resultCast !== undefined) {
+      this.pipeline.dof.focusLength = resultCast.cameraDistance;
       this.pipeline.resetSample();
       this.scene.select(resultCast.object);
     }

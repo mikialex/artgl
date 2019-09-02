@@ -80,6 +80,10 @@ export class ShaderGraph {
     return this.fragmentRoot;
   }
 
+  getVertRoot(): ShaderNode {
+    return this.vertexRoot;
+  }
+
   getVary(key: string): ShaderVaryInputNode {
     let ret = this.varyings.get(key);
     if (ret === undefined) {

@@ -53,7 +53,7 @@ export default class MaterialViewPanel extends Vue {
   }
 
   deleteMaterial(material: Material) {
-    this.appMaterials = this.appMaterials.filter(mat => mat !== material);
+    this.appMaterials.splice(this.appMaterials.indexOf(material), 1);
   }
 }
 </script>

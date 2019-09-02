@@ -1,7 +1,7 @@
 import { Vector3, Matrix4 } from "../math/index";
 import { Nullable } from "../type";
 import { Ray } from "../math/entity/ray";
-import { RenderSource, foreachRenderableInSource } from "../engine/render-source";
+import { RenderSource } from "../engine/render-source";
 import { RenderObject } from "./render-object";
 
 
@@ -72,7 +72,7 @@ export class Raycaster {
 
   pick(source: RenderSource, preFilter?: (obj: RenderObject) => boolean) {
     const results: RayCastResult[] = [];
-    foreachRenderableInSource(source, (obj) => {
+    source.visitAllRenderObject((obj) => {
 
       if ((obj as unknown as RayCasterable).raycasterable !== true) {
         return

@@ -12,7 +12,7 @@ import { Nullable, GLReleasable } from "../type";
 import { GlobalUniforms, createAllInnerSupportUniformProxy } from "./uniform-proxy";
 import { Observable } from "../core/observable";
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
-import { QuadSource, RenderSource, foreachRenderableInSource } from './render-source';
+import { QuadSource, RenderSource } from './render-source';
 import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/vao";
@@ -163,9 +163,7 @@ export class RenderEngine implements
   //// render APIs
   // render renderList from given source
   render(source: RenderSource) {
-    foreachRenderableInSource(source, (obj) => {
-      this.renderObject(obj);
-    })
+    source.render(this);
   }
 
   renderObject(object: RenderObject) {

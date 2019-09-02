@@ -5,7 +5,7 @@
         <a href="">source</a>
       </div> -->
       <h1>ARTGL</h1>
-      <h2>A state of art web 3D framework</h2>
+      <h2>A state of art Web 3D framework</h2>
     </div>
     <div class="part-entry">
       <div class="part" @click="goto('viewer')">
