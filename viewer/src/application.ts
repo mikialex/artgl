@@ -87,7 +87,7 @@ export class Application {
 
     return;
     // TODO
-    const f = this.pipeline.getFramebufferByName("sceneResult");
+    const f = this.pipeline.getFramebufferByName("sceneResult")!;
     const result = new Uint8Array(10);
     f.readPixels(
       x * this.engine.renderer.width,

@@ -15,7 +15,7 @@ export interface PassInputMapInfo{
 export interface PassDefine<ShadingType extends ShadingConstrain> {
   name: string,
   inputs?: () => PassInputMapInfo,
-  source: RenderSource[],
+  source: Function[],
   filter?: () => boolean,
   sorter?: () => number,
   states?: stateType[],

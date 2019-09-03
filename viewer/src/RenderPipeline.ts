@@ -1,11 +1,12 @@
 import {
   RenderGraph, TAAShading,
   TSSAOShading, TSSAOBlendShading, Matrix4,
-  DepthShading, Scene, RenderEngine, Shading, Vector4, ProgressiveDof
+  DepthShading, Scene, RenderEngine, Shading, Vector4, ProgressiveDof, RenderObject
 } from "../../src/artgl";
 import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
 import { createConf } from './conf';
+import { GLFramebuffer } from '../../src/webgl/gl-framebuffer';
 
 export class RenderPipeline{
   constructor(engine: RenderEngine, ) {
@@ -15,8 +16,8 @@ export class RenderPipeline{
   engine: RenderEngine;
   config?: RenderConfig;
 
-  graph: RenderGraph<any, any, any> = new RenderGraph();
-  composer: EffectComposer<any, any, any>;
+  graph: RenderGraph<Shading, RenderObject, GLFramebuffer> = new RenderGraph();
+  composer: EffectComposer<Shading, RenderObject, GLFramebuffer>;
 
   enableTAA = true;
   taaShading = new TAAShading()
@@ -54,7 +55,7 @@ export class RenderPipeline{
     return fbo;
   }
 
-  render(scene: Scene) {
+  render(_scene: Scene) {
     this.tickNum++;
 
     if (this.sampleCount >= 2) {
@@ -123,13 +124,13 @@ export class RenderPipeline{
       passes: [
         { // general scene origin
           name: "SceneOrigin",
-          source: [scene],
+          source: [scene.render],
           clearColor: new Vector4(0, 0, 0, 1)
         },
         { // depth
           name: "Depth",
           shading: this.depthShader,
-          source: [scene],
+          source: [scene.renderScene],
         },
         { // mix new render and old samples
           name: "TAA",
@@ -141,7 +142,7 @@ export class RenderPipeline{
             }
           },
           shading: this.taaShader,
-          source: [RenderGraph.quadSource],
+          source: [RenderGraph.quadSource.render],
           enableColorClear: false,
           beforePassExecute: () => {
             this.engine.unJit();
@@ -159,7 +160,7 @@ export class RenderPipeline{
             }
           },
           shading: this.tssaoShader,
-          source: [RenderGraph.quadSource],
+          source: [RenderGraph.quadSource.render],
           enableColorClear: false,
           beforePassExecute: () => {
             const VP: Matrix4 = this.engine.globalUniforms.VPMatrix.value
@@ -192,7 +193,7 @@ export class RenderPipeline{
             this.sampleCount++;``
           },
           shading: this.composeShader,
-          source: [RenderGraph.quadSource],
+          source: [RenderGraph.quadSource.render],
         },
       ]
     })

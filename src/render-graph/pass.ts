@@ -147,7 +147,7 @@ export class RenderPass<
 
     //////  render //////
     this.define.source.forEach(source => {
-      engine.render(source);
+      source(engine);
     })
     /////////////////////
 

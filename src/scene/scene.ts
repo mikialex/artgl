@@ -52,9 +52,12 @@ export class Scene implements RenderSource {
     })
   }
 
-  render(engine: RenderEngine) {
+  render = (engine: RenderEngine) => {
     this.background.render(engine);
+    this.renderScene(engine);
+  }
 
+  renderScene = (engine: RenderEngine) => {
     this.visitAllRenderObject((item) => {
       engine.renderObject(item);
     })
