@@ -25,7 +25,7 @@ export class ProgressiveDof extends BaseEffectShading<ProgressiveDof> {
   coc = new Vector2();
 
   updateSample() {
-    this.coc = new Vector2(Math.random() - 1, Math.random() - 1)
+    this.coc = new Vector2(Math.random() - 0.5, Math.random() - 0.5)
       .normalize().multiplyScalar(this.blurRadius)// todo, fix change watch
   }
 

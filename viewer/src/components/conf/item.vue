@@ -6,10 +6,10 @@
       </div>
       <div class="inline-editor">
         <NumberEditor
-          v-if="typeof config.value === 'number' && config.valueConfig === undefined"
+          v-if="typeof configValue === 'number' && config.valueConfig === undefined"
           v-model="configValue"/>
         <BooleanEditor
-          v-if="typeof config.value === 'boolean' && config.valueConfig === undefined"
+          v-if="typeof configValue === 'boolean' && config.valueConfig === undefined"
           v-model="configValue"/>
 
         <SelectEditor

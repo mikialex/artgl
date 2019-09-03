@@ -48,8 +48,6 @@ export default class Folder extends Vue {
     }
   }
 }
-
-
 </script>
 
 <style lang="scss" scoped>

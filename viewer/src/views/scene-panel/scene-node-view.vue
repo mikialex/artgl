@@ -75,8 +75,8 @@ export default class BooleanEditor extends Vue {
     const geo = objLoader.parse(objStr);
     const mesh = new Mesh();
     mesh.geometry = geo;
-    mesh.shading = new Shading().decorate(new NormalShading());
     this.node!.addChild(mesh);
+    this.showMenu = false;
   }
 
   get isRoot() {

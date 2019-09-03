@@ -7,7 +7,7 @@ import { ExposureController, ToneMapType } from '../../../src/shading/basic-lib/
 import { RenderConfig } from '@/components/conf/interface';
 import { Application } from '../application';
 import { ArrowGeometry } from '../../../src/geometry/geo-lib/arrow-geometry';
-import { createBarycentricBufferForStandardGeometry} from '../../../src/geometry/geo-util/barycentric'
+import { createBarycentricBufferForStandardGeometry } from '../../../src/geometry/geo-util/barycentric'
 
 export default function (root: SceneNode, app: Application): RenderConfig {
   const sphereGeo = new SphereGeometry(1, 40, 40);
@@ -41,6 +41,14 @@ export default function (root: SceneNode, app: Application): RenderConfig {
     .decorate(ambient)
     .decorate(exposureController)
     .decorate(wireframe)
+
+  const defaultShading = new Shading()
+    .decorate(app.pipeline.dof)
+    .decorate(phong)
+    .decorate(ambient)
+    .decorate(exposureController)
+
+  app.engine.defaultShading = defaultShading;
 
 
   shading.afterShaderCompiled.add((config) => {
@@ -113,7 +121,7 @@ export default function (root: SceneNode, app: Application): RenderConfig {
           app.pipeline.resetSample();
         },
         show: () => {
-          return exposureController.toneMapType===ToneMapType.Uncharted2ToneMapping
+          return exposureController.toneMapType === ToneMapType.Uncharted2ToneMapping
         },
         editors: [
           {
@@ -176,26 +184,26 @@ export default function (root: SceneNode, app: Application): RenderConfig {
             type: 'slider',
             min: 0,
             max: 50,
-            step: 0.001
+            step: 0.1
           },
         ]
       },
-      // {
-      //   name: 'coc radius',
-      //   value: app.pipeline.dof.coc.x,
-      //   onChange: (value: number) => {
-      //     app.pipeline.dof.focusLength = value;
-      //     app.pipeline.resetSample();
-      //   },
-      //   editors: [
-      //     {
-      //       type: 'slider',
-      //       min: 0,
-      //       max: 50,
-      //       step: 0.001
-      //     },
-      //   ]
-      // }
+      {
+        name: 'coc radius',
+        value: app.pipeline.dof.blurRadius,
+        onChange: (value: number) => {
+          app.pipeline.dof.blurRadius = value;
+          app.pipeline.resetSample();
+        },
+        editors: [
+          {
+            type: 'slider',
+            min: 0,
+            max: 1,
+            step: 0.001
+          },
+        ]
+      }
     ]
   }
 

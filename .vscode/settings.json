@@ -9,6 +9,7 @@
     "Renderable",
     "colorbuffer",
     "drawcall",
+    "exposurer",
     "fwidth",
     "phong",
     "smoothstep",
