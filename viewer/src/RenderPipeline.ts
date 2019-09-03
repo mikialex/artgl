@@ -9,7 +9,7 @@ import { createConf } from './conf';
 import { GLFramebuffer } from '../../src/webgl/gl-framebuffer';
 
 export class RenderPipeline{
-  constructor(engine: RenderEngine, ) {
+  constructor(engine: RenderEngine) {
     this.engine = engine;
     this.composer = new EffectComposer(engine);
   }

@@ -11,23 +11,30 @@ export function downloadCanvasPNGImage(canvas: HTMLCanvasElement, name: string) 
 
 async function getStringContentFromFile(file: Blob) {
   const reader = new FileReader();
-  return new Promise<string>(function (resolve, _) {
+  return new Promise<string>(function (resolve, reject) {
     reader.onload = function (e) {
       const str = reader.result;
       resolve(str as string);
     };
+    reader.onerror = (e) => {
+      reject(e)
+    }
     reader.readAsText(file);
   });
 }
 
+
+let temp; // input ele maybe will GC in raf calls, maybe a bug
 export function openFile(): Promise<Blob> {
   return new Promise((resolve) => {
     const input = document.createElement('input');
     input.setAttribute('type', 'file');
     const func = (e: any) => {
+      temp = undefined;
       resolve(e.target.files[0])
     }
     input.addEventListener('change', func);
+    temp = input;
     input.click();
   })
 }

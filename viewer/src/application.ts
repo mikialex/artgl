@@ -6,7 +6,6 @@ import {
 import hierarchyBallBuilder from './scene/hierarchy-balls';
 import { RenderPipeline } from './RenderPipeline';
 import { Raycaster } from '../../src/core/raycaster';
-import { BackGround, PureColorBackGround, SkyBackGround } from '../../src/scene/background';
 
 export const STATIC_SERVER = "http://localhost:3000/"
 
@@ -32,11 +31,6 @@ export class Application {
   el: HTMLCanvasElement;
 
   scene: Scene = new Scene();
-
-  backgrounds: BackGround[] = [
-    new PureColorBackGround(),
-    new SkyBackGround(),
-  ]
   
   materials: Material[] = [];
   geometries: Geometry[] = [];
