@@ -37,11 +37,11 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { ViewerTestBridge } from "../../../../example/src/test-bridge";
+import { TestBridge } from "../../../../example/src/test-bridge";
 import Config from "../../components/conf/config.vue";
 import { RenderConfig } from "../../components/conf/interface";
 
-const bridge = new ViewerTestBridge();
+const bridge = new TestBridge();
 
 @Component({
   components: { Config }
@@ -88,7 +88,7 @@ export default class ConfigPanel extends Vue {
   }
 
   async mounted() {
-    bridge.reset();
+    bridge.reset(this.$el.querySelector('canvas')!);
 
     await this.example.build(bridge);
 
@@ -120,6 +120,7 @@ export default class ConfigPanel extends Vue {
 
 .canvas-wrap {
   flex-grow: 1;
+  height: 500px;
 }
 
 canvas {

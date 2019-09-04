@@ -1,7 +1,7 @@
 import renderRange from '../contents/render-range'
 import testDrawPrimitive from '../contents/draw-primitives'
 import barycentric from '../contents/barycentric-wireframe'
-import { HeadlessTestBridge } from './test-bridge'
+import { TestBridge } from './test-bridge';
 
 type ConstructorTypeOf<T> = new (...args: any[]) => T;
 
@@ -10,7 +10,7 @@ type ConstructorTypeOf<T> = new (...args: any[]) => T;
 declare global {
   interface Window {
     artglExamples: Example[],
-    HeadlessTestBridge: ConstructorTypeOf<HeadlessTestBridge>;
+    artglTestBridge: ConstructorTypeOf<TestBridge>;
     screenShotCompareElement(element: HTMLElement, goldenPath: string): Promise<void>;
   }
 }
@@ -43,5 +43,4 @@ export const examples: Example[] = [
 
 
 window.artglExamples = examples;
-window.HeadlessTestBridge = HeadlessTestBridge
 

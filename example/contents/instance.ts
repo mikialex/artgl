@@ -3,7 +3,7 @@ import {
   PureShading,
   Mesh
 } from "../../src/artgl";
-import { TestBridge } from "./test-bridge";
+import { TestBridge } from "../src/test-bridge";
 
 
 const transform = new Transformation();

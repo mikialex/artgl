@@ -20,7 +20,7 @@ export abstract class Camera extends SceneNode {
   }
 
   projectionMatrix = new Matrix4();
-  projectionMatrixNeedUpdate = false;
+  projectionMatrixNeedUpdate = true;
   updateProjectionMatrix() { };
   abstract onRenderResize(newSize: Size): void;
 

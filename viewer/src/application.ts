@@ -6,6 +6,7 @@ import {
 import hierarchyBallBuilder from './scene/hierarchy-balls';
 import { RenderPipeline } from './RenderPipeline';
 import { Raycaster } from '../../src/core/raycaster';
+import { SkyBackGround } from '../../src/scene/background';
 
 export const STATIC_SERVER = "http://localhost:3000/"
 
@@ -26,6 +27,8 @@ export class Application {
     window.addEventListener('resize', this.onContainerResize);
     this.onContainerResize();
     this.framer.setFrame(this.render);
+
+    this.scene.background = new SkyBackGround()
   }
 
   pipeline: RenderPipeline;

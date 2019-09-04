@@ -8,7 +8,7 @@ export default async function test(testBridge: TestBridge) {
 
   //==>
 
-  let canvas = document.querySelector('canvas')!;
+  let canvas = testBridge.requestCanvas();
   const engine = new RenderEngine(canvas);
 
   const scene = new Scene();
@@ -43,6 +43,11 @@ export default async function test(testBridge: TestBridge) {
 
   const orbitController = new OrbitController(camera as PerspectiveCamera);
   orbitController.registerInteractor(engine.interactor);
+
+  engine.camera.bindEngineRenderSize(engine);
+  testBridge.resizeObserver.add((size) => {
+    engine.setSize(size.width, size.height);
+  })
 
   let allCount = range.count
 
