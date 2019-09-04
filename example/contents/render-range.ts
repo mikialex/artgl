@@ -1,4 +1,4 @@
-import { TestBridge } from './test-bridge';
+import { TestBridge } from '../src/test-bridge';
 import {
   Vector3, RenderRange, Vector4, RenderEngine, CullSide,
   Scene, SphereGeometry, Mesh, PerspectiveCamera, OrbitController

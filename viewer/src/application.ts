@@ -1,6 +1,6 @@
 import {
   RenderEngine, Mesh, PerspectiveCamera, OrbitController,
-  OBJLoader, Scene, Observable, Framer, Vector4, Material, Geometry, Shading, ProgressiveDof
+  OBJLoader, Scene, Observable, Framer, Material, Geometry, Shading,
 } from '../../src/artgl';
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
@@ -15,7 +15,10 @@ export class Application {
     this.engine = new RenderEngine(canvas);
     this.pipeline = new RenderPipeline(this.engine);
     this.pipeline.build(this.scene);
+
+    this.engine.camera.bindEngineRenderSize(this.engine);
     this.engine.camera.transform.position.set(5, 5, 5)
+
     this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);
     this.orbitController.registerInteractor(this.engine.interactor);
     this.createScene(this.scene);
@@ -49,7 +52,6 @@ export class Application {
     const width = this.el.offsetWidth;
     const height = this.el.offsetHeight;
     this.engine.setSize(width, height);
-    (this.engine.camera as PerspectiveCamera).aspect = width / height;
   }
   notifyResize() {
     this.onContainerResize();

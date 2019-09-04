@@ -1,6 +1,7 @@
 import { Vector3, Matrix4, MathUtil } from "../math/index";
 import { Camera } from "../core/camera";
 import { ScreenSpaceRayProvider, Raycaster } from "../core/raycaster";
+import { Size } from "../engine/render-engine";
 
 const tempMatrix = new Matrix4();
 
@@ -65,6 +66,10 @@ export class PerspectiveCamera extends Camera implements ScreenSpaceRayProvider 
       .unProject(this.worldMatrix, this.projectionMatrix)
       .sub(caster.worldRay.origin)
       .normalize();
+  }
+
+  onRenderResize(size: Size) {
+    this.aspect = size.width / size.height;
   }
 
 }

@@ -1,4 +1,5 @@
 import { Camera } from "../core/camera";
+import { Size } from "../engine/render-engine";
 
 
 export class OrthographicCamera extends Camera {
@@ -33,6 +34,11 @@ export class OrthographicCamera extends Camera {
   top: number;
   bottom: number;
   
+  onRenderResize(size: Size) {
+    // todo
+    // this.aspect = size.width / size.height;
+  }
+
   updateProjectionMatrix() {
     var dx = ( this.right - this.left ) / ( 2 * this.zoom );
 		var dy = ( this.top - this.bottom ) / ( 2 * this.zoom );

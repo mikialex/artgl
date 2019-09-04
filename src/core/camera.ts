@@ -14,7 +14,7 @@ import { Nullable } from '../type';
  * @class Camera
  * @extends {SceneNode}
  */
-export class Camera extends SceneNode {
+export abstract class Camera extends SceneNode {
   constructor() {
     super();
   }
@@ -22,9 +22,7 @@ export class Camera extends SceneNode {
   projectionMatrix = new Matrix4();
   projectionMatrixNeedUpdate = false;
   updateProjectionMatrix() { };
-  onRenderResize(newSize: Size) {
-    
-  }
+  abstract onRenderResize(newSize: Size): void;
 
   private renderSizeObserver: Nullable<Observer<Size>> = null;
   bindEngineRenderSize(engine: RenderEngine) {

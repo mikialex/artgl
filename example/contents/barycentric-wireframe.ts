@@ -1,4 +1,4 @@
-import { TestBridge } from './test-bridge';
+import { TestBridge } from '../src/test-bridge';
 import {
   Vector3, RenderEngine, Scene, SphereGeometry, Mesh,
   PerspectiveCamera, Vector4, OrbitController, Shading, PointLight,
@@ -38,10 +38,10 @@ export default async function test(testBridge: TestBridge) {
   const phong = new PhongShading<DirectionalLight | PointLight>([dirLight, pointLight]);
 
   let shading = new Shading()
-  .decorate(phong)
-  .decorate(ambient)
-  .decorate(exposureController)
-  .decorate(wireframe)
+    .decorate(phong)
+    .decorate(ambient)
+    .decorate(exposureController)
+    .decorate(wireframe)
 
   const mesh = new Mesh().g(geometry).s(shading);
 
@@ -49,7 +49,7 @@ export default async function test(testBridge: TestBridge) {
 
   const camera = engine.camera as PerspectiveCamera;
   camera.transform.position.set(0, 0, 15);
-  camera.lookAt(new Vector3(0,0,0))
+  camera.lookAt(new Vector3(0, 0, 0))
 
   function draw() {
     engine.connectCamera();

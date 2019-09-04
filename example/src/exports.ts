@@ -1,5 +1,6 @@
-import renderRange from './render-range'
-import testDrawPrimitive from './draw-primitives'
+import renderRange from '../contents/render-range'
+import testDrawPrimitive from '../contents/draw-primitives'
+import barycentric from '../contents/barycentric-wireframe'
 import { HeadlessTestBridge } from './test-bridge'
 
 type ConstructorTypeOf<T> = new (...args: any[]) => T;
@@ -33,6 +34,11 @@ export const examples: Example[] = [
     title: "Use RenderRange",
     build: renderRange
   },
+  {
+    name:  "barycentric-wireframe",
+    title: "Barycentric wireframe shading",
+    build: barycentric
+  }
 ];
 
 
