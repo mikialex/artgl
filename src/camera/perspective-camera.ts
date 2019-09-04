@@ -68,7 +68,7 @@ export class PerspectiveCamera extends Camera implements ScreenSpaceRayProvider 
       .normalize();
   }
 
-  onRenderResize(size: Size) {
+  onRenderResize = (size: Size) => {
     this.aspect = size.width / size.height;
   }
 

@@ -52,6 +52,7 @@ export class Application {
     const width = this.el.offsetWidth;
     const height = this.el.offsetHeight;
     this.engine.setSize(width, height);
+    this.pipeline.resetSample();
   }
   notifyResize() {
     this.onContainerResize();

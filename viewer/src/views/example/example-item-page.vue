@@ -37,7 +37,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { ViewerTestBridge } from "../../../../example/contents/test-bridge";
+import { ViewerTestBridge } from "../../../../example/src/test-bridge";
 import Config from "../../components/conf/config.vue";
 import { RenderConfig } from "../../components/conf/interface";
 
