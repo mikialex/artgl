@@ -1,9 +1,9 @@
 import {
   SphereGeometry, PlaneGeometry, AmbientLight, Mesh, SceneNode,
-  Shading, CubeGeometry, Vector3, DirectionalLight, PhongShading, BarycentricWireFrame, ProgressiveDof, MVPWorld
+  Shading, CubeGeometry, Vector3, DirectionalLight, PhongShading, BarycentricWireFrame,
+  ExposureController, ToneMapType 
 } from '../../../src/artgl';
 import { PointLight } from '../../../src/light/point-light';
-import { ExposureController, ToneMapType } from '../../../src/shading/basic-lib/exposurer';
 import { RenderConfig } from '@/components/conf/interface';
 import { Application } from '../application';
 import { ArrowGeometry } from '../../../src/geometry/geo-lib/arrow-geometry';
@@ -22,12 +22,12 @@ export default function (root: SceneNode, app: Application): RenderConfig {
   pointLight.color = new Vector3(0.9, 0.8, 0.5);
   pointLight.radius = 10;
 
-  const ambient = new AmbientLight();
-  ambient.color = new Vector3(0.3, 0.3, 0.4);
-
   const dirLight = new DirectionalLight();
   dirLight.color = new Vector3(0.3, 0.6, 0.8);
   dirLight.direction = new Vector3(1, 1, -1).normalize();
+
+  const ambient = new AmbientLight();
+  ambient.color = new Vector3(0.3, 0.3, 0.4);
 
   const exposureController = new ExposureController();
 
