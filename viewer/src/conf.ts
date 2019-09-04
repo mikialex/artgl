@@ -75,9 +75,7 @@ export function createConf(engine: RenderEngine, pipeline: RenderPipeline): Rend
                 value: pipeline.enableTAA,
                 onChange: (value: boolean) => {
                   pipeline.enableTAA = value;
-                  if (!value) {
-                    pipeline.resetSample();
-                  }
+                  pipeline.resetSample();
                 },
               },
             ]
