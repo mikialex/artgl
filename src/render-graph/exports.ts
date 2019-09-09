@@ -4,3 +4,4 @@ export { RenderTargetNode } from './node/render-target-node';
 
 export * from './render-graph'
 
+export * from './node-maker'

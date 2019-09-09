@@ -1,12 +1,10 @@
 import {
-  RenderGraph, TAAShading,
+  RenderGraph, TAAShading, screen,
   TSSAOShading, TSSAOBlendShading, Matrix4,
-  DepthShading, Scene, RenderEngine, Shading, Vector4, ProgressiveDof, RenderObject
+  DepthShading, Scene, RenderEngine, Shading, ProgressiveDof, pass, pingpong, target
 } from "../../src/artgl";
 import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
-import { createConf } from './conf';
-import { GLFramebuffer } from '../../src/webgl/gl-framebuffer';
 
 export class RenderPipeline{
   constructor(engine: RenderEngine) {
@@ -16,8 +14,8 @@ export class RenderPipeline{
   engine: RenderEngine;
   config?: RenderConfig;
 
-  graph: RenderGraph<Shading, RenderObject, GLFramebuffer> = new RenderGraph();
-  composer: EffectComposer<Shading, RenderObject, GLFramebuffer>;
+  graph: RenderGraph = new RenderGraph();
+  composer: EffectComposer;
 
   enableTAA = true;
   taaShading = new TAAShading()

@@ -32,3 +32,5 @@ export class QuadSource implements RenderSource {
   }
 
 }
+
+export const QuadSourceInstance = new QuadSource();

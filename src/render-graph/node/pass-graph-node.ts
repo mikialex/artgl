@@ -1,47 +1,87 @@
 import { DAGNode } from "../../core/dag-node";
-import { PassDefine, PassInputMapInfo } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { RenderPass, uniformName } from "../pass";
 import { Nullable } from "../../type";
 import { RenderTargetNode } from "../exports";
+import { Vector4 } from "../../math";
+import { Observable } from "../../core/observable";
+import { Shading } from "../../artgl";
+import { QuadSourceInstance } from "../../engine/render-source";
+
+export interface PassInputMapInfo{
+  [index:string]: string
+}
 
 export class PassGraphNode extends DAGNode {
-  constructor(define: PassDefine) {
+  constructor(name: string) {
     super();
-    this.name = define.name;
-
-    if (define.inputs !== undefined) {
-      this.inputsGetter = define.inputs;
-    }
-
-    this.define = define;
-
+    this.name = name;
   }
-  private inputsGetter: Nullable<() => PassInputMapInfo> = null
+
   inputs: Map<uniformName, RenderTargetNode> = new Map();
-  readonly name: string;
-  readonly define: PassDefine;
-
-  // update graph structure
-  updateDependNode(graph: RenderGraph) {
-    // disconnect all depends node 
-    this.clearAllFrom();
-    this.inputs.clear();
-
-    // reval getter
-    if (this.inputsGetter !== null) {
-      const inputs = this.inputsGetter();
-      Object.keys(inputs).forEach(key => {
-        const renderTargetNode = graph.getRenderTargetDependence(inputs[key]);
-        if (renderTargetNode === undefined) {
-          throw `render graph updating error, renderTarget depend node ${inputs[key]} cant found`;
-        }
-        this.inputs.set(key, renderTargetNode)
-        renderTargetNode.connectTo(this);
-      })
-    }
-
+  input(inputKey: string, node: RenderTargetNode) {
+    // todo
+    return this;
   }
+
+  readonly name: string;
+
+  source: Function[] = [];
+  use(source: Function) {
+    this.source.push(source);
+    return this;
+  }
+  useQuad() {
+    this.source.push(QuadSourceInstance.render)
+    return this;
+  }
+  clearUse() {
+    this.source = [];
+    return this;
+  }
+
+  _overrideShading: Nullable<Shading> = null;
+  overrideShading(shading: Nullable<Shading>) {
+    this._overrideShading = shading;
+    return this;
+  }
+
+  _enableColorWrite: boolean = true;
+  enableColorWrite() {
+    this._enableColorWrite = true;
+    return this;
+  }
+  disableColorWrite() {
+    this._enableColorWrite = false;
+    return this;
+  }
+
+  _enableColorClear: boolean = true;
+  enableColorClear() {
+    this._enableColorClear = true;
+    return this;
+  }
+  disableColorClear() {
+    this._enableColorClear = false;
+    return this;
+  }
+
+  enableDepthWrite: boolean = true;
+  enableDepthClear:boolean = true;
+  clearColor = new Vector4(1, 1, 1, 1);
+
+  beforePassExecute = new Observable<PassGraphNode>();
+  beforeExecute(callback: (node:PassGraphNode) => any) {
+    this.beforePassExecute.add(callback);
+    return this;
+  }
+
+  afterPassExecute = new Observable<PassGraphNode>();
+  afterExecute(callback: (node:PassGraphNode) => any) {
+    this.afterPassExecute.add(callback);
+    return this;
+  }
+
 
   // from updated graph structure, setup render pass
   updatePass(pass: RenderPass) {

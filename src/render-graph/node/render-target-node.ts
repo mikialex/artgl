@@ -1,5 +1,5 @@
 import { DAGNode } from "../../core/dag-node";
-import { RenderTargetDefine, DimensionType } from "../interface";
+import { DimensionType } from "../interface";
 import { RenderGraph } from "../render-graph";
 import { GLFramebuffer } from "../../webgl/gl-framebuffer";
 import { MathUtil } from '../../math/util'
@@ -11,54 +11,22 @@ import { PassGraphNode } from "./pass-graph-node";
 import { RenderEngine } from "../../engine/render-engine";
 
 export class RenderTargetNode extends DAGNode{
-  constructor(define: RenderTargetDefine) {
+  constructor(name: string) {
     super();
-    this.name = define.name;
-    this.define = define;
+    this.name = name;
 
-    this.fromGetter = define.from;
-
-    this.isScreenNode = define.name === RenderGraph.screenRoot;
-    if (this.isScreenNode) {
-      return
-    }
-
-    if (define.keepContent !== undefined) {
-      this.keepContent = define.keepContent;
-    }
-
-    // set a default format config
-    if (define.format === undefined) {
-      define.format = {
-        pixelFormat: PixelFormat.RGBA,
-        dimensionType: DimensionType.bindRenderSize,
-      }
-    } else {
-      if (define.format.pixelFormat === undefined) {
-        define.format.pixelFormat = PixelFormat.RGBA;
-      }
-      if (define.format.dimensionType === undefined) {
-        define.format.dimensionType = DimensionType.bindRenderSize;
-      }
-    }
-
-    if (define.format.dimensionType === DimensionType.bindRenderSize) {
-      this.autoWidthRatio = define.format.width !== undefined ? MathUtil.clamp(define.format.width, 0, 1) : 1;
-      this.autoHeightRatio = define.format.height !== undefined ? MathUtil.clamp(define.format.height, 0, 1) : 1;
-    }
-    this.enableDepth = define.format.enableDepthBuffer !== undefined ? define.format.enableDepthBuffer : false;
-    
   }
-  readonly isScreenNode: boolean;
+  readonly isScreenNode: boolean = false;
   readonly name: string;
-  readonly define: RenderTargetDefine;
+  readonly pixelFormat: PixelFormat = PixelFormat.RGBA;
+  readonly dimensionType: DimensionType = DimensionType.bindRenderSize;
 
   debugViewPort: Vector4 = new Vector4(0, 0, 200, 200);
 
   keepContent: () => boolean  = () => false;
 
-  autoWidthRatio: number = 0;
-  autoHeightRatio: number = 0;
+  autoWidthRatio: number = 1;
+  autoHeightRatio: number = 1;
   enableDepth: boolean = false;
 
   widthAbs: number = 0;
@@ -66,7 +34,6 @@ export class RenderTargetNode extends DAGNode{
 
   formatKey: string = "";
 
-  private fromGetter: () => Nullable<string>
   private from: Nullable<string> = null;
 
   private _fromPassNode: Nullable<PassGraphNode> = null
