@@ -3,18 +3,17 @@ import { PassDefine } from "./interface";
 import { Nullable } from "../type";
 import { RenderTargetNode } from "./node/render-target-node";
 import { PassGraphNode } from "./node/pass-graph-node";
-import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingDetermined, ShadingConstrain } from "./backend-interface";
 import { Vector4Like } from "../math/interface";
 import { Vector4 } from "../math";
+import { Shading } from "../artgl";
+import { RenderEngine } from "../engine/render-engine";
+import { GLFramebuffer } from "../webgl/gl-framebuffer";
 
 export type uniformName = string;
 type framebufferName = string;
 
-export class RenderPass<
-  ShadingType extends ShadingConstrain,
-  RenderableType extends ShadingDetermined<ShadingType>,
-  FBOType extends NamedAndFormatKeyed>{
-  constructor(define: PassDefine<ShadingType>) {
+export class RenderPass {
+  constructor(define: PassDefine) {
     this.define = define;
     this.name = define.name;
     if (define.shading !== undefined) {
@@ -36,7 +35,7 @@ export class RenderPass<
 
   }
 
-  readonly define: PassDefine<ShadingType>;
+  readonly define: PassDefine;
   public name: string;
 
   private clearColor: Vector4Like = new Vector4(1, 1, 1, 1);
@@ -47,15 +46,15 @@ export class RenderPass<
   private afterPassExecute?: () => any;
   private beforePassExecute?: () => any;
 
-  private overrideShading: Nullable<ShadingType> = null;
+  private overrideShading: Nullable<Shading> = null;
 
   uniformNameFBOMap: Map<uniformName, framebufferName> = new Map();
-  uniformRenderTargetNodeMap: Map<uniformName, RenderTargetNode<ShadingType, RenderableType, FBOType>> = new Map();
-  framebuffersDepends: Set<RenderTargetNode<ShadingType, RenderableType, FBOType>> = new Set();
+  uniformRenderTargetNodeMap: Map<uniformName, RenderTargetNode> = new Map();
+  framebuffersDepends: Set<RenderTargetNode> = new Set();
 
-  passNode: Nullable<PassGraphNode<ShadingType, RenderableType, FBOType>> = null;
+  passNode: Nullable<PassGraphNode> = null;
   // outputInfos
-  outputTarget: Nullable<RenderTargetNode<ShadingType, RenderableType, FBOType>> = null;
+  outputTarget: Nullable<RenderTargetNode> = null;
 
   get hasNodePrepared() {
     return this.passNode !== null && this.outputTarget !== null;
@@ -69,8 +68,8 @@ export class RenderPass<
   }
 
   renderDebugResult(
-    engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>,
-    framebuffer: FBOType
+    engine: RenderEngine,
+    framebuffer: GLFramebuffer
   ) {
     if (!this.hasNodePrepared) {
       throw `pass is not prepared, passNode or TargetNode not provided`
@@ -86,9 +85,9 @@ export class RenderPass<
   }
 
   execute(
-    engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>,
-    graph: RenderGraph<ShadingType, RenderableType, FBOType>,
-    framebuffer: FBOType
+    engine: RenderEngine,
+    graph: RenderGraph,
+    framebuffer: GLFramebuffer
   ) {
 
     if (!this.hasNodePrepared) {
@@ -96,7 +95,7 @@ export class RenderPass<
     }
 
     this.checkIsValid();
-    let outputTarget: FBOType;
+    let outputTarget: GLFramebuffer;
 
     // setup viewport and render target
     if (this.isOutputScreen) {

@@ -1,10 +1,10 @@
 import { Vector4 } from "../math/vector4";
 import { Nullable } from "../type";
 import { PixelFormat } from "../webgl/const";
-import { ShadingConstrain } from "./backend-interface";
-import { RenderSource } from "../engine/render-source";
-export interface GraphDefine<ShadingType extends ShadingConstrain> {
-  passes: PassDefine<ShadingType>[],
+import { Shading } from "../core/shading";
+
+export interface GraphDefine {
+  passes: PassDefine[],
   renderTargets: RenderTargetDefine[];
 }
 
@@ -12,14 +12,14 @@ export interface PassInputMapInfo{
   [index:string]: string
 }
 
-export interface PassDefine<ShadingType extends ShadingConstrain> {
+export interface PassDefine{
   name: string,
   inputs?: () => PassInputMapInfo,
   source: Function[],
   filter?: () => boolean,
   sorter?: () => number,
   states?: stateType[],
-  shading?: ShadingType,
+  shading?: Shading,
   enableColorClear?:boolean,
   enableDepthClear?:boolean,
   clearColor?: Vector4,

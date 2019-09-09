@@ -8,13 +8,9 @@ import { Vector4 } from '../../math/vector4';
 import { PixelFormat } from "../../webgl/const";
 import { RenderPass } from "../pass";
 import { PassGraphNode } from "./pass-graph-node";
-import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingDetermined, ShadingConstrain } from "../backend-interface";
+import { RenderEngine } from "../../engine/render-engine";
 
-export class RenderTargetNode<
-  ShadingType extends ShadingConstrain = any,
-  RenderableType extends ShadingDetermined<ShadingType> = any,
-  FBOType extends NamedAndFormatKeyed = any
-  > extends DAGNode{
+export class RenderTargetNode extends DAGNode{
   constructor(define: RenderTargetDefine) {
     super();
     this.name = define.name;
@@ -73,9 +69,9 @@ export class RenderTargetNode<
   private fromGetter: () => Nullable<string>
   private from: Nullable<string> = null;
 
-  private _fromPassNode: Nullable<PassGraphNode<ShadingType, RenderableType, FBOType>> = null
+  private _fromPassNode: Nullable<PassGraphNode> = null
 
-  set fromPassNode(node: Nullable<PassGraphNode<ShadingType, RenderableType, FBOType>>) {
+  set fromPassNode(node: Nullable<PassGraphNode>) {
     if (node === null) {
       this._fromPassNode = node;
       this.clearAllFrom();
@@ -96,7 +92,7 @@ export class RenderTargetNode<
   }
 
   // update abs size info from given engine render size
-  updateSize(engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>) {
+  updateSize(engine: RenderEngine) {
     if (this.isScreenNode) {
       return;
     }
@@ -117,7 +113,7 @@ export class RenderTargetNode<
   }
 
   // update graph structure
-  updateDependNode(graph: RenderGraph<ShadingType, RenderableType, FBOType>) {
+  updateDependNode(graph: RenderGraph) {
     // disconnect depends pass node
     this.fromPassNode = null;
 
@@ -131,8 +127,8 @@ export class RenderTargetNode<
 
   // from updated graph structure, setup render pass
   updatePass(
-    engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>,
-    pass: RenderPass<ShadingType, RenderableType, FBOType>
+    engine: RenderEngine,
+    pass: RenderPass
   ) {
     this.updateSize(engine);
     pass.outputTarget = this;

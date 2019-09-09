@@ -3,37 +3,25 @@ import { PassGraphNode } from "./node/pass-graph-node";
 import { RenderTargetNode } from "./node/render-target-node";
 import { QuadSource } from '../engine/render-source';
 import { EffectComposer } from "./effect-composer";
-import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingConstrain, ShadingDetermined } from "./backend-interface";
 import { RenderPass } from "./pass";
 import { Nullable } from "../type";
+import { RenderEngine } from "../engine/render-engine";
 
-export type RenderGraphNode
-  <
-  ShadingType extends ShadingConstrain,
-  RenderableType extends ShadingDetermined<ShadingType>,
-  FBOType extends NamedAndFormatKeyed
-  >
-  =
-  PassGraphNode<ShadingType, RenderableType, FBOType>
-  | RenderTargetNode<ShadingType, RenderableType, FBOType>;
+export type RenderGraphNode = PassGraphNode | RenderTargetNode;
 
-export class RenderGraph<
-  ShadingType extends ShadingConstrain,
-  RenderableType extends ShadingDetermined<ShadingType>,
-  FBOType extends NamedAndFormatKeyed
-  > {
+export class RenderGraph {
 
   static screenRoot: string = 'artgl-rendergraph-screen-rt';
   static quadSource = new QuadSource();
 
   enableDebuggingView: boolean = false;
 
-  screenNode: Nullable<RenderTargetNode<ShadingType, RenderableType, FBOType>> = null;
-  renderTargetNodes: Map<string, RenderTargetNode<ShadingType, RenderableType, FBOType>> = new Map();
-  passNodes: Map<string, PassGraphNode<ShadingType, RenderableType, FBOType>> = new Map();
+  screenNode: Nullable<RenderTargetNode> = null;
+  renderTargetNodes: Map<string, RenderTargetNode> = new Map();
+  passNodes: Map<string, PassGraphNode> = new Map();
 
   get nodes() {
-    const nodes: RenderGraphNode<ShadingType, RenderableType, FBOType>[] = [];
+    const nodes: RenderGraphNode[] = [];
     this.passNodes.forEach(node => {
       nodes.push(node);
     })
@@ -51,7 +39,7 @@ export class RenderGraph<
   /**
    * Setup a new Graph configuration
    */
-  defineGraph(graphDefine: GraphDefine<ShadingType>): void {
+  defineGraph(graphDefine: GraphDefine): void {
     this.reset();
     this.allocateRenderTargetNodes(graphDefine.renderTargets);
     this.constructPassGraph(graphDefine.passes);
@@ -60,10 +48,7 @@ export class RenderGraph<
   /**
    * Update the pass queue from current graph configure
    */
-  update(
-    engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>,
-    composer: EffectComposer<ShadingType, RenderableType, FBOType>
-  ) {
+  update(engine: RenderEngine, composer: EffectComposer) {
 
     //updateNodesConnection
     this.passNodes.forEach(node => {
@@ -75,8 +60,8 @@ export class RenderGraph<
 
     // create and update pass queue
     const nodeQueue = this.screenNode!.getTopologicalSortedList() as
-      RenderGraphNode<ShadingType, RenderableType, FBOType>[];
-    const passes: RenderPass<ShadingType, RenderableType, FBOType>[] = [];
+      RenderGraphNode[];
+    const passes: RenderPass[] = [];
     nodeQueue.forEach(node => {
       if (node instanceof PassGraphNode) {
         const pass = composer.registerNode(node);
@@ -92,10 +77,10 @@ export class RenderGraph<
     composer.setPasses(passes)
   }
 
-  private constructPassGraph(passesDefine: PassDefine<ShadingType>[]) {
+  private constructPassGraph(passesDefine: PassDefine[]) {
     passesDefine.forEach(define => {
       if (!this.passNodes.has(define.name)) {
-        const node = new PassGraphNode<ShadingType, RenderableType, FBOType>(define);
+        const node = new PassGraphNode(define);
         this.passNodes.set(define.name, node);
       } else {
         throw 'duplicate pass define found'
@@ -120,7 +105,7 @@ export class RenderGraph<
       if (this.renderTargetNodes.has(define.name)) {
         throw 'render graph build error, duplicate texture key name found '
       }
-      const renderTargetNode = new RenderTargetNode<ShadingType, RenderableType, FBOType>(define);
+      const renderTargetNode = new RenderTargetNode(define);
       if (define.name === RenderGraph.screenRoot) {
         this.screenNode = renderTargetNode
       }
