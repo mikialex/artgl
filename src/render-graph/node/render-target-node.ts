@@ -44,7 +44,13 @@ export class RenderTargetNode extends DAGNode {
 
   private _fromPassNode: Nullable<PassGraphNode> = null
   from(node: Nullable<PassGraphNode>) {
+    if (this._fromPassNode !== null) {
+      this._fromPassNode.disconnectTo(this);
+    }
     this._fromPassNode = node;
+    if (this._fromPassNode !== null) {
+      this._fromPassNode.connectTo(this);
+    }
     return this;
   }
 
@@ -77,15 +83,6 @@ export class RenderTargetNode extends DAGNode {
     }
     this.updateFormatKey();
 
-  }
-
-  // from updated graph structure, setup render pass
-  updatePass(
-    engine: RenderEngine,
-    pass: RenderPass
-  ) {
-    this.updateSize(engine);
-    pass.outputTarget = this;
   }
 
 }

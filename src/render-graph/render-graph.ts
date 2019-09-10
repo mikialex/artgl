@@ -4,7 +4,6 @@ import { QuadSource } from '../engine/render-source';
 import { EffectComposer } from "./effect-composer";
 import { RenderPass } from "./pass";
 import { Nullable } from "../type";
-import { RenderEngine } from "../engine/render-engine";
 
 export type RenderGraphNode = PassGraphNode | RenderTargetNode;
 
@@ -13,19 +12,11 @@ export class RenderGraph {
   static screenRoot: string = 'artgl-rendergraph-screen-rt';
   static quadSource = new QuadSource();
 
-  enableDebuggingView: boolean = false;
-
   screenNode: Nullable<RenderTargetNode> = null;
+  _nodesCache: RenderGraphNode[] = [];
 
   get nodes() {
-    const nodes: RenderGraphNode[] = [];
-    this.passNodes.forEach(node => {
-      nodes.push(node);
-    })
-    this.renderTargetNodes.forEach(node => {
-      nodes.push(node);
-    })
-    return nodes;
+    return this._nodesCache;
   }
 
   setScreenRoot(node: RenderTargetNode) {
@@ -39,21 +30,21 @@ export class RenderGraph {
   /**
    * build the pass queue from current graph structure
    */
-  build(engine: RenderEngine, composer: EffectComposer) {
+  build(composer: EffectComposer) {
+    if (this.screenNode === null) {
+      throw "render graph is not ready, screen root node is not set"
+    }
 
     // create and update pass queue
-    const nodeQueue = this.screenNode!.getTopologicalSortedList() as
-      RenderGraphNode[];
+    const nodeQueue = this.screenNode.getTopologicalSortedList() as RenderGraphNode[];
+    this._nodesCache = nodeQueue;
     const passes: RenderPass[] = [];
+
     nodeQueue.forEach(node => {
-      if (node instanceof PassGraphNode) {
-        const pass = composer.registerNode(node);
-        node.updatePass(pass);
-        passes.push(pass);
-      } else if (node instanceof RenderTargetNode) {
+      if (node instanceof RenderTargetNode) {
         if (node.fromPassNode !== null) {
-          const pass = composer.getPass(node.fromPassNode)!;
-          node.updatePass(engine, pass)
+          const pass = new RenderPass(node.fromPassNode, node);
+          passes.push(pass);
         }
       }
     })

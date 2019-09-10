@@ -30,6 +30,8 @@ export class RenderPipeline{
   dof = new ProgressiveDof();
   depthShader = new Shading().decorate(new DepthShading()).decorate(this.dof);
 
+  enableGraphDebugging = false;
+
   private sampleCount: number = 0;
   getSampleCount() {
     return this.sampleCount;
@@ -71,8 +73,8 @@ export class RenderPipeline{
 
     // if (this.sampleCount <= 100) {
     this.build(scene);
-    this.graph.build(this.engine, this.composer);
-    this.composer.render(this.engine, this.graph);
+    this.graph.build(this.composer);
+    this.composer.render(this.engine, this.enableGraphDebugging);
     // }
   }
 

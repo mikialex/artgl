@@ -17,10 +17,10 @@ export class EffectComposer {
     })
   }
 
+  hasAllPassIsValidChecked = false;
+
   private engine: RenderEngine;
   private passes: RenderPass[] = [];
-
-  private nodeMap: Map<PassGraphNode, RenderPass> = new Map();
   
   private framebufferPool: FrameBufferPool;
 
@@ -31,9 +31,10 @@ export class EffectComposer {
     return this.keptFramebuffer.get(node)
   }
 
-  render(engine: RenderEngine, graph: RenderGraph) {
+  render(engine: RenderEngine, enableGraphDebugging: boolean = false) {
     this.passes.forEach((pass, index) => {
-      const output = pass.outputTarget!;
+      const output = pass.outputTarget;
+      output.updateSize(engine);
       let framebuffer: GLFramebuffer = this.keptFramebuffer.get(output)!
 
       if (framebuffer === undefined) {
@@ -53,7 +54,10 @@ export class EffectComposer {
         pass.uniformNameFBOMap.set(uniformName, inputFBO.name)
       })
     
-      pass.execute(engine, graph, framebuffer);
+      if (!this.hasAllPassIsValidChecked) {
+        pass.checkIsValid(); 
+      }
+      pass.execute(engine, framebuffer, enableGraphDebugging);
 
       this.keptFramebuffer.set(output, framebuffer);
 
@@ -63,10 +67,12 @@ export class EffectComposer {
       })
 
     });
+    this.hasAllPassIsValidChecked = true;
   }
 
   setPasses(passes: RenderPass[]) {
     this.passes = passes;
+    this.hasAllPassIsValidChecked = false;
 
     // compute dropList
     this.framebufferDropList = [];
@@ -75,7 +81,6 @@ export class EffectComposer {
     }
 
     passes.forEach((pass, index) => {
-      this.nodeMap.set(pass.passNode!, pass);
 
       const targetCreated = pass.outputTarget!;
       if (targetCreated.isScreenNode) {
@@ -96,26 +101,10 @@ export class EffectComposer {
 
   }
 
-  registerNode(node: PassGraphNode)
-    : RenderPass {
-    const p = this.nodeMap.get(node);
-    if (p !== undefined) {
-      return p;
-    }
-    const pass = new RenderPass(node.define)
-    this.nodeMap.set(node, pass);
-    return pass;
-  }
-
   clear() {
     this.passes = [];
-    this.nodeMap.clear();
     this.framebufferDropList = [];
     this.keptFramebuffer.clear();
-  }
-
-  getPass(node: PassGraphNode) {
-    return this.nodeMap.get(node);
   }
 
 }

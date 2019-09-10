@@ -20,7 +20,12 @@ export class PassGraphNode extends DAGNode {
 
   inputs: Map<uniformName, RenderTargetNode> = new Map();
   input(inputKey: string, node: RenderTargetNode) {
-    // todo
+    const nodeBefore = this.inputs.get(inputKey);
+    if (nodeBefore !== undefined) {
+      nodeBefore.disconnectTo(this);
+    }
+    this.inputs.set(inputKey, node);
+    node.connectTo(this);
     return this;
   }
 
