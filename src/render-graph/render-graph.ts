@@ -1,4 +1,3 @@
-import { PassDefine, GraphDefine, RenderTargetDefine } from "./interface";
 import { PassGraphNode } from "./node/pass-graph-node";
 import { RenderTargetNode } from "./node/render-target-node";
 import { QuadSource } from '../engine/render-source';
@@ -17,8 +16,6 @@ export class RenderGraph {
   enableDebuggingView: boolean = false;
 
   screenNode: Nullable<RenderTargetNode> = null;
-  renderTargetNodes: Map<string, RenderTargetNode> = new Map();
-  passNodes: Map<string, PassGraphNode> = new Map();
 
   get nodes() {
     const nodes: RenderGraphNode[] = [];
@@ -31,32 +28,18 @@ export class RenderGraph {
     return nodes;
   }
 
+  setScreenRoot(node: RenderTargetNode) {
+    this.screenNode = node;
+  }
+
   reset() {
-    this.renderTargetNodes.clear();
-    this.passNodes.clear();
+    this.screenNode = null;
   }
 
   /**
-   * Setup a new Graph configuration
+   * build the pass queue from current graph structure
    */
-  defineGraph(graphDefine: GraphDefine): void {
-    this.reset();
-    this.allocateRenderTargetNodes(graphDefine.renderTargets);
-    this.constructPassGraph(graphDefine.passes);
-  }
-
-  /**
-   * Update the pass queue from current graph configure
-   */
-  update(engine: RenderEngine, composer: EffectComposer) {
-
-    //updateNodesConnection
-    this.passNodes.forEach(node => {
-      node.updateDependNode(this);
-    });
-    this.renderTargetNodes.forEach(node => {
-      node.updateDependNode(this);
-    });
+  build(engine: RenderEngine, composer: EffectComposer) {
 
     // create and update pass queue
     const nodeQueue = this.screenNode!.getTopologicalSortedList() as
@@ -75,46 +58,6 @@ export class RenderGraph {
       }
     })
     composer.setPasses(passes)
-  }
-
-  private constructPassGraph(passesDefine: PassDefine[]) {
-    passesDefine.forEach(define => {
-      if (!this.passNodes.has(define.name)) {
-        const node = new PassGraphNode(define);
-        this.passNodes.set(define.name, node);
-      } else {
-        throw 'duplicate pass define found'
-      }
-    })
-  }
-
-  getRenderTargetDependence(name: string) {
-    return this.renderTargetNodes.get(name);
-  }
-
-  getRenderPassDependence(name: string) {
-    return this.passNodes.get(name);
-  }
-
-  getRootScreenTargetNode() {
-    return this.screenNode;
-  }
-
-  private allocateRenderTargetNodes(textsDefine: RenderTargetDefine[]) {
-    textsDefine.forEach(define => {
-      if (this.renderTargetNodes.has(define.name)) {
-        throw 'render graph build error, duplicate texture key name found '
-      }
-      const renderTargetNode = new RenderTargetNode(define);
-      if (define.name === RenderGraph.screenRoot) {
-        this.screenNode = renderTargetNode
-      }
-      this.renderTargetNodes.set(define.name, renderTargetNode);
-    })
-
-    if (this.screenNode === null) {
-      throw "screen root not found"
-    }
   }
 
 }

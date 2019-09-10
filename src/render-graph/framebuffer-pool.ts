@@ -61,7 +61,7 @@ export class FrameBufferPool {
   /**
    * return a framebuffer that maybe request before, which will be pooling and reused 
    */
-  returnFramebuffer(framebuffer: FBOType) {
+  returnFramebuffer(framebuffer: GLFramebuffer) {
     if (!this.framebuffers.has(framebuffer.name)) {
       throw 'cant return a framebuffer not belong to this pool'
     }

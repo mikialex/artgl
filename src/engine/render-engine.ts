@@ -19,7 +19,6 @@ import { VAOCreateCallback } from "../webgl/vao";
 import { Vector4 } from "../math/vector4";
 import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
-import { RenderGraphBackendAdaptor } from "../render-graph/backend-interface";
 import { Vector4Like } from "../math/interface";
 
 export interface Size {
@@ -30,10 +29,7 @@ export interface Size {
 const copyShading = new Shading().decorate(new CopyShading());
 const quad = new QuadSource();
 
-export class RenderEngine implements
-  GLReleasable,
-  RenderGraphBackendAdaptor<Shading, RenderObject, GLFramebuffer>
-{
+export class RenderEngine implements GLReleasable {
   constructor(el: HTMLCanvasElement, ctxOptions?: any) {
     this.renderer = new GLRenderer(el, ctxOptions);
     // if we have a element param, use it as the default camera's param for convenience
@@ -367,7 +363,7 @@ export class RenderEngine implements
 
   private overrideShading: Nullable<Shading> = null;
   public defaultShading: Shading = new Shading().decorate(new NormalShading());
-  setOverrideShading(shading: Shading): void {
+  setOverrideShading(shading: Nullable<Shading>): void {
     this.overrideShading = shading;
   }
   getOverrideShading(): Nullable<Shading> {

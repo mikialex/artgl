@@ -53,7 +53,7 @@ export class RenderPipeline{
     return fbo;
   }
 
-  render(_scene: Scene) {
+  render(scene: Scene) {
     this.tickNum++;
 
     if (this.sampleCount >= 2) {
@@ -70,12 +70,13 @@ export class RenderPipeline{
     }
 
     // if (this.sampleCount <= 100) {
-    this.graph.update(this.engine, this.composer);
+    this.build(scene);
+    this.graph.build(this.engine, this.composer);
     this.composer.render(this.engine, this.graph);
     // }
   }
 
-  build(scene: Scene) {
+  private build(scene: Scene) {
 
     // this.config = createConf(this.engine, this);
 
