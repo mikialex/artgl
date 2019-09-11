@@ -53,7 +53,7 @@ export class RenderPass {
 
   execute(
     engine: RenderEngine,
-    framebuffer: GLFramebuffer,
+    framebuffer: Nullable<GLFramebuffer>,
     enableDebuggingView: boolean = false,
   ) {
 
@@ -73,7 +73,7 @@ export class RenderPass {
         engine.setFullScreenViewPort();
       }
     } else {
-      outputTarget = framebuffer;
+      outputTarget = framebuffer!;
       engine.setRenderTarget(outputTarget);
       engine.setViewport(0, 0, this.outputTarget.widthAbs, this.outputTarget.heightAbs);
     }
@@ -117,7 +117,7 @@ export class RenderPass {
 
 
     if (enableDebuggingView && !this.isOutputScreen) {
-      this.renderDebugResult(engine, framebuffer);
+      this.renderDebugResult(engine, framebuffer!);
     }
 
   }

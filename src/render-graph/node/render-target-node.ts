@@ -13,12 +13,12 @@ export enum DimensionType {
 }
 
 export class RenderTargetNode extends DAGNode {
-  constructor(name: string) {
+  constructor(name: string, isScreenNode: boolean) {
     super();
     this.name = name;
-
+    this.isScreenNode = isScreenNode;
   }
-  readonly isScreenNode: boolean = false;
+  readonly isScreenNode: boolean;
   readonly name: string;
   readonly pixelFormat: PixelFormat = PixelFormat.RGBA;
 

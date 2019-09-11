@@ -38,11 +38,11 @@ export function pingpong(name: string) {
 }
 
 export function target(name: string) {
-  return new RenderTargetNode(name);
+  return new RenderTargetNode(name, false);
 }
 
 export function screen() {
-  return new RenderTargetNode(RenderGraph.screenRoot);
+  return new RenderTargetNode(RenderGraph.screenRoot, true);
 }
 
 export function when<Y, N>(condition: boolean, yes: Y, no: N) {

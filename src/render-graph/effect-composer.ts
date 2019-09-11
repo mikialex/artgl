@@ -3,6 +3,7 @@ import { FrameBufferPool } from "./framebuffer-pool";
 import { RenderPass } from "./pass";
 import { RenderTargetNode } from "./node/render-target-node";
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
+import { Nullable } from "../type";
 
 /**
  * Responsible for rendergraph execution and optimization
@@ -35,10 +36,13 @@ export class EffectComposer {
     this.passes.forEach((pass, index) => {
       const output = pass.outputTarget;
       output.updateSize(engine);
-      let framebuffer: GLFramebuffer = this.keptFramebuffer.get(output)!
+      let framebuffer: Nullable<GLFramebuffer> = null;
 
-      if (framebuffer === undefined) {
-        framebuffer = this.framebufferPool.requestFramebuffer(output)
+      if (!output.isScreenNode) {
+        framebuffer = this.keptFramebuffer.get(output)!
+        if (framebuffer === undefined) {
+          framebuffer = this.framebufferPool.requestFramebuffer(output)
+        }
       }
 
       pass.uniformRenderTargetNodeMap.forEach((targetDepend, uniformName) => {
@@ -59,7 +63,9 @@ export class EffectComposer {
       }
       pass.execute(engine, framebuffer, enableGraphDebugging);
 
-      this.keptFramebuffer.set(output, framebuffer);
+      if (!output.isScreenNode) {
+        this.keptFramebuffer.set(output, framebuffer!);
+      }
 
       this.framebufferDropList[index].forEach(target => {
         this.framebufferPool.returnFramebuffer(this.keptFramebuffer.get(target)!)
