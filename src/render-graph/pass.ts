@@ -14,7 +14,8 @@ type framebufferName = string;
 export class RenderPass {
   constructor(passNode: PassGraphNode, outputNode: RenderTargetNode) {
     this.passNode = passNode;
-    this.outputTarget = outputNode
+    this.outputTarget = outputNode;
+    passNode.updatePass(this);
   }
   passNode: PassGraphNode;
 
@@ -29,10 +30,6 @@ export class RenderPass {
   // outputInfos
   outputTarget: RenderTargetNode;
 
-  get hasNodePrepared() {
-    return this.passNode !== null && this.outputTarget !== null;
-  }
-
   get isOutputScreen() {
     if (this.outputTarget === null) {
       return false;
@@ -44,9 +41,6 @@ export class RenderPass {
     engine: RenderEngine,
     framebuffer: GLFramebuffer
   ) {
-    if (!this.hasNodePrepared) {
-      throw `pass is not prepared, passNode or TargetNode not provided`
-    }
     const debugOutputViewport = this.outputTarget.debugViewPort;
     engine.renderFrameBuffer(framebuffer, debugOutputViewport)
     // this will cause no use draw TODO optimize
@@ -62,10 +56,6 @@ export class RenderPass {
     framebuffer: GLFramebuffer,
     enableDebuggingView: boolean = false,
   ) {
-
-    if (!this.hasNodePrepared) {
-      throw `pass is not prepared, passNode or TargetNode not provided`
-    }
 
     let outputTarget: GLFramebuffer;
 
@@ -135,9 +125,6 @@ export class RenderPass {
   checkIsValid() {
     if (this.isOutputScreen) {
       return
-    }
-    if (!this.hasNodePrepared) {
-      throw `pass is not prepared, passNode or TargetNode not provided`
     }
     const target = this.outputTarget.name;
     this.uniformNameFBOMap.forEach(input => {

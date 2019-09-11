@@ -87,7 +87,7 @@ export class EffectComposer {
         return;
       }
 
-      if (targetCreated.keepContent()) {
+      if (targetCreated._keepContent) {
         return;
       }
       for (let i = passes.length - 1; i > index; i--) {

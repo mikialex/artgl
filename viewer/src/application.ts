@@ -4,7 +4,7 @@ import {
 } from '../../src/artgl';
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
-import { RenderPipeline } from './RenderPipeline';
+import { AdvanceStaticRenderPipeline } from './advance-static-pipeline';
 import { Raycaster } from '../../src/core/raycaster';
 import { SkyBackGround } from '../../src/scene/background';
 
@@ -14,8 +14,7 @@ export class Application {
   constructor(canvas: HTMLCanvasElement) {
     this.el = canvas;
     this.engine = new RenderEngine(canvas);
-    this.pipeline = new RenderPipeline(this.engine);
-    this.pipeline.build(this.scene);
+    this.pipeline = new AdvanceStaticRenderPipeline(this.engine);
 
     this.engine.camera.bindEngineRenderSize(this.engine);
     this.engine.camera.transform.position.set(5, 5, 5)
@@ -31,7 +30,7 @@ export class Application {
     this.scene.background = new SkyBackGround()
   }
 
-  pipeline: RenderPipeline;
+  pipeline: AdvanceStaticRenderPipeline;
   engine: RenderEngine;
   framer: Framer = new Framer();
   el: HTMLCanvasElement;
@@ -87,13 +86,13 @@ export class Application {
 
     return;
     // TODO
-    const f = this.pipeline.getFramebufferByName("sceneResult")!;
-    const result = new Uint8Array(10);
-    f.readPixels(
-      x * this.engine.renderer.width,
-      y * this.engine.renderer.height,
-      1, 1, result);
-    console.log(`${result[0]}`)
+    // const f = this.pipeline.getFramebufferByName("sceneResult")!;
+    // const result = new Uint8Array(10);
+    // f.readPixels(
+    //   x * this.engine.renderer.width,
+    //   y * this.engine.renderer.height,
+    //   1, 1, result);
+    // console.log(`${result[0]}`)
 
     // console.log(resultCast.map(re => re.object.geometry.constructor.name));
   }
@@ -115,7 +114,7 @@ export class Application {
   createScene(scene: Scene): Scene {
     const config = hierarchyBallBuilder(scene.root, this);
     // this.loadOBJFromURL();
-    this.pipeline.config!.value.push(config);
+    this.pipeline.config.value.push(config);
     return scene;
   }
 

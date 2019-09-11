@@ -1,8 +1,8 @@
 import { RenderConfig } from './components/conf/interface'
 import { RenderEngine } from '../../src/artgl';
-import { RenderPipeline } from './RenderPipeline';
+import { AdvanceStaticRenderPipeline } from './advance-static-pipeline';
 
-export function createConf(engine: RenderEngine, pipeline: RenderPipeline): RenderConfig {
+export function createConf(engine: RenderEngine, pipeline: AdvanceStaticRenderPipeline): RenderConfig {
   return {
     name: 'root',
     type: 'folder',

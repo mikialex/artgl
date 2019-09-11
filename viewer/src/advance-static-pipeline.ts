@@ -1,18 +1,20 @@
 import {
   RenderGraph, TAAShading, screen,
   TSSAOShading, TSSAOBlendShading, Matrix4,
-  DepthShading, Scene, RenderEngine, Shading, ProgressiveDof, pass, pingpong, target
+  DepthShading, Scene, RenderEngine, Shading, ProgressiveDof, pass, pingpong, target, when, PingPongTarget
 } from "../../src/artgl";
 import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
+import { createConf } from './conf';
 
-export class RenderPipeline{
+export class AdvanceStaticRenderPipeline {
   constructor(engine: RenderEngine) {
     this.engine = engine;
     this.composer = new EffectComposer(engine);
+    this.config = createConf(this.engine, this);
   }
   engine: RenderEngine;
-  config?: RenderConfig;
+  config: RenderConfig;
 
   graph: RenderGraph = new RenderGraph();
   composer: EffectComposer;
@@ -20,10 +22,12 @@ export class RenderPipeline{
   enableTAA = true;
   taaShading = new TAAShading()
   taaShader: Shading = new Shading().decorate(this.taaShading);
+  taaHistory: PingPongTarget = pingpong('taa');
 
   enableTSSAO = true;
   tssaoShading = new TSSAOShading();
   tssaoShader: Shading = new Shading().decorate(this.tssaoShading);
+  tssaoHistory: PingPongTarget = pingpong('tssao');
 
   composeShading = new TSSAOBlendShading()
   composeShader: Shading = new Shading().decorate(this.composeShading);
@@ -41,22 +45,23 @@ export class RenderPipeline{
     this.sampleCount = 0;
   }
 
-  private tickNum = 0;
-  get isEvenTick() {
-    return this.tickNum % 2 === 0;
+  updateTicks() {
+    this.taaHistory.tick();
+    this.tssaoHistory.tick();
+
   }
 
   getFramebufferByName(name: string) {
-    const node = this.graph.getRenderTargetDependence(name)!;
-    const fbo = this.composer.getFramebuffer(node);
-    if (fbo === undefined) {
-      console.warn(`fbo ${name} has been optimized, to make it available, set keep content always true in render target node config`)
-    }
-    return fbo;
+    // const node = this.graph.getRenderTargetDependence(name)!;
+    // const fbo = this.composer.getFramebuffer(node);
+    // if (fbo === undefined) {
+    //   console.warn(`fbo ${name} has been optimized, to make it available, set keep content always true in render target node config`)
+    // }
+    // return fbo;
   }
 
   render(scene: Scene) {
-    this.tickNum++;
+    this.updateTicks();
 
     if (this.sampleCount >= 2) {
       this.dof.updateSample();
@@ -80,20 +85,15 @@ export class RenderPipeline{
 
   private build(scene: Scene) {
 
-    // this.config = createConf(this.engine, this);
-
-    this.tickNum++;
-    
     const depthPass = pass("depthPass").use(scene.render)
     const scenePass = pass("scenePass")
       .use(scene.renderScene)
       .overrideShading(this.depthShader)
-    
+
     const depthResult = target("depthResult").needDepth().from(depthPass)
     const sceneResult = target("sceneResult").needDepth().from(scenePass)
-    
-    const createTAA = ()=> {
-      const taaHistory = pingpong("TAAHistory", this.tickNum)
+
+    const createTAA = () => {
       const taaPass = pass("taa").useQuad()
         .overrideShading(this.taaShader)
         .disableColorClear()
@@ -105,15 +105,14 @@ export class RenderPipeline{
         })
         .input("sceneResult", sceneResult)
         .input("depthResult", depthResult)
-        .input("TAAHistoryOld", taaHistory.ping())
-      taaHistory.pong().from(taaPass)
-      return taaHistory
+        .input("TAAHistoryOld", this.taaHistory.ping())
+
+      return this.taaHistory.pong().from(taaPass)
     }
-    
-    const AAedScene = when(this.enableTAA, createTAA().pong(), sceneResult)
+
+    const AAedScene = when(this.enableTAA, createTAA(), sceneResult)
 
     const createTSSAO = () => {
-      const TSSAOHistory = pingpong("TSSAOHistory", this.tickNum)
       const tssaoPass = pass("tssao").useQuad()
         .overrideShading(this.tssaoShader)
         .disableColorClear()
@@ -123,34 +122,28 @@ export class RenderPipeline{
           this.tssaoShading.sampleCount = this.sampleCount;
         })
         .input("depthResult", depthResult)
-        .input("AOAcc", TSSAOHistory.ping())
-      TSSAOHistory.pong().from(tssaoPass)
+        .input("AOAcc", this.tssaoHistory.ping())
 
       const tssaoCompose = pass("composeAll")
-      .overrideShading(this.composeShader)
-      .input("basic", AAedScene)
-      .input("tssao", TSSAOHistory.pong())
-      .beforeExecute(() => {
-        this.composeShading.sampleCount = this.sampleCount;
-      })
-      .afterExecute(() => {
-        this.composeShading.sampleCount = this.sampleCount;
-      })
-      .disableColorClear()
+        .overrideShading(this.composeShader)
+        .input("basic", AAedScene)
+        .input("tssao", this.tssaoHistory.pong().from(tssaoPass))
+        .beforeExecute(() => {
+          this.composeShading.sampleCount = this.sampleCount;
+        })
+        .afterExecute(() => {
+          this.composeShading.sampleCount = this.sampleCount;
+        })
+        .disableColorClear()
 
       return screen().from(tssaoCompose);
     }
-  
-    
+
     this.graph.setScreenRoot(
       when(this.enableTSSAO, createTSSAO(), AAedScene)
     )
 
   }
-}
-
-function when<Y, N>(condition: boolean, yes: Y, no: N) {
-  return condition? yes: no
 }
 
 

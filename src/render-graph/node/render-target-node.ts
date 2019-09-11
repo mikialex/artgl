@@ -3,7 +3,6 @@ import { GLFramebuffer } from "../../webgl/gl-framebuffer";
 import { Nullable } from "../../type";
 import { Vector4 } from '../../math/vector4';
 import { PixelFormat } from "../../webgl/const";
-import { RenderPass } from "../pass";
 import { PassGraphNode } from "./pass-graph-node";
 import { RenderEngine } from "../../engine/render-engine";
 
@@ -25,7 +24,11 @@ export class RenderTargetNode extends DAGNode {
 
   debugViewPort: Vector4 = new Vector4(0, 0, 200, 200);
 
-  keepContent: () => boolean = () => false;
+  _keepContent: boolean = false;
+  keepContent() {
+    this._keepContent = true;
+    return this;
+  }
 
   widthAbs: number = 5;
   heightAbs: number = 5;
