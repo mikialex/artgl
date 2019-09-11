@@ -40,7 +40,6 @@ export class AdvanceStaticRenderPipeline {
   getSampleCount() {
     return this.sampleCount;
   }
-
   resetSample() {
     this.sampleCount = 0;
   }
@@ -61,7 +60,6 @@ export class AdvanceStaticRenderPipeline {
   }
 
   render(scene: Scene) {
-    this.updateTicks();
 
     if (this.sampleCount >= 2) {
       this.dof.updateSample();
@@ -84,6 +82,7 @@ export class AdvanceStaticRenderPipeline {
   }
 
   private build(scene: Scene) {
+    this.updateTicks();
 
     const depthPass = pass("depthPass").use(scene.render)
     const scenePass = pass("scenePass")

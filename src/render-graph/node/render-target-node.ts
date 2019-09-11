@@ -44,7 +44,16 @@ export class RenderTargetNode extends DAGNode {
 
   formatKey: string = "";
 
-
+  cleanConnections() {
+    this.from(null)
+    this.toNodes.forEach(n => {
+      if (n instanceof PassGraphNode) {
+        n.clearAllInput();
+      } else {
+        n.clearAllFrom();
+      }
+    })
+  }
   private _fromPassNode: Nullable<PassGraphNode> = null
   from(node: Nullable<PassGraphNode>) {
     if (this._fromPassNode !== null) {

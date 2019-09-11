@@ -9,7 +9,7 @@ export function pass(name: string) {
 export class PingPongTarget{
   constructor(name: string) {
     this.ATarget = target(name + "-A")
-    this.BTarget = target(name + "-A")
+    this.BTarget = target(name + "-B")
   }
 
   private tickId: number = 0;
@@ -18,10 +18,8 @@ export class PingPongTarget{
 
   tick() {
     this.tickId++;
-    this.ATarget.clearAllFrom();
-    this.ATarget.clearAllTo();
-    this.BTarget.clearAllFrom();
-    this.BTarget.clearAllTo();
+    this.ATarget.cleanConnections()
+    this.BTarget.cleanConnections();
   }
 
   ping() {

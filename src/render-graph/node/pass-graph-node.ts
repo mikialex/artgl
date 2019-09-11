@@ -28,6 +28,10 @@ export class PassGraphNode extends DAGNode {
     node.connectTo(this);
     return this;
   }
+  clearAllInput() {
+    this.inputs.clear();
+    this.clearAllFrom();
+  }
 
   readonly name: string;
 

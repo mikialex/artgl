@@ -17,7 +17,7 @@ test('dag connect and disconnect', () => {
   const node1 = new DAGNode();
   const node2 = new DAGNode();
   node1.connectTo(node2);
-  
+
   expect(node2.fromNodes.size).toBe(1);
   expect(node1.toNodes.size).toBe(1);
 
@@ -53,7 +53,7 @@ test('dag dep sort', () => {
   const list = node3.getTopologicalSortedList();
   expect(list.length).toBe(3);
   expect(list).toStrictEqual([node1, node2, node3])
-  
+
 });
 
 test('dag graph contains cycle', () => {
@@ -70,4 +70,43 @@ test('dag graph contains cycle', () => {
 
   expect(tryCatchCycle).toThrow('node graph contains cycles.');
 });
+
+test('dag node clean all from', () => {
+  const node1 = new DAGNode();
+  const node2 = new DAGNode();
+  const node = new DAGNode();
+  node1.connectTo(node);
+  node2.connectTo(node);
+
+  expect(node.fromNodes.size).toBe(2)
+  expect(node1.toNodes.size).toBe(1)
+  expect(node2.toNodes.size).toBe(1)
+
+  node.clearAllFrom()
+
+  expect(node.fromNodes.size).toBe(0)
+  expect(node1.toNodes.size).toBe(0)
+  expect(node2.toNodes.size).toBe(0)
+
+});
+
+test('dag node clean all to', () => {
+  const node1 = new DAGNode();
+  const node2 = new DAGNode();
+  const node = new DAGNode();
+  node.connectTo(node1);
+  node.connectTo(node2);
+
+  expect(node.toNodes.size).toBe(2)
+  expect(node1.fromNodes.size).toBe(1)
+  expect(node2.fromNodes.size).toBe(1)
+
+  node.clearAllTo()
+
+  expect(node.toNodes.size).toBe(0)
+  expect(node1.fromNodes.size).toBe(0)
+  expect(node2.fromNodes.size).toBe(0)
+
+});
+
 
