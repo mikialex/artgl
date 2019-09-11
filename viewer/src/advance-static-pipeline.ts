@@ -84,10 +84,11 @@ export class AdvanceStaticRenderPipeline {
   private build(scene: Scene) {
     this.updateTicks();
 
-    const depthPass = pass("depthPass").use(scene.render)
+    const depthPass = pass("depthPass").use(scene.renderScene)
+      .overrideShading(this.depthShader)
+
     const scenePass = pass("scenePass")
       .use(scene.renderScene)
-      .overrideShading(this.depthShader)
 
     const depthResult = target("depthResult").needDepth().from(depthPass)
     const sceneResult = target("sceneResult").needDepth().from(scenePass)
@@ -106,10 +107,10 @@ export class AdvanceStaticRenderPipeline {
         .input("depthResult", depthResult)
         .input("TAAHistoryOld", this.taaHistory.ping())
 
-      return this.taaHistory.pong().from(taaPass)
+      return taaPass
     }
 
-    const AAedScene = when(this.enableTAA, createTAA(), sceneResult)
+    const AAedScene = when(this.enableTAA, this.taaHistory.pong().from(createTAA()), sceneResult)
 
     const createTSSAO = () => {
       const tssaoPass = pass("tssao").useQuad()
@@ -135,11 +136,11 @@ export class AdvanceStaticRenderPipeline {
         })
         .disableColorClear()
 
-      return screen().from(tssaoCompose);
+      return tssaoCompose;
     }
 
     this.graph.setScreenRoot(
-      when(this.enableTSSAO, createTSSAO(), AAedScene)
+      when(this.enableTSSAO, screen().from(createTSSAO()), AAedScene)
     )
 
   }

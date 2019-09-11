@@ -21,8 +21,6 @@ export class RenderPass {
 
   private beforeClearColor: Vector4Like = new Vector4(1, 1, 1, 1);
 
-  private overrideShading: Nullable<Shading> = null;
-
   uniformNameFBOMap: Map<uniformName, framebufferName> = new Map();
   uniformRenderTargetNodeMap: Map<uniformName, RenderTargetNode> = new Map();
   framebuffersDepends: Set<RenderTargetNode> = new Set();
@@ -31,9 +29,6 @@ export class RenderPass {
   outputTarget: RenderTargetNode;
 
   get isOutputScreen() {
-    if (this.outputTarget === null) {
-      return false;
-    }
     return this.outputTarget.isScreenNode;
   }
 
@@ -79,7 +74,7 @@ export class RenderPass {
     }
 
     // input binding 
-    const overrideShading = this.overrideShading;
+    const overrideShading = this.passNode._overrideShading;
     if (overrideShading !== null) {
       engine.setOverrideShading(overrideShading);
       this.uniformNameFBOMap.forEach((inputFramebufferName, uniformName) => {
@@ -92,11 +87,11 @@ export class RenderPass {
 
     engine.getClearColor(this.beforeClearColor);
     // clear setting
-    if (this.passNode.enableColorClear) {
-      engine.setClearColor(this.passNode.clearColor);
+    if (this.passNode._enableColorClear) {
+      engine.setClearColor(this.passNode._clearColor);
       engine.clearColor();
     }
-    if (this.passNode.enableDepthClear) {
+    if (this.passNode._enableDepthClear) {
       if (!this.isOutputScreen && this.outputTarget.enableDepth) {
         engine.clearDepth();
       }

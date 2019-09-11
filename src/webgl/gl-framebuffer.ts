@@ -2,7 +2,6 @@ import { GLRenderer } from "./gl-renderer";
 import { Nullable, GLReleasable } from "../type";
 import { PixelFormat } from "./const";
 import { Texture, TextureSource } from "../core/texture";
-import { texture } from "../shader-graph/node-maker";
 
 
 export class FramebufferAttachTexture extends Texture implements GLReleasable {
@@ -57,7 +56,7 @@ export class GLFramebuffer {
     return this._formatKey;
   }
 
-  enableDepth: boolean = true;
+  _enableDepth: boolean = false;
   webglDepthBuffer: Nullable<WebGLRenderbuffer> = null;
   webglFrameBuffer: Nullable<WebGLFramebuffer>;
 
@@ -65,7 +64,7 @@ export class GLFramebuffer {
 
   private updateFormatKey() {
     this._formatKey = GLFramebuffer.buildFBOFormatKey(
-      this.width, this.height, this.enableDepth
+      this.width, this.height, this._enableDepth
     );
   }
 
@@ -130,7 +129,8 @@ export class GLFramebuffer {
     const attachTexture = new FramebufferAttachTexture();
     this.attach(attachTexture, attachPoint);
     this.textureAttachedSlot[attachPoint] = attachTexture;
-
+    this.updateFormatKey();
+    return this;
   }
 
   createAttachDepthBuffer() {
@@ -147,6 +147,9 @@ export class GLFramebuffer {
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this.width, this.height);
 
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
+    this._enableDepth = true;
+    this.updateFormatKey();
+    return this;
   }
 
   disposeAttachedDepthBuffer() {

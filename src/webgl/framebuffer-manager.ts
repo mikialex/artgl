@@ -18,7 +18,6 @@ export class GLFrameBufferManager {
 
     const framebuffer = new GLFramebuffer(this.renderer, name, width, height);
     framebuffer.createAttachTexture(0);
-    framebuffer.enableDepth = enableDepth;
     if (enableDepth) {
       framebuffer.createAttachDepthBuffer();
     }
