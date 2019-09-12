@@ -92,7 +92,7 @@ export class RenderPass {
       engine.clearColor();
     }
     if (this.passNode._enableDepthClear) {
-      if (!this.isOutputScreen && this.outputTarget.enableDepth) {
+      if (this.isOutputScreen || this.outputTarget.enableDepth) {
         engine.clearDepth();
       }
     }
@@ -121,6 +121,10 @@ export class RenderPass {
     if (this.isOutputScreen) {
       return
     }
+    if (this.passNode.source.length === 0) {
+      throw 'your pass has no render source'
+    }
+
     const target = this.outputTarget.name;
     this.uniformNameFBOMap.forEach(input => {
       if (input === target) {

@@ -18,7 +18,8 @@ const tssaoBlend = new ShaderFunction({
       vec3 aoColor = texture2D(aoMap, uvInput).xyz;
       vec3 aoModify = vec3(1.0) - tssaoComposeRate * (vec3(1.0) - aoColor) * vec3(min(sampleCount / tssaoShowThreshold, 1.0));
       aoModify = clamp(aoModify + vec3(tssaoComposeThreshold), vec3(0.0), vec3(1.0));
-      return vec4(color * aoModify, 1.0);
+      // return vec4(color * aoModify, 1.0);
+      return vec4(aoColor, 1.0);
   }
   `
 })

@@ -1,5 +1,4 @@
 import { DAGNode } from "../../core/dag-node";
-import { RenderGraph } from "../render-graph";
 import { RenderPass, uniformName } from "../pass";
 import { Nullable } from "../../type";
 import { RenderTargetNode } from "../exports";

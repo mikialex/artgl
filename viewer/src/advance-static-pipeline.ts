@@ -1,17 +1,21 @@
 import {
   RenderGraph, TAAShading, screen,
   TSSAOShading, TSSAOBlendShading, Matrix4,
-  DepthShading, Scene, RenderEngine, Shading, ProgressiveDof, pass, pingpong, target, when, PingPongTarget
+  DepthShading, Scene, RenderEngine, Shading, ProgressiveDof,
+  pass, pingpong, target, when, PingPongTarget
 } from "../../src/artgl";
 import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
 import { createConf } from './conf';
+import { CopyShading } from '../../src/shading/pass-lib/copy';
+
+const copier = new Shading().decorate(new CopyShading())
 
 export class AdvanceStaticRenderPipeline {
   constructor(engine: RenderEngine) {
     this.engine = engine;
     this.composer = new EffectComposer(engine);
-    this.config = createConf(this.engine, this);
+    this.config = createConf(this.engine, this); 
   }
   engine: RenderEngine;
   config: RenderConfig;
@@ -47,7 +51,6 @@ export class AdvanceStaticRenderPipeline {
   updateTicks() {
     this.taaHistory.tick();
     this.tssaoHistory.tick();
-
   }
 
   getFramebufferByName(name: string) {
@@ -78,6 +81,7 @@ export class AdvanceStaticRenderPipeline {
     this.build(scene);
     this.graph.build(this.composer);
     this.composer.render(this.engine, this.enableGraphDebugging);
+    this.sampleCount++;
     // }
   }
 
@@ -88,7 +92,7 @@ export class AdvanceStaticRenderPipeline {
       .overrideShading(this.depthShader)
 
     const scenePass = pass("scenePass")
-      .use(scene.renderScene)
+      .use(scene.render)
 
     const depthResult = target("depthResult").needDepth().from(depthPass)
     const sceneResult = target("sceneResult").needDepth().from(scenePass)
@@ -124,14 +128,11 @@ export class AdvanceStaticRenderPipeline {
         .input("depthResult", depthResult)
         .input("AOAcc", this.tssaoHistory.ping())
 
-      const tssaoCompose = pass("composeAll")
+      const tssaoCompose = pass("composeAll").useQuad()
         .overrideShading(this.composeShader)
         .input("basic", AAedScene)
         .input("tssao", this.tssaoHistory.pong().from(tssaoPass))
         .beforeExecute(() => {
-          this.composeShading.sampleCount = this.sampleCount;
-        })
-        .afterExecute(() => {
           this.composeShading.sampleCount = this.sampleCount;
         })
         .disableColorClear()
@@ -140,7 +141,13 @@ export class AdvanceStaticRenderPipeline {
     }
 
     this.graph.setScreenRoot(
-      when(this.enableTSSAO, screen().from(createTSSAO()), AAedScene)
+      screen().from(
+        when(
+          this.enableTSSAO,
+          createTSSAO(),
+          pass("copy").useQuad().overrideShading(copier)
+            .input("copySource", AAedScene))
+      )
     )
 
   }
