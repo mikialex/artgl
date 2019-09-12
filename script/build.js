@@ -9,4 +9,8 @@ console.log(`source code will build at: ${distDir}`)
 delDir(distDir)
 console.log(`old folder has been cleaned`)
 
-execSync(`yarn buildsrc`)
+try {
+  execSync(`yarn buildsrc`)
+} catch (error) {
+  console.log(error)
+}
