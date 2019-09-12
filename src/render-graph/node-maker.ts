@@ -22,12 +22,18 @@ export class PingPongTarget{
     this.BTarget.cleanConnections();
   }
 
-  ping() {
-    return this.tickId % 2 === 0 ? this.ATarget : this.BTarget;
+  get evenTick() {
+    return this.tickId % 2 === 0
   }
 
+  // always for input
+  ping() {
+    return (this.evenTick ? this.ATarget : this.BTarget).notNeedKeepContent();
+  }
+
+  // always for output
   pong() {
-    return this.tickId % 2 === 0 ? this.BTarget : this.ATarget;
+    return (this.evenTick ? this.BTarget : this.ATarget).keepContent();
   }
 }
 

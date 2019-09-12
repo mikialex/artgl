@@ -5,6 +5,7 @@ import { Vector4 } from '../../math/vector4';
 import { PixelFormat } from "../../webgl/const";
 import { PassGraphNode } from "./pass-graph-node";
 import { RenderEngine } from "../../engine/render-engine";
+import { PingPongTarget } from "../node-maker";
 
 
 export enum DimensionType {
@@ -27,6 +28,10 @@ export class RenderTargetNode extends DAGNode {
   _keepContent: boolean = false;
   keepContent() {
     this._keepContent = true;
+    return this;
+  }
+  notNeedKeepContent() {
+    this._keepContent = false;
     return this;
   }
 

@@ -150,7 +150,7 @@ export function createConf(engine: RenderEngine, pipeline: AdvanceStaticRenderPi
                 editors: [
                   {
                     type: 'slider',
-                    min: 1,
+                    min: 0,
                     max: 1000,
                     step: 20
                   },
