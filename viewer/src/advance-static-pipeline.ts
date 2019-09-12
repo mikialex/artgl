@@ -23,12 +23,23 @@ export class AdvanceStaticRenderPipeline {
   graph: RenderGraph = new RenderGraph();
   composer: EffectComposer;
 
-  enableTAA = true;
+  _enableTAA = true;
+  get enableTAA() { return this._enableTAA }
+  set enableTAA(value) {
+    this.resetSample();
+    this._enableTAA = value;
+  }
   taaShading = new TAAShading()
   taaShader: Shading = new Shading().decorate(this.taaShading);
   taaHistory: PingPongTarget = pingpong('taa');
 
-  enableTSSAO = true;
+  _enableTSSAO = true;
+  
+  get enableTSSAO() { return this._enableTSSAO }
+  set enableTSSAO(value) {
+    this.resetSample();
+    this._enableTSSAO = value;
+  }
   tssaoShading = new TSSAOShading();
   tssaoShader: Shading = new Shading().decorate(this.tssaoShading);
   tssaoHistory: PingPongTarget = pingpong('tssao');
@@ -65,6 +76,9 @@ export class AdvanceStaticRenderPipeline {
   render(scene: Scene) {
 
     if (this.sampleCount >= 2) {
+      if (!this._enableTAA) {
+        this.dof.blurRadius = 0;
+      }
       this.dof.updateSample();
     }
 
@@ -72,7 +86,7 @@ export class AdvanceStaticRenderPipeline {
     if (this.engine.isCameraChanged) {
       this.sampleCount = 0;
     } else {
-      if (this.enableTAA) {
+      if (this._enableTAA) {
         this.engine.jitterProjectionMatrix();
       }
     }
@@ -114,7 +128,7 @@ export class AdvanceStaticRenderPipeline {
       return taaPass
     }
 
-    const AAedScene = when(this.enableTAA, this.taaHistory.pong().from(createTAA()), sceneResult)
+    const AAedScene = when(this._enableTAA, this.taaHistory.pong().from(createTAA()), sceneResult)
 
     const createTSSAO = () => {
       const tssaoPass = pass("tssao").useQuad()
@@ -143,7 +157,7 @@ export class AdvanceStaticRenderPipeline {
     this.graph.setScreenRoot(
       screen().from(
         when(
-          this.enableTSSAO,
+          this._enableTSSAO,
           createTSSAO(),
           pass("copy").useQuad().overrideShading(copier)
             .input("copySource", AAedScene))

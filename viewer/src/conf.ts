@@ -75,7 +75,6 @@ export function createConf(engine: RenderEngine, pipeline: AdvanceStaticRenderPi
                 value: pipeline.enableTAA,
                 onChange: (value: boolean) => {
                   pipeline.enableTAA = value;
-                  pipeline.resetSample();
                 },
               },
             ]
@@ -88,11 +87,6 @@ export function createConf(engine: RenderEngine, pipeline: AdvanceStaticRenderPi
                 value: pipeline.enableTSSAO,
                 onChange: (value: boolean) => {
                   pipeline.enableTSSAO = value;
-                  if (value) {
-                    pipeline.composeShading.tssaoComposeRate = 1;
-                  } else {
-                    pipeline.composeShading.tssaoComposeRate = 0;
-                  }
                 },
               },
               {
@@ -152,7 +146,7 @@ export function createConf(engine: RenderEngine, pipeline: AdvanceStaticRenderPi
                     type: 'slider',
                     min: 0,
                     max: 1000,
-                    step: 20
+                    step: 1
                   },
                 ]
               },
