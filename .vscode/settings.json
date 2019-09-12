@@ -10,9 +10,13 @@
     "colorbuffer",
     "drawcall",
     "exposurer",
+    "framebuffers",
     "fwidth",
     "phong",
+    "pingpong",
+    "rendergraph",
     "smoothstep",
+    "tssao",
     "unintialize",
     "varyings",
     "wireframe"

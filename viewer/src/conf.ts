@@ -1,8 +1,8 @@
 import { RenderConfig } from './components/conf/interface'
 import { RenderEngine } from '../../src/artgl';
-import { RenderPipeline } from './RenderPipeline';
+import { AdvanceStaticRenderPipeline } from './advance-static-pipeline';
 
-export function createConf(engine: RenderEngine, pipeline: RenderPipeline): RenderConfig {
+export function createConf(engine: RenderEngine, pipeline: AdvanceStaticRenderPipeline): RenderConfig {
   return {
     name: 'root',
     type: 'folder',
@@ -75,9 +75,6 @@ export function createConf(engine: RenderEngine, pipeline: RenderPipeline): Rend
                 value: pipeline.enableTAA,
                 onChange: (value: boolean) => {
                   pipeline.enableTAA = value;
-                  if (!value) {
-                    pipeline.resetSample();
-                  }
                 },
               },
             ]
@@ -90,11 +87,6 @@ export function createConf(engine: RenderEngine, pipeline: RenderPipeline): Rend
                 value: pipeline.enableTSSAO,
                 onChange: (value: boolean) => {
                   pipeline.enableTSSAO = value;
-                  if (value) {
-                    pipeline.composeShading.tssaoComposeRate = 1;
-                  } else {
-                    pipeline.composeShading.tssaoComposeRate = 0;
-                  }
                 },
               },
               {
@@ -152,9 +144,9 @@ export function createConf(engine: RenderEngine, pipeline: RenderPipeline): Rend
                 editors: [
                   {
                     type: 'slider',
-                    min: 1,
+                    min: 0,
                     max: 1000,
-                    step: 20
+                    step: 1
                   },
                 ]
               },

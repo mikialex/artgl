@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { examples } from "../../example/contents/exports";
+import { examples } from "../../example/src/exports";
 
 Vue.use(Vuex)
 

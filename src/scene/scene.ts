@@ -31,7 +31,7 @@ export class Scene implements RenderSource {
   selectionSet: Set<RenderObject> = new Set();
   selectShading: Shading = new Shading().decorate(new PureShading());
 
-  background: BackGround = new SkyBackGround();
+  background: BackGround = new PureColorBackGround();
 
   clearSelect() {
     this.selectionSet.clear();

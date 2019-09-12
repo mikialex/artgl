@@ -1,5 +1,6 @@
 import { Nullable } from "../type";
 import { Accumulator } from "../util/accumulator";
+import { Observable } from "../core/observable";
 
 
 /**
@@ -12,17 +13,22 @@ export class Framer{
 
   avgRenderFrameTimeLast120Frame: Accumulator = new Accumulator(120)
 
+  onFrameStart: Observable<void> = new Observable()
+  onFrameEnd: Observable<number> = new Observable()
+
   private userRenderFrame: Nullable<FrameRequestCallback> = null;
   setFrame(frame: FrameRequestCallback) {
     this.userRenderFrame = frame;
   }
 
   private renderFrame: FrameRequestCallback = (time) => {
-    this.frameStart(time);
+    this.frameStartTiming(time);
+    this.onFrameStart.notifyObservers();
     if (this.userRenderFrame !== null) {
       this.userRenderFrame(time);
     }
-    this.frameEnd(performance.now());
+    const lastFrameTime = this.frameEndTiming(performance.now());
+    this.onFrameEnd.notifyObservers(lastFrameTime);
     if (this.active) {
       this.tickId = window.requestAnimationFrame(this.renderFrame);
     }
@@ -50,12 +56,14 @@ export class Framer{
   }
 
   frameStartTime = 0;
-  private frameStart(frameStartTime: number) {
+  private frameStartTiming(frameStartTime: number) {
     this.frameStartTime = frameStartTime;
   }
 
-  private frameEnd(frameEndTime: number) {
-    this.avgRenderFrameTimeLast120Frame.push(frameEndTime - this.frameStartTime)
+  private frameEndTiming(frameEndTime: number): number {
+    const time = frameEndTime - this.frameStartTime;
+    this.avgRenderFrameTimeLast120Frame.push(time)
+    return time;
   }
   
 }

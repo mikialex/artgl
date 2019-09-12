@@ -110,7 +110,7 @@ export default class ViewerCanvas extends Vue {
     if (action !== undefined) {
       this.$store.state.showScenePanel = action;
     } else {
-      this.$store.state.showScenePanel = !this.$store.state.showScenePanel;
+      this.$store.state.showScenePanel = this.$store.state.showScenePanel;
     }
     await this.$nextTick();
     this.$viewer.notifyResize();
@@ -207,7 +207,7 @@ export default class ViewerCanvas extends Vue {
   }
 
   inspectGraph() {
-    this.$viewer.pipeline.graph.enableDebuggingView = true;
+    this.$viewer.pipeline.enableGraphDebugging = true;
     const nodes = this.$viewer.pipeline.graph.nodes;
     this.viewNodes = nodes.map(node => {
       return {
@@ -220,7 +220,7 @@ export default class ViewerCanvas extends Vue {
   }
 
   closeGraphInspector() {
-    this.$viewer.pipeline.graph.enableDebuggingView = false;
+    this.$viewer.pipeline.enableGraphDebugging = false;
     this.showGraphViewer = false;
   }
 

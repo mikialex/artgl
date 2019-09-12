@@ -1,10 +1,12 @@
 import { generateUUID } from "../math/uuid";
 
+type uuid = string;
+
 export class DAGNode {
-  uuid: string = generateUUID();
+  uuid: uuid = generateUUID();
   toNodes: Set<DAGNode> = new Set();
   fromNodes: Set<DAGNode> = new Set();
-  protected fulfillList: Map<string, boolean> = new Map();
+  protected fulfillList: Map<uuid, boolean> = new Map();
 
   connectTo(node: DAGNode) {
     this.toNodes.add(node);

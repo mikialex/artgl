@@ -21,12 +21,16 @@ export interface ShaderFunctionParsedDefine {
 
 const functionNamesRecord: { [index: string]: number } = {};
 
+export function shader(source: string) {
+  return new ShaderFunction({
+    source
+  })
+}
+
 /**
  *  Define a shader function node factory
  *  that with depend some input 
  *  and output
- * @export
- * @class ShaderFunction
  */
 export class ShaderFunction {
   constructor(define: ShaderFunctionDefine) {

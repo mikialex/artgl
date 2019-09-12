@@ -1,85 +1,81 @@
 import { DAGNode } from "../../core/dag-node";
-import { RenderTargetDefine, DimensionType } from "../interface";
-import { RenderGraph } from "../render-graph";
 import { GLFramebuffer } from "../../webgl/gl-framebuffer";
-import { MathUtil } from '../../math/util'
 import { Nullable } from "../../type";
 import { Vector4 } from '../../math/vector4';
 import { PixelFormat } from "../../webgl/const";
-import { RenderPass } from "../pass";
 import { PassGraphNode } from "./pass-graph-node";
-import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingDetermined, ShadingConstrain } from "../backend-interface";
+import { RenderEngine } from "../../engine/render-engine";
+import { PingPongTarget } from "../node-maker";
 
-export class RenderTargetNode<
-  ShadingType extends ShadingConstrain = any,
-  RenderableType extends ShadingDetermined<ShadingType> = any,
-  FBOType extends NamedAndFormatKeyed = any
-  > extends DAGNode{
-  constructor(define: RenderTargetDefine) {
+
+export enum DimensionType {
+  bindRenderSize,
+  fixed
+}
+
+export class RenderTargetNode extends DAGNode {
+  constructor(name: string, isScreenNode: boolean) {
     super();
-    this.name = define.name;
-    this.define = define;
-
-    this.fromGetter = define.from;
-
-    this.isScreenNode = define.name === RenderGraph.screenRoot;
-    if (this.isScreenNode) {
-      return
-    }
-
-    if (define.keepContent !== undefined) {
-      this.keepContent = define.keepContent;
-    }
-
-    // set a default format config
-    if (define.format === undefined) {
-      define.format = {
-        pixelFormat: PixelFormat.RGBA,
-        dimensionType: DimensionType.bindRenderSize,
-      }
-    } else {
-      if (define.format.pixelFormat === undefined) {
-        define.format.pixelFormat = PixelFormat.RGBA;
-      }
-      if (define.format.dimensionType === undefined) {
-        define.format.dimensionType = DimensionType.bindRenderSize;
-      }
-    }
-
-    if (define.format.dimensionType === DimensionType.bindRenderSize) {
-      this.autoWidthRatio = define.format.width !== undefined ? MathUtil.clamp(define.format.width, 0, 1) : 1;
-      this.autoHeightRatio = define.format.height !== undefined ? MathUtil.clamp(define.format.height, 0, 1) : 1;
-    }
-    this.enableDepth = define.format.enableDepthBuffer !== undefined ? define.format.enableDepthBuffer : false;
-    
+    this.name = name;
+    this.isScreenNode = isScreenNode;
   }
   readonly isScreenNode: boolean;
   readonly name: string;
-  readonly define: RenderTargetDefine;
+  readonly pixelFormat: PixelFormat = PixelFormat.RGBA;
 
   debugViewPort: Vector4 = new Vector4(0, 0, 200, 200);
 
-  keepContent: () => boolean  = () => false;
+  _keepContent: boolean = false;
+  keepContent() {
+    this._keepContent = true;
+    return this;
+  }
+  notNeedKeepContent() {
+    this._keepContent = false;
+    return this;
+  }
 
-  autoWidthRatio: number = 0;
-  autoHeightRatio: number = 0;
+  widthAbs: number = 5;
+  heightAbs: number = 5;
+  autoWidthRatio: number = 1;
+  autoHeightRatio: number = 1;
+  readonly dimensionType: DimensionType = DimensionType.bindRenderSize;
+
   enableDepth: boolean = false;
-
-  widthAbs: number = 0;
-  heightAbs: number = 0;
+  needDepth() {
+    this.enableDepth = true;
+    return this;
+  }
 
   formatKey: string = "";
 
-  private fromGetter: () => Nullable<string>
-  private from: Nullable<string> = null;
+  cleanConnections() {
+    this.from(null)
+    this.toNodes.forEach(n => {
+      if (n instanceof PassGraphNode) {
+        n.clearAllInput();
+      } else {
+        n.clearAllFrom();
+      }
+    })
+  }
+  private _fromPassNode: Nullable<PassGraphNode> = null
+  from(node: Nullable<PassGraphNode>) {
+    if (this._fromPassNode !== null) {
+      this._fromPassNode.disconnectTo(this);
+    }
+    this._fromPassNode = node;
+    if (this._fromPassNode !== null) {
+      this._fromPassNode.connectTo(this);
+    }
+    return this;
+  }
 
-  private _fromPassNode: Nullable<PassGraphNode<ShadingType, RenderableType, FBOType>> = null
-
-  set fromPassNode(node: Nullable<PassGraphNode<ShadingType, RenderableType, FBOType>>) {
+  set fromPassNode(node: Nullable<PassGraphNode>) {
     if (node === null) {
       this._fromPassNode = node;
       this.clearAllFrom();
-      return 
+      return
     }
     this._fromPassNode = node;
     node.connectTo(this);
@@ -96,46 +92,14 @@ export class RenderTargetNode<
   }
 
   // update abs size info from given engine render size
-  updateSize(engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>) {
-    if (this.isScreenNode) {
-      return;
+  updateSize(engine: RenderEngine) {
+
+    if (this.dimensionType === DimensionType.bindRenderSize) {
+      this.widthAbs = Math.max(5, engine.renderBufferWidth() * this.autoWidthRatio);
+      this.heightAbs = Math.max(5, engine.renderBufferHeight() * this.autoHeightRatio);
     }
-    const define = this.define;
-    let width: number;
-    let height: number;
-    // decide initial size and create resize observer
-    if (define.format && define.format.dimensionType === DimensionType.fixed) {
-      width = define.format.width !== undefined ? define.format.width : engine.renderBufferWidth();
-      height = define.format.height !== undefined ? define.format.height : engine.renderBufferHeight();
-    } else { //  === DimensionType.bindRenderSize
-      width = Math.max(5, engine.renderBufferWidth() * this.autoWidthRatio);
-      height = Math.max(5, engine.renderBufferHeight() * this.autoHeightRatio);
-    }
-    this.widthAbs = Math.max(5, width);
-    this.heightAbs = Math.max(5, height);
     this.updateFormatKey();
-  }
 
-  // update graph structure
-  updateDependNode(graph: RenderGraph<ShadingType, RenderableType, FBOType>) {
-    // disconnect depends pass node
-    this.fromPassNode = null;
-
-    this.from = this.fromGetter();
-
-    if (this.from !== null) {
-      const passNode = graph.getRenderPassDependence(this.from)!;
-      this.fromPassNode = passNode;
-    }
-  }
-
-  // from updated graph structure, setup render pass
-  updatePass(
-    engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>,
-    pass: RenderPass<ShadingType, RenderableType, FBOType>
-  ) {
-    this.updateSize(engine);
-    pass.outputTarget = this;
   }
 
 }

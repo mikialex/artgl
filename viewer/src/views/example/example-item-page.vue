@@ -7,15 +7,12 @@
         <div>
           <button>view code</button>
 
-          <button  @click="showConfig = !showConfig"
-          >config panel
-            <font-awesome-icon
-            v-if="showConfig"
-             icon="minus-square" />
+          <button @click="showConfig = !showConfig">
+            config panel
+            <font-awesome-icon v-if="showConfig" icon="minus-square" />
           </button>
 
-          <div class="config-panel"
-          v-if="config && showConfig">
+          <div class="config-panel" v-if="config && showConfig">
             <Config :config="config" />
           </div>
         </div>
@@ -27,9 +24,15 @@
       </div>
 
       <div v-if="exampleHasBuild" class="control-panel">
-        <font-awesome-icon icon="play" @click="start" v-if="!isRunning" />
-        <font-awesome-icon icon="stop" @click="stop" v-if="isRunning" />
-        <font-awesome-icon icon="step-forward" @click="step" v-if="!isRunning" />
+        <button class="btn" v-if="!isRunning" @click="start">
+          <font-awesome-icon icon="play" />
+        </button>
+        <button class="btn" v-if="isRunning" @click="stop">
+          <font-awesome-icon icon="stop" />
+        </button>
+        <button class="btn" @click="step" v-if="!isRunning">
+          <font-awesome-icon icon="step-forward" />
+        </button>
       </div>
     </div>
   </div>
@@ -37,11 +40,11 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { ViewerTestBridge } from "../../../../example/contents/test-bridge";
+import { TestBridge } from "../../../../example/src/test-bridge";
 import Config from "../../components/conf/config.vue";
 import { RenderConfig } from "../../components/conf/interface";
 
-const bridge = new ViewerTestBridge();
+const bridge = new TestBridge();
 
 @Component({
   components: { Config }
@@ -88,7 +91,7 @@ export default class ConfigPanel extends Vue {
   }
 
   async mounted() {
-    bridge.reset();
+    bridge.reset(this.$el.querySelector("canvas")!);
 
     await this.example.build(bridge);
 
@@ -120,6 +123,7 @@ export default class ConfigPanel extends Vue {
 
 .canvas-wrap {
   flex-grow: 1;
+  height: 500px;
 }
 
 canvas {
@@ -139,23 +143,44 @@ canvas {
   }
   border-bottom: #eee;
 
-  button{
+  button {
     height: 30px;
-    margin:3px;
+    margin: 3px;
     background: #444;
-    border:0px;
+    border: 0px;
     border-radius: 3px;
     color: #fff;
   }
 }
 
-.config-panel{
+.config-panel {
   position: absolute;
-  right:0px;
-  bottom:-50%;
+  right: 0px;
+  top: 100%;
 }
 
 .control-panel {
-  min-height: 25px;
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eee;
+
+  > .btn {
+    padding: 5px;
+    margin: 3px;
+    border-radius: 3px;
+    border: 0px;
+    background: #ddd;
+    cursor: pointer;
+
+    &:hover {
+      background: #fff;
+    }
+
+    &:active {
+      background: #eee;
+    }
+  }
 }
 </style>

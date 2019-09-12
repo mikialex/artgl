@@ -50,10 +50,7 @@ export class Observable<T> {
    * @param unregisterOnFirstCall defines if the observer as to be unregistered after the next notification
    * @returns the new observer created for the callback
    */
-  public add(callback: (eventData: T) => void,  unregisterOnFirstCall = false): Nullable<Observer<T>> {
-    if (!callback) {
-      return null;
-    }
+  public add(callback: (eventData: T) => void,  unregisterOnFirstCall = false): Observer<T> {
 
     var observer = new Observer(callback);
     observer.unregisterOnNextCall = unregisterOnFirstCall;

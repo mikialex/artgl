@@ -1,8 +1,11 @@
 import { TestBridge } from '../src/test-bridge';
 import {
   Vector3, RenderEngine, Scene, SphereGeometry, Mesh,
-  Line, Points, PerspectiveCamera, Vector4, OrbitController
+  PerspectiveCamera, Vector4, OrbitController, Shading, PointLight,
+  DirectionalLight, AmbientLight, BarycentricWireFrame, PhongShading,
+  ExposureController
 } from '../../src/artgl';
+import { createBarycentricBufferForStandardGeometry } from '../../src/geometry/geo-util/barycentric'
 
 export default async function test(testBridge: TestBridge) {
 
@@ -14,21 +17,35 @@ export default async function test(testBridge: TestBridge) {
   const scene = new Scene();
 
   const geometry = new SphereGeometry();
+  createBarycentricBufferForStandardGeometry(geometry);
 
-  const mesh = new Mesh();
-  const line = new Line();
-  const points = new Points();
+  const pointLight = new PointLight();
+  pointLight.position = new Vector3(-1, 3, 3);
+  pointLight.color = new Vector3(0.9, 0.8, 0.5);
+  pointLight.radius = 10;
 
-  mesh.geometry = geometry;
-  line.geometry = geometry;
-  points.geometry = geometry;
+  const dirLight = new DirectionalLight();
+  dirLight.color = new Vector3(0.3, 0.6, 0.8);
+  dirLight.direction = new Vector3(1, 1, -1).normalize();
 
-  line.transform.position.x = -5;
-  points.transform.position.x = 5;
+  const ambient = new AmbientLight();
+  ambient.color = new Vector3(0.3, 0.3, 0.4);
+
+  const exposureController = new ExposureController();
+
+  const wireframe = new BarycentricWireFrame();
+
+  const phong = new PhongShading<DirectionalLight | PointLight>([dirLight, pointLight]);
+
+  let shading = new Shading()
+    .decorate(phong)
+    .decorate(ambient)
+    .decorate(exposureController)
+    .decorate(wireframe)
+
+  const mesh = new Mesh().g(geometry).s(shading);
 
   scene.root.addChild(mesh);
-  scene.root.addChild(line);
-  scene.root.addChild(points);
 
   const camera = engine.camera as PerspectiveCamera;
   camera.transform.position.set(0, 0, 15);

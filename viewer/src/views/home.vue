@@ -3,28 +3,33 @@
     <div class="first-screen">
       <!-- <div class="nav">
         <a href="">source</a>
-      </div> -->
+      </div>-->
       <h1>ARTGL</h1>
       <h2>A state of art Web 3D framework</h2>
     </div>
     <div class="part-entry">
       <div class="part" @click="goto('viewer')">
-        <a class="part-title" >Scene Viewer</a>
+        <a class="part-title">Scene Viewer</a>
       </div>
       <div class="part" @click="goto('shader-editor')">
-        <a class="part-title" >Shader Composer</a>`
+        <a class="part-title">Shader Composer</a>`
       </div>
       <div class="part" @click="goto('examples')">
-        <a class="part-title" >Simple Examples</a>
+        <a class="part-title">Simple Examples</a>
       </div>
     </div>
+    <div style="width: 100vw;height: 200px;"></div>
+    <Footer />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import Footer from "./home-footer.vue";
 
-@Component
+@Component({
+  components: { Footer }
+})
 export default class ConfigPanel extends Vue {
   $store: any;
   $router: any;
@@ -37,7 +42,6 @@ export default class ConfigPanel extends Vue {
       }
     });
   }
-
 }
 </script>
 
@@ -47,9 +51,6 @@ export default class ConfigPanel extends Vue {
   height: 100vh;
   overflow-y: scroll;
   overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   position: relative;
 }
 
@@ -87,6 +88,7 @@ img {
   justify-content: space-around;
   width: 900px;
   position: relative;
+  margin: auto;
   top: -100px;
   .part {
     width: 250px;
@@ -95,11 +97,11 @@ img {
     position: relative;
     transition: 200ms;
     cursor: pointer;
-    &:hover{
+    &:hover {
       transform: translateY(-30px);
     }
 
-    &:active{
+    &:active {
       transform: scale(1.1);
     }
   }
@@ -116,5 +118,4 @@ img {
   font-weight: bold;
   transition: 200ms;
 }
-
 </style>

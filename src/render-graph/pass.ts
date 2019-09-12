@@ -1,81 +1,42 @@
 import { RenderGraph } from "./render-graph";
-import { PassDefine } from "./interface";
 import { Nullable } from "../type";
 import { RenderTargetNode } from "./node/render-target-node";
 import { PassGraphNode } from "./node/pass-graph-node";
-import { RenderGraphBackendAdaptor, NamedAndFormatKeyed, ShadingDetermined, ShadingConstrain } from "./backend-interface";
 import { Vector4Like } from "../math/interface";
 import { Vector4 } from "../math";
+import { Shading } from "../artgl";
+import { RenderEngine } from "../engine/render-engine";
+import { GLFramebuffer } from "../webgl/gl-framebuffer";
 
 export type uniformName = string;
 type framebufferName = string;
 
-export class RenderPass<
-  ShadingType extends ShadingConstrain,
-  RenderableType extends ShadingDetermined<ShadingType>,
-  FBOType extends NamedAndFormatKeyed>{
-  constructor(define: PassDefine<ShadingType>) {
-    this.define = define;
-    this.name = define.name;
-    if (define.shading !== undefined) {
-      const overrideShading = define.shading;
-      if (overrideShading === undefined) {
-        throw `technique '${define.shading}' not defined`
-      }
-      this.overrideShading = overrideShading;
-    }
-
-    if (define.clearColor !== undefined) {
-      this.clearColor = define.clearColor;
-    }
-    this.enableColorClear = define.enableColorClear === undefined ? true : define.enableColorClear
-    this.enableDepthClear = define.enableDepthClear === undefined ? true : define.enableDepthClear
-
-    this.beforePassExecute = define.beforePassExecute;
-    this.afterPassExecute = define.afterPassExecute;
-
+export class RenderPass {
+  constructor(passNode: PassGraphNode, outputNode: RenderTargetNode) {
+    this.passNode = passNode;
+    this.outputTarget = outputNode;
+    passNode.updatePass(this);
   }
+  passNode: PassGraphNode;
 
-  readonly define: PassDefine<ShadingType>;
-  public name: string;
-
-  private clearColor: Vector4Like = new Vector4(1, 1, 1, 1);
   private beforeClearColor: Vector4Like = new Vector4(1, 1, 1, 1);
-  private enableDepthClear: boolean = true;
-  private enableColorClear: boolean = true;
-
-  private afterPassExecute?: () => any;
-  private beforePassExecute?: () => any;
-
-  private overrideShading: Nullable<ShadingType> = null;
 
   uniformNameFBOMap: Map<uniformName, framebufferName> = new Map();
-  uniformRenderTargetNodeMap: Map<uniformName, RenderTargetNode<ShadingType, RenderableType, FBOType>> = new Map();
-  framebuffersDepends: Set<RenderTargetNode<ShadingType, RenderableType, FBOType>> = new Set();
+  uniformRenderTargetNodeMap: Map<uniformName, RenderTargetNode> = new Map();
+  framebuffersDepends: Set<RenderTargetNode> = new Set();
 
-  passNode: Nullable<PassGraphNode<ShadingType, RenderableType, FBOType>> = null;
   // outputInfos
-  outputTarget: Nullable<RenderTargetNode<ShadingType, RenderableType, FBOType>> = null;
-
-  get hasNodePrepared() {
-    return this.passNode !== null && this.outputTarget !== null;
-  }
+  outputTarget: RenderTargetNode;
 
   get isOutputScreen() {
-    if (this.outputTarget === null) {
-      return false;
-    }
     return this.outputTarget.isScreenNode;
   }
 
   renderDebugResult(
-    engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>,
-    framebuffer: FBOType
+    engine: RenderEngine,
+    framebuffer: GLFramebuffer
   ) {
-    if (!this.hasNodePrepared) {
-      throw `pass is not prepared, passNode or TargetNode not provided`
-    }
-    const debugOutputViewport = this.outputTarget!.debugViewPort;
+    const debugOutputViewport = this.outputTarget.debugViewPort;
     engine.renderFrameBuffer(framebuffer, debugOutputViewport)
     // this will cause no use draw TODO optimize
     this.uniformNameFBOMap.forEach((inputFramebufferName, uniformName) => {
@@ -86,23 +47,18 @@ export class RenderPass<
   }
 
   execute(
-    engine: RenderGraphBackendAdaptor<ShadingType, RenderableType, FBOType>,
-    graph: RenderGraph<ShadingType, RenderableType, FBOType>,
-    framebuffer: FBOType
+    engine: RenderEngine,
+    framebuffer: Nullable<GLFramebuffer>,
+    enableDebuggingView: boolean = false,
   ) {
 
-    if (!this.hasNodePrepared) {
-      throw `pass is not prepared, passNode or TargetNode not provided`
-    }
-
-    this.checkIsValid();
-    let outputTarget: FBOType;
+    let outputTarget: GLFramebuffer;
 
     // setup viewport and render target
     if (this.isOutputScreen) {
       engine.setRenderTargetScreen();
-      if (graph.enableDebuggingView) {
-        const debugViewPort = graph.screenNode!.debugViewPort;
+      if (enableDebuggingView) {
+        const debugViewPort = this.outputTarget.debugViewPort;
         engine.setViewport(
           debugViewPort.x, debugViewPort.y,
           debugViewPort.z, debugViewPort.w
@@ -112,13 +68,13 @@ export class RenderPass<
         engine.setFullScreenViewPort();
       }
     } else {
-      outputTarget = framebuffer;
+      outputTarget = framebuffer!;
       engine.setRenderTarget(outputTarget);
-      engine.setViewport(0, 0, this.outputTarget!.widthAbs, this.outputTarget!.heightAbs);
+      engine.setViewport(0, 0, this.outputTarget.widthAbs, this.outputTarget.heightAbs);
     }
 
     // input binding 
-    const overrideShading = this.overrideShading;
+    const overrideShading = this.passNode._overrideShading;
     if (overrideShading !== null) {
       engine.setOverrideShading(overrideShading);
       this.uniformNameFBOMap.forEach((inputFramebufferName, uniformName) => {
@@ -131,36 +87,32 @@ export class RenderPass<
 
     engine.getClearColor(this.beforeClearColor);
     // clear setting
-    if (this.enableColorClear) {
-      engine.setClearColor(this.clearColor);
+    if (this.passNode._enableColorClear) {
+      engine.setClearColor(this.passNode._clearColor);
       engine.clearColor();
     }
-    if (this.enableDepthClear) {
-      if (!this.isOutputScreen && this.outputTarget!.enableDepth) {
+    if (this.passNode._enableDepthClear) {
+      if (this.isOutputScreen || this.outputTarget.enableDepth) {
         engine.clearDepth();
       }
     }
 
-    if (this.beforePassExecute !== undefined) {
-      this.beforePassExecute();
-    }
+    this.passNode.beforePassExecute.notifyObservers(this.passNode);
 
     //////  render //////
-    this.define.source.forEach(source => {
+    this.passNode.source.forEach(source => {
       source(engine);
     })
     /////////////////////
-
-    if (this.afterPassExecute !== undefined) {
-      this.afterPassExecute();
-    }
+    
+    this.passNode.afterPassExecute.notifyObservers(this.passNode);
 
     engine.setOverrideShading(null);
     engine.setClearColor(this.beforeClearColor);
 
 
-    if (graph.enableDebuggingView && !this.isOutputScreen) {
-      this.renderDebugResult(engine, framebuffer);
+    if (enableDebuggingView && !this.isOutputScreen) {
+      this.renderDebugResult(engine, framebuffer!);
     }
 
   }
@@ -169,14 +121,15 @@ export class RenderPass<
     if (this.isOutputScreen) {
       return
     }
-    if (!this.hasNodePrepared) {
-      throw `pass is not prepared, passNode or TargetNode not provided`
+    if (this.passNode.source.length === 0) {
+      throw 'your pass has no render source'
     }
-    const target = this.outputTarget!.name;
+
+    const target = this.outputTarget.name;
     this.uniformNameFBOMap.forEach(input => {
       if (input === target) {
         throw `you cant output to the render target which is depend on: 
-Duplicate target: ${this.outputTarget!.name};`
+Duplicate target: ${this.outputTarget.name};`
       }
     })
   }

@@ -11,7 +11,7 @@ export abstract class BackGround{
 }
 
 export class PureColorBackGround extends BackGround{
-  color: Vector4 = new Vector4(0.5, 0.5, 0.5, 1.0);
+  color: Vector4 = new Vector4(0.8, 0.8, 0.8, 1.0);
   private beforeColor: Vector4 = new Vector4();
 
   render(engine: RenderEngine) {

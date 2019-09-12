@@ -8,7 +8,6 @@ import { RenderEngine } from "../engine/render-engine";
 import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
 import { uniformFromValue } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
-import { ShadingConstrain } from "../render-graph/backend-interface";
 import { Light } from "./light";
 
 export interface ShaderUniformDecorator {
@@ -37,7 +36,7 @@ export interface ShaderUniformProvider {
   propertyUniformNameMap: Map<propertyName, uniformName>;
 }
 
-export class Shading implements ShadingConstrain{
+export class Shading {
   uuid = generateUUID();
   graph: ShaderGraph = new ShaderGraph();
 
@@ -50,7 +49,7 @@ export class Shading implements ShadingConstrain{
 
   updateDecorator(oldDecorator: ShaderUniformDecorator, newDecorator: ShaderUniformDecorator) {
     if (!this._decoratorSlot.has(oldDecorator)) {
-      throw  `decorator has not been decorate before`
+      throw `decorator has not been decorate before`
     }
 
     if (oldDecorator === newDecorator) {
@@ -217,7 +216,7 @@ export abstract class BaseEffectShading<T>
   uniforms: Map<string, any>;
 
   nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
-  
+
   getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
     return getPropertyUniform(this, name)
   }

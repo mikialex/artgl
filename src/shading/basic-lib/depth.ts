@@ -1,18 +1,14 @@
 import { BaseEffectShading } from "../../core/shading";
 import { MVPWorld } from "../../shader-graph/node-maker";
-import { ShaderFunction } from "../../shader-graph/shader-function";
+import { shader } from "../../shader-graph/shader-function";
 import { depthPack } from "../../shader-graph/built-in/depth-pack";
 import { ShaderGraph } from "../../shader-graph/shader-graph";
 
-
-const depthV = new ShaderFunction(
-  {
-    source: `
-    float depthVary(vec4 worldPosition){
-      return worldPosition.z / worldPosition.w;
-    }
-    `}
-)
+const depthV = shader(`
+float depthVary(vec4 worldPosition){
+  return worldPosition.z / worldPosition.w;
+}
+`)
 
 export class DepthShading extends BaseEffectShading<DepthShading> {
 
