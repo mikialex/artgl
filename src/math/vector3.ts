@@ -1,6 +1,6 @@
 import { Quaternion } from './quaternion';
 import { Matrix4 } from '../math';
-import { Spherical } from './Spherical';
+import { Spherical } from './spherical';
 import { DataObject, VectorDataObject, ArrayFlattenable } from './index';
 import { Vector3Like } from './interface';
 
