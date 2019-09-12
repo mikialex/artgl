@@ -19,7 +19,7 @@ export class GLRenderer implements GLReleasable {
     options = { ...options };
     options.antialias = false;
     // options.preserveDrawingBuffer = true; // for screen shot
-    const ctx = el.getContext('webgl', options);
+    const ctx = el.getContext('webgl', options)  as WebGLRenderingContext;
     if (ctx === null) {
       throw 'webgl context create failed';
     }

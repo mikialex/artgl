@@ -29,3 +29,5 @@ jobs:
     - run: npm install yarn -g
     - run: yarn
     - run: yarn test
+    - run: yarn build
+    - run: yarn package
