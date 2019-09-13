@@ -1,5 +1,4 @@
 import { GLRenderer } from "./gl-renderer";
-import { GLProgramConfig } from "./program";
 
 export enum ShaderType {
   vertex,

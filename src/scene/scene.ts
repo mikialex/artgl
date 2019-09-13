@@ -8,6 +8,7 @@ import { SceneNode, RenderObject, RenderEngine } from "../artgl";
 import { PureShading } from "../shading/basic-lib/pure";
 import { RefCountMap } from "../util/ref-count-map";
 import { BackGround, PureColorBackGround, SkyBackGround } from "./background";
+import { RayCastSource, RayCasterable } from "../core/raycaster";
 
 /**
  * scene data management
@@ -16,7 +17,7 @@ import { BackGround, PureColorBackGround, SkyBackGround } from "./background";
  * @export
  * @class Scene
  */
-export class Scene implements RenderSource {
+export class Scene implements RenderSource, RayCastSource {
   constructor() {
     this.root.scene = this;
   }
@@ -49,6 +50,15 @@ export class Scene implements RenderSource {
     this.updateObjectList();
     this.renderList.forEach(item => {
       visitor(item);
+    })
+  }
+
+  foreachRaycasterable(visitor: (obj: RayCasterable) => boolean): void {
+    this.updateObjectList();
+    this.renderList.forEach(item => {
+      if ((item as unknown as RayCasterable).raycasterable === true) {
+        visitor(item as unknown as RayCasterable);
+      }
     })
   }
 
@@ -91,6 +101,7 @@ export class Scene implements RenderSource {
   }
 
   updateObjectList() {
+    // todo check if not need update
     this.renderList.reset();
     this.root.traverse((node) => {
       node.scene = this;
