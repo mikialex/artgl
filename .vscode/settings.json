@@ -15,6 +15,7 @@
     "fwidth",
     "phong",
     "pingpong",
+    "raycast",
     "rendergraph",
     "smoothstep",
     "tssao",

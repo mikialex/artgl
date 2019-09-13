@@ -13,10 +13,9 @@ export default async function test(testBridge: TestBridge) {
 
   let canvas = testBridge.requestCanvas();
   const engine = new RenderEngine(canvas);
-
   const scene = new Scene();
 
-  const geometry = new SphereGeometry();
+  const geometry = new SphereGeometry(1, 30, 30);
   createBarycentricBufferForStandardGeometry(geometry);
 
   const pointLight = new PointLight();
@@ -48,7 +47,7 @@ export default async function test(testBridge: TestBridge) {
   scene.root.addChild(mesh);
 
   const camera = engine.camera as PerspectiveCamera;
-  camera.transform.position.set(0, 0, 15);
+  camera.transform.position.set(2, 2, 2);
   camera.lookAt(new Vector3(0, 0, 0))
 
   function draw() {
@@ -72,6 +71,46 @@ export default async function test(testBridge: TestBridge) {
   testBridge.resizeObserver.add((size) => {
     engine.setSize(size.width, size.height);
   })
+
+  testBridge.testConfig = [
+    {
+      name: 'line-width-ratio',
+      value: wireframe.barycentricLine_threshold,
+      onChange: (value: number) => {
+        wireframe.barycentricLine_threshold = value;
+      },
+      editors: [
+        {
+          type: 'slider',
+          min: 0,
+          max: 0.33,
+          step: 0.01,
+        },
+      ]
+    },
+    {
+      name: 'screen-space-ratio',
+      value: wireframe.screenSpaceRatio,
+      onChange: (value: number) => {
+        wireframe.screenSpaceRatio = value;
+      },
+      editors: [
+        {
+          type: 'slider',
+          min: 0,
+          max: 10,
+          step: 0.1,
+        },
+      ]
+    },
+    {
+      name: 'is-screen-spaced',
+      value: wireframe.useScreenSpace,
+      onChange: (value: boolean) => {
+        wireframe.useScreenSpace = value;
+      },
+    },
+  ]
 
   testBridge.framer.setFrame(() => {
     orbitController.update();

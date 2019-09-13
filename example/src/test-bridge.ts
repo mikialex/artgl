@@ -19,7 +19,7 @@ export class TestBridge implements TestBridge {
   }
 
   framer: Framer = new Framer();
-  testConfig?: RenderConfig;
+  testConfig?: RenderConfig | RenderConfig[];
 
   resizeObserver: Observable<Size> = new Observable()
 
