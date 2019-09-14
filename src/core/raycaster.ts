@@ -1,10 +1,10 @@
 import { Vector3, Matrix4 } from "../math/index";
 import { Nullable } from "../type";
 import { Ray } from "../math/entity/ray";
-import { RenderSource } from "../engine/render-source";
-import { RenderObject } from "./render-object";
 
-
+export interface RayCastSource{
+  foreachRaycasterable(visitor: (obj: RayCasterable)=> boolean): void;
+}
 
 export interface RayCasterable {
 
@@ -12,6 +12,8 @@ export interface RayCasterable {
    * mark this obj is raycasterable
    */
   raycasterable: true
+
+  worldMatrix: Matrix4;
 
   /**
    * check if this obj has any hit, should early return.
@@ -38,7 +40,7 @@ export interface RayCastResult {
   /**
    * hit object
    */
-  object: RenderObject
+  object: RayCasterable
 
   /**
   * The hit position in object's local space.
@@ -70,25 +72,22 @@ export class Raycaster {
     return this.localRay.copy(this.worldRay).applyMatrix4(worldMatrix);
   }
 
-  pick(source: RenderSource, preFilter?: (obj: RenderObject) => boolean) {
+  pick(source: RayCastSource, preFilter?: (obj: RayCasterable) => boolean) {
     const results: RayCastResult[] = [];
-    source.visitAllRenderObject((obj) => {
-
-      if ((obj as unknown as RayCasterable).raycasterable !== true) {
-        return
-      }
+    source.foreachRaycasterable((obj) => {
 
       if (preFilter !== undefined && !preFilter(obj)) {
-        return;
+        return true;
       }
 
       (obj as unknown as RayCasterable).raycast(this, results);
-
+      
+      return true;
     })
     return results;
   }
 
-  pickFirst(source: RenderSource, preFilter?: (obj: RenderObject) => boolean) {
+  pickFirst(source: RayCastSource, preFilter?: (obj: RayCasterable) => boolean) {
     // TODO use pre exist 
     return this.pick(source, preFilter).map(re => {
       const hitWorldPosition = re.hitLocalPosition.applyMatrix4(re.object.worldMatrix);

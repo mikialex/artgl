@@ -4,6 +4,7 @@
   "cSpell.words": [
     "ARTGL",
     "Cineon",
+    "Flattenable",
     "Interactor",
     "Reinhard",
     "Renderable",
@@ -14,6 +15,7 @@
     "fwidth",
     "phong",
     "pingpong",
+    "raycast",
     "rendergraph",
     "smoothstep",
     "tssao",

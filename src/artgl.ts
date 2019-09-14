@@ -10,12 +10,13 @@ export { RenderEngine } from "./engine/render-engine";
 export { Framer } from "./engine/framer";
 
 export * from "./core/render-object";
+export * from "./core/texture";
 export { Mesh } from "./object/mesh";
 export { Line } from "./object/line";
 export { Points } from "./object/points";
 
 export { Geometry } from "./core/geometry";
-export { Material, ChannelType } from './core/material';
+export * from './core/material';
 export { Shading } from "./core/shading";
 export { BufferData } from "./core/buffer-data";
 export { Camera } from "./core/camera";

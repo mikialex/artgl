@@ -1,6 +1,6 @@
 import {
   RenderEngine, Mesh, PerspectiveCamera, OrbitController,
-  OBJLoader, Scene, Observable, Framer, Material, Geometry, Shading,
+  OBJLoader, Scene, Observable, Framer, Material, Geometry, Shading, RenderObject,
 } from '../../src/artgl';
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
@@ -80,7 +80,7 @@ export class Application {
     if (resultCast !== undefined) {
       this.pipeline.dof.focusLength = resultCast.cameraDistance;
       this.pipeline.resetSample();
-      this.scene.select(resultCast.object);
+      this.scene.select(resultCast.object as unknown as RenderObject);
     }
     console.log(resultCast);
 

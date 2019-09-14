@@ -2,7 +2,11 @@ import { MathUtil } from "../math";
 
 type ImageLike = HTMLImageElement | HTMLCanvasElement | ImageBitmap;
 
-export function resizeImage(image: ImageLike, needsPowerOfTwo, canvas: HTMLCanvasElement, maxSize): ImageData {
+export function resizeImageFORWebGL(
+  image: ImageLike,
+  needsPowerOfTwo: boolean,
+  utilCanvas: HTMLCanvasElement,
+  maxSize: number) {
 
   let scale = 1;
 
@@ -12,18 +16,18 @@ export function resizeImage(image: ImageLike, needsPowerOfTwo, canvas: HTMLCanva
   }
 
   // only perform resize if necessary
-  if (scale < 1 || needsPowerOfTwo === true) {
+  if (scale < 1 || needsPowerOfTwo) {
 
     const width = MathUtil.floorPowerOfTwo(scale * image.width);
     const height = MathUtil.floorPowerOfTwo(scale * image.height);
 
-    canvas.width = width;
-    canvas.height = height;
+    utilCanvas.width = width;
+    utilCanvas.height = height;
 
-    var context = canvas.getContext('2d');
+    var context = utilCanvas.getContext('2d')!;
     context.drawImage(image, 0, 0, width, height);
 
-    console.warn('Texture has been resized from (' + image.width + 'x' + image.height + ') to (' + width + 'x' + height + ').');
+    console.warn(`Texture has been resized from (${image.width}, ${image.height}) to (${width}, ${height}).`);
 
     return context.getImageData(10, 10, 50, 50);;
 

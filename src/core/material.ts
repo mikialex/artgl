@@ -41,6 +41,15 @@ export class Material {
   uuid = generateUUID();
   _channels: Map<ChannelName, Texture> = new Map();
 
+  channel(channel: ChannelName, value: Vector3 | Texture) {
+    if (value instanceof Vector3) {
+      this.setChannelColor(channel, value);
+    } else {
+      this.setChannelTexture(channel, value);
+    }
+    return this;
+  }
+
   setChannelColor(channel: ChannelName, color: Vector3) {
     let channelTexture = this._channels.get(channel);
     if (channelTexture === undefined) {
@@ -49,10 +58,12 @@ export class Material {
       updateTextureToPureColor(channelTexture, color);
     }
     this.setChannelTexture(channel, channelTexture);
+    return this;
   }
 
   setChannelTexture(channel: ChannelName, texture: Texture) {
     this._channels.set(channel, texture);
+    return this;
   }
 
   getChannelTexture(type: ChannelName): Texture {

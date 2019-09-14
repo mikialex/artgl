@@ -9,10 +9,6 @@ import { Nullable } from '../type';
  * extender can support more useful interface
  * to make the projection relation more easy to 
  * understand and modified;
- * 
- * @export
- * @class Camera
- * @extends {SceneNode}
  */
 export abstract class Camera extends SceneNode {
   constructor() {

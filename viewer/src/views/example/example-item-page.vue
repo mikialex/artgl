@@ -96,7 +96,11 @@ export default class ConfigPanel extends Vue {
     await this.example.build(bridge);
 
     if (bridge.testConfig !== undefined) {
-      this.config.value.push(bridge.testConfig);
+      if (Array.isArray(bridge.testConfig)) {
+        this.config.value = this.config.value.concat(bridge.testConfig);
+      } else {
+        this.config.value.push(bridge.testConfig);
+      }
     }
 
     this.exampleHasBuild = true;

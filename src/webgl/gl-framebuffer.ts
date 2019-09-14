@@ -1,7 +1,6 @@
 import { GLRenderer } from "./gl-renderer";
 import { Nullable, GLReleasable } from "../type";
-import { PixelFormat } from "./const";
-import { Texture, TextureSource } from "../core/texture";
+import { Texture, TextureSource, PixelFormat } from "../core/texture";
 
 
 export class FramebufferAttachTexture extends Texture implements GLReleasable {

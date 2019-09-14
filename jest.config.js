@@ -6,7 +6,8 @@ module.exports = {
   roots: ["<rootDir>/src/"],
   collectCoverage: true,
   coverageReporters: [
-    "html"
+    // "html", "lcov", "clover", "json",
+     "text", 
   ],
   collectCoverageFrom: [
     "src/**/*.ts",

@@ -45,15 +45,11 @@ export type RenderablePrimitive = Line3 | Vector3 | Face3
 export type PrimitiveVisitor = (prim: RenderablePrimitive) => any
 
 /**
- * Class for render drawcall description,  which is describe all drawable things
+ * Class for one render drawcall description,  which is describe all drawable things
  * a drawable thing should have a geometry to define what to draw
  * and a technique to defined how to draw
  * and many other draw config such as blending depth behavior defined in state object
  * engine will read these information and organize things properly
- * 
- * @export
- * @class RenderObject
- * @extends {SceneNode}
  */
 export class RenderObject extends SceneNode {
 

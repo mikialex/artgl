@@ -19,7 +19,7 @@ export class GLRenderer implements GLReleasable {
     options = { ...options };
     options.antialias = false;
     // options.preserveDrawingBuffer = true; // for screen shot
-    const ctx = el.getContext('webgl', options);
+    const ctx = el.getContext('webgl', options) as WebGLRenderingContext;
     if (ctx === null) {
       throw 'webgl context create failed';
     }
@@ -36,7 +36,7 @@ export class GLRenderer implements GLReleasable {
       this.angleInstanceExt = ext;
     }
 
-    this.setSize(this.el.offsetWidth, this.el.offsetHeight);
+    this.syncCanvasSize();
   }
   readonly gl: WebGLRenderingContext;
   readonly el: HTMLCanvasElement;
@@ -56,6 +56,10 @@ export class GLRenderer implements GLReleasable {
   get height() { return this._height };
 
   private devicePixelRatio = window.devicePixelRatio;
+
+  syncCanvasSize() {
+    this.setSize(this.el.offsetWidth, this.el.offsetHeight);
+  }
 
   // set render size by device logic size
   setSize(width: number, height: number): boolean {
