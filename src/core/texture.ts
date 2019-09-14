@@ -95,7 +95,7 @@ export class Texture implements GraphicResourceReleasable {
   private _wrapS: TextureWrap = TextureWrap.clampToEdge
   get wrapS() { return this._wrapS }
 
-  private _wrapT: TextureWrap = TextureWrap.clampToEdge
+  private _wrapT: TextureWrap = TextureWrap.repeat
   get wrapT() { return this._wrapT }
 
 

@@ -32,7 +32,7 @@ export function resizeImageFORWebGL(
 
     console.warn(`Texture has been resized from (${source.width}, ${source.height}) to (${width}, ${height}).`);
 
-    const resizedData = context.getImageData(10, 10, 50, 50);
+    const resizedData = context.getImageData(0, 0, width, height);
 
     const newSource = new TextureSource()
     newSource.source = resizedData;

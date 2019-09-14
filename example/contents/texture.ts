@@ -3,7 +3,7 @@ import {
   Vector3, RenderEngine, SphereGeometry, Mesh,
   PerspectiveCamera, Vector4, OrbitController, Material,
   ChannelType, textureFromUrl, ShaderGraph, texture,
-  BaseEffectShading, UvFragVary, Shading
+  BaseEffectShading, UvFragVary, Shading, TextureWrap
 } from '../../src/artgl';
 
 export class CustomShading extends BaseEffectShading<CustomShading> {
@@ -28,8 +28,7 @@ export default async function test(testBridge: TestBridge) {
   const material = new Material();
   const shading = new Shading().decorate(new CustomShading());
 
-  const texture = await textureFromUrl(
-    testBridge.getResourceURL("img/demo.jpg"))
+  const texture = await textureFromUrl(testBridge.getResourceURL("img/demo.jpg"))
   
   material.channel(ChannelType.diffuse, texture)
 
