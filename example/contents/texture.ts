@@ -2,9 +2,20 @@ import { TestBridge } from '../src/test-bridge';
 import {
   Vector3, RenderEngine, Scene, SphereGeometry, Mesh,
   PerspectiveCamera, Vector4, OrbitController, Material,
-  ChannelType
+  ChannelType, textureFromUrl, ShaderGraph, texture,
+  BaseEffectShading, UvFragVary, Shading
 } from '../../src/artgl';
-import { Texture, TextureSource } from '../../src/core/texture';
+
+export class CustomShading extends BaseEffectShading<CustomShading> {
+  decorate(graph: ShaderGraph): void {
+    graph
+      .declareFragUV()
+      .setFragmentRoot(
+        texture(ChannelType.diffuse).fetch(graph.getVary(UvFragVary))
+      )
+  }
+
+}
 
 export default async function test(testBridge: TestBridge) {
 
@@ -17,13 +28,14 @@ export default async function test(testBridge: TestBridge) {
 
   const geometry = new SphereGeometry();
   const material = new Material();
+  const shading = new Shading().decorate(new CustomShading());
 
-  const texture = new Texture(await TextureSource.fromUrl(
-    testBridge.getResourceURL("img/demo.jpg")));
+  const texture = await textureFromUrl(
+    testBridge.getResourceURL("img/demo.png"))
   
   material.channel(ChannelType.diffuse, texture)
 
-  const mesh = new Mesh().g(geometry).m(material)
+  const mesh = new Mesh().g(geometry).m(material).s(shading)
 
   scene.root.addChild(mesh);
 

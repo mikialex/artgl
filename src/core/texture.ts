@@ -47,6 +47,7 @@ export class TextureSource {
   static async fromUrl(url: string) {
     const img = await new Promise<HTMLImageElement>((re, rj) => {
       const image = document.createElement('img');
+      image.crossOrigin = "*"
       image.src = url;
       image.onload = () => {
         re(image)
@@ -76,6 +77,10 @@ export class TextureSource {
   source: Nullable<TexImageSource | ArrayBufferView> = null
   width: number = 1;
   height: number = 1;
+}
+
+export async function textureFromUrl(url: string) {
+  return new Texture(await TextureSource.fromUrl(url));
 }
 
 /**

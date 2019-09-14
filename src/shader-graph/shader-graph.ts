@@ -97,7 +97,7 @@ export class ShaderGraph {
     return new ShaderVaryInputNode(key, ret!.type);
   }
 
-  cachedInnerSupportEyeDir: Nullable<ShaderNode> = null;
+  private cachedInnerSupportEyeDir: Nullable<ShaderNode> = null;
   getEyeDir(): ShaderNode {
     if (this.cachedInnerSupportEyeDir === null) {
       this.cachedInnerSupportEyeDir = eyeDir.make()
@@ -107,7 +107,7 @@ export class ShaderGraph {
     return this.cachedInnerSupportEyeDir
   }
 
-  cachedReusedChannelNodes: Map<ChannelType, ShaderNode> = new Map();
+  private cachedReusedChannelNodes: Map<ChannelType, ShaderNode> = new Map();
   getChannel(channelType: ChannelType): ShaderNode {
     if (!this.cachedReusedChannelNodes.has(channelType)) {
       this.cachedReusedChannelNodes.set(channelType,
@@ -126,10 +126,10 @@ export class ShaderGraph {
   }
 
   compile(): GLProgramConfig {
-    const {results, needDerivative } = this.compileFragSource();
+    const {results, needDerivative } = genFragShader(this);
     return {
       ...this.collectInputs(),
-      vertexShaderString: this.compileVertexSource(),
+      vertexShaderString: genVertexShader(this),
       fragmentShaderString: results,
       autoInjectHeader: true,
       needDerivative
@@ -208,15 +208,6 @@ export class ShaderGraph {
     })
 
     return { attributes, uniforms, textures, varyings, uniformsIncludes }
-  }
-
-  compileVertexSource(): string {
-    return genVertexShader(this);
-  }
-
-  compileFragSource()
-  : { results: string, needDerivative: boolean } {
-    return genFragShader(this);
   }
 
 }

@@ -23,7 +23,7 @@ export class TestBridge implements TestBridge {
     return this.resourceBaseURL + url;
   }
 
-  resourceBaseURL: string = "localhost:3000/"
+  resourceBaseURL: string = "http://localhost:3001/"
   framer: Framer = new Framer();
   testConfig?: RenderConfig | RenderConfig[];
 
