@@ -1,7 +1,8 @@
-import { Texture, TextureSource } from "./texture";
+import { Texture } from "./texture";
 import { generateUUID } from "../math/uuid";
 import { Vector3, Vector4 } from "../math/index";
 import { Nullable } from "../type";
+import { TextureSource } from "./texture-source";
 
 export const enum ChannelType {
   diffuse = 'diffuse',

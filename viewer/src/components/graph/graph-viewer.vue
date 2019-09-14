@@ -1,14 +1,12 @@
 <template>
   <div class="graph-viewer" tabindex="-1">
-    <div style="transform-origin: top left;"
-    :style="{
+    <div style="transform-origin: top left;" :style="{
           transform,
         }">
       <slot></slot>
     </div>
 
     <div class="mask" v-if="showMove" @mousedown="startDrag"></div>
-
   </div>
 </template>
 
@@ -24,7 +22,9 @@ export default class GraphViewer extends Vue {
   @Prop({ required: true }) board?: GraphBoardInfo;
 
   get transform() {
-    return `translate(${this.board!.transformX}px, ${this.board!.transformY}px) scale(${this.board!.scale})`;
+    return `translate(${this.board!.transformX}px, ${
+      this.board!.transformY
+    }px) scale(${this.board!.scale})`;
   }
 
   showMove = false;
@@ -55,29 +55,29 @@ export default class GraphViewer extends Vue {
     this.$emit("updateAllViewport");
   }
 
-  enableDragKeyboard(e: KeyboardEvent){
-    if(e.code === "Space"){
-        this.showMove = true;
-      }
+  enableDragKeyboard(e: KeyboardEvent) {
+    if (e.code === "Space") {
+      this.showMove = true;
+    }
   }
 
-  disableDragKeyboard(e: KeyboardEvent){
-    if(e.code === "Space"){
-        this.showMove = false;
-      }
+  disableDragKeyboard(e: KeyboardEvent) {
+    if (e.code === "Space") {
+      this.showMove = false;
+    }
   }
 
   mounted() {
     this.updateBoard();
-    window.addEventListener("resize", this.updateBoard)
-    window.addEventListener("keydown", this.enableDragKeyboard)
-    window.addEventListener("keyup", this.disableDragKeyboard)
+    window.addEventListener("resize", this.updateBoard);
+    window.addEventListener("keydown", this.enableDragKeyboard);
+    window.addEventListener("keyup", this.disableDragKeyboard);
   }
 
-  beforeDestroy(){
-    window.removeEventListener("resize", this.updateBoard)
-    window.removeEventListener("keydown", this.enableDragKeyboard)
-    window.removeEventListener("keyup", this.disableDragKeyboard)
+  beforeDestroy() {
+    window.removeEventListener("resize", this.updateBoard);
+    window.removeEventListener("keydown", this.enableDragKeyboard);
+    window.removeEventListener("keyup", this.disableDragKeyboard);
   }
 
   updateBoard() {
@@ -116,5 +116,4 @@ export default class GraphViewer extends Vue {
   position: absolute;
   pointer-events: auto;
 }
-
 </style>

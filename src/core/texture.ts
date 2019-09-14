@@ -1,5 +1,6 @@
 import { RenderEngine } from "../engine/render-engine";
 import { GraphicResourceReleasable, Nullable } from "../type";
+import { TextureSource } from "./texture-source";
 
 // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Pixel_formats
 export enum PixelFormat {
@@ -31,60 +32,12 @@ export const enum TextureFilter {
   linear_mipmap_linear = 0x2703
 }
 
-/**
- * Container for texture data storage, not only data self,
- * but also some meta info like width height, because data texture need this
- */
-export class TextureSource {
-  static fromImageElement(image: HTMLImageElement) {
-    const data = new TextureSource();
-    data.source = image;
-    data.width = image.width;
-    data.height = image.height;
-    return data;
-  }
-
-  static async fromUrl(url: string) {
-    const img = await new Promise<HTMLImageElement>((re, rj) => {
-      const image = document.createElement('img');
-      image.crossOrigin = "*"
-      image.src = url;
-      image.onload = () => {
-        re(image)
-      }
-      image.onerror = (err) => {
-        rj(err)
-      }
-    })
-    return TextureSource.fromImageElement(img);
-  }
-
-  static fromPixelDataUint8(buffer: Uint8ClampedArray, width: number, height: number) {
-    const data = new TextureSource();
-    data.source = buffer;
-    data.width = width;
-    data.height = height;
-    return data;
-  }
-
-  static forRenderTarget(width: number, height: number) {
-    const data = new TextureSource();
-    data.source = null;
-    data.width = width;
-    data.height = height;
-    return data;
-  }
-  source: Nullable<TexImageSource | ArrayBufferView> = null
-  width: number = 1;
-  height: number = 1;
-}
-
 export async function textureFromUrl(url: string) {
   return new Texture(await TextureSource.fromUrl(url));
 }
 
 /**
- * Texture container, for mipmap operate
+ * Texture container, for mipmap operate, sample behavior
  * 
  */
 export class Texture implements GraphicResourceReleasable {
@@ -98,16 +51,19 @@ export class Texture implements GraphicResourceReleasable {
   }
 
   isDataTexture: boolean = false;
+
   private _dataSource: TextureSource;
-  private _POTResizedSource: Nullable<TextureSource> = null;
+  private _convertedResizedSource: Nullable<TextureSource> = null;
   get rawDataSource() { return this._dataSource }
-  get potDataSource() { return this._POTResizedSource }
+  get convertedDataSource() { return this._convertedResizedSource }
   get renderUsedDataSource(): TextureSource {
-    if (this.potDataSource !== null) {
-      // TODO create pot
-      return this._POTResizedSource!
+    if (this._dataSource.isValid(this.needUsePOT)) {
+      return this._dataSource
     } else {
-      return this.rawDataSource
+      if (this._convertedResizedSource === null) {
+        this._convertedResizedSource = this._dataSource.createPOTTextureSource(this.needUsePOT)
+      }
+      return this._convertedResizedSource!
     }
   }
 
@@ -124,6 +80,13 @@ export class Texture implements GraphicResourceReleasable {
     this.setNeedUpdate();
     this._format = format;
     return this;
+  }
+
+  get needUsePOT() {
+    return this._wrapS !== TextureWrap.clampToEdge ||
+      this._wrapT !== TextureWrap.clampToEdge ||
+      this._magFilter !== TextureFilter.nearest ||
+      this._minFilter !== TextureFilter.nearest
   }
 
   private _dataType: PixelDataType = PixelDataType.UNSIGNED_BYTE

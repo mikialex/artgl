@@ -1,8 +1,9 @@
 import { GLRenderer } from "./gl-renderer";
-import { Texture, TextureWrap, TextureFilter, TextureSource } from "../core/texture";
+import { Texture, TextureWrap, TextureFilter } from "../core/texture";
 import { GLReleasable } from '../type';
 import { FramebufferAttachTexture } from "./gl-framebuffer";
 import { GLTextureSlot } from "./states/gl-texture-slot";
+import { TextureSource } from "../core/texture-source";
 
 interface TextureDescriptor {
   minFilter: TextureFilter;

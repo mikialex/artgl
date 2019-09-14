@@ -1,6 +1,6 @@
 import { TestBridge } from '../src/test-bridge';
 import {
-  Vector3, RenderEngine, Scene, SphereGeometry, Mesh,
+  Vector3, RenderEngine, SphereGeometry, Mesh,
   PerspectiveCamera, Vector4, OrbitController, Material,
   ChannelType, textureFromUrl, ShaderGraph, texture,
   BaseEffectShading, UvFragVary, Shading
@@ -29,7 +29,7 @@ export default async function test(testBridge: TestBridge) {
   const shading = new Shading().decorate(new CustomShading());
 
   const texture = await textureFromUrl(
-    testBridge.getResourceURL("img/demo.png"))
+    testBridge.getResourceURL("img/demo.jpg"))
   
   material.channel(ChannelType.diffuse, texture)
 
