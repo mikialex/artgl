@@ -18,6 +18,12 @@ export class TestBridge implements TestBridge {
     return this.canvas
   }
 
+  // /img/demo.jpg
+  getResourceURL(url: string) {
+    return this.resourceBaseURL + url;
+  }
+
+  resourceBaseURL: string = "localhost:3000/"
   framer: Framer = new Framer();
   testConfig?: RenderConfig | RenderConfig[];
 

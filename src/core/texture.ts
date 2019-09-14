@@ -1,20 +1,21 @@
 import { RenderEngine } from "../engine/render-engine";
 import { GraphicResourceReleasable, Nullable } from "../type";
 
-export const enum PixelFormat {
-  AlphaFormat = 1021,
-  RGBFormat = 1022,
-  RGBAFormat = 1023,
+// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Pixel_formats
+export enum PixelFormat {
+  Alpha = 0x1906,
+  RGB = 0x1907,
+  RGBA = 0x1908,
 }
 
-export const enum PixelDataType {
-  UNSIGNED_BYTE,
-  UNSIGNED_SHORT_5_6_5,
-  UNSIGNED_SHORT_4_4_4_4,
-  UNSIGNED_SHORT_5_5_5_1,
+// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Pixel_types
+export enum PixelDataType {
+  UNSIGNED_BYTE = 0x1401,
+  UNSIGNED_SHORT_5_6_5 = 0x8033,
+  UNSIGNED_SHORT_4_4_4_4 = 0x8034,
+  UNSIGNED_SHORT_5_5_5_1 = 0x8363,
   FLOAT,
 }
-
 export const enum TextureWrap {
   repeat = 0x2901,
   clampToEdge = 0x812F,
@@ -30,6 +31,10 @@ export const enum TextureFilter {
   linear_mipmap_linear = 0x2703
 }
 
+/**
+ * Container for texture data storage, not only data self,
+ * but also some meta info like width height, because data texture need this
+ */
 export class TextureSource {
   static fromImageElement(image: HTMLImageElement) {
     const data = new TextureSource();
@@ -37,6 +42,20 @@ export class TextureSource {
     data.width = image.width;
     data.height = image.height;
     return data;
+  }
+
+  static async fromUrl(url: string) {
+    const img = await new Promise<HTMLImageElement>((re, rj) => {
+      const image = document.createElement('img');
+      image.src = url;
+      image.onload = () => {
+        re(image)
+      }
+      image.onerror = (err) => {
+        rj(err)
+      }
+    })
+    return TextureSource.fromImageElement(img);
   }
 
   static fromPixelDataUint8(buffer: Uint8ClampedArray, width: number, height: number) {
@@ -60,10 +79,8 @@ export class TextureSource {
 }
 
 /**
- * texture container for bitmap render data
+ * Texture container, for mipmap operate
  * 
- * @export
- * @class Texture
  */
 export class Texture implements GraphicResourceReleasable {
   constructor(dataSource: TextureSource) {
@@ -92,7 +109,7 @@ export class Texture implements GraphicResourceReleasable {
   _webGLMipMapInUsed: boolean = false;
   _mipmapArray: TextureSource[] = [];
 
-  private _format: PixelFormat = PixelFormat.RGBAFormat
+  private _format: PixelFormat = PixelFormat.RGBA
   get format() { return this._format }
   set format(value) {
     this.setNeedUpdate();
