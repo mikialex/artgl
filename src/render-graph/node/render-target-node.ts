@@ -53,6 +53,7 @@ export class RenderTargetNode extends DAGNode {
     this.toNodes.forEach(n => {
       if (n instanceof PassGraphNode) {
         n.clearAllInput();
+        n.clearAllDepends();
       } else {
         n.clearAllFrom();
       }

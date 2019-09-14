@@ -102,11 +102,17 @@ export class AdvanceStaticRenderPipeline {
   private build(scene: Scene) {
     this.updateTicks();
 
+    const directionalShadowMapPass = pass("directionalShadowMapPass")
+    .use(scene.renderScene).overrideShading(this.depthShader)
+    
+    const directionalShadowMap = target("directionalShadowMap")
+      .needDepth().from(directionalShadowMapPass)
+    
     const depthPass = pass("depthPass").use(scene.renderScene)
       .overrideShading(this.depthShader)
 
     const scenePass = pass("scenePass")
-      .use(scene.render)
+      .use(scene.render).depend(directionalShadowMap)
 
     const depthResult = target("depthResult").needDepth().from(depthPass)
     const sceneResult = target("sceneResult").needDepth().from(scenePass)
