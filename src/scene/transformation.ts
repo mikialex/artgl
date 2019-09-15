@@ -15,31 +15,38 @@ export class Transformation{
   constructor() {
     this._position.onChange = () => {
       this.matrixIsDirty = true;
-      this.transformFrameChanged = true;
+      this.matrixInverseDirty = true;
+      this.transformChanged = true;
     }
 
     this._scale.onChange = () => {
       this.matrixIsDirty = true;
-      this.transformFrameChanged = true;
+      this.matrixInverseDirty = true;
+      this.transformChanged = true;
     }
 
     this._rotation.onChangeCallback = () => {
       this.matrixIsDirty = true;
-      this.transformFrameChanged = true;
+      this.matrixInverseDirty = true;
+      this.transformChanged = true;
       this._quaternion.setFromEuler(this._rotation, false);
     }
 
     this._quaternion.onChangeCallback = () => {
       this.matrixIsDirty = true;
-      this.transformFrameChanged = true;
+      this.transformChanged = true;
+      this.matrixInverseDirty = true;
       this._rotation.setFromQuaternion(this._quaternion, this._rotation.order, false);
     }
   }
 
-  transformFrameChanged = true;
+  transformChanged: boolean = true;
 
   private _matrix: Matrix4 = new Matrix4();
   private matrixIsDirty = true;
+
+  private _matrixInverse: Matrix4 = new Matrix4();
+  private matrixInverseDirty = true;
 
   private _position: Vector3Observable = new Vector3Observable();
   private positionIsDirty = false;
@@ -59,6 +66,8 @@ export class Transformation{
     this.scaleIsDirty = true;
     this.eulerIsDirty = true;
     this.quaternionIsDirty = true;
+    this.matrixInverseDirty = true;
+    this.transformChanged = true;
   }
 
   get matrix(): Matrix4 {
@@ -66,6 +75,13 @@ export class Transformation{
       this._matrix.compose(this._position, this._quaternion, this._scale);
     }
     return this._matrix;
+  }
+
+  get inverseMatrix(): Matrix4{
+    if (this.matrixInverseDirty) {
+      this._matrixInverse.getInverse(this.matrix, false);
+    }
+    return this._matrixInverse;
   }
 
   get position(): Vector3 {
@@ -109,5 +125,26 @@ export class Transformation{
     return this._quaternion;
   }
 
+  copy(other: Transformation) {
+    this.transformChanged = true;
 
+    this._matrix.copy(other._matrix);
+    this.matrixIsDirty = other.matrixIsDirty;
+  
+    this._matrixInverse.copy(other._matrixInverse);
+    this.matrixInverseDirty = other.matrixInverseDirty;
+  
+    this._position.copy(other._position);
+    this.positionIsDirty = other.positionIsDirty;
+  
+    this._scale.copy(other._scale);
+    this.scaleIsDirty = other.scaleIsDirty;
+  
+    this._rotation.copy(other._rotation);
+    this.eulerIsDirty = other.eulerIsDirty;
+  
+    this._quaternion.copy(other._quaternion);
+    this.quaternionIsDirty = other.quaternionIsDirty;
+    return this;
+  }
 }

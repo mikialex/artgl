@@ -128,7 +128,7 @@ export class RenderEngine implements GLReleasable {
       this.ProjectionMatrix.copy(this.camera.projectionMatrix);
       needUpdateVP = true;
     }
-    if (this.camera.transform.transformFrameChanged) {
+    if (this.camera.transform.transformChanged) {
       this.camera.transform.matrix;
       this.camera.updateWorldMatrix(true);
       this.cameraMatrixReverse.getInverse(this.camera.worldMatrix, true);

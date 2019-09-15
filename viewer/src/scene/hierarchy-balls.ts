@@ -8,6 +8,7 @@ import { RenderConfig } from '@/components/conf/interface';
 import { Application } from '../application';
 import { ArrowGeometry } from '../../../src/geometry/geo-lib/arrow-geometry';
 import { createBarycentricBufferForStandardGeometry } from '../../../src/geometry/geo-util/barycentric'
+import {DirectionalShadowMap} from '../../../src/shadow-map/directional-shadowmap'
 
 export default function (root: SceneNode, app: Application): RenderConfig {
   const sphereGeo = new SphereGeometry(1, 40, 40);
