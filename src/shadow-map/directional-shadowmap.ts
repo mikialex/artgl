@@ -2,23 +2,24 @@ import { DirectionalLight } from "../light/exports";
 import { OrthographicCamera } from "../camera/orthographic-camera";
 import { generateUUID } from "../math/uuid";
 import { Matrix4 } from "../math";
+import { ShaderUniformProvider } from "../artgl";
 
-export class DirectionalShadowMap {
+export class ShadowMap implements ShaderUniformProvider {
+
+  hasAnyUniformChanged: boolean = true;
+  uniforms: Map<string, any> = new Map();
+  propertyUniformNameMap: Map<string, string> = new Map();
+
+}
+
+export class DirectionalShadowMap extends ShadowMap {
   constructor(light: DirectionalLight) {
+    super();
     this.light = light;
   }
 
   updateShadowMatrix() {
     this.shadowCamera.transform.copy(this.light.transform);
-    // lightPositionWorld.setFromMatrixPosition( light.matrixWorld );
-    // shadowCamera.position.copy( lightPositionWorld );
-
-    // lookTarget.setFromMatrixPosition( light.target.matrixWorld );
-    // shadowCamera.lookAt( lookTarget );
-    // shadowCamera.updateMatrixWorld();
-
-    // projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-    // this._frustum.setFromMatrix( projScreenMatrix );
 
     this.shadowMatrix.set(
     	0.5, 0.0, 0.0, 0.5,
@@ -36,5 +37,6 @@ export class DirectionalShadowMap {
   private shadowMatrix: Matrix4 = new Matrix4();
 
   private mapFBOKey: string = generateUUID();
+
 
 }
