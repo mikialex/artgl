@@ -2,17 +2,30 @@ import { DirectionalLight } from "../light/exports";
 import { OrthographicCamera } from "../camera/orthographic-camera";
 import { generateUUID } from "../math/uuid";
 import { Matrix4 } from "../math";
-import { ShaderUniformProvider } from "../artgl";
+import { BaseEffectShading, MapUniform } from "../core/shading";
+import { ShaderFunction } from "../shader-graph/shader-function";
+import { ShaderGraph, WorldPositionFragVary } from "../artgl";
+import { Texture } from "../core/texture";
 
-export class ShadowMap implements ShaderUniformProvider {
+export abstract class ShadowMap<T> extends BaseEffectShading<T> {
 
-  hasAnyUniformChanged: boolean = true;
-  uniforms: Map<string, any> = new Map();
-  propertyUniformNameMap: Map<string, string> = new Map();
 
 }
 
-export class DirectionalShadowMap extends ShadowMap {
+const addShadow = new ShaderFunction({
+  source: `
+  vec4 addShadow(
+    vec3 worldPosition,
+    sampler2D shadowMap, 
+    mat4 shadowMatrix,
+    vec4 inputColor,
+    ){
+      return inputColor;
+  }
+  `
+})
+
+export class DirectionalShadowMap extends ShadowMap<DirectionalShadowMap> {
   constructor(light: DirectionalLight) {
     super();
     this.light = light;
@@ -34,9 +47,20 @@ export class DirectionalShadowMap extends ShadowMap {
 
   private light: DirectionalLight
   private shadowCamera: OrthographicCamera = new OrthographicCamera();
-  private shadowMatrix: Matrix4 = new Matrix4();
 
-  private mapFBOKey: string = generateUUID();
+  @MapUniform('directionalShadowMapMatrix')
+  shadowMatrix: Matrix4 = new Matrix4();
 
+  // private shadowMapTexture: Texture;
+
+  decorate(graph: ShaderGraph): void {
+    graph.setFragmentRoot(
+      addShadow.make()
+      .input('worldPosition', graph.getVary(WorldPositionFragVary))
+      // .input('shadowMap', )
+      .input('shadowMatrix', this.getPropertyUniform('shadowMatrix'))
+      .input('inputColor', graph.getFragRoot())
+    )
+  }
 
 }

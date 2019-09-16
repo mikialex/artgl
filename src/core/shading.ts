@@ -5,10 +5,9 @@ import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { Observable, Observer } from "./observable";
 import { RenderEngine } from "../engine/render-engine";
-import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
-import { uniformFromValue } from '../shader-graph/node-maker';
+import { ShaderCommonUniformInputNode, ShaderTextureNode } from '../shader-graph/shader-node';
+import { uniformFromValue, texture } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
-import { Light } from "./light";
 
 export interface ShaderUniformDecorator {
   /**
@@ -22,10 +21,13 @@ export interface ShaderUniformDecorator {
   foreachProvider(visitor: (p: ShaderUniformProvider) => any): void;
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator>;
+  nodeCreated: Map<string, ShaderCommonUniformInputNode>;
+  textureNodeCreated: Map<string, ShaderTextureNode>;
 }
 
 type propertyName = string;
 type uniformName = string;
+type textureShaderName = string;
 export interface ShaderUniformProvider {
 
   // mark any change in this uniform group
@@ -34,6 +36,7 @@ export interface ShaderUniformProvider {
   // mark the shader need recompile
   uniforms: Map<uniformName, any>;
   propertyUniformNameMap: Map<propertyName, uniformName>;
+  propertyTextureNameMap: Map<propertyName, textureShaderName>;
 }
 
 export class Shading {
@@ -200,6 +203,7 @@ export abstract class BaseEffectShading<T>
   constructor() {
     this.uniforms = checkCreate((this as any).uniforms, new Map());
     this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
+    this.propertyTextureNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
     this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
   }
 
@@ -213,17 +217,46 @@ export abstract class BaseEffectShading<T>
 
   hasAnyUniformChanged: boolean = true;
   propertyUniformNameMap: Map<string, string>;
+  propertyTextureNameMap: Map<string, string>;
   uniforms: Map<string, any>;
 
+
   nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
+  textureNodeCreated: Map<string, ShaderTextureNode> = new Map();
 
   getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
     return getPropertyUniform(this, name)
   }
 
+  getPropertyTexture(name: keyof T): ShaderTextureNode {
+    return getPropertyTexture(this, name);
+  }
+
 }
 
-export function getPropertyUniform<T, K extends BaseEffectShading<any> | Light<any>>(env: K, name: keyof T) {
+export function getPropertyTexture<T, K extends ShaderUniformDecorator & ShaderUniformProvider>
+  (env: K, name: keyof T): ShaderTextureNode {
+  const textureNode = env.textureNodeCreated.get(name as string);
+  if (textureNode !== undefined) {
+    return textureNode;
+  }
+  const textureName = env.propertyTextureNameMap.get(name as string);
+
+  if (textureName === undefined) {
+    throw `${name} shader texture name not found, maybe forget decorator`
+  }
+
+  const value = (env as unknown as T)[name];
+  if (value === undefined) {
+    throw "texture value not given"
+  }
+  const node = texture(textureName);
+  env.textureNodeCreated.set(name as string, node);
+  return node;
+}
+
+export function getPropertyUniform<T, K extends ShaderUniformDecorator & ShaderUniformProvider>
+  (env: K, name: keyof T): ShaderCommonUniformInputNode {
   const uniformNode = env.nodeCreated.get(name as string);
   if (uniformNode !== undefined) {
     return uniformNode;
@@ -231,7 +264,7 @@ export function getPropertyUniform<T, K extends BaseEffectShading<any> | Light<a
   const uniformName = env.propertyUniformNameMap.get(name as string);
 
   if (uniformName === undefined) {
-    throw `${name} uniform name not found, maybe forget uniform decorator`
+    throw `${name} uniform name not found, maybe forget decorator`
   }
 
   const value = (env as unknown as T)[name];
