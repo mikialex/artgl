@@ -1,11 +1,12 @@
 import { DirectionalLight } from "../light/exports";
 import { OrthographicCamera } from "../camera/orthographic-camera";
-import { generateUUID } from "../math/uuid";
 import { Matrix4 } from "../math";
-import { BaseEffectShading, MapUniform } from "../core/shading";
+import { BaseEffectShading } from "../core/shading";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { ShaderGraph, WorldPositionFragVary } from "../artgl";
 import { Texture } from "../core/texture";
+import { TextureSource } from "../core/texture-source";
+import { MapUniform, MapTexture } from "../core/shading-util";
 
 export abstract class ShadowMap<T> extends BaseEffectShading<T> {
 
@@ -51,13 +52,14 @@ export class DirectionalShadowMap extends ShadowMap<DirectionalShadowMap> {
   @MapUniform('directionalShadowMapMatrix')
   shadowMatrix: Matrix4 = new Matrix4();
 
-  // private shadowMapTexture: Texture;
+  @MapTexture('directionalShadowMapTexture')
+  shadowMapTexture: Texture = new Texture(TextureSource.forRenderTarget(5, 5))
 
   decorate(graph: ShaderGraph): void {
     graph.setFragmentRoot(
       addShadow.make()
       .input('worldPosition', graph.getVary(WorldPositionFragVary))
-      // .input('shadowMap', )
+      .input('shadowMap', this.getPropertyTexture('shadowMapTexture'))
       .input('shadowMatrix', this.getPropertyUniform('shadowMatrix'))
       .input('inputColor', graph.getFragRoot())
     )

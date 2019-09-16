@@ -8,6 +8,11 @@ import { RenderEngine } from "../engine/render-engine";
 import { ShaderCommonUniformInputNode, ShaderTextureNode } from '../shader-graph/shader-node';
 import { uniformFromValue, texture } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
+import { Texture } from "./texture";
+import { checkCreate } from "./shading-util";
+
+export { MapUniform } from "./shading-util";
+export { MapTexture } from "./shading-util";
 
 export interface ShaderUniformDecorator {
   /**
@@ -36,6 +41,7 @@ export interface ShaderUniformProvider {
   // mark the shader need recompile
   uniforms: Map<uniformName, any>;
   propertyUniformNameMap: Map<propertyName, uniformName>;
+  textures: Map<textureShaderName, Texture>;
   propertyTextureNameMap: Map<propertyName, textureShaderName>;
 }
 
@@ -159,49 +165,11 @@ export function MarkNeedRedecorate() {
   };
 }
 
-
-export function MapUniform(remapName: string) {
-  return (target: ShaderUniformProvider, key: string) => {
-    if (target.uniforms === undefined) {
-      target.uniforms = new Map();
-    }
-    if (target.propertyUniformNameMap === undefined) {
-      target.propertyUniformNameMap = new Map();
-    }
-
-    let val = (target as any)[key];
-    const getter = () => {
-      return val;
-    };
-    const setter = (value: any) => {
-      target.uniforms.set(remapName, value);
-      target.hasAnyUniformChanged = true;
-      val = value;
-    };
-
-    target.propertyUniformNameMap.set(key, remapName);
-
-    Object.defineProperty(target, key, {
-      get: getter,
-      set: setter,
-      enumerable: true,
-      configurable: true,
-    });
-  };
-}
-
-export function checkCreate(testValue: any, inputValue: any) {
-  if (testValue === undefined) {
-    return inputValue
-  } else {
-    return testValue
-  }
-}
-
 export abstract class BaseEffectShading<T>
   implements ShaderUniformProvider, ShaderUniformDecorator {
   constructor() {
     this.uniforms = checkCreate((this as any).uniforms, new Map());
+    this.textures = checkCreate((this as any).uniforms, new Map());
     this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
     this.propertyTextureNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
     this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
@@ -219,6 +187,7 @@ export abstract class BaseEffectShading<T>
   propertyUniformNameMap: Map<string, string>;
   propertyTextureNameMap: Map<string, string>;
   uniforms: Map<string, any>;
+  textures: Map<textureShaderName, Texture>;
 
 
   nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();

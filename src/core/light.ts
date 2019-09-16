@@ -1,11 +1,13 @@
 import { SceneNode } from "../scene/scene-node";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { constValue } from "../shader-graph/node-maker";
-import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, checkCreate } from "./shading";
+import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform } from "./shading";
 import { ShaderCommonUniformInputNode, ShaderNode, ShaderTextureNode } from "../shader-graph/shader-node";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { Observable } from "./observable";
 import { Vector3 } from '../math';
+import { Texture } from "./texture";
+import { checkCreate } from "./shading-util";
 
 // TODO I cant figure out right multi inheritance impl with strong type, code duplicate 
 
@@ -15,6 +17,7 @@ export abstract class Light<T> extends SceneNode
     super();
 
     this.uniforms = checkCreate((this as any).uniforms, new Map());
+    this.textures = checkCreate((this as any).uniforms, new Map());
     this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
     this.propertyTextureNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
     this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
@@ -42,6 +45,7 @@ export abstract class Light<T> extends SceneNode
   hasAnyUniformChanged: boolean = true;
 
   uniforms: Map<string, any>;
+  textures: Map<string, Texture>;
 
   propertyUniformNameMap: Map<string, string>;
   propertyTextureNameMap: Map<string, string>;
