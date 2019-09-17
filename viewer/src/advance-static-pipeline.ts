@@ -8,6 +8,7 @@ import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
 import { createConf } from './conf';
 import { CopyShading } from '../../src/shading/pass-lib/copy';
+import { Nullable } from '../../src/type';
 
 const copier = new Shading().decorate(new CopyShading())
 
@@ -51,10 +52,7 @@ export class AdvanceStaticRenderPipeline {
 
   enableGraphDebugging = false;
 
-  private shadowMapTexture!: Texture;
-  getShadowMapTexture() {
-    return this.shadowMapTexture;
-  }
+  sceneShading: Nullable<Shading> = null;
 
   private sampleCount: number = 0;
   getSampleCount() {
