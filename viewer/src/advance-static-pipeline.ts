@@ -2,7 +2,7 @@ import {
   RenderGraph, TAAShading, screen,
   TSSAOShading, TSSAOBlendShading, Matrix4,
   DepthShading, Scene, RenderEngine, Shading, ProgressiveDof,
-  pass, pingpong, target, when, PingPongTarget
+  pass, pingpong, target, when, PingPongTarget, Texture
 } from "../../src/artgl";
 import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
@@ -50,6 +50,11 @@ export class AdvanceStaticRenderPipeline {
   depthShader = new Shading().decorate(new DepthShading()).decorate(this.dof);
 
   enableGraphDebugging = false;
+
+  private shadowMapTexture!: Texture;
+  getShadowMapTexture() {
+    return this.shadowMapTexture;
+  }
 
   private sampleCount: number = 0;
   getSampleCount() {
@@ -103,10 +108,13 @@ export class AdvanceStaticRenderPipeline {
     this.updateTicks();
 
     const directionalShadowMapPass = pass("directionalShadowMapPass")
-    .use(scene.renderScene).overrideShading(this.depthShader)
+      .use(scene.renderScene).overrideShading(this.depthShader)
     
     const directionalShadowMap = target("directionalShadowMap")
       .needDepth().from(directionalShadowMapPass)
+      .afterContentReceived(node => {
+        this.shadowMapTexture = this.composer.getFramebufferTexture(node)!
+      })
     
     const depthPass = pass("depthPass").use(scene.renderScene)
       .overrideShading(this.depthShader)

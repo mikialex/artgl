@@ -32,6 +32,14 @@ export class EffectComposer {
     return this.keptFramebuffer.get(node)
   }
 
+  getFramebufferTexture(node: RenderTargetNode) {
+    const fbo = this.keptFramebuffer.get(node)
+    if (fbo === undefined) {
+      return;
+    }
+    return fbo.getMainAttachedTexture();
+  }
+
   render(engine: RenderEngine, enableGraphDebugging: boolean = false) {
     this.passes.forEach((pass, index) => {
       const output = pass.outputTarget;

@@ -96,15 +96,15 @@ export class PassGraphNode extends DAGNode {
   _enableDepthClear:boolean = true;
   _clearColor = new Vector4(1, 1, 1, 1);
 
-  beforePassExecute = new Observable<PassGraphNode>();
+  _beforePassExecute = new Observable<PassGraphNode>();
   beforeExecute(callback: (node:PassGraphNode) => any) {
-    this.beforePassExecute.add(callback);
+    this._beforePassExecute.add(callback);
     return this;
   }
 
-  afterPassExecute = new Observable<PassGraphNode>();
+  _afterPassExecute = new Observable<PassGraphNode>();
   afterExecute(callback: (node:PassGraphNode) => any) {
-    this.afterPassExecute.add(callback);
+    this._afterPassExecute.add(callback);
     return this;
   }
 

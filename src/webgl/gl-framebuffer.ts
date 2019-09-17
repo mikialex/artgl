@@ -62,6 +62,10 @@ export class GLFramebuffer {
 
   textureAttachedSlot: FramebufferAttachTexture[] = [];
 
+  getMainAttachedTexture() {
+    return this.textureAttachedSlot[0]
+  }
+
   private updateFormatKey() {
     this._formatKey = GLFramebuffer.buildFBOFormatKey(
       this.width, this.height, this._enableDepth

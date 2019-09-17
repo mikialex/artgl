@@ -5,6 +5,8 @@ import { Vector4 } from '../../math/vector4';
 import { PassGraphNode } from "./pass-graph-node";
 import { RenderEngine } from "../../engine/render-engine";
 import { PixelFormat } from "../../core/texture";
+import { EffectComposer } from '../effect-composer';
+import { Observable } from '../../core/observable';
 
 
 export enum DimensionType {
@@ -47,6 +49,12 @@ export class RenderTargetNode extends DAGNode {
   }
 
   formatKey: string = "";
+
+  _afterContentReceived = new Observable<RenderTargetNode>();
+  afterContentReceived(callback: (node:RenderTargetNode) => any) {
+    this._afterContentReceived.add(callback);
+    return this;
+  }
 
   cleanConnections() {
     this.from(null)
