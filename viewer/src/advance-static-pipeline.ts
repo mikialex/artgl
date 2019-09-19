@@ -9,6 +9,7 @@ import { RenderConfig } from './components/conf/interface';
 import { createConf } from './conf';
 import { CopyShading } from '../../src/shading/pass-lib/copy';
 import { Nullable } from '../../src/type';
+import { DirectionalShadowMap } from '../../src/shadow-map/directional-shadowmap';
 
 const copier = new Shading().decorate(new CopyShading())
 
@@ -111,7 +112,11 @@ export class AdvanceStaticRenderPipeline {
     const directionalShadowMap = target("directionalShadowMap")
       .needDepth().from(directionalShadowMapPass)
       .afterContentReceived(node => {
-        this.shadowMapTexture = this.composer.getFramebufferTexture(node)!
+        const shadowMapTexture = this.composer.getFramebufferTexture(node)!
+        if (this.sceneShading !== null) {
+          const dirShadow = this.sceneShading.getDecoratorByName('dirShadow') as DirectionalShadowMap
+          dirShadow.shadowMapTexture = shadowMapTexture;
+        }
       })
     
     const depthPass = pass("depthPass").use(scene.renderScene)

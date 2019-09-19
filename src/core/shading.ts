@@ -9,7 +9,6 @@ import { ShaderCommonUniformInputNode, ShaderTextureNode } from '../shader-graph
 import { uniformFromValue, texture } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
 import { Texture } from "./texture";
-import { checkCreate } from "./shading-util";
 
 export { MapUniform } from "./shading-util";
 export { MapTexture } from "./shading-util";
@@ -54,7 +53,12 @@ export class Shading {
 
   _decorators: ShaderUniformDecorator[] = [];
   private _decoratorSlot: Set<ShaderUniformDecorator> = new Set();
+  private _namedDecoratorMap: Map<string, ShaderUniformDecorator> = new Map();
   private _decoratorObs: Map<ShaderUniformDecorator, Observer<ShaderUniformDecorator>> = new Map();
+
+  getDecoratorByName(name: string) {
+    return this._namedDecoratorMap.get(name)
+  }
 
   updateDecorator(oldDecorator: ShaderUniformDecorator, newDecorator: ShaderUniformDecorator) {
     if (!this._decoratorSlot.has(oldDecorator)) {
@@ -79,14 +83,19 @@ export class Shading {
     this.framebufferTextureMap = {};
     this._decoratorObs.clear();
     this._decoratorSlot.clear();
+    this._namedDecoratorMap.clear();
     this._decorators = [];
     this._needRebuildShader = true;
     this._programConfigCache = null;
   }
 
-  decorate(decorator: ShaderUniformDecorator): Shading {
+  decorate(decorator: ShaderUniformDecorator, name?: string): Shading {
     if (this._decoratorSlot.has(decorator)) {
       throw `this decorator has been decorate before`
+    }
+
+    if (name !== undefined) {
+      this._namedDecoratorMap.set(name, decorator);
     }
 
     const obs = decorator.notifyNeedRedecorate.add((_deco) => {
@@ -165,43 +174,7 @@ export function MarkNeedRedecorate() {
   };
 }
 
-export abstract class BaseEffectShading<T>
-  implements ShaderUniformProvider, ShaderUniformDecorator {
-  constructor() {
-    this.uniforms = checkCreate((this as any).uniforms, new Map());
-    this.textures = checkCreate((this as any).uniforms, new Map());
-    this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
-    this.propertyTextureNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
-    this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
-  }
-
-  abstract decorate(graph: ShaderGraph): void;
-
-  foreachProvider(visitor: (p: ShaderUniformProvider) => any) {
-    return visitor(this);
-  }
-
-  notifyNeedRedecorate: Observable<ShaderUniformDecorator>
-
-  hasAnyUniformChanged: boolean = true;
-  propertyUniformNameMap: Map<string, string>;
-  propertyTextureNameMap: Map<string, string>;
-  uniforms: Map<string, any>;
-  textures: Map<textureShaderName, Texture>;
-
-
-  nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
-  textureNodeCreated: Map<string, ShaderTextureNode> = new Map();
-
-  getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
-    return getPropertyUniform(this, name)
-  }
-
-  getPropertyTexture(name: keyof T): ShaderTextureNode {
-    return getPropertyTexture(this, name);
-  }
-
-}
+export { BaseEffectShading } from './shading-base';
 
 export function getPropertyTexture<T, K extends ShaderUniformDecorator & ShaderUniformProvider>
   (env: K, name: keyof T): ShaderTextureNode {
