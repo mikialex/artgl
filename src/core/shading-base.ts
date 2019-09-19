@@ -1,11 +1,13 @@
-import {
-  ShaderUniformProvider, ShaderUniformDecorator,
-  ShaderGraph, Texture, ShaderCommonUniformInputNode, ShaderTextureNode,
-  getPropertyUniform, getPropertyTexture
-} from "../artgl";
 
 import { checkCreate } from "./shading-util";
 import { Observable } from "./observable";
+import {
+  ShaderUniformProvider, ShaderUniformDecorator,
+  getPropertyUniform, getPropertyTexture
+} from "./shading";
+import { ShaderGraph } from "../shader-graph/shader-graph";
+import { ShaderCommonUniformInputNode, ShaderTextureNode } from "../shader-graph/shader-node";
+import { Texture } from "./texture";
 type textureShaderName = string;
 
 export abstract class BaseEffectShading<T>
