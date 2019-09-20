@@ -103,27 +103,28 @@ export class AdvanceStaticRenderPipeline {
     // }
   }
 
+  directionalShadowMap = target("directionalShadowMap").needDepth()
+  .afterContentReceived(node => {
+    const shadowMapTextureFBOKey = this.composer.getFramebuffer(node)!.name
+    if (this.sceneShading !== null) {
+      this.sceneShading.defineFBOInput(shadowMapTextureFBOKey, 'directionalShadowMapTexture')
+    }
+  })
+
   private build(scene: Scene) {
     this.updateTicks();
 
     const directionalShadowMapPass = pass("directionalShadowMapPass")
       .use(scene.renderScene).overrideShading(this.depthShader)
     
-    const directionalShadowMap = target("directionalShadowMap")
-      .needDepth().from(directionalShadowMapPass)
-      .afterContentReceived(node => {
-        const shadowMapTexture = this.composer.getFramebufferTexture(node)!
-        if (this.sceneShading !== null) {
-          const dirShadow = this.sceneShading.getDecoratorByName('dirShadow') as DirectionalShadowMap
-          dirShadow.shadowMapTexture = shadowMapTexture;
-        }
-      })
+    this.directionalShadowMap.from(directionalShadowMapPass)
     
     const depthPass = pass("depthPass").use(scene.renderScene)
       .overrideShading(this.depthShader)
 
     const scenePass = pass("scenePass")
-      .use(scene.render).depend(directionalShadowMap)
+      .use(scene.render)
+      .depend(this.directionalShadowMap)
 
     const depthResult = target("depthResult").needDepth().from(depthPass)
     const sceneResult = target("sceneResult").needDepth().from(scenePass)

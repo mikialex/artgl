@@ -33,7 +33,7 @@ export default function (app: Application) {
     .decorate(ambient)
     .decorate(exposureController)
     .decorate(wireframe)
-    .decorate(dirShadow, 'dirShadow')
+    // .decorate(dirShadow, 'dirShadow') 
 
 
   const exposureConfig = {

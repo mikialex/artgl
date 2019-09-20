@@ -8,10 +8,8 @@ import { RenderEngine } from "../engine/render-engine";
 import { ShaderCommonUniformInputNode, ShaderTextureNode } from '../shader-graph/shader-node';
 import { uniformFromValue, texture } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
-import { Texture } from "./texture";
 
 export { MapUniform } from "./shading-util";
-export { MapTexture } from "./shading-util";
 
 export interface ShaderUniformDecorator {
   /**
@@ -26,7 +24,6 @@ export interface ShaderUniformDecorator {
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator>;
   nodeCreated: Map<string, ShaderCommonUniformInputNode>;
-  textureNodeCreated: Map<string, ShaderTextureNode>;
 }
 
 type propertyName = string;
@@ -40,8 +37,6 @@ export interface ShaderUniformProvider {
   // mark the shader need recompile
   uniforms: Map<uniformName, any>;
   propertyUniformNameMap: Map<propertyName, uniformName>;
-  textures: Map<textureShaderName, Texture>;
-  propertyTextureNameMap: Map<propertyName, textureShaderName>;
 }
 
 export class Shading {
@@ -175,27 +170,6 @@ export function MarkNeedRedecorate() {
 }
 
 export { BaseEffectShading } from './shading-base';
-
-export function getPropertyTexture<T, K extends ShaderUniformDecorator & ShaderUniformProvider>
-  (env: K, name: keyof T): ShaderTextureNode {
-  const textureNode = env.textureNodeCreated.get(name as string);
-  if (textureNode !== undefined) {
-    return textureNode;
-  }
-  const textureName = env.propertyTextureNameMap.get(name as string);
-
-  if (textureName === undefined) {
-    throw `${name} shader texture name not found, maybe forget decorator`
-  }
-
-  const value = (env as unknown as T)[name];
-  if (value === undefined) {
-    throw "texture value not given"
-  }
-  const node = texture(textureName);
-  env.textureNodeCreated.set(name as string, node);
-  return node;
-}
 
 export function getPropertyUniform<T, K extends ShaderUniformDecorator & ShaderUniformProvider>
   (env: K, name: keyof T): ShaderCommonUniformInputNode {

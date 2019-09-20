@@ -3,10 +3,8 @@ import { OrthographicCamera } from "../camera/orthographic-camera";
 import { Matrix4 } from "../math";
 import { BaseEffectShading } from "../core/shading";
 import { ShaderFunction } from "../shader-graph/shader-function";
-import { ShaderGraph, WorldPositionFragVary } from "../artgl";
-import { Texture } from "../core/texture";
-import { TextureSource } from "../core/texture-source";
-import { MapUniform, MapTexture } from "../core/shading-util";
+import { ShaderGraph, WorldPositionFragVary, texture } from "../artgl";
+import { MapUniform } from "../core/shading-util";
 
 export abstract class ShadowMap<T> extends BaseEffectShading<T> {
 
@@ -21,7 +19,7 @@ const addShadow = new ShaderFunction({
     mat4 shadowMatrix,
     vec4 inputColor,
     ){
-      return inputColor;
+      return vec4(1.0);
   }
   `
 })
@@ -52,14 +50,14 @@ export class DirectionalShadowMap extends ShadowMap<DirectionalShadowMap> {
   @MapUniform('directionalShadowMapMatrix')
   shadowMatrix: Matrix4 = new Matrix4();
 
-  @MapTexture('directionalShadowMapTexture')
-  shadowMapTexture: Texture = new Texture(TextureSource.forRenderTarget(5, 5))
+  // @MapTexture('directionalShadowMapTexture')
+  // shadowMapTexture: string = ''
 
   decorate(graph: ShaderGraph): void {
     graph.setFragmentRoot(
       addShadow.make()
       .input('worldPosition', graph.getVary(WorldPositionFragVary))
-      .input('shadowMap', this.getPropertyTexture('shadowMapTexture'))
+      .input('shadowMap', texture("directionalShadowMapTexture"))
       .input('shadowMatrix', this.getPropertyUniform('shadowMatrix'))
       .input('inputColor', graph.getFragRoot())
     )
