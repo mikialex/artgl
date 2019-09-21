@@ -122,9 +122,11 @@ export class GLProgram{
     }
   }
 
-  public forAttributes(cb: (texture: GLAttribute) => any): void {
+  public forAttributes(cb: (texture: GLAttribute) => boolean): void {
     for (const key in this.attributes) {
-      cb(this.attributes[key]);
+      if (!cb(this.attributes[key])) {
+        return;
+      }
     }
   }
 

@@ -59,9 +59,17 @@ export class GLVAOManager implements GLReleasable{
     }
     let vao = map.get(geometry);
     if (vao !== undefined) {
-      this.vaoExt.deleteVAO(vao)
+      this.vaoExt.deleteVertexArrayOES(vao)
       map.delete(geometry);
     }
+  }
+
+  deleteAllGeometryCreatedVAO(geometry: Geometry) {
+    
+  }
+
+  deleteAllShadingCreatedVAO(shading: Shading) {
+
   }
 
   useVAO(vao: webglVAO) {

@@ -298,15 +298,21 @@ export class RenderEngine implements GLReleasable {
     if (this._vaoEnabled) {
       const vaoManager = this.renderer.vaoManager;
       const webglVAO = vaoManager.getVAO(shading, geometry)
-      if (webglVAO === undefined ||
-        geometry.checkBufferArrayChange() ||
-        shading.checkShaderChangeHasSyncVAO()
-      ) {
-        vaoManager.deleteVAO(shading, geometry);
+
+      if (webglVAO === undefined) {
         vaoUnbindCallback = vaoManager.createVAO(shading, geometry);
       } else {
-        vaoManager.useVAO(webglVAO)
-        return;
+        if (geometry.checkBufferArrayChange(program)) {
+          vaoManager.deleteAllGeometryCreatedVAO(geometry);
+          vaoUnbindCallback = vaoManager.createVAO(shading, geometry);
+        } else if (!shading.checkShaderChangeHasSyncVAO()) {
+          vaoManager.deleteAllShadingCreatedVAO(shading);
+          shading._markShaderChangeHasSyncVAO();
+          vaoUnbindCallback = vaoManager.createVAO(shading, geometry);
+        } else {
+          vaoManager.useVAO(webglVAO)
+          return;
+        }
       }
     }
 
@@ -322,6 +328,7 @@ export class RenderEngine implements GLReleasable {
         bufferData.dataChanged = false;
       }
       att.useBuffer(glBuffer);
+      return true;
     })
 
     if (program.useIndexDraw) {
@@ -340,8 +347,6 @@ export class RenderEngine implements GLReleasable {
     if (this._vaoEnabled) {
       if (vaoUnbindCallback! !== undefined) {
         vaoUnbindCallback.unbind();
-        geometry._markBufferArrayHasUpload();
-        shading._markShaderChangeHasSyncVAO();
         this.renderer.vaoManager.useVAO(vaoUnbindCallback.vao)
       }
     }

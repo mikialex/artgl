@@ -7,6 +7,7 @@ import { Face3 } from "../math/entity/face3";
 import { Line3 } from "../math/entity/line3";
 import { Vector3 } from "../math/vector3";
 import { Nullable } from "../type";
+import { GLProgram } from "../webgl/program";
 
 /**
  * geometry define what to draw
@@ -19,16 +20,6 @@ export abstract class Geometry {
   name: string = ""
   uuid = generateUUID();
 
-  /**
-   * This for mark VAO need update, if buffer layout has changed,
-   * or bufferData it self changed, we need mark it, and after upload,
-   *  call _markBufferArrayHasUpload set it back;
-   */
-  _bufferArraysChange: boolean = true;
-  _markBufferArrayHasUpload() {
-    this._bufferArraysChange = false;
-  }
-
   _bufferDatum: { [index: string]: BufferData } = {};
   _indexBuffer: Nullable<BufferData> = null;
 
@@ -38,7 +29,7 @@ export abstract class Geometry {
 
   setBuffer(name: string, data: BufferData) {
     this._bufferDatum[name] = data;
-    this._bufferArraysChange = true;
+    data.dataChanged = true; //this trigger this geometry's vao dirty
     return this;
   }
 
@@ -48,7 +39,9 @@ export abstract class Geometry {
 
   set indexBuffer(value: Nullable<BufferData>) {
     this._indexBuffer = value;
-    this._bufferArraysChange = true;
+    if (value !== null) {
+      value.dataChanged = true; //this trigger this geometry's vao dirty
+    }
   }
 
   setIndexBuffer(value: BufferData) {
@@ -56,17 +49,16 @@ export abstract class Geometry {
     return this;
   }
 
-  checkBufferArrayChange() {
-    if (this._bufferArraysChange) {
-      return this._bufferArraysChange
-    }
-    for (const key in this._bufferDatum) {
-      if (this._bufferDatum[key].dataChanged) {
-        this._bufferArraysChange = true;
-        return this._bufferArraysChange;
+  checkBufferArrayChange(program: GLProgram) {
+    let changed = false;
+    program.forAttributes(att => {
+      if (this._bufferDatum[att.name].dataChanged) {
+        changed = true;
+        return false;
       }
-    }
-    return this._bufferArraysChange;
+      return true;
+    })
+    return changed;
   }
 
   _shapeChanged = true;
