@@ -17,6 +17,7 @@ export class PassGraphNode extends DAGNode {
     this.name = name;
   }
 
+  // if this pass use a override shading, input will act as override shading texture input
   inputs: Map<uniformName, RenderTargetNode> = new Map();
   input(inputKey: string, node: RenderTargetNode) {
     const nodeBefore = this.inputs.get(inputKey);
@@ -28,8 +29,25 @@ export class PassGraphNode extends DAGNode {
     return this;
   }
   clearAllInput() {
+    this.inputs.forEach(n => {
+      n.disconnectTo(this);
+    })
     this.inputs.clear();
-    this.clearAllFrom();
+  }
+
+  // if some drawcall in this pass need target rendered before, use this
+  _depends: RenderTargetNode[] = [];
+  depend(node: RenderTargetNode) {
+    this._depends.push(node)
+    node.connectTo(this);
+    return this;
+  }
+  clearAllDepends() {
+    this._depends.forEach(n => {
+      n.disconnectTo(this);
+    })
+    this._depends = [];
+    return this;
   }
 
   readonly name: string;
@@ -78,15 +96,15 @@ export class PassGraphNode extends DAGNode {
   _enableDepthClear:boolean = true;
   _clearColor = new Vector4(1, 1, 1, 1);
 
-  beforePassExecute = new Observable<PassGraphNode>();
+  _beforePassExecute = new Observable<PassGraphNode>();
   beforeExecute(callback: (node:PassGraphNode) => any) {
-    this.beforePassExecute.add(callback);
+    this._beforePassExecute.add(callback);
     return this;
   }
 
-  afterPassExecute = new Observable<PassGraphNode>();
+  _afterPassExecute = new Observable<PassGraphNode>();
   afterExecute(callback: (node:PassGraphNode) => any) {
-    this.afterPassExecute.add(callback);
+    this._afterPassExecute.add(callback);
     return this;
   }
 

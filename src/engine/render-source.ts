@@ -28,7 +28,7 @@ export class QuadSource implements RenderSource {
   }
 
   render(engine: RenderEngine) {
-    engine.renderObject(quadMesh);
+    engine.render(quadMesh);
   }
 
 }

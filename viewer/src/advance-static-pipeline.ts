@@ -2,12 +2,14 @@ import {
   RenderGraph, TAAShading, screen,
   TSSAOShading, TSSAOBlendShading, Matrix4,
   DepthShading, Scene, RenderEngine, Shading, ProgressiveDof,
-  pass, pingpong, target, when, PingPongTarget
+  pass, pingpong, target, when, PingPongTarget, Texture
 } from "../../src/artgl";
 import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
 import { createConf } from './conf';
 import { CopyShading } from '../../src/shading/pass-lib/copy';
+import { Nullable } from '../../src/type';
+import { DirectionalShadowMap } from '../../src/shadow-map/directional-shadowmap';
 
 const copier = new Shading().decorate(new CopyShading())
 
@@ -50,6 +52,8 @@ export class AdvanceStaticRenderPipeline {
   depthShader = new Shading().decorate(new DepthShading()).decorate(this.dof);
 
   enableGraphDebugging = false;
+
+  sceneShading: Nullable<Shading> = null;
 
   private sampleCount: number = 0;
   getSampleCount() {
@@ -99,14 +103,31 @@ export class AdvanceStaticRenderPipeline {
     // }
   }
 
+  directionalShadowMap = target("directionalShadowMap").needDepth()
+  .afterContentReceived(node => {
+    const shadowMapTextureFBOKey = this.composer.getFramebuffer(node)!.name
+    if (this.sceneShading !== null) {
+      this.sceneShading.defineFBOInput(shadowMapTextureFBOKey, 'directionalShadowMapTexture')
+    }
+  })
+
+  
+  depthShader2 = new Shading().decorate(new DepthShading()).decorate(this.dof);
   private build(scene: Scene) {
     this.updateTicks();
 
+    const directionalShadowMapPass = pass("directionalShadowMapPass")
+      .use(scene.renderScene)
+      .overrideShading(this.depthShader2)
+    
+    this.directionalShadowMap.from(directionalShadowMapPass)
+    
     const depthPass = pass("depthPass").use(scene.renderScene)
       .overrideShading(this.depthShader)
 
     const scenePass = pass("scenePass")
       .use(scene.render)
+      .depend(this.directionalShadowMap)
 
     const depthResult = target("depthResult").needDepth().from(depthPass)
     const sceneResult = target("sceneResult").needDepth().from(scenePass)

@@ -4,12 +4,12 @@ import { Size } from "../engine/render-engine";
 
 export class OrthographicCamera extends Camera {
   constructor(
-    near: number,
-    far: number,
-    left: number,
-    right: number,
-    top: number,
-    bottom: number,
+    near?: number,
+    far?: number,
+    left?: number,
+    right?: number,
+    top?: number,
+    bottom?: number,
   ) {
     super();
     this.zoom = 1;

@@ -70,7 +70,7 @@ export class TextureSource {
     this.isPOT = MathUtil.isPowerOfTwo(this.width) && MathUtil.isPowerOfTwo(this.height);
   }
 
-  get sizeDimensionValid() {
+  get isSizeDimensionValid() {
     return this.width < TextureSource.WEBGL_LARGEST_TEXTURE_SIZE &&
     this.height < TextureSource.WEBGL_LARGEST_TEXTURE_SIZE
   }
@@ -79,9 +79,9 @@ export class TextureSource {
   // todo maybe need cache
   isValid(needPOT: boolean): boolean {
     if (needPOT) {
-      return this.sizeDimensionValid && this.isPOT
+      return this.isSizeDimensionValid && this.isPOT
     } else {
-      return this.sizeDimensionValid
+      return this.isSizeDimensionValid
     }
   }
 

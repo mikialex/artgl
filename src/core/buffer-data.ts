@@ -22,7 +22,7 @@ export class BufferData<T extends BufferDataType = BufferDataType>{
   }
   data: T;
   readonly stride: number;
-  dataChanged = true;
+  _version = 0;
 
   get count() {
     return this.data.length / this.stride;
@@ -30,17 +30,19 @@ export class BufferData<T extends BufferDataType = BufferDataType>{
 
   foreach(
     visitor: (data: BufferDataType, index: number, stride: number, countIndex: number) => any,
-    start:number = 0, end: number = Number.MAX_VALUE
+    start: number = 0, end: number = Number.MAX_VALUE
   ) {
     const e = Math.max(this.count, end);
     const s = Math.min(Math.max(0, start), e);
-    for (let i = s; i < e; i ++) {
+    for (let i = s; i < e; i++) {
       visitor(this.data, i * this.stride, this.stride, i);
     }
   }
 
-  setIndex(index: number, value: number, offset:number) {
-    this.dataChanged = true;
+  /** 
+   * need call markBufferDataChange later
+   */
+  setIndex(index: number, value: number, offset: number) {
     this.data[index * this.stride + offset] = value;
   }
 
@@ -49,8 +51,12 @@ export class BufferData<T extends BufferDataType = BufferDataType>{
   }
 
   setData(data: T) {
-    this.dataChanged = true;
+    this.markBufferDataChange();
     this.data = data;
+  }
+
+  markBufferDataChange() {
+    this._version++;
   }
 
   getGLAttribute(engine: RenderEngine) {
@@ -62,7 +68,7 @@ export class BufferData<T extends BufferDataType = BufferDataType>{
   }
 }
 
-export class InstancedBufferData extends BufferData{
+export class InstancedBufferData extends BufferData {
   constructor(data: BufferDataType, stride: number, divisor: number) {
     super(data, stride);
     this.divisor = divisor;
