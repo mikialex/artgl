@@ -50,9 +50,6 @@ export class DirectionalShadowMap extends ShadowMap<DirectionalShadowMap> {
   @MapUniform('directionalShadowMapMatrix')
   shadowMatrix: Matrix4 = new Matrix4();
 
-  // @MapTexture('directionalShadowMapTexture')
-  // shadowMapTexture: string = ''
-
   decorate(graph: ShaderGraph): void {
     graph.setFragmentRoot(
       addShadow.make()

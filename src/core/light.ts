@@ -1,6 +1,6 @@
 import { SceneNode } from "../scene/scene-node";
 import { ShaderGraph } from "../shader-graph/shader-graph";
-import { constValue } from "../shader-graph/node-maker";
+import { constValue, vec4 } from "../shader-graph/node-maker";
 import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform } from "./shading";
 import { ShaderCommonUniformInputNode, ShaderNode } from "../shader-graph/shader-node";
 import { ShaderFunction } from "../shader-graph/shader-function";
@@ -24,7 +24,7 @@ export abstract class Light<T> extends SceneNode
     decorated
       .setFragmentRoot(
         collectLight.make()
-          .input("base", decorated.getFragRoot())
+          .input("base", decorated.getFragRoot().swizzling('xyz'))
           .input("light", this.produceLightIntensity(decorated))
       )
   }
@@ -74,5 +74,5 @@ export function collectLightNodes<T>(
       .input("light", lightNode)
   })
 
-  return root;
+  return vec4(root, constValue(1));
 }

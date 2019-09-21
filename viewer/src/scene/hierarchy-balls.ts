@@ -18,13 +18,7 @@ export default function (root: SceneNode, app: Application, shading: Shading) {
   const cubeGeo = new CubeGeometry(5, 3, 4)
   createBarycentricBufferForStandardGeometry(cubeGeo);
 
-
   app.engine.defaultShading = shading;
-
-
-  shading.afterShaderCompiled.add((config) => {
-    console.log(config);
-  })
 
   const arrowGeo = new ArrowGeometry()
   createBarycentricBufferForStandardGeometry(arrowGeo);

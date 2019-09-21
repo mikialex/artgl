@@ -1,6 +1,6 @@
 import {
   PointLight, DirectionalLight, AmbientLight, ExposureController,
-  BarycentricWireFrame, PhongShading, Shading, Vector3, ToneMapType
+  BarycentricWireFrame, PhongShading, Shading, Vector3, ToneMapType, NormalShading
 } from '../../../src/artgl';
 
 import { DirectionalShadowMap } from '../../../src/shadow-map/directional-shadowmap';
@@ -28,12 +28,17 @@ export default function (app: Application) {
   const phong = new PhongShading<DirectionalLight | PointLight>([dirLight, pointLight]);
 
   let shading = new Shading()
-    .decorate(app.pipeline.dof)
-    .decorate(phong)
-    .decorate(ambient)
-    .decorate(exposureController)
-    .decorate(wireframe)
+  .decorate(new NormalShading())
+    // .decorate(app.pipeline.dof)
+    // .decorate(phong)
+    // .decorate(ambient)
+    // .decorate(exposureController)
+    // .decorate(wireframe)
     // .decorate(dirShadow, 'dirShadow') 
+  
+  shading.afterShaderCompiled.add((conf) => {
+    console.log(conf)
+  })
 
 
   const exposureConfig = {
