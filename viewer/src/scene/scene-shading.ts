@@ -28,12 +28,11 @@ export default function (app: Application) {
   const phong = new PhongShading<DirectionalLight | PointLight>([dirLight, pointLight]);
 
   let shading = new Shading()
-  .decorate(new NormalShading())
-    // .decorate(app.pipeline.dof)
-    // .decorate(phong)
-    // .decorate(ambient)
-    // .decorate(exposureController)
-    // .decorate(wireframe)
+    .decorate(app.pipeline.dof)
+    .decorate(phong)
+    .decorate(ambient)
+    .decorate(exposureController)
+    .decorate(wireframe)
     // .decorate(dirShadow, 'dirShadow') 
   
   shading.afterShaderCompiled.add((conf) => {

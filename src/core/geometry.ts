@@ -22,6 +22,7 @@ export abstract class Geometry {
 
   _bufferDatum: { [index: string]: BufferData } = {};
   _indexBuffer: Nullable<BufferData> = null;
+  _version: number = 0;
 
   getBuffer(name: string) {
     return this._bufferDatum[name];
@@ -29,7 +30,7 @@ export abstract class Geometry {
 
   setBuffer(name: string, data: BufferData) {
     this._bufferDatum[name] = data;
-    data.dataChanged = true; //this trigger this geometry's vao dirty
+    this._version++;
     return this;
   }
 
@@ -40,13 +41,8 @@ export abstract class Geometry {
   set indexBuffer(value: Nullable<BufferData>) {
     this._indexBuffer = value;
     if (value !== null) {
-      value.dataChanged = true; //this trigger this geometry's vao dirty
+      this._version++;
     }
-  }
-
-  setIndexBuffer(value: BufferData) {
-    this.indexBuffer = value;
-    return this;
   }
 
   checkBufferArrayChange(program: GLProgram) {

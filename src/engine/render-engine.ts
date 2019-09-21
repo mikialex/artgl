@@ -294,26 +294,12 @@ export class RenderEngine implements GLReleasable {
     }
 
     // vao check
-    let vaoUnbindCallback: VAOCreateCallback;
+    let vaoUnbindCallback: VAOCreateCallback | undefined;
     if (this._vaoEnabled) {
-      const vaoManager = this.renderer.vaoManager;
-      const webglVAO = vaoManager.getVAO(shading, geometry)
-
-      if (webglVAO === undefined) {
-        vaoUnbindCallback = vaoManager.createVAO(shading, geometry);
-      } else {
-        if (geometry.checkBufferArrayChange(program)) {
-          vaoManager.deleteAllGeometryCreatedVAO(geometry);
-          vaoUnbindCallback = vaoManager.createVAO(shading, geometry);
-        } else if (!shading.checkShaderChangeHasSyncVAO()) {
-          vaoManager.deleteAllShadingCreatedVAO(shading);
-          shading._markShaderChangeHasSyncVAO();
-          vaoUnbindCallback = vaoManager.createVAO(shading, geometry);
-        } else {
-          vaoManager.useVAO(webglVAO)
-          return;
-        }
-      }
+      vaoUnbindCallback = this.renderer.vaoManager.connectGeometry(geometry, shading)
+      if (vaoUnbindCallback === undefined) {
+        return;// vao has bind, geometry buffer is ok;
+     }
     }
 
     // common procedure

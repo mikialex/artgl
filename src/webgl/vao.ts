@@ -6,17 +6,20 @@ import { Shading } from "../core/shading";
 
 type webglVAO = any;
 
-export interface VAOCreateCallback{
+export interface VAOCreateCallback {
   vao: webglVAO,
   unbind: () => void
 }
 
-export class GLVAOManager implements GLReleasable{
+export class GLVAOManager implements GLReleasable {
   readonly gl: WebGLRenderingContext;
   readonly renderer: GLRenderer;
   readonly vaoExt: any;
   readonly isSupported: boolean;
-  private vaos: WeakMap<Shading, WeakMap<Geometry, webglVAO>> = new WeakMap();
+
+  private vaoMap: Map<Shading, Map<Geometry, webglVAO>> = new Map();
+  private geometryVersionMap: Map<Geometry, number> = new Map();
+  private shadingVersionMap: Map<Shading, number> = new Map();
 
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
@@ -25,8 +28,35 @@ export class GLVAOManager implements GLReleasable{
     this.isSupported = this.vaoExt !== undefined;
   }
 
+  connectGeometry(geometry: Geometry, shading: Shading) {
+    let vaoUnbindCallback: VAOCreateCallback;
+
+    const webglVAO = this.getVAO(shading, geometry)
+
+    if (webglVAO === undefined) {
+      vaoUnbindCallback = this.createVAO(shading, geometry);
+    } else {
+
+      // validate vao is dirty by check version
+      const lastGeometryVersion = this.geometryVersionMap.get(geometry);
+      const lastShadingVersion = this.shadingVersionMap.get(shading);
+
+      if (lastGeometryVersion !== geometry._version) {
+        this.deleteAllGeometryCreatedVAO(geometry);
+        vaoUnbindCallback = this.createVAO(shading, geometry);
+      } else if (lastShadingVersion !== shading._version) {
+        this.deleteAllShadingCreatedVAO(shading);
+        vaoUnbindCallback = this.createVAO(shading, geometry);
+      } else {
+        this.useVAO(webglVAO)
+        return;
+      }
+    }
+    return vaoUnbindCallback;
+  }
+
   getVAO(shading: Shading, geometry: Geometry) {
-    const map = this.vaos.get(shading);
+    const map = this.vaoMap.get(shading);
     if (map === undefined) {
       return undefined
     }
@@ -34,16 +64,18 @@ export class GLVAOManager implements GLReleasable{
   }
 
   createVAO(shading: Shading, geometry: Geometry): VAOCreateCallback {
-    const vao = this.vaoExt.createVertexArrayOES(); 
+    const vao = this.vaoExt.createVertexArrayOES();
     this.vaoExt.bindVertexArrayOES(vao);
 
-    let map = this.vaos.get(shading);
+    let map = this.vaoMap.get(shading);
     if (map === undefined) {
-      map = new WeakMap();
+      map = new Map();
     }
     map.set(geometry, vao)
 
-    this.vaos.set(shading, map);
+    this.vaoMap.set(shading, map);
+    this.geometryVersionMap.set(geometry, geometry._version);
+    this.shadingVersionMap.set(shading, shading._version);
 
     return {
       vao, unbind: () => {
@@ -53,7 +85,10 @@ export class GLVAOManager implements GLReleasable{
   }
 
   deleteVAO(shading: Shading, geometry: Geometry) {
-    let map = this.vaos.get(shading);
+    this.geometryVersionMap.delete(geometry);
+    this.shadingVersionMap.delete(shading);
+
+    let map = this.vaoMap.get(shading);
     if (map === undefined) {
       return;
     }
@@ -65,11 +100,25 @@ export class GLVAOManager implements GLReleasable{
   }
 
   deleteAllGeometryCreatedVAO(geometry: Geometry) {
-    
+    this.geometryVersionMap.delete(geometry);
+    this.vaoMap.forEach(map => {
+      const vao = map.get(geometry);
+      if (vao !== undefined) {
+        this.vaoExt.deleteVertexArrayOES(vao)
+      }
+      map.delete(vao);
+    })
   }
 
   deleteAllShadingCreatedVAO(shading: Shading) {
-
+    this.shadingVersionMap.delete(shading);
+    const map = this.vaoMap.get(shading);
+    if (map !== undefined) {
+      map.forEach(vao => {
+        this.vaoExt.deleteVertexArrayOES(vao)
+      });
+    }
+    this.vaoMap.delete(shading);
   }
 
   useVAO(vao: webglVAO) {
@@ -78,6 +127,8 @@ export class GLVAOManager implements GLReleasable{
 
   releaseGL(): void {
     this.vaoExt.bindVertexArrayOES(null);
-    this.vaos = new WeakMap();
+    this.vaoMap = new Map();
+    this.shadingVersionMap = new Map();
+    this.geometryVersionMap = new Map();
   }
 }
