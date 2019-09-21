@@ -66,8 +66,6 @@ export class GLProgram{
     if (config.useIndex !== undefined) {
       this.useIndexDraw = config.useIndex;
     }
-    renderer.programManager.addNewProgram(this);
-
   }
   
   id: string = generateUUID();

@@ -128,11 +128,7 @@ export class Shading {
     if (this._needRebuildShader) {
       this.disposeProgram(engine);
     }
-    let program = engine.getProgram(this);
-    if (program === undefined) {
-      program = engine.createProgram(this);
-    }
-    return program;
+    return  engine.getProgram(this);
   }
 
   framebufferTextureMap: { [index: string]: string } = {};

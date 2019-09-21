@@ -26,6 +26,7 @@ export class GLRenderer implements GLReleasable {
     this.gl = ctx;
     this.el = el;
     this.glInfo = new GLInfo(ctx);
+    this.programManager = new GLProgramManager(this);
     this.framebufferManager = new GLFrameBufferManager(this);
     this.vaoManager = new GLVAOManager(this);
     this.state = new GLState(this);
@@ -81,21 +82,11 @@ export class GLRenderer implements GLReleasable {
   _programChangeId: number = 0;
 
   // resource managers
-  readonly programManager = new GLProgramManager();
+  readonly programManager: GLProgramManager;
   readonly textureManger: GLTextureManager;
   readonly attributeBufferManager = new GLAttributeBufferDataManager(this);
   readonly vaoManager: GLVAOManager;
   readonly framebufferManager: GLFrameBufferManager;
-
-  createProgram(conf: GLProgramConfig): GLProgram {
-    const program = new GLProgram(this, conf);
-    this.programManager.addNewProgram(program);
-    return program;
-  }
-
-  getProgram(storeId: string) {
-    return this.programManager.getProgram(storeId);
-  }
 
   useProgram(program: GLProgram) {
     if (this.activeProgram !== program) {

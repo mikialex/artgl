@@ -46,12 +46,12 @@ export abstract class Geometry {
   }
 
   _shapeChanged = true;
-  set shapeChanged(value: boolean) {
-    this._shapeChanged = value;
-    if (value) {
-      this._AABBBoxNeedUpdate = true;
-      this._boundingSphereNeedUpdate = true;
-    }
+  notifyShapeChanged() {
+    this._shapeChanged = true;
+    this._AABBBoxNeedUpdate = true;
+    this._boundingSphereNeedUpdate = true;
+    this._version++;
+
   };
 
   _AABBBox: Box3 = new Box3();
@@ -78,7 +78,7 @@ export abstract class Geometry {
 
   buildShape() {
     this.shape();
-    this.shapeChanged = true;
+    this.notifyShapeChanged();
   }
 
   /**

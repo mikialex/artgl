@@ -422,23 +422,18 @@ export class RenderEngine implements GLReleasable {
 
 
   //  GL resource acquisition
-  private programShadingMap: Map<Shading, GLProgram> = new Map();
   getProgram(shading: Shading) {
-    return this.programShadingMap.get(shading);
+    return this.renderer.programManager.getProgram(shading);
   }
 
-  createProgram(shading: Shading): GLProgram {
-    const program = this.renderer.createProgram(shading.getProgramConfig());
-    this.programShadingMap.set(shading, program);
-    return program;
-  }
+  // createProgram(shading: Shading): GLProgram {
+  //   const program = this.renderer.createProgram(shading.getProgramConfig());
+  //   this.programShadingMap.set(shading, program);
+  //   return program;
+  // }
 
   deleteProgram(shading: Shading) {
-    const program = this.programShadingMap.get(shading);
-    if (program !== undefined) {
-      program.dispose();
-      this.programShadingMap.delete(shading);
-    }
+    this.renderer.programManager.deleteProgram(shading);
   }
 
   getGLAttributeBuffer(bufferData: BufferData) {

@@ -1,17 +1,48 @@
 import { GLRenderer } from "./gl-renderer";
 import { GLProgram } from "./program";
 import { GLReleasable } from '../type';
+import { Shading } from "../core/shading";
 
 export class GLProgramManager implements GLReleasable {
-  
-  private programs: Map<string, GLProgram> = new Map();
-
-  addNewProgram(program: GLProgram) {
-    this.programs.set(program.id, program);
+  constructor(renderer: GLRenderer) {
+    this.renderer = renderer;
   }
 
-  getProgram(storeId: string) {
-    return this.programs.get(storeId);
+  readonly renderer: GLRenderer
+  
+  private programs: Map<Shading, GLProgram> = new Map();
+  private programsVersion: Map<Shading, number> = new Map();
+
+  getProgram(shading: Shading) {
+    const program = this.programs.get(shading);
+    if (program === undefined) {
+      return this.createProgram(shading);
+    }
+
+    if (shading._version !== this.programsVersion.get(shading)) {
+      this.deleteProgram(shading)
+      return this.createProgram(shading);
+    }
+
+    return program
+  }
+
+  deleteProgram(shading: Shading) {
+    const program = this.programs.get(shading);
+    if (program === undefined) {
+      return;
+    }
+    program.dispose();
+    this.programs.delete(shading);
+    this.programsVersion.delete(shading);
+  }
+
+  private createProgram(shading: Shading): GLProgram {
+    const programConfig = shading.getProgramConfig()
+    const program = new GLProgram(this.renderer, programConfig);
+    this.programs.set(shading, program);
+    this.programsVersion.set(shading, shading._version);
+    return program;
   }
 
   get compiledProgramsCount() {
@@ -23,6 +54,7 @@ export class GLProgramManager implements GLReleasable {
       program.dispose();
     })
     this.programs = new Map();
+    this.programsVersion = new Map();
   }
 
 }
