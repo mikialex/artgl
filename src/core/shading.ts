@@ -41,9 +41,9 @@ export interface ShaderUniformProvider {
 
 export class Shading {
   uuid = generateUUID();
-  graph: ShaderGraph = new ShaderGraph();
+  graph = new ShaderGraph();
 
-  _version: number = 0;
+  _version = 0;
 
   private _programConfigCache: Nullable<GLProgramConfig> = null;
   private _needRebuildShader: boolean = true;

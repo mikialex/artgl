@@ -299,7 +299,7 @@ export class RenderEngine implements GLReleasable {
       vaoUnbindCallback = this.renderer.vaoManager.connectGeometry(geometry, shading)
       if (vaoUnbindCallback === undefined) {
         return;// vao has bind, geometry buffer is ok;
-     }
+      }
     }
 
     // common procedure
@@ -308,11 +308,7 @@ export class RenderEngine implements GLReleasable {
       if (bufferData === undefined) {
         throw `program needs an attribute named ${att.name}, but cant find in geometry data`;
       }
-      let glBuffer = this.getGLAttributeBuffer(bufferData);
-      if (glBuffer === undefined || bufferData.dataChanged) {
-        glBuffer = this.createOrUpdateAttributeBuffer(bufferData, false);
-        bufferData.dataChanged = false;
-      }
+      const glBuffer = this.createOrUpdateAttributeBuffer(bufferData, false);
       att.useBuffer(glBuffer);
       return true;
     })
@@ -322,10 +318,7 @@ export class RenderEngine implements GLReleasable {
       if (geometryIndexBuffer === null) {
         throw "index draw need index buffer"
       }
-      let glBuffer = this.getGLAttributeBuffer(geometryIndexBuffer);
-      if (glBuffer === undefined) {
-        glBuffer = this.createOrUpdateAttributeBuffer(geometryIndexBuffer, true);
-      }
+      const glBuffer = this.createOrUpdateAttributeBuffer(geometryIndexBuffer, true);
       program.useIndexBuffer(glBuffer);
     }
 
@@ -452,8 +445,11 @@ export class RenderEngine implements GLReleasable {
     return this.renderer.attributeBufferManager.getGLBuffer(bufferData.data.buffer as ArrayBuffer);
   }
 
-  createOrUpdateAttributeBuffer(bufferData: BufferData, useForIndex: boolean): WebGLBuffer {
-    return this.renderer.attributeBufferManager.updateOrCreateBuffer(bufferData.data.buffer as ArrayBuffer, useForIndex);
+  createOrUpdateAttributeBuffer(
+    bufferData: BufferData,
+    useForIndex: boolean): WebGLBuffer {
+    return this.renderer.attributeBufferManager.updateOrCreateBuffer(
+      bufferData.data.buffer as ArrayBuffer, useForIndex, bufferData._version);
   }
 
 

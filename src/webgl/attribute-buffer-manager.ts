@@ -7,12 +7,13 @@ export class GLAttributeBufferDataManager implements GLReleasable {
   }
   readonly renderer: GLRenderer;
   private buffers: WeakMap<ArrayBuffer, WebGLBuffer> = new WeakMap();
+  private bufferVersion: WeakMap<ArrayBuffer, number> = new WeakMap();
 
   getGLBuffer(arraybuffer: ArrayBuffer) {
     return this.buffers.get(arraybuffer);
   }
 
-  createBuffer(data: ArrayBuffer, useForIndex: boolean): WebGLBuffer {
+  createBuffer(data: ArrayBuffer, useForIndex: boolean, version: number): WebGLBuffer {
     const gl = this.renderer.gl;
     const buffer = gl.createBuffer();
     if (buffer === null) {
@@ -26,6 +27,7 @@ export class GLAttributeBufferDataManager implements GLReleasable {
       gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
     }
     this.buffers.set(data, buffer);
+    this.bufferVersion.set(data, version);
     return buffer;
   }
 
@@ -36,18 +38,29 @@ export class GLAttributeBufferDataManager implements GLReleasable {
     const gl = this.renderer.gl;
     const buffer = this.buffers.get(data);
     if (buffer === undefined) {
-      return 
+      return
     }
     gl.deleteBuffer(buffer);
     this.buffers.delete(data);
+    this.bufferVersion.delete(data);
   }
 
-  updateOrCreateBuffer(data: ArrayBuffer, useForIndex: boolean): WebGLBuffer {
-    if (!this.buffers.has(data)) {
-      return this.createBuffer(data, useForIndex);
+  updateOrCreateBuffer(
+    data: ArrayBuffer,
+    useForIndex: boolean,
+    version: number): WebGLBuffer {
+    
+    const webglBuffer = this.buffers.get(data);
+    if (webglBuffer === undefined) {
+      return this.createBuffer(data, useForIndex, version);
     }
-    this.disposeBuffer(data);
-    return this.createBuffer(data, useForIndex);
+
+    if (version !== this.bufferVersion.get(data)) {
+      this.disposeBuffer(data);
+      return this.createBuffer(data, useForIndex, version);
+    }
+
+    return webglBuffer;
   }
 
   releaseGL() {

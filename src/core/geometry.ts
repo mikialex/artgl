@@ -22,7 +22,7 @@ export abstract class Geometry {
 
   _bufferDatum: { [index: string]: BufferData } = {};
   _indexBuffer: Nullable<BufferData> = null;
-  _version: number = 0;
+  _version = 0;
 
   getBuffer(name: string) {
     return this._bufferDatum[name];
@@ -43,18 +43,6 @@ export abstract class Geometry {
     if (value !== null) {
       this._version++;
     }
-  }
-
-  checkBufferArrayChange(program: GLProgram) {
-    let changed = false;
-    program.forAttributes(att => {
-      if (this._bufferDatum[att.name].dataChanged) {
-        changed = true;
-        return false;
-      }
-      return true;
-    })
-    return changed;
   }
 
   _shapeChanged = true;
