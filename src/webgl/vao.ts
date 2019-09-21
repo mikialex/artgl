@@ -2,9 +2,12 @@ import { GLRenderer } from "./gl-renderer";
 import { GLExtList } from "./gl-info";
 import { GLReleasable } from "../type";
 import { Geometry } from "../core/geometry";
+import { Shading } from "../core/shading";
+
+type webglVAO = any;
 
 export interface VAOCreateCallback{
-  vao: any,
+  vao: webglVAO,
   unbind: () => void
 }
 
@@ -13,7 +16,7 @@ export class GLVAOManager implements GLReleasable{
   readonly renderer: GLRenderer;
   readonly vaoExt: any;
   readonly isSupported: boolean;
-  private vaos: WeakMap<Geometry, any> = new WeakMap();
+  private vaos: WeakMap<Shading, WeakMap<Geometry, webglVAO>> = new WeakMap();
 
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
@@ -22,14 +25,26 @@ export class GLVAOManager implements GLReleasable{
     this.isSupported = this.vaoExt !== undefined;
   }
 
-  getVAO(geometry: Geometry) {
-    return this.vaos.get(geometry);
+  getVAO(shading: Shading, geometry: Geometry) {
+    const map = this.vaos.get(shading);
+    if (map === undefined) {
+      return undefined
+    }
+    return map.get(geometry);
   }
 
-  createVAO(geometry: Geometry): VAOCreateCallback {
+  createVAO(shading: Shading, geometry: Geometry): VAOCreateCallback {
     const vao = this.vaoExt.createVertexArrayOES(); 
     this.vaoExt.bindVertexArrayOES(vao);
-    this.vaos.set(geometry, vao);
+
+    let map = this.vaos.get(shading);
+    if (map === undefined) {
+      map = new WeakMap();
+    }
+    map.set(geometry, vao)
+
+    this.vaos.set(shading, map);
+
     return {
       vao, unbind: () => {
         this.vaoExt.bindVertexArrayOES(null);
@@ -37,11 +52,19 @@ export class GLVAOManager implements GLReleasable{
     };
   }
 
-  deleteVAO(geometry: Geometry) {
-    this.vaos.delete(geometry);
+  deleteVAO(shading: Shading, geometry: Geometry) {
+    let map = this.vaos.get(shading);
+    if (map === undefined) {
+      return;
+    }
+    let vao = map.get(geometry);
+    if (vao !== undefined) {
+      this.vaoExt.deleteVAO(vao)
+      map.delete(geometry);
+    }
   }
 
-  useVAO(vao: any) {
+  useVAO(vao: webglVAO) {
     this.vaoExt.bindVertexArrayOES(vao);
   }
 

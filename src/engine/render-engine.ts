@@ -177,7 +177,7 @@ export class RenderEngine implements GLReleasable {
     this.connectMaterial(shading, program, object.material);
 
     // prepare geometry
-    this.connectGeometry(program, object.geometry);
+    this.connectGeometry(shading, program, object.geometry);
 
     this.connectRange(program, object.geometry, object.range)
 
@@ -278,7 +278,7 @@ export class RenderEngine implements GLReleasable {
     })
   }
 
-  private connectGeometry(program: GLProgram, geometry: Geometry) {
+  private connectGeometry(shading: Shading, program: GLProgram, geometry: Geometry) {
 
     // check index buffer and update program.indexUINT
     if (program.useIndexDraw) {
@@ -297,10 +297,13 @@ export class RenderEngine implements GLReleasable {
     let vaoUnbindCallback: VAOCreateCallback;
     if (this._vaoEnabled) {
       const vaoManager = this.renderer.vaoManager;
-      const webglVAO = vaoManager.getVAO(geometry)
-      if (webglVAO === undefined && geometry.checkBufferArrayChange()) {
-        vaoManager.deleteVAO(geometry);
-        vaoUnbindCallback = vaoManager.createVAO(geometry);
+      const webglVAO = vaoManager.getVAO(shading, geometry)
+      if (webglVAO === undefined ||
+        geometry.checkBufferArrayChange() ||
+        shading.checkShaderChangeHasSyncVAO()
+      ) {
+        vaoManager.deleteVAO(shading, geometry);
+        vaoUnbindCallback = vaoManager.createVAO(shading, geometry);
       } else {
         vaoManager.useVAO(webglVAO)
         return;
@@ -338,6 +341,7 @@ export class RenderEngine implements GLReleasable {
       if (vaoUnbindCallback! !== undefined) {
         vaoUnbindCallback.unbind();
         geometry._markBufferArrayHasUpload();
+        shading._markShaderChangeHasSyncVAO();
         this.renderer.vaoManager.useVAO(vaoUnbindCallback.vao)
       }
     }

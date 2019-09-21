@@ -43,6 +43,14 @@ export class Shading {
   uuid = generateUUID();
   graph: ShaderGraph = new ShaderGraph();
 
+  private shaderChangeHasSyncVAO = false;
+  checkShaderChangeHasSyncVAO() {
+    return this.shaderChangeHasSyncVAO;
+  }
+  _markShaderChangeHasSyncVAO() {
+    this.shaderChangeHasSyncVAO = true;
+  }
+
   private _programConfigCache: Nullable<GLProgramConfig> = null;
   private _needRebuildShader: boolean = true;
 
@@ -94,6 +102,7 @@ export class Shading {
     }
 
     const obs = decorator.notifyNeedRedecorate.add((_deco) => {
+      this.shaderChangeHasSyncVAO = false;
       this._needRebuildShader = true;
     })!
     this._decoratorObs.set(decorator, obs);
