@@ -32,6 +32,14 @@ export class EffectComposer {
     return this.keptFramebuffer.get(node)
   }
 
+  getFramebufferTexture(node: RenderTargetNode) {
+    const fbo = this.keptFramebuffer.get(node)
+    if (fbo === undefined) {
+      return;
+    }
+    return fbo.getMainAttachedTexture();
+  }
+
   render(engine: RenderEngine, enableGraphDebugging: boolean = false) {
     this.passes.forEach((pass, index) => {
       const output = pass.outputTarget;
@@ -61,11 +69,19 @@ export class EffectComposer {
       if (!this.hasAllPassIsValidChecked) {
         pass.checkIsValid(); 
       }
+
+      
+      pass.passNode._beforePassExecute.notifyObservers(pass.passNode);
+
       pass.execute(engine, framebuffer, enableGraphDebugging);
+      
+      pass.passNode._afterPassExecute.notifyObservers(pass.passNode);
 
       if (!output.isScreenNode) {
         this.keptFramebuffer.set(output, framebuffer!);
       }
+      
+      output._afterContentReceived.notifyObservers(output);
 
       this.framebufferDropList[index].forEach(target => {
         this.framebufferPool.returnFramebuffer(this.keptFramebuffer.get(target)!)

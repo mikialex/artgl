@@ -97,15 +97,11 @@ export class RenderPass {
       }
     }
 
-    this.passNode.beforePassExecute.notifyObservers(this.passNode);
-
     //////  render //////
     this.passNode.source.forEach(source => {
       source(engine);
     })
     /////////////////////
-    
-    this.passNode.afterPassExecute.notifyObservers(this.passNode);
 
     engine.setOverrideShading(null);
     engine.setClearColor(this.beforeClearColor);

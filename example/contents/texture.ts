@@ -1,10 +1,21 @@
 import { TestBridge } from '../src/test-bridge';
 import {
-  Vector3, RenderEngine, Scene, SphereGeometry, Mesh,
+  Vector3, RenderEngine, SphereGeometry, Mesh,
   PerspectiveCamera, Vector4, OrbitController, Material,
-  ChannelType
+  ChannelType, textureFromUrl, ShaderGraph, texture,
+  BaseEffectShading, UvFragVary, Shading, TextureWrap
 } from '../../src/artgl';
-import { Texture, TextureSource } from '../../src/core/texture';
+
+export class CustomShading extends BaseEffectShading<CustomShading> {
+  decorate(graph: ShaderGraph): void {
+    graph
+      .declareFragUV()
+      .setFragmentRoot(
+        texture(ChannelType.diffuse).fetch(graph.getVary(UvFragVary))
+      )
+  }
+
+}
 
 export default async function test(testBridge: TestBridge) {
 
@@ -13,19 +24,15 @@ export default async function test(testBridge: TestBridge) {
   let canvas = testBridge.requestCanvas();
   const engine = new RenderEngine(canvas);
 
-  const scene = new Scene();
-
   const geometry = new SphereGeometry();
   const material = new Material();
+  const shading = new Shading().decorate(new CustomShading());
 
-  const texture = new Texture(await TextureSource.fromUrl(
-    testBridge.getResourceURL("img/demo.jpg")));
+  const texture = await textureFromUrl(testBridge.getResourceURL("img/demo.jpg"))
   
   material.channel(ChannelType.diffuse, texture)
 
-  const mesh = new Mesh().g(geometry).m(material)
-
-  scene.root.addChild(mesh);
+  const mesh = new Mesh().g(geometry).m(material).s(shading)
 
   const camera = engine.camera as PerspectiveCamera;
   camera.transform.position.set(0, 0, 15);
@@ -35,7 +42,7 @@ export default async function test(testBridge: TestBridge) {
     engine.connectCamera();
     engine.setClearColor(new Vector4(0.9, 0.9, 0.9, 1.0))
     engine.clearColor();
-    engine.render(scene);
+    engine.render(mesh);
   }
 
   draw();

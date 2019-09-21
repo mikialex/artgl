@@ -90,6 +90,16 @@ export default class ConfigPanel extends Vue {
     bridge.framer.step();
   }
 
+  keyboardToggle(e: KeyboardEvent) {
+    if (e.code === "Space") {
+      if (!this.isRunning) {
+        this.start();
+      } else {
+        this.stop();
+      }
+    }
+  }
+
   async mounted() {
     bridge.reset(this.$el.querySelector("canvas")!);
 
@@ -104,6 +114,12 @@ export default class ConfigPanel extends Vue {
     }
 
     this.exampleHasBuild = true;
+
+    window.addEventListener("keydown", this.keyboardToggle);
+  }
+
+  beforeDestroy() {
+    window.removeEventListener("keydown", this.keyboardToggle);
   }
 }
 </script>

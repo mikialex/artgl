@@ -1,6 +1,7 @@
 import renderRange from '../contents/render-range'
 import testDrawPrimitive from '../contents/draw-primitives'
 import barycentric from '../contents/barycentric-wireframe'
+import texture from '../contents/texture'
 import { TestBridge } from './test-bridge';
 
 type ConstructorTypeOf<T> = new (...args: any[]) => T;
@@ -38,6 +39,11 @@ export const examples: Example[] = [
     name:  "barycentric-wireframe",
     title: "Barycentric wireframe shading",
     build: barycentric
+  },
+  {
+    name: "texture",
+    title: "Use texture",
+    build: texture
   }
 ];
 

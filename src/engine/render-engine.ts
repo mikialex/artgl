@@ -1,5 +1,5 @@
 import { GLRenderer } from "../webgl/gl-renderer";
-import { RenderObject, RenderRange } from "../core/render-object";
+import { RenderObject, RenderRange, ShadingParams } from "../core/render-object";
 import { Camera } from "../core/camera";
 import { Matrix4 } from "../math/matrix4";
 import { GLProgram } from "../webgl/program";
@@ -20,6 +20,7 @@ import { Vector4 } from "../math/vector4";
 import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
 import { Vector4Like } from "../math/interface";
+import { Renderable } from "./interface";
 
 export interface Size {
   width: number;
@@ -128,7 +129,7 @@ export class RenderEngine implements GLReleasable {
       this.ProjectionMatrix.copy(this.camera.projectionMatrix);
       needUpdateVP = true;
     }
-    if (this.camera.transform.transformFrameChanged) {
+    if (this.camera.transform.transformChanged) {
       this.camera.transform.matrix;
       this.camera.updateWorldMatrix(true);
       this.cameraMatrixReverse.getInverse(this.camera.worldMatrix, true);
@@ -157,34 +158,8 @@ export class RenderEngine implements GLReleasable {
 
 
   //// render APIs
-  // render renderList from given source
-  render(source: RenderSource) {
+  render(source: Renderable) {
     source.render(this);
-  }
-
-  renderObject(object: RenderObject) {
-
-    if (object.geometry === undefined) {
-      return;
-    }
-
-    const shading = this.getUsedShading(object);
-
-    // prepare technique
-    const program = this.connectShading(object, shading);
-
-    // prepare material
-    this.connectMaterial(shading, program, object.material);
-
-    // prepare geometry
-    this.connectGeometry(program, object.geometry);
-
-    this.connectRange(program, object.geometry, object.range)
-
-    object.state.syncGL(this.renderer)
-
-    // render
-    this.renderer.draw(object.drawMode);
   }
 
   renderFrameBuffer(framebuffer: GLFramebuffer, debugViewPort: Vector4) {
@@ -219,7 +194,13 @@ export class RenderEngine implements GLReleasable {
   private lastUploadedShaderUniformProvider: Set<ShaderUniformProvider> = new Set();
   private lastProgramRendered: Nullable<GLProgram> = null;
 
-  private connectShading(object: RenderObject, shading: Shading): GLProgram {
+  private currentProgram: Nullable<GLProgram> = null;
+
+  useShading(shading: Nullable<Shading>, shadingParams?: ShadingParams) {
+    if (shading === null) {
+      this.currentProgram = null;
+      return;
+    }
 
     // get program, refresh provider cache if changed
     const program = shading.getProgram(this);
@@ -227,13 +208,16 @@ export class RenderEngine implements GLReleasable {
       this.lastUploadedShaderUniformProvider.clear();
     }
 
+    this.currentProgram = program;
     this.renderer.useProgram(program);
 
-    this.globalUniforms.MMatrix.setValue(object.worldMatrix);
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
 
     shading._decorators.forEach(defaultDecorator => {
-      const overrideDecorator = object.shadingParams.get(defaultDecorator)
+      let overrideDecorator
+      if (shadingParams !== undefined) {
+        overrideDecorator =  shadingParams.get(defaultDecorator)
+      }
       const decorator = overrideDecorator === undefined ? defaultDecorator : overrideDecorator;
       decorator.foreachProvider(provider => {
         if (this.lastUploadedShaderUniformProvider.has(provider)
@@ -250,12 +234,13 @@ export class RenderEngine implements GLReleasable {
       })
     })
 
-    return program;
   }
 
-  private connectMaterial(shading: Shading, program: GLProgram, material?: Material, ) {
-
-    program.forTextures((tex: GLTextureUniform) => {
+  useMaterial(shading: Shading, material?: Material, ) {
+    if (this.currentProgram === null) {
+      throw 'shading not exist'
+    }
+    this.currentProgram.forTextures((tex: GLTextureUniform) => {
       let glTexture: WebGLTexture | undefined;
 
       // acquire texture from material
@@ -278,7 +263,12 @@ export class RenderEngine implements GLReleasable {
     })
   }
 
-  private connectGeometry(program: GLProgram, geometry: Geometry) {
+  useGeometry(shading: Shading, geometry: Geometry) {
+
+    const program = this.currentProgram;
+    if (program === null) {
+      throw 'shading not exist'
+    }
 
     // check index buffer and update program.indexUINT
     if (program.useIndexDraw) {
@@ -294,16 +284,11 @@ export class RenderEngine implements GLReleasable {
     }
 
     // vao check
-    let vaoUnbindCallback: VAOCreateCallback;
+    let vaoUnbindCallback: VAOCreateCallback | undefined;
     if (this._vaoEnabled) {
-      const vaoManager = this.renderer.vaoManager;
-      const webglVAO = vaoManager.getVAO(geometry)
-      if (webglVAO === undefined && geometry.checkBufferArrayChange()) {
-        vaoManager.deleteVAO(geometry);
-        vaoUnbindCallback = vaoManager.createVAO(geometry);
-      } else {
-        vaoManager.useVAO(webglVAO)
-        return;
+      vaoUnbindCallback = this.renderer.vaoManager.connectGeometry(geometry, shading)
+      if (vaoUnbindCallback === undefined) {
+        return;// vao has bind, geometry buffer is ok;
       }
     }
 
@@ -313,12 +298,9 @@ export class RenderEngine implements GLReleasable {
       if (bufferData === undefined) {
         throw `program needs an attribute named ${att.name}, but cant find in geometry data`;
       }
-      let glBuffer = this.getGLAttributeBuffer(bufferData);
-      if (glBuffer === undefined || bufferData.dataChanged) {
-        glBuffer = this.createOrUpdateAttributeBuffer(bufferData, false);
-        bufferData.dataChanged = false;
-      }
+      const glBuffer = this.createOrUpdateAttributeBuffer(bufferData, false);
       att.useBuffer(glBuffer);
+      return true;
     })
 
     if (program.useIndexDraw) {
@@ -326,10 +308,7 @@ export class RenderEngine implements GLReleasable {
       if (geometryIndexBuffer === null) {
         throw "index draw need index buffer"
       }
-      let glBuffer = this.getGLAttributeBuffer(geometryIndexBuffer);
-      if (glBuffer === undefined) {
-        glBuffer = this.createOrUpdateAttributeBuffer(geometryIndexBuffer, true);
-      }
+      const glBuffer = this.createOrUpdateAttributeBuffer(geometryIndexBuffer, true);
       program.useIndexBuffer(glBuffer);
     }
 
@@ -337,13 +316,16 @@ export class RenderEngine implements GLReleasable {
     if (this._vaoEnabled) {
       if (vaoUnbindCallback! !== undefined) {
         vaoUnbindCallback.unbind();
-        geometry._markBufferArrayHasUpload();
         this.renderer.vaoManager.useVAO(vaoUnbindCallback.vao)
       }
     }
   }
 
-  private connectRange(program: GLProgram, geometry: Geometry, range?: RenderRange) {
+  useRange(geometry: Geometry, range?: RenderRange) {
+    const program = this.currentProgram;
+    if (program === null) {
+      throw 'shading not exist'
+    }
     let start = 0;
     let count = 0;
     if (range === undefined) {
@@ -369,7 +351,7 @@ export class RenderEngine implements GLReleasable {
   getOverrideShading(): Nullable<Shading> {
     return this.overrideShading;
   }
-  private getUsedShading(object: RenderObject) {
+  getRealUseShading(object: RenderObject) {
     // // get shading, check override, default situation
     let shading: Shading;
     if (this.overrideShading !== null) {
@@ -434,31 +416,23 @@ export class RenderEngine implements GLReleasable {
 
 
   //  GL resource acquisition
-  private programShadingMap: Map<Shading, GLProgram> = new Map();
   getProgram(shading: Shading) {
-    return this.programShadingMap.get(shading);
-  }
-
-  createProgram(shading: Shading): GLProgram {
-    const program = this.renderer.createProgram(shading.getProgramConfig());
-    this.programShadingMap.set(shading, program);
-    return program;
+    return this.renderer.programManager.getProgram(shading);
   }
 
   deleteProgram(shading: Shading) {
-    const program = this.programShadingMap.get(shading);
-    if (program !== undefined) {
-      program.dispose();
-      this.programShadingMap.delete(shading);
-    }
+    this.renderer.programManager.deleteProgram(shading);
   }
 
   getGLAttributeBuffer(bufferData: BufferData) {
     return this.renderer.attributeBufferManager.getGLBuffer(bufferData.data.buffer as ArrayBuffer);
   }
 
-  createOrUpdateAttributeBuffer(bufferData: BufferData, useForIndex: boolean): WebGLBuffer {
-    return this.renderer.attributeBufferManager.updateOrCreateBuffer(bufferData.data.buffer as ArrayBuffer, useForIndex);
+  createOrUpdateAttributeBuffer(
+    bufferData: BufferData,
+    useForIndex: boolean): WebGLBuffer {
+    return this.renderer.attributeBufferManager.updateOrCreateBuffer(
+      bufferData.data.buffer as ArrayBuffer, useForIndex, bufferData._version);
   }
 
 

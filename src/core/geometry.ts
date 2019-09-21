@@ -7,6 +7,7 @@ import { Face3 } from "../math/entity/face3";
 import { Line3 } from "../math/entity/line3";
 import { Vector3 } from "../math/vector3";
 import { Nullable } from "../type";
+import { GLProgram } from "../webgl/program";
 
 /**
  * geometry define what to draw
@@ -19,18 +20,9 @@ export abstract class Geometry {
   name: string = ""
   uuid = generateUUID();
 
-  /**
-   * This for mark VAO need update, if buffer layout has changed,
-   * or bufferData it self changed, we need mark it, and after upload,
-   *  call _markBufferArrayHasUpload set it back;
-   */
-  _bufferArraysChange: boolean = true;
-  _markBufferArrayHasUpload() {
-    this._bufferArraysChange = false;
-  }
-
   _bufferDatum: { [index: string]: BufferData } = {};
   _indexBuffer: Nullable<BufferData> = null;
+  _version = 0;
 
   getBuffer(name: string) {
     return this._bufferDatum[name];
@@ -38,7 +30,7 @@ export abstract class Geometry {
 
   setBuffer(name: string, data: BufferData) {
     this._bufferDatum[name] = data;
-    this._bufferArraysChange = true;
+    this._version++;
     return this;
   }
 
@@ -48,34 +40,18 @@ export abstract class Geometry {
 
   set indexBuffer(value: Nullable<BufferData>) {
     this._indexBuffer = value;
-    this._bufferArraysChange = true;
-  }
-
-  setIndexBuffer(value: BufferData) {
-    this.indexBuffer = value;
-    return this;
-  }
-
-  checkBufferArrayChange() {
-    if (this._bufferArraysChange) {
-      return this._bufferArraysChange
+    if (value !== null) {
+      this._version++;
     }
-    for (const key in this._bufferDatum) {
-      if (this._bufferDatum[key].dataChanged) {
-        this._bufferArraysChange = true;
-        return this._bufferArraysChange;
-      }
-    }
-    return this._bufferArraysChange;
   }
 
   _shapeChanged = true;
-  set shapeChanged(value: boolean) {
-    this._shapeChanged = value;
-    if (value) {
-      this._AABBBoxNeedUpdate = true;
-      this._boundingSphereNeedUpdate = true;
-    }
+  notifyShapeChanged() {
+    this._shapeChanged = true;
+    this._AABBBoxNeedUpdate = true;
+    this._boundingSphereNeedUpdate = true;
+    this._version++;
+
   };
 
   _AABBBox: Box3 = new Box3();
@@ -102,7 +78,7 @@ export abstract class Geometry {
 
   buildShape() {
     this.shape();
-    this.shapeChanged = true;
+    this.notifyShapeChanged();
   }
 
   /**

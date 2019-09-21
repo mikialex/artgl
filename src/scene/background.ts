@@ -6,11 +6,11 @@ import { SphereGeometry } from "../geometry/geo-lib/sphere-geometry";
 import { Mesh } from "../object/mesh";
 import { CullSide } from "../webgl/const";
 
-export abstract class BackGround{
+export abstract class Background{
   abstract render(engine: RenderEngine): void;
 }
 
-export class PureColorBackGround extends BackGround{
+export class SolidColorBackground extends Background{
   color: Vector4 = new Vector4(0.8, 0.8, 0.8, 1.0);
   private beforeColor: Vector4 = new Vector4();
 
@@ -23,7 +23,7 @@ export class PureColorBackGround extends BackGround{
 
 const domeSphere = new SphereGeometry()
 
-export class SkyBackGround extends BackGround {
+export class SkyBackground extends Background {
   skyShading = new Shading().decorate(new SkyShading())
   domeMesh = new Mesh().g(domeSphere).s(this.skyShading)
 
@@ -35,7 +35,7 @@ export class SkyBackGround extends BackGround {
   }
 
   render(engine: RenderEngine) {
-    engine.renderObject(this.domeMesh);
+    engine.render(this.domeMesh);
   }
 }
 

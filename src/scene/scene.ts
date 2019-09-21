@@ -7,7 +7,7 @@ import { Shading } from "../core/shading";
 import { SceneNode, RenderObject, RenderEngine } from "../artgl";
 import { PureShading } from "../shading/basic-lib/pure";
 import { RefCountMap } from "../util/ref-count-map";
-import { BackGround, PureColorBackGround, SkyBackGround } from "./background";
+import { Background, SolidColorBackground } from "./background";
 import { RayCastSource, RayCasterable } from "../core/raycaster";
 
 /**
@@ -32,7 +32,7 @@ export class Scene implements RenderSource, RayCastSource {
   selectionSet: Set<RenderObject> = new Set();
   selectShading: Shading = new Shading().decorate(new PureShading());
 
-  background: BackGround = new PureColorBackGround();
+  background: Background = new SolidColorBackground();
 
   clearSelect() {
     this.selectionSet.clear();
@@ -69,7 +69,7 @@ export class Scene implements RenderSource, RayCastSource {
 
   renderScene = (engine: RenderEngine) => {
     this.visitAllRenderObject((item) => {
-      engine.renderObject(item);
+      engine.render(item);
     })
   }
 

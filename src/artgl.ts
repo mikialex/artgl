@@ -17,7 +17,7 @@ export { Points } from "./object/points";
 
 export { Geometry } from "./core/geometry";
 export * from './core/material';
-export { Shading } from "./core/shading";
+export * from "./core/shading";
 export { BufferData } from "./core/buffer-data";
 export { Camera } from "./core/camera";
 export { Observable } from "./core/observable";
@@ -32,7 +32,7 @@ export { Transformation } from "./scene/transformation";
 export * from './render-graph/exports';
 
 // shader graph
-export { ShaderGraph } from './shader-graph/shader-graph';
+export * from './shader-graph/shader-graph';
 export * from './shader-graph/shader-node';
 export * from './shader-graph/node-maker';
 

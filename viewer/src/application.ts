@@ -4,9 +4,11 @@ import {
 } from '../../src/artgl';
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
+import createSceneShading from './scene/scene-shading';
 import { AdvanceStaticRenderPipeline } from './advance-static-pipeline';
 import { Raycaster } from '../../src/core/raycaster';
-import { SkyBackGround } from '../../src/scene/background';
+import { SkyBackground } from '../../src/scene/background';
+import { Nullable } from '../../src/type';
 
 export const STATIC_SERVER = "http://localhost:3000/"
 
@@ -27,7 +29,7 @@ export class Application {
     this.onContainerResize();
     this.framer.setFrame(this.render);
 
-    this.scene.background = new SkyBackGround()
+    this.scene.background = new SkyBackground()
   }
 
   pipeline: AdvanceStaticRenderPipeline;
@@ -112,7 +114,9 @@ export class Application {
   }
 
   createScene(scene: Scene): Scene {
-    const config = hierarchyBallBuilder(scene.root, this);
+    const { config, shading } = createSceneShading(this);
+    this.pipeline.sceneShading = shading;
+    hierarchyBallBuilder(scene.root, this, this.pipeline.sceneShading);
     // this.loadOBJFromURL();
     this.pipeline.config.value.push(config);
     return scene;

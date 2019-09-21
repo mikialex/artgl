@@ -112,6 +112,10 @@ export class Matrix4
     return this;
   }
 
+  multiply(m: Matrix4) {
+    return this.multiplyMatrices(this, m);
+  }
+
   multiplyMatrices(a: Matrix4, b: Matrix4) {
 
     var ae = a.elements;
