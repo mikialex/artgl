@@ -35,7 +35,7 @@ export class SkyBackground extends Background {
   }
 
   render(engine: RenderEngine) {
-    engine.renderObject(this.domeMesh);
+    engine.render(this.domeMesh);
   }
 }
 

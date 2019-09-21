@@ -1,5 +1,5 @@
 import { GLRenderer } from "../webgl/gl-renderer";
-import { RenderObject, RenderRange } from "../core/render-object";
+import { RenderObject, RenderRange, ShadingParams } from "../core/render-object";
 import { Camera } from "../core/camera";
 import { Matrix4 } from "../math/matrix4";
 import { GLProgram } from "../webgl/program";
@@ -20,6 +20,7 @@ import { Vector4 } from "../math/vector4";
 import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
 import { Vector4Like } from "../math/interface";
+import { Renderable } from "./interface";
 
 export interface Size {
   width: number;
@@ -157,34 +158,8 @@ export class RenderEngine implements GLReleasable {
 
 
   //// render APIs
-  // render renderList from given source
-  render(source: RenderSource) {
+  render(source: Renderable) {
     source.render(this);
-  }
-
-  renderObject(object: RenderObject) {
-
-    if (object.geometry === undefined) {
-      return;
-    }
-
-    const shading = this.getUsedShading(object);
-
-    // prepare technique
-    const program = this.connectShading(object, shading);
-
-    // prepare material
-    this.connectMaterial(shading, program, object.material);
-
-    // prepare geometry
-    this.connectGeometry(shading, program, object.geometry);
-
-    this.connectRange(program, object.geometry, object.range)
-
-    object.state.syncGL(this.renderer)
-
-    // render
-    this.renderer.draw(object.drawMode);
   }
 
   renderFrameBuffer(framebuffer: GLFramebuffer, debugViewPort: Vector4) {
@@ -219,7 +194,13 @@ export class RenderEngine implements GLReleasable {
   private lastUploadedShaderUniformProvider: Set<ShaderUniformProvider> = new Set();
   private lastProgramRendered: Nullable<GLProgram> = null;
 
-  private connectShading(object: RenderObject, shading: Shading): GLProgram {
+  private currentProgram: Nullable<GLProgram> = null;
+
+  useShading(shading: Nullable<Shading>, shadingParams?: ShadingParams) {
+    if (shading === null) {
+      this.currentProgram = null;
+      return;
+    }
 
     // get program, refresh provider cache if changed
     const program = shading.getProgram(this);
@@ -227,13 +208,16 @@ export class RenderEngine implements GLReleasable {
       this.lastUploadedShaderUniformProvider.clear();
     }
 
+    this.currentProgram = program;
     this.renderer.useProgram(program);
 
-    this.globalUniforms.MMatrix.setValue(object.worldMatrix);
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
 
     shading._decorators.forEach(defaultDecorator => {
-      const overrideDecorator = object.shadingParams.get(defaultDecorator)
+      let overrideDecorator
+      if (shadingParams !== undefined) {
+        overrideDecorator =  shadingParams.get(defaultDecorator)
+      }
       const decorator = overrideDecorator === undefined ? defaultDecorator : overrideDecorator;
       decorator.foreachProvider(provider => {
         if (this.lastUploadedShaderUniformProvider.has(provider)
@@ -250,12 +234,13 @@ export class RenderEngine implements GLReleasable {
       })
     })
 
-    return program;
   }
 
-  private connectMaterial(shading: Shading, program: GLProgram, material?: Material, ) {
-
-    program.forTextures((tex: GLTextureUniform) => {
+  useMaterial(shading: Shading, material?: Material, ) {
+    if (this.currentProgram === null) {
+      throw 'shading not exist'
+    }
+    this.currentProgram.forTextures((tex: GLTextureUniform) => {
       let glTexture: WebGLTexture | undefined;
 
       // acquire texture from material
@@ -278,7 +263,12 @@ export class RenderEngine implements GLReleasable {
     })
   }
 
-  private connectGeometry(shading: Shading, program: GLProgram, geometry: Geometry) {
+  useGeometry(shading: Shading, geometry: Geometry) {
+
+    const program = this.currentProgram;
+    if (program === null) {
+      throw 'shading not exist'
+    }
 
     // check index buffer and update program.indexUINT
     if (program.useIndexDraw) {
@@ -331,7 +321,11 @@ export class RenderEngine implements GLReleasable {
     }
   }
 
-  private connectRange(program: GLProgram, geometry: Geometry, range?: RenderRange) {
+  useRange(geometry: Geometry, range?: RenderRange) {
+    const program = this.currentProgram;
+    if (program === null) {
+      throw 'shading not exist'
+    }
     let start = 0;
     let count = 0;
     if (range === undefined) {
@@ -357,7 +351,7 @@ export class RenderEngine implements GLReleasable {
   getOverrideShading(): Nullable<Shading> {
     return this.overrideShading;
   }
-  private getUsedShading(object: RenderObject) {
+  getRealUseShading(object: RenderObject) {
     // // get shading, check override, default situation
     let shading: Shading;
     if (this.overrideShading !== null) {
@@ -425,12 +419,6 @@ export class RenderEngine implements GLReleasable {
   getProgram(shading: Shading) {
     return this.renderer.programManager.getProgram(shading);
   }
-
-  // createProgram(shading: Shading): GLProgram {
-  //   const program = this.renderer.createProgram(shading.getProgramConfig());
-  //   this.programShadingMap.set(shading, program);
-  //   return program;
-  // }
 
   deleteProgram(shading: Shading) {
     this.renderer.programManager.deleteProgram(shading);

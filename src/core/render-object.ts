@@ -8,6 +8,7 @@ import { Line3 } from "../math/entity/line3";
 import { Vector3 } from "../math";
 import { Shading, ShaderUniformDecorator } from "./shading";
 import { StandardGeometry } from "../geometry/standard-geometry";
+import { RenderEngine } from "../engine/render-engine";
 
 export class RenderRange {
   static fromStandardGeometry(geometry: StandardGeometry) {
@@ -43,6 +44,7 @@ export const enum PrimitiveType {
 
 export type RenderablePrimitive = Line3 | Vector3 | Face3
 export type PrimitiveVisitor = (prim: RenderablePrimitive) => any
+export type ShadingParams = Map<ShaderUniformDecorator, ShaderUniformDecorator>
 
 /**
  * Class for one render drawcall description,  which is describe all drawable things
@@ -56,7 +58,7 @@ export class RenderObject extends SceneNode {
   material?: Material;
   geometry?: Geometry;
   shading?: Shading;
-  shadingParams: Map<ShaderUniformDecorator, ShaderUniformDecorator> = new Map();
+  shadingParams: ShadingParams = new Map();
   range?: RenderRange;
   state: DrawState =  new DrawState();
 
@@ -80,5 +82,32 @@ export class RenderObject extends SceneNode {
   s(shading: Shading) {
     this.shading = shading;
     return this;
+  }
+
+  render(engine: RenderEngine) {
+    
+    if (this.geometry === undefined) {
+      return;
+    }
+
+    engine.globalUniforms.MMatrix.setValue(this.worldMatrix);
+
+    const shading = engine.getRealUseShading(this);
+
+    // prepare technique
+    engine.useShading(shading, this.shadingParams);
+
+    // prepare material
+    engine.useMaterial(shading, this.material);
+
+    // prepare geometry
+    engine.useGeometry(shading, this.geometry);
+
+    engine.useRange(this.geometry, this.range)
+
+    this.state.syncGL(engine.renderer)
+
+    // render
+    engine.renderer.draw(this.drawMode);
   }
 }

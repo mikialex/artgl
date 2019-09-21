@@ -69,7 +69,7 @@ export class Scene implements RenderSource, RayCastSource {
 
   renderScene = (engine: RenderEngine) => {
     this.visitAllRenderObject((item) => {
-      engine.renderObject(item);
+      engine.render(item);
     })
   }
 

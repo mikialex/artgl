@@ -42,7 +42,7 @@ export default async function test(testBridge: TestBridge) {
     engine.connectCamera();
     engine.setClearColor(new Vector4(0.9, 0.9, 0.9, 1.0))
     engine.clearColor();
-    engine.renderObject(mesh);
+    engine.render(mesh);
   }
 
   draw();

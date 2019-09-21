@@ -55,7 +55,7 @@ export class GLVAOManager implements GLReleasable {
     return vaoUnbindCallback;
   }
 
-  getVAO(shading: Shading, geometry: Geometry) {
+  private getVAO(shading: Shading, geometry: Geometry) {
     const map = this.vaoMap.get(shading);
     if (map === undefined) {
       return undefined
@@ -63,7 +63,7 @@ export class GLVAOManager implements GLReleasable {
     return map.get(geometry);
   }
 
-  createVAO(shading: Shading, geometry: Geometry): VAOCreateCallback {
+  private createVAO(shading: Shading, geometry: Geometry): VAOCreateCallback {
     const vao = this.vaoExt.createVertexArrayOES();
     this.vaoExt.bindVertexArrayOES(vao);
 
