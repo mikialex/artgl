@@ -111,14 +111,12 @@ export class AdvanceStaticRenderPipeline {
     }
   })
 
-  
-  depthShader2 = new Shading().decorate(new DepthShading()).decorate(this.dof);
   private build(scene: Scene) {
     this.updateTicks();
 
     const directionalShadowMapPass = pass("directionalShadowMapPass")
       .use(scene.renderScene)
-      .overrideShading(this.depthShader2)
+      .overrideShading(this.depthShader)
     
     this.directionalShadowMap.from(directionalShadowMapPass)
     

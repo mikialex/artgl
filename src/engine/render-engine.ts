@@ -21,6 +21,7 @@ import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
 import { Vector4Like } from "../math/interface";
 import { Renderable } from "./interface";
+import { InnerSupportUniform } from "../webgl/uniform/uniform";
 
 export interface Size {
   width: number;
@@ -39,8 +40,6 @@ export class RenderEngine implements GLReleasable {
     }
 
     this.interactor = new Interactor(el);
-
-    this.globalUniforms = createAllInnerSupportUniformProxy();
 
     this.preferVAO = true;
   }
@@ -95,61 +94,50 @@ export class RenderEngine implements GLReleasable {
     this._camera = camera;
     this.isCameraChanged = true;
   };
-  private cameraMatrixReverse = new Matrix4();
-  private ProjectionMatrix = new Matrix4();
-  private VPMatrix = new Matrix4();
-  private LastVPMatrix = new Matrix4();
+  // priv 
+  // jitterProjectionMatrix() {
+  //   // this.jitterPMatrix.copy(this.ProjectionMatrix);
+  //   // this.jitterPMatrix.elements[8] += ((2 * Math.random() - 1) / this.renderer.width);
+  //   // this.jitterPMatrix.elements[9] += ((2 * Math.random() - 1) / this.renderer.height);
+  //   // this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.cameraMatrixReverse);
+  //   // this.globalUniforms.VPMatrix.setValue(this.jitterVPMatrix);
+  // }
 
-  private jitterPMatrix = new Matrix4();
-  private jitterVPMatrix = new Matrix4();
+  // unJit() {
+  //   // this.globalUniforms.VPMatrix.setValue(this.VPMatrix);
+  // }
 
-  jitterProjectionMatrix() {
-    this.jitterPMatrix.copy(this.ProjectionMatrix);
-    this.jitterPMatrix.elements[8] += ((2 * Math.random() - 1) / this.renderer.width);
-    this.jitterPMatrix.elements[9] += ((2 * Math.random() - 1) / this.renderer.height);
-    this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.cameraMatrixReverse);
-    this.globalUniforms.VPMatrix.setValue(this.jitterVPMatrix);
-  }
+  useCamera(camera: Camera) {
+    // this.camera = camera;
+    
+    // let needUpdateVP = false;
+    // // 
+    // if (this.camera.projectionMatrixNeedUpdate) {
+    //   this.camera.updateProjectionMatrix();
+    //   this.ProjectionMatrix.copy(this.camera.projectionMatrix);
+    //   needUpdateVP = true;
+    // }
+    // if (this.camera.transform.transformChanged) {
+    //   this.camera.transform.matrix;
+    //   this.camera.updateWorldMatrix(true);
+    //   this.cameraMatrixReverse.getInverse(this.camera.worldMatrix, true);
 
-  unJit() {
-    this.globalUniforms.VPMatrix.setValue(this.VPMatrix);
-  }
+    //   // TODO this should cal world position
+    //   this.globalUniforms.CameraWorldPosition.setValue(this.camera.transform.position)
+    //   needUpdateVP = true;
+    // }
 
-  /**
-   * call this to update engine layer camera related render info
-   * such as matrix global uniform.
-   *
-   * @memberof RenderEngine
-   */
-  connectCamera() {
-    let needUpdateVP = false;
-    // 
-    if (this.camera.projectionMatrixNeedUpdate) {
-      this.camera.updateProjectionMatrix();
-      this.ProjectionMatrix.copy(this.camera.projectionMatrix);
-      needUpdateVP = true;
-    }
-    if (this.camera.transform.transformChanged) {
-      this.camera.transform.matrix;
-      this.camera.updateWorldMatrix(true);
-      this.cameraMatrixReverse.getInverse(this.camera.worldMatrix, true);
+    // this.LastVPMatrix.copy(this.VPMatrix);
+    // this.globalUniforms.LastVPMatrix.setValue(this.LastVPMatrix);
 
-      // TODO this should cal world position
-      this.globalUniforms.CameraWorldPosition.setValue(this.camera.transform.position)
-      needUpdateVP = true;
-    }
-
-    this.LastVPMatrix.copy(this.VPMatrix);
-    this.globalUniforms.LastVPMatrix.setValue(this.LastVPMatrix);
-
-    if (needUpdateVP) {
-      this.VPMatrix.multiplyMatrices(this.ProjectionMatrix, this.cameraMatrixReverse);
-      this.globalUniforms.VPMatrix.setValue(this.VPMatrix);
-      needUpdateVP = false;
-      this.isCameraChanged = true;
-    } else {
-      this.isCameraChanged = false;
-    }
+    // if (needUpdateVP) {
+    //   this.VPMatrix.multiplyMatrices(this.ProjectionMatrix, this.cameraMatrixReverse);
+    //   this.globalUniforms.VPMatrix.setValue(this.VPMatrix);
+    //   needUpdateVP = false;
+    //   this.isCameraChanged = true;
+    // } else {
+    //   this.isCameraChanged = false;
+    // }
 
   }
   ////
@@ -182,14 +170,6 @@ export class RenderEngine implements GLReleasable {
 
 
   //// low level resource binding
-
-  /**
-   * GlobalUniforms is store useful inner support uniforms
-   * Engine will update these values and auto bind them to
-   * program that you will draw as needed
-   *
-   */
-  readonly globalUniforms: GlobalUniforms
 
   private lastUploadedShaderUniformProvider: Set<ShaderUniformProvider> = new Set();
   private lastProgramRendered: Nullable<GLProgram> = null;

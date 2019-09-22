@@ -256,6 +256,11 @@ export class Matrix4
     return this;
   }
 
+  getPosition(position: Vector3) {
+    var te = this.elements;
+    return position.set(te[12], te[13], te[14])
+  }
+
   getMaxScaleOnAxis() {
     var te = this.elements;
     var scaleXSq = te[0] * te[0] + te[1] * te[1] + te[2] * te[2];
