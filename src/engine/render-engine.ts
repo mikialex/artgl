@@ -194,10 +194,12 @@ export class RenderEngine implements GLReleasable {
   private lastUploadedShaderUniformProvider: Set<ShaderUniformProvider> = new Set();
   private lastProgramRendered: Nullable<GLProgram> = null;
 
+  private currentShading: Nullable<Shading> = null;
   private currentProgram: Nullable<GLProgram> = null;
 
   useShading(shading: Nullable<Shading>, shadingParams?: ShadingParams) {
     if (shading === null) {
+      this.currentShading = null;
       this.currentProgram = null;
       return;
     }
@@ -209,6 +211,7 @@ export class RenderEngine implements GLReleasable {
     }
 
     this.currentProgram = program;
+    this.currentShading = shading;
     this.renderer.useProgram(program);
 
     program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
@@ -236,7 +239,7 @@ export class RenderEngine implements GLReleasable {
 
   }
 
-  useMaterial(shading: Shading, material?: Material, ) {
+  useMaterial(material?: Material) {
     if (this.currentProgram === null) {
       throw 'shading not exist'
     }
@@ -251,7 +254,7 @@ export class RenderEngine implements GLReleasable {
 
       // acquire texture from framebuffer
       if (glTexture === undefined) {
-        const framebufferName = shading.framebufferTextureMap[tex.name];
+        const framebufferName = this.currentShading!.framebufferTextureMap[tex.name];
         glTexture = this.renderer.framebufferManager.getFramebufferTexture(framebufferName);
       }
 
@@ -263,7 +266,7 @@ export class RenderEngine implements GLReleasable {
     })
   }
 
-  useGeometry(shading: Shading, geometry: Geometry) {
+  useGeometry(geometry: Geometry) {
 
     const program = this.currentProgram;
     if (program === null) {
@@ -286,7 +289,7 @@ export class RenderEngine implements GLReleasable {
     // vao check
     let vaoUnbindCallback: VAOCreateCallback | undefined;
     if (this._vaoEnabled) {
-      vaoUnbindCallback = this.renderer.vaoManager.connectGeometry(geometry, shading)
+      vaoUnbindCallback = this.renderer.vaoManager.connectGeometry(geometry, this.currentShading!)
       if (vaoUnbindCallback === undefined) {
         return;// vao has bind, geometry buffer is ok;
       }
