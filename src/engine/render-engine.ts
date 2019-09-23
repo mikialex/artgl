@@ -34,11 +34,6 @@ const quad = new QuadSource();
 export class RenderEngine implements GLReleasable {
   constructor(el: HTMLCanvasElement, ctxOptions?: any) {
     this.renderer = new GLRenderer(el, ctxOptions);
-    // if we have a element param, use it as the default camera's param for convenience
-    if (el !== undefined) {
-      (this.camera as PerspectiveCamera).aspect = el.width / el.height;
-    }
-
     this.interactor = new Interactor(el);
 
     this.preferVAO = true;
@@ -84,67 +79,6 @@ export class RenderEngine implements GLReleasable {
   ////
 
 
-
-
-  //// camera related
-  _camera: Camera = new PerspectiveCamera();
-  public isCameraChanged = true;
-  get camera() { return this._camera };
-  set camera(camera) {
-    this._camera = camera;
-    this.isCameraChanged = true;
-  };
-  // priv 
-  // jitterProjectionMatrix() {
-  //   // this.jitterPMatrix.copy(this.ProjectionMatrix);
-  //   // this.jitterPMatrix.elements[8] += ((2 * Math.random() - 1) / this.renderer.width);
-  //   // this.jitterPMatrix.elements[9] += ((2 * Math.random() - 1) / this.renderer.height);
-  //   // this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.cameraMatrixReverse);
-  //   // this.globalUniforms.VPMatrix.setValue(this.jitterVPMatrix);
-  // }
-
-  // unJit() {
-  //   // this.globalUniforms.VPMatrix.setValue(this.VPMatrix);
-  // }
-
-  useCamera(camera: Camera) {
-    // this.camera = camera;
-    
-    // let needUpdateVP = false;
-    // // 
-    // if (this.camera.projectionMatrixNeedUpdate) {
-    //   this.camera.updateProjectionMatrix();
-    //   this.ProjectionMatrix.copy(this.camera.projectionMatrix);
-    //   needUpdateVP = true;
-    // }
-    // if (this.camera.transform.transformChanged) {
-    //   this.camera.transform.matrix;
-    //   this.camera.updateWorldMatrix(true);
-    //   this.cameraMatrixReverse.getInverse(this.camera.worldMatrix, true);
-
-    //   // TODO this should cal world position
-    //   this.globalUniforms.CameraWorldPosition.setValue(this.camera.transform.position)
-    //   needUpdateVP = true;
-    // }
-
-    // this.LastVPMatrix.copy(this.VPMatrix);
-    // this.globalUniforms.LastVPMatrix.setValue(this.LastVPMatrix);
-
-    // if (needUpdateVP) {
-    //   this.VPMatrix.multiplyMatrices(this.ProjectionMatrix, this.cameraMatrixReverse);
-    //   this.globalUniforms.VPMatrix.setValue(this.VPMatrix);
-    //   needUpdateVP = false;
-    //   this.isCameraChanged = true;
-    // } else {
-    //   this.isCameraChanged = false;
-    // }
-
-  }
-  ////
-
-
-
-
   //// render APIs
   render(source: Renderable) {
     source.render(this);
@@ -165,8 +99,6 @@ export class RenderEngine implements GLReleasable {
     this.overrideShading = null;
   }
   ////
-
-
 
 
   //// low level resource binding

@@ -1,8 +1,10 @@
 import { SceneNode } from "../scene/scene-node";
 import { Matrix4, Vector3 } from "../math/index";
 import { RenderEngine, Size } from '../engine/render-engine';
-import { Observer } from './observable';
+import { Observer, Observable } from './observable';
 import { Nullable } from '../type';
+import { ShaderUniformProvider, ShaderUniformDecorator } from "./shading";
+import { ShaderCommonUniformInputNode } from "../shader-graph/shader-node";
 
 /**
  * Camera is abstraction of a params set to a projection matrix.
@@ -10,7 +12,23 @@ import { Nullable } from '../type';
  * to make the projection relation more easy to 
  * understand and modified;
  */
-export abstract class Camera extends SceneNode {
+export abstract class Camera extends SceneNode
+  implements ShaderUniformProvider, ShaderUniformDecorator {
+
+
+  decorate(graph: import("../artgl").ShaderGraph): void {
+    throw new Error("Method not implemented.");
+  }
+  foreachProvider(visitor: (p: ShaderUniformProvider) => void): void {
+    throw new Error("Method not implemented.");
+  }
+
+  notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable();
+  nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
+
+  hasAnyUniformChanged: boolean = true;
+  uniforms: Map<string, any> = new Map();
+  propertyUniformNameMap: Map<string, string> = new Map();
 
   abstract updateProjectionMatrix(): void;
   abstract onRenderResize(newSize: Size): void;
@@ -18,7 +36,7 @@ export abstract class Camera extends SceneNode {
   projectionChanged() {
     this._projectionMatrixNeedUpdate = true;
     this._viewProjectionMatrixNeedUpdate = true;
-    
+
   }
 
   private renderSizeObserver: Nullable<Observer<Size>> = null;
@@ -31,7 +49,7 @@ export abstract class Camera extends SceneNode {
 
   _projectionMatrix = new Matrix4();
   _projectionMatrixNeedUpdate = true;
-  
+
   get projectionMatrix(): Readonly<Matrix4> {
     if (this._projectionMatrixNeedUpdate) {
       this.updateProjectionMatrix();
@@ -40,7 +58,7 @@ export abstract class Camera extends SceneNode {
     return this._projectionMatrix
   }
 
-  
+
   _worldMatrixInverse = new Matrix4();
   _worldMatrixInverseNeedUpdate = true;
 
