@@ -8,8 +8,11 @@ export class ShaderApplication {
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.engine = new RenderEngine(canvas);
-    this.engine.camera.transform.position.set(20, 10, 10)
-    this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);
+
+    this.camera.transform.position.set(20, 10, 10)
+    this.camera.updateRenderRatio(this.engine);
+
+    this.orbitController = new OrbitController(this.camera);
     this.orbitController.registerInteractor(this.engine.interactor);
     this.shader = new Shading().decorate(new NormalShading());
     // this.loadScene();
@@ -23,6 +26,7 @@ export class ShaderApplication {
   canvas: HTMLCanvasElement;
   graph: ShaderGraph = new ShaderGraph();
   scene: Scene = new Scene();
+  camera: PerspectiveCamera = new PerspectiveCamera();
 
   shader: Shading;
   mesh: Mesh = new Mesh();
@@ -63,7 +67,6 @@ export class ShaderApplication {
 
   render() {
     this.orbitController.update();
-    this.engine.connectCamera();
     this.engine.render(this.scene);
   }
 
@@ -71,7 +74,7 @@ export class ShaderApplication {
     const width = this.canvas.offsetWidth;
     const height = this.canvas.offsetHeight;
     this.engine.setSize(width, height);
-    (this.engine.camera as PerspectiveCamera).aspect = width / height;
+    (this.camera).aspect = width / height;
   }
 
 

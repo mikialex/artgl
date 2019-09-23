@@ -5,22 +5,33 @@ import { Observer, Observable } from './observable';
 import { Nullable } from '../type';
 import { ShaderUniformProvider, ShaderUniformDecorator } from "./shading";
 import { ShaderCommonUniformInputNode } from "../shader-graph/shader-node";
+import { checkCreate, MapUniform } from "./shading-util";
+import { ShaderGraph } from "../shader-graph/shader-graph";
 
 /**
- * Camera is abstraction of a params set to a projection matrix.
- * extender can support more useful interface
- * to make the projection relation more easy to 
- * understand and modified;
+ * Camera is abstraction of a decoration of view projection matrix in a vertex graph
+ * Implementor should impl how matrix is calculate and how to react to render size change
  */
 export abstract class Camera extends SceneNode
   implements ShaderUniformProvider, ShaderUniformDecorator {
+  constructor() {
+    super();
+    this.uniforms = checkCreate((this as any).uniforms, new Map());
+    this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
+    this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
+  }
 
+  @MapUniform('VPMatrix')
+  _renderMatrix = new Matrix4();
 
-  decorate(graph: import("../artgl").ShaderGraph): void {
+  decorate(graph: ShaderGraph): void {
     throw new Error("Method not implemented.");
   }
   foreachProvider(visitor: (p: ShaderUniformProvider) => void): void {
-    throw new Error("Method not implemented.");
+    // trigger getter to update VP
+    this._renderMatrix = this.projectionMatrix;
+
+    return visitor(this);
   }
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable();
@@ -39,12 +50,8 @@ export abstract class Camera extends SceneNode
 
   }
 
-  private renderSizeObserver: Nullable<Observer<Size>> = null;
-  bindEngineRenderSize(engine: RenderEngine) {
-    if (this.renderSizeObserver !== null) {
-      engine.resizeObservable.remove(this.renderSizeObserver);
-    }
-    this.renderSizeObserver = engine.resizeObservable.add(this.onRenderResize);
+  updateRenderRatio(engine: RenderEngine) {
+    this.onRenderResize({width:engine.renderer.width, height: engine.renderer.height})
   }
 
   _projectionMatrix = new Matrix4();
@@ -57,7 +64,6 @@ export abstract class Camera extends SceneNode
     }
     return this._projectionMatrix
   }
-
 
   _worldMatrixInverse = new Matrix4();
   _worldMatrixInverseNeedUpdate = true;
