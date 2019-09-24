@@ -1,9 +1,8 @@
 import {
-  ShaderAttributeInputNode, ShaderCommonUniformInputNode, ShaderInnerUniformInputNode,
+  ShaderAttributeInputNode, ShaderCommonUniformInputNode,
   ShaderTextureNode, ShaderNode, ShaderConstType, ShaderConstNode, ShaderCombineNode
 } from "./shader-node";
 import { GLDataType } from "../webgl/shader-util";
-import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
 import { GLTextureType } from "../webgl/uniform/uniform-texture";
 import { VPTransform, MTransform } from "./built-in/transform";
 import { Vector2 } from "../math/vector2";
@@ -38,13 +37,6 @@ export function uniformFromValue(name: string, value: any) {
   } else {
     throw "un support uniform value"
   }
-}
-
-export function innerUniform(type: InnerSupportUniform) {
-  return new ShaderInnerUniformInputNode({
-    name: 'inner' + InnerUniformMap[type].name,
-    mapInner: type,
-  })
 }
 
 export function value(value: ShaderConstType) {

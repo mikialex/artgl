@@ -1,6 +1,5 @@
 import { MapUniform, BaseEffectShading } from "../../core/shading";
-import { InnerSupportUniform } from "../../webgl/uniform/uniform";
-import { texture, innerUniform, screenQuad } from "../../shader-graph/node-maker";
+import { texture, screenQuad } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
 import { unitDir } from "../../shader-graph/built-in/transform";

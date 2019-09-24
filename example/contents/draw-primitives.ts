@@ -30,12 +30,11 @@ export default async function test(testBridge: TestBridge) {
   scene.root.addChild(line);
   scene.root.addChild(points);
 
-  const camera = engine.camera as PerspectiveCamera;
+  const camera = new PerspectiveCamera().updateRenderRatio(engine)
   camera.transform.position.set(0, 0, 15);
   camera.lookAt(new Vector3(0, 0, 0))
 
   function draw() {
-    engine.connectCamera();
     engine.setClearColor(new Vector4(0.9, 0.9, 0.9, 1.0))
     engine.clearColor();
     engine.render(scene);
@@ -51,9 +50,9 @@ export default async function test(testBridge: TestBridge) {
   const orbitController = new OrbitController(camera as PerspectiveCamera);
   orbitController.registerInteractor(engine.interactor);
 
-  engine.camera.bindEngineRenderSize(engine);
   testBridge.resizeObserver.add((size) => {
     engine.setSize(size.width, size.height);
+    camera.updateRenderRatio(engine)
   })
 
   testBridge.framer.setFrame(() => {

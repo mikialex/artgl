@@ -126,8 +126,6 @@ export class RenderEngine implements GLReleasable {
     this.currentShading = shading;
     this.renderer.useProgram(program);
 
-    program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
-
     shading._decorators.forEach(defaultDecorator => {
       let overrideDecorator
       if (shadingParams !== undefined) {

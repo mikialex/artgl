@@ -1,6 +1,5 @@
 import { BaseEffectShading, MapUniform } from "../../core/shading";
 import { Matrix4 } from "../../math/matrix4";
-import { InnerSupportUniform } from "../../webgl/uniform/uniform";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { texture, innerUniform, screenQuad } from "../../shader-graph/node-maker";
 import { NDCxyToUV, getLastPixelNDC, UVDepthToNDC } from "../../shader-graph/built-in/transform";

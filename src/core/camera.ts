@@ -51,7 +51,8 @@ export abstract class Camera extends SceneNode
   }
 
   updateRenderRatio(engine: RenderEngine) {
-    this.onRenderResize({width:engine.renderer.width, height: engine.renderer.height})
+    this.onRenderResize({ width: engine.renderer.width, height: engine.renderer.height })
+    return this;
   }
 
   _projectionMatrix = new Matrix4();
@@ -78,6 +79,10 @@ export abstract class Camera extends SceneNode
 
   _viewProjectionMatrix = new Matrix4();
   _viewProjectionMatrixNeedUpdate = true;
+
+  get viewProjectionMatrixNeedUpdate() {
+    return this._viewProjectionMatrixNeedUpdate;
+  }
 
   get viewProjectionMatrix(): Readonly<Matrix4> {
     if (this._viewProjectionMatrixNeedUpdate) {

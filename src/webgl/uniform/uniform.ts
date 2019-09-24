@@ -13,27 +13,27 @@ export type setterType = (gl: WebGLRenderingContext, location: WebGLUniformLocat
 export type copierType = (newValue: uniformUploadType, target: uniformUploadType) => uniformUploadType;
 export type differType = (newValue: uniformUploadType, oldValue: uniformUploadType) => boolean;
 
-export type InnerSupportUniform = keyof GlobalUniforms
+// export type InnerSupportUniform = keyof GlobalUniforms
 
-export interface InnerUniformMapDescriptor {
-  name: string,
-  mapInner: InnerSupportUniform,
-}
+// export interface InnerUniformMapDescriptor {
+//   name: string,
+//   mapInner: InnerSupportUniform,
+// }
 
-export const InnerUniformMap = {
-  MMatrix: {
-    name: 'MMatrix', type: GLDataType.Mat4, default: new Matrix4()
-  },
-  VPMatrix: {
-    name: 'VPMatrix', type: GLDataType.Mat4, default: new Matrix4()
-  },
-  LastVPMatrix: {
-    name: 'LastVPMatrix', type: GLDataType.Mat4, default: new Matrix4()
-  },
-  CameraWorldPosition: {
-    name: 'CameraWorldPosition', type: GLDataType.floatVec3, default: new Vector3()
-  }
-}
+// export const InnerUniformMap = {
+//   MMatrix: {
+//     name: 'MMatrix', type: GLDataType.Mat4, default: new Matrix4()
+//   },
+//   VPMatrix: {
+//     name: 'VPMatrix', type: GLDataType.Mat4, default: new Matrix4()
+//   },
+//   LastVPMatrix: {
+//     name: 'LastVPMatrix', type: GLDataType.Mat4, default: new Matrix4()
+//   },
+//   CameraWorldPosition: {
+//     name: 'CameraWorldPosition', type: GLDataType.floatVec3, default: new Vector3()
+//   }
+// }
 
 
 export interface UniformDescriptor {
@@ -44,7 +44,6 @@ export interface UniformDescriptor {
   setter?: setterType,
   copier?: copierType,
   differ?: differType
-  _innerGlobalUniform?: InnerSupportUniform
 }
 
 
@@ -52,16 +51,16 @@ export function createUniform(program: GLProgram, descriptor: UniformDescriptor)
   return new GLUniform(program, descriptor);
 }
 
-export function getInnerUniformDescriptor(des: InnerUniformMapDescriptor): UniformDescriptor {
-  const tempDescriptor = InnerUniformMap[des.mapInner];
-  const descriptor = {
-    name: des.name,
-    type: tempDescriptor.type,
-    default: tempDescriptor.default, // TODO default seems not useful
-    _innerGlobalUniform: des.mapInner
-  }
-  return descriptor;
-}
+// export function getInnerUniformDescriptor(des: InnerUniformMapDescriptor): UniformDescriptor {
+//   const tempDescriptor = InnerUniformMap[des.mapInner];
+//   const descriptor = {
+//     name: des.name,
+//     type: tempDescriptor.type,
+//     default: tempDescriptor.default, // TODO default seems not useful
+//     _innerGlobalUniform: des.mapInner
+//   }
+//   return descriptor;
+// }
 
 export class GLUniform {
   constructor(program: GLProgram, descriptor: UniformDescriptor) {
@@ -85,7 +84,6 @@ export class GLUniform {
     this.copier = descriptor.copier !== undefined ?
       descriptor.copier : findUniformCopier(descriptor.type);
 
-    this.innerGlobal = descriptor._innerGlobalUniform;
   }
   name: string;
   private gl: WebGLRenderingContext;
@@ -93,7 +91,6 @@ export class GLUniform {
   private renderer: GLRenderer;
 
   private location: Nullable<WebGLUniformLocation>;
-  innerGlobal?: InnerSupportUniform;
   value: any;
   private lastReceiveData?: uniformUploadType;
   private receiveData?: uniformUploadType;

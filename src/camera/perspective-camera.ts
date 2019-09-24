@@ -51,7 +51,7 @@ export class PerspectiveCamera extends Camera implements ScreenSpaceRayProvider 
     const width = this.aspect * height;
     const left = - 0.5 * width;
     this.projectionMatrix.makePerspective(left, left + width, top, top - height, this.near, this.far);
-    this.projectionMatrixNeedUpdate = false;
+    this._projectionMatrixNeedUpdate = false;
   }
 
   lookAt(targetPosition: Vector3) {

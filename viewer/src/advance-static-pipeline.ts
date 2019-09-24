@@ -2,7 +2,7 @@ import {
   RenderGraph, TAAShading, screen,
   TSSAOShading, TSSAOBlendShading, Matrix4,
   DepthShading, Scene, RenderEngine, Shading, ProgressiveDof,
-  pass, pingpong, target, when, PingPongTarget, Texture
+  pass, pingpong, target, when, PingPongTarget, Texture, PerspectiveCamera, Camera
 } from "../../src/artgl";
 import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
@@ -77,7 +77,8 @@ export class AdvanceStaticRenderPipeline {
     // return fbo;
   }
 
-  render(scene: Scene) {
+  jitterMatrix = new Matrix4();
+  render(scene: Scene, camera: PerspectiveCamera) {
 
     if (this.sampleCount >= 2) {
       if (!this._enableTAA) {
@@ -86,17 +87,18 @@ export class AdvanceStaticRenderPipeline {
       this.dof.updateSample();
     }
 
-    this.engine.connectCamera();
-    if (this.engine.isCameraChanged) {
+    if (camera.viewProjectionMatrixNeedUpdate) {
       this.sampleCount = 0;
     } else {
       if (this._enableTAA) {
-        this.engine.jitterProjectionMatrix();
+        this.jitterMatrix = camera.getJitteredViewProjectionMatrix(
+          this.engine.renderer.width, this.engine.renderer.height
+        )
       }
     }
 
     // if (this.sampleCount <= 100) {
-    this.build(scene);
+    this.build(scene, camera);
     this.graph.build(this.composer);
     this.composer.render(this.engine, this.enableGraphDebugging);
     this.sampleCount++;
@@ -111,7 +113,7 @@ export class AdvanceStaticRenderPipeline {
     }
   })
 
-  private build(scene: Scene) {
+  private build(scene: Scene, camera: PerspectiveCamera) {
     this.updateTicks();
 
     const directionalShadowMapPass = pass("directionalShadowMapPass")
@@ -130,13 +132,12 @@ export class AdvanceStaticRenderPipeline {
     const depthResult = target("depthResult").needDepth().from(depthPass)
     const sceneResult = target("sceneResult").needDepth().from(scenePass)
 
+    const VP = camera.viewProjectionMatrix;
     const createTAA = () => {
       const taaPass = pass("taa").useQuad()
         .overrideShading(this.taaShader)
         .disableColorClear()
         .beforeExecute(() => {
-          this.engine.unJit();
-          const VP: Matrix4 = this.engine.globalUniforms.VPMatrix.value
           this.taaShading.VPMatrixInverse = this.taaShading.VPMatrixInverse.getInverse(VP, true); // TODO maybe add watch
           this.taaShading.sampleCount = this.sampleCount;
         })
@@ -154,7 +155,6 @@ export class AdvanceStaticRenderPipeline {
         .overrideShading(this.tssaoShader)
         .disableColorClear()
         .beforeExecute(() => {
-          const VP: Matrix4 = this.engine.globalUniforms.VPMatrix.value
           this.tssaoShading.VPMatrixInverse = this.tssaoShading.VPMatrixInverse.getInverse(VP, true);
           this.tssaoShading.sampleCount = this.sampleCount;
         })

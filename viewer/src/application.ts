@@ -67,7 +67,7 @@ export class Application {
     this.beforeRender.notifyObservers(this.engine);
     this.orbitController.update();
 
-    this.pipeline.render(this.scene);
+    this.pipeline.render(this.scene, this.camera);
 
     this.afterRender.notifyObservers(this.engine);
     this.engine.renderer.stat.reset();
