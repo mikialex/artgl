@@ -1,18 +1,14 @@
 import { GLRenderer } from "../webgl/gl-renderer";
 import { RenderObject, RenderRange, ShadingParams } from "../core/render-object";
-import { Camera } from "../core/camera";
-import { Matrix4 } from "../math/matrix4";
 import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
 import { Material } from "../core/material";
 import { GLTextureUniform } from "../webgl/uniform/uniform-texture";
-import { PerspectiveCamera } from "../camera/perspective-camera";
 import { Nullable, GLReleasable } from "../type";
-import { GlobalUniforms, createAllInnerSupportUniformProxy } from "./uniform-proxy";
 import { Observable } from "../core/observable";
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
-import { QuadSource, RenderSource } from './render-source';
+import { QuadSource } from './render-source';
 import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/vao";
@@ -21,7 +17,6 @@ import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
 import { Vector4Like } from "../math/interface";
 import { Renderable } from "./interface";
-import { InnerSupportUniform } from "../webgl/uniform/uniform";
 
 export interface Size {
   width: number;
@@ -129,7 +124,7 @@ export class RenderEngine implements GLReleasable {
     shading._decorators.forEach(defaultDecorator => {
       let overrideDecorator
       if (shadingParams !== undefined) {
-        overrideDecorator =  shadingParams.get(defaultDecorator)
+        overrideDecorator = shadingParams.get(defaultDecorator)
       }
       const decorator = overrideDecorator === undefined ? defaultDecorator : overrideDecorator;
       decorator.foreachProvider(provider => {

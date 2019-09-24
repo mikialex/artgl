@@ -2,10 +2,10 @@ import { GLProgramConfig, VaryingDescriptor } from "../webgl/program";
 import { genFragShader, genVertexShader } from "./code-gen";
 import {
   ShaderInputNode, ShaderTextureNode, ShaderFunctionNode,
-  ShaderAttributeInputNode, ShaderInnerUniformInputNode,
-  ShaderCommonUniformInputNode, ShaderNode, ShaderVaryInputNode,
+  ShaderAttributeInputNode, ShaderVaryInputNode,
+  ShaderCommonUniformInputNode, ShaderNode,
 } from "./shader-node";
-import { attribute, constValue, MVPWorld, texture, innerUniform } from "./node-maker";
+import { attribute, constValue, MVPWorld, texture } from "./node-maker";
 import { GLDataType } from "../webgl/shader-util";
 import { CommonAttribute } from "../webgl/attribute";
 import { Vector4 } from "../math";
@@ -126,7 +126,7 @@ export class ShaderGraph {
   }
 
   compile(): GLProgramConfig {
-    const {results, needDerivative } = genFragShader(this);
+    const { results, needDerivative } = genFragShader(this);
     return {
       ...this.collectInputs(),
       vertexShaderString: genVertexShader(this),
@@ -163,7 +163,7 @@ export class ShaderGraph {
       n => n instanceof ShaderInputNode
     );
 
-    const attributes = (inputNodes as ShaderAttributeInputNode[]) 
+    const attributes = (inputNodes as ShaderAttributeInputNode[])
       .filter(node => node instanceof ShaderAttributeInputNode)
       .map((node: ShaderAttributeInputNode) => {
         return {
@@ -172,7 +172,7 @@ export class ShaderGraph {
         }
       });
 
-    const uniforms = (inputNodes as ShaderCommonUniformInputNode[]) 
+    const uniforms = (inputNodes as ShaderCommonUniformInputNode[])
       .filter(node => node instanceof ShaderCommonUniformInputNode)
       .map((node: ShaderCommonUniformInputNode) => {
         return {
@@ -181,16 +181,8 @@ export class ShaderGraph {
           default: node.defaultValue
         }
       });
-    const uniformsIncludes =  (inputNodes as ShaderInnerUniformInputNode[]) 
-      .filter(node => node instanceof ShaderInnerUniformInputNode)
-      .map((node: ShaderInnerUniformInputNode) => {
-        return {
-          name: node.name,
-          mapInner: node.mapInner,
-        }
-      });
 
-    const textures =  (inputNodes as ShaderTextureNode[]) 
+    const textures = (inputNodes as ShaderTextureNode[])
       .filter(node => node instanceof ShaderTextureNode)
       .map((node: ShaderTextureNode) => {
         return {
@@ -207,7 +199,7 @@ export class ShaderGraph {
       })
     })
 
-    return { attributes, uniforms, textures, varyings, uniformsIncludes }
+    return { attributes, uniforms, textures, varyings }
   }
 
 }
