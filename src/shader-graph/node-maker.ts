@@ -9,6 +9,7 @@ import { Vector2 } from "../math/vector2";
 import { Vector3, Matrix4 } from "../math";
 import { Vector4 } from "../math/vector4";
 import { CommonAttribute } from "../webgl/attribute";
+import { ShaderGraph } from "./shader-graph";
 
 export function attribute(name: string, type: GLDataType) {
   return new ShaderAttributeInputNode({ name, type });
@@ -59,12 +60,12 @@ export function constValue(value: any) {
   return new ShaderConstNode(value);
 }
 
-export function MVPWorld() {
+export function MVPWorld(graph: ShaderGraph) {
   return VPTransform.make()
-    .input("VPMatrix", innerUniform("VPMatrix"))
+    .input("VPMatrix", graph.getSharedUniform("VPMatrix"))
     .input("position",
       MTransform.make()
-        .input('MMatrix', innerUniform("MMatrix"))
+        .input('MMatrix', graph.getSharedUniform("MMatrix"))
         .input('position', attribute(CommonAttribute.position, GLDataType.floatVec3))
     )
 }

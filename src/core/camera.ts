@@ -1,12 +1,12 @@
 import { SceneNode } from "../scene/scene-node";
 import { Matrix4, Vector3 } from "../math/index";
 import { RenderEngine, Size } from '../engine/render-engine';
-import { Observer, Observable } from './observable';
-import { Nullable } from '../type';
-import { ShaderUniformProvider, ShaderUniformDecorator } from "./shading";
+import { Observable } from './observable';
+import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform } from "./shading";
 import { ShaderCommonUniformInputNode } from "../shader-graph/shader-node";
 import { checkCreate, MapUniform } from "./shading-util";
 import { ShaderGraph } from "../shader-graph/shader-graph";
+import { VPTransform } from "../shader-graph/built-in/transform";
 
 /**
  * Camera is abstraction of a decoration of view projection matrix in a vertex graph
@@ -14,6 +14,10 @@ import { ShaderGraph } from "../shader-graph/shader-graph";
  */
 export abstract class Camera extends SceneNode
   implements ShaderUniformProvider, ShaderUniformDecorator {
+
+  static WorldPositionKey = 'CameraWorldPosition'
+  static ProjectionMatrix = 'CameraProjectionMatrix'
+
   constructor() {
     super();
     this.uniforms = checkCreate((this as any).uniforms, new Map());
@@ -25,13 +29,23 @@ export abstract class Camera extends SceneNode
   _renderMatrix = new Matrix4();
 
   decorate(graph: ShaderGraph): void {
-    throw new Error("Method not implemented.");
+    graph.registerSharedUniform(Camera.WorldPositionKey, this.getPropertyUniform('_worldPosition'))
+    graph.registerSharedUniform(Camera.ProjectionMatrix, this.getPropertyUniform('_renderMatrix'))
+    graph.setVertexRoot(
+      VPTransform.make()
+        .input("VPMatrix", graph.getSharedUniform("VPMatrix"))
+        .input("position", graph.getVertRoot())
+    )
   }
   foreachProvider(visitor: (p: ShaderUniformProvider) => void): void {
     // trigger getter to update VP
     this._renderMatrix = this.projectionMatrix;
 
     return visitor(this);
+  }
+
+  getPropertyUniform(name: keyof Camera): ShaderCommonUniformInputNode {
+    return getPropertyUniform(this, name)
   }
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable();
@@ -92,7 +106,9 @@ export abstract class Camera extends SceneNode
     return this._viewProjectionMatrix;
   }
 
+  @MapUniform("worldPosition")
   _worldPosition = new Vector3();
+
   _worldPositionNeedUpdate = true;
   get worldPosition(): Readonly<Vector3> {
     if (this._worldPositionNeedUpdate) {

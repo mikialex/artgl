@@ -5,7 +5,7 @@ import {
   ShaderAttributeInputNode, ShaderVaryInputNode,
   ShaderCommonUniformInputNode, ShaderNode,
 } from "./shader-node";
-import { attribute, constValue, MVPWorld, texture } from "./node-maker";
+import { attribute, constValue, texture } from "./node-maker";
 import { GLDataType } from "../webgl/shader-util";
 import { CommonAttribute } from "../webgl/attribute";
 import { Vector4 } from "../math";
@@ -13,6 +13,7 @@ import { eyeDir } from "./built-in/transform";
 import { ChannelType } from "../core/material";
 import { GLTextureType } from "../webgl/uniform/uniform-texture";
 import { Nullable } from "../type";
+import { Camera } from "../core/camera";
 
 
 export const UvFragVary = "v_uv"
@@ -97,12 +98,24 @@ export class ShaderGraph {
     return new ShaderVaryInputNode(key, ret!.type);
   }
 
+  private sharedUniformNodes: Map<string, ShaderCommonUniformInputNode> = new Map();
+  getSharedUniform(uniformKey: string) {
+    const re = this.sharedUniformNodes.get(uniformKey)
+    if (re === undefined) {
+      throw `cant found shared uniform <${uniformKey}>`
+    }
+    return re;
+  }
+  registerSharedUniform(uniformKey: string, node: ShaderCommonUniformInputNode) {
+    this.sharedUniformNodes.set(uniformKey, node);
+  }
+
   private cachedInnerSupportEyeDir: Nullable<ShaderNode> = null;
   getEyeDir(): ShaderNode {
     if (this.cachedInnerSupportEyeDir === null) {
       this.cachedInnerSupportEyeDir = eyeDir.make()
         .input("worldPosition", this.getVary(WorldPositionFragVary))
-        .input("cameraWorldPosition", innerUniform("CameraWorldPosition"))
+        .input("cameraWorldPosition", this.getSharedUniform(Camera.WorldPositionKey))
     }
     return this.cachedInnerSupportEyeDir
   }
@@ -118,9 +131,9 @@ export class ShaderGraph {
 
   reset(): ShaderGraph {
     this.varyings.clear();
+    this.sharedUniformNodes = new Map();
     this.cachedReusedChannelNodes.clear();
     this.cachedInnerSupportEyeDir = null;
-    this.setVertexRoot(MVPWorld());
     this.setFragmentRoot(constValue(new Vector4()))
     return this;
   }

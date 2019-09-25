@@ -1,7 +1,7 @@
 import { BaseEffectShading, MapUniform } from "../../core/shading";
 import { Matrix4 } from "../../math/matrix4";
 import { ShaderFunction } from "../../shader-graph/shader-function";
-import { texture, innerUniform, screenQuad } from "../../shader-graph/node-maker";
+import { texture, screenQuad } from "../../shader-graph/node-maker";
 import { NDCxyToUV, getLastPixelNDC, UVDepthToNDC } from "../../shader-graph/built-in/transform";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
@@ -42,20 +42,21 @@ export class TAAShading extends BaseEffectShading<TAAShading> {
       .declareFragUV()
 
     const vUV = graph.getVary(UvFragVary);
-    const depth = unPackDepth.make().input("enc", texture("depthResult").fetch(vUV))
+    // const depth = unPackDepth.make().input("enc", texture("depthResult").fetch(vUV))
 
-    const colorOld = texture("TAAHistoryOld").fetch(
-      NDCxyToUV.make().input("ndc",
-        getLastPixelNDC.make()
-          .input("ndc",
-            UVDepthToNDC.make()
-              .input("depth", depth)
-              .input("uv", graph.getVary(UvFragVary))
-          )
-          .input("VPMatrixInverse", this.getPropertyUniform("VPMatrixInverse"))
-          .input("LastVPMatrix", innerUniform("LastVPMatrix"))
-      )
-    )
+    const colorOld = texture("TAAHistoryOld").fetch(vUV)
+    // const colorOld = texture("TAAHistoryOld").fetch(
+    //   NDCxyToUV.make().input("ndc",
+    //     getLastPixelNDC.make()
+    //       .input("ndc",
+    //         UVDepthToNDC.make()
+    //           .input("depth", depth)
+    //           .input("uv", graph.getVary(UvFragVary))
+    //       )
+    //       .input("VPMatrixInverse", this.getPropertyUniform("VPMatrixInverse"))
+    //       .input("LastVPMatrix", innerUniform("LastVPMatrix"))
+    //   )
+    // )
 
     graph.setFragmentRoot(
       TAAMix.make()
