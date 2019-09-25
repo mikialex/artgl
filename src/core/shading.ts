@@ -57,7 +57,7 @@ export class Shading {
     return this._namedDecoratorMap.get(name)
   }
 
-  updateDecorator(oldDecorator: ShaderUniformDecorator, newDecorator: ShaderUniformDecorator) {
+  updateNewDecorator(oldDecorator: ShaderUniformDecorator, newDecorator: ShaderUniformDecorator) {
     if (!this._decoratorSlot.has(oldDecorator)) {
       throw `decorator has not been decorate before`
     }
@@ -71,6 +71,22 @@ export class Shading {
 
     replaceFirst(this._decorators, oldDecorator, newDecorator);
     this._needRebuildShader = true;
+  }
+
+  replaceDecorator(oldDecorator: ShaderUniformDecorator, newDecorator: ShaderUniformDecorator) {
+    // todo check type is same
+    if (!this._decoratorSlot.has(oldDecorator)) {
+      throw `decorator has not been decorate before`
+    }
+
+    if (oldDecorator === newDecorator) {
+      return;
+    }
+
+    this._decoratorSlot.delete(oldDecorator);
+    this._decoratorSlot.add(newDecorator);
+
+    replaceFirst(this._decorators, oldDecorator, newDecorator);
   }
 
   reset() {

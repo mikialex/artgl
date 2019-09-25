@@ -72,3 +72,5 @@ export class PerspectiveCamera extends Camera implements ScreenSpaceRayProvider 
   }
 
 }
+
+export const PerspectiveCameraInstance = new PerspectiveCamera();

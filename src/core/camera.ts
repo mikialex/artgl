@@ -21,14 +21,14 @@ export abstract class Camera extends SceneNode
 
   constructor() {
     super();
-    this.uniforms = checkCreate((this as any).uniforms, new Map());
-    this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
-    this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
+    this.uniforms = checkCreate(this.uniforms, new Map());
+    this.propertyUniformNameMap = checkCreate(this.propertyUniformNameMap, new Map());
+    this.notifyNeedRedecorate = checkCreate(this.notifyNeedRedecorate, new Observable());
   }
 
   @MapUniform('VPMatrix')
   _renderMatrix = new Matrix4();
-
+  
   decorate(graph: ShaderGraph): void {
     graph.registerSharedUniform(Camera.WorldPositionKey, this.getPropertyUniform('_worldPosition'))
     graph.registerSharedUniform(Camera.ProjectionMatrix, this.getPropertyUniform('_renderMatrix'))
