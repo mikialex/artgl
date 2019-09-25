@@ -90,8 +90,6 @@ export class RenderObject extends SceneNode {
       return;
     }
 
-    // engine.globalUniforms.MMatrix.setValue(this.worldMatrix);
-
     const shading = engine.getRealUseShading(this);
 
     // prepare technique

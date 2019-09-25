@@ -10,6 +10,7 @@ import { Vector3, Matrix4 } from "../math";
 import { Vector4 } from "../math/vector4";
 import { CommonAttribute } from "../webgl/attribute";
 import { ShaderGraph } from "./shader-graph";
+import { Camera } from "../core/camera";
 
 export function attribute(name: string, type: GLDataType) {
   return new ShaderAttributeInputNode({ name, type });
@@ -56,18 +57,25 @@ export function vec4(...args: ShaderNode[]) {
   return new ShaderCombineNode(args, GLDataType.floatVec4)
 }
 
-export function constValue(value: any) {
+export function constValue(value: ShaderConstType) {
   return new ShaderConstNode(value);
 }
 
 export function MVPWorld(graph: ShaderGraph) {
-  return VPTransform.make()
-    .input("VPMatrix", graph.getSharedUniform("VPMatrix"))
-    .input("position",
-      MTransform.make()
-        .input('MMatrix', graph.getSharedUniform("MMatrix"))
-        .input('position', attribute(CommonAttribute.position, GLDataType.floatVec3))
-    )
+  if (graph.getIfSharedUniform(Camera.WorldMatrixKey) !== undefined &&
+    graph.getIfSharedUniform(Camera.ProjectionMatrix) !== undefined
+  ) {
+    return VPTransform.make()
+      .input("VPMatrix", graph.getSharedUniform("VPMatrix"))
+      .input("position",
+        MTransform.make()
+          .input('MMatrix', graph.getSharedUniform("MMatrix"))
+          .input('position', attribute(CommonAttribute.position, GLDataType.floatVec3))
+      )
+  } else {
+    return vec4(attribute(CommonAttribute.position, GLDataType.floatVec3), constValue(1))
+  }
+
 }
 
 export function screenQuad() {

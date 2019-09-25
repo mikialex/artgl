@@ -7,6 +7,7 @@ import { ShaderCommonUniformInputNode } from "../shader-graph/shader-node";
 import { checkCreate, MapUniform } from "./shading-util";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { VPTransform } from "../shader-graph/built-in/transform";
+import { uniformFromValue } from "../shader-graph/node-maker";
 
 /**
  * Camera is abstraction of a decoration of view projection matrix in a vertex graph
@@ -15,8 +16,8 @@ import { VPTransform } from "../shader-graph/built-in/transform";
 export abstract class Camera extends SceneNode
   implements ShaderUniformProvider, ShaderUniformDecorator {
 
-  static WorldPositionKey = 'CameraWorldPosition'
-  static ProjectionMatrix = 'CameraProjectionMatrix'
+  static readonly WorldPositionKey = 'CameraWorldPosition'
+  static readonly ProjectionMatrix = 'CameraProjectionMatrix'
 
   constructor() {
     super();
@@ -31,6 +32,7 @@ export abstract class Camera extends SceneNode
   decorate(graph: ShaderGraph): void {
     graph.registerSharedUniform(Camera.WorldPositionKey, this.getPropertyUniform('_worldPosition'))
     graph.registerSharedUniform(Camera.ProjectionMatrix, this.getPropertyUniform('_renderMatrix'))
+    graph.registerSharedUniform(SceneNode.WorldMatrixKey, uniformFromValue(SceneNode.WorldMatrixKey, this.worldMatrix))
     graph.setVertexRoot(
       VPTransform.make()
         .input("VPMatrix", graph.getSharedUniform("VPMatrix"))

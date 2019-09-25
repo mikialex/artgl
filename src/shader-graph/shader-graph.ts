@@ -106,6 +106,13 @@ export class ShaderGraph {
     }
     return re;
   }
+  tryGetSharedUniform(uniformKey: string, or: ShaderNode) {
+    const re = this.sharedUniformNodes.get(uniformKey)
+    return re === undefined ? or : re;
+  }
+  getIfSharedUniform(uniformKey: string) {
+    return this.sharedUniformNodes.get(uniformKey);
+  }
   registerSharedUniform(uniformKey: string, node: ShaderCommonUniformInputNode) {
     this.sharedUniformNodes.set(uniformKey, node);
   }

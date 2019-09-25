@@ -62,6 +62,6 @@ export class OrthographicCamera extends Camera {
 		var top = cy + dy;
 		var bottom = cy - dy;
 
-		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far );
+		this._projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far );
   }
 }

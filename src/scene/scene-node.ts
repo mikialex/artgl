@@ -15,6 +15,8 @@ interface TreeNode{
  * @class SceneNode
  */
 export class SceneNode {
+  static readonly WorldMatrixKey = "worldMatrix"
+
   uuid = generateUUID();
   scene: Nullable<Scene> = null;
   sceneNodeListIndex: number = -1;

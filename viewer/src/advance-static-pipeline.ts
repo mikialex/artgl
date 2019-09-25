@@ -43,7 +43,9 @@ export class AdvanceStaticRenderPipeline {
     this._enableTSSAO = value;
   }
   tssaoShading = new TSSAOShading();
-  tssaoShader: Shading = new Shading().decorate(this.tssaoShading);
+  tssaoShader: Shading = new Shading()
+    .decorate(this.taaShading)
+    .decorate(this.tssaoShading);
   tssaoHistory: PingPongTarget = pingpong('tssao');
 
   composeShading = new TSSAOBlendShading()
@@ -66,15 +68,6 @@ export class AdvanceStaticRenderPipeline {
   updateTicks() {
     this.taaHistory.tick();
     this.tssaoHistory.tick();
-  }
-
-  getFramebufferByName(name: string) {
-    // const node = this.graph.getRenderTargetDependence(name)!;
-    // const fbo = this.composer.getFramebuffer(node);
-    // if (fbo === undefined) {
-    //   console.warn(`fbo ${name} has been optimized, to make it available, set keep content always true in render target node config`)
-    // }
-    // return fbo;
   }
 
   jitterMatrix = new Matrix4();

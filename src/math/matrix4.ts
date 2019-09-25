@@ -11,9 +11,6 @@ export class Matrix4
   DataObject<Matrix4>,
   ArrayFlattenable<Matrix4>
 {
-  constructor() {
-
-  }
 
   copy(m: Matrix4) {
     var te = this.elements;
