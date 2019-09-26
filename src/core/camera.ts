@@ -11,7 +11,7 @@ import { uniformFromValue, attribute, vec4, constValue } from "../shader-graph/n
 import { CommonAttribute } from "../webgl/attribute";
 import { GLDataType } from "../webgl/shader-util";
 
-export function MVPWorld(graph: ShaderGraph) {
+export function MVP(graph: ShaderGraph) {
   if (graph.getIfSharedUniform(Camera.WorldMatrixKey) !== undefined &&
     graph.getIfSharedUniform(Camera.ViewProjectionMatrix) !== undefined
   ) {
@@ -49,7 +49,7 @@ export abstract class Camera extends SceneNode
     graph.registerSharedUniform(Camera.WorldPositionKey, this.getPropertyUniform('_worldPosition'))
     graph.registerSharedUniform(Camera.ViewProjectionMatrix, this.getPropertyUniform('_renderMatrix'))
     graph.registerSharedUniform(SceneNode.WorldMatrixKey, uniformFromValue(SceneNode.WorldMatrixKey, this.worldMatrix))
-    graph.setVertexRoot(MVPWorld(graph));
+    graph.setVertexRoot(MVP(graph));
   }
   foreachProvider(visitor: (p: ShaderUniformProvider) => void): void {
     // trigger getter to update VP

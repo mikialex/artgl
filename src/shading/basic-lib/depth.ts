@@ -1,8 +1,8 @@
 import { BaseEffectShading } from "../../core/shading";
-import { MVPWorld } from "../../shader-graph/node-maker";
 import { shader } from "../../shader-graph/shader-function";
 import { depthPack } from "../../shader-graph/built-in/depth-pack";
 import { ShaderGraph } from "../../shader-graph/shader-graph";
+import { MVP } from "../../core/camera";
 
 const depthV = shader(`
 float depthVary(vec4 worldPosition){
@@ -13,7 +13,7 @@ float depthVary(vec4 worldPosition){
 export class DepthShading extends BaseEffectShading<DepthShading> {
 
   decorate(graph: ShaderGraph): void {
-    const worldPosition = MVPWorld(graph)
+    const worldPosition = MVP(graph)
     graph.setVertexRoot(worldPosition)
       .setVary("depth", depthV.make().input("worldPosition", worldPosition))
       .setFragmentRoot(

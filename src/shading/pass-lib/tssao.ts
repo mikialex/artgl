@@ -63,7 +63,7 @@ export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
   aoRadius: number = 1
 
   decorate(graph: ShaderGraph) {
-    const VPMatrix = this.getPropertyUniform()
+    const VPMatrix = this.getPropertyUniform('VPMatrix')
     const sampleCount = this.getPropertyUniform("sampleCount");
     const depthTex = texture("depthResult");
     graph
