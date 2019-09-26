@@ -6,8 +6,27 @@ import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform } fro
 import { ShaderCommonUniformInputNode } from "../shader-graph/shader-node";
 import { checkCreate, MapUniform } from "./shading-util";
 import { ShaderGraph } from "../shader-graph/shader-graph";
-import { VPTransform } from "../shader-graph/built-in/transform";
-import { uniformFromValue } from "../shader-graph/node-maker";
+import { VPTransform, MTransform } from "../shader-graph/built-in/transform";
+import { uniformFromValue, attribute, vec4, constValue } from "../shader-graph/node-maker";
+import { CommonAttribute } from "../webgl/attribute";
+import { GLDataType } from "../webgl/shader-util";
+
+export function MVPWorld(graph: ShaderGraph) {
+  if (graph.getIfSharedUniform(Camera.WorldMatrixKey) !== undefined &&
+    graph.getIfSharedUniform(Camera.ViewProjectionMatrix) !== undefined
+  ) {
+    return VPTransform.make()
+      .input("VPMatrix", graph.getSharedUniform(Camera.ViewProjectionMatrix))
+      .input("position",
+        MTransform.make()
+          .input('MMatrix', graph.getSharedUniform("MMatrix"))
+          .input('position', attribute(CommonAttribute.position, GLDataType.floatVec3))
+      )
+  } else {
+    return vec4(attribute(CommonAttribute.position, GLDataType.floatVec3), constValue(1))
+  }
+
+}
 
 /**
  * Camera is abstraction of a decoration of view projection matrix in a vertex graph
@@ -17,13 +36,10 @@ export abstract class Camera extends SceneNode
   implements ShaderUniformProvider, ShaderUniformDecorator {
 
   static readonly WorldPositionKey = 'CameraWorldPosition'
-  static readonly ProjectionMatrix = 'CameraProjectionMatrix'
+  static readonly ViewProjectionMatrix = 'CameraViewProjectionMatrix'
 
   constructor() {
     super();
-    this.uniforms = checkCreate(this.uniforms, new Map());
-    this.propertyUniformNameMap = checkCreate(this.propertyUniformNameMap, new Map());
-    this.notifyNeedRedecorate = checkCreate(this.notifyNeedRedecorate, new Observable());
   }
 
   @MapUniform('VPMatrix')
@@ -31,17 +47,13 @@ export abstract class Camera extends SceneNode
   
   decorate(graph: ShaderGraph): void {
     graph.registerSharedUniform(Camera.WorldPositionKey, this.getPropertyUniform('_worldPosition'))
-    graph.registerSharedUniform(Camera.ProjectionMatrix, this.getPropertyUniform('_renderMatrix'))
+    graph.registerSharedUniform(Camera.ViewProjectionMatrix, this.getPropertyUniform('_renderMatrix'))
     graph.registerSharedUniform(SceneNode.WorldMatrixKey, uniformFromValue(SceneNode.WorldMatrixKey, this.worldMatrix))
-    graph.setVertexRoot(
-      VPTransform.make()
-        .input("VPMatrix", graph.getSharedUniform("VPMatrix"))
-        .input("position", graph.getVertRoot())
-    )
+    graph.setVertexRoot(MVPWorld(graph));
   }
   foreachProvider(visitor: (p: ShaderUniformProvider) => void): void {
     // trigger getter to update VP
-    this._renderMatrix = this.projectionMatrix;
+    this._renderMatrix = this.viewProjectionMatrix;
 
     return visitor(this);
   }
@@ -54,8 +66,8 @@ export abstract class Camera extends SceneNode
   nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
 
   hasAnyUniformChanged: boolean = true;
-  uniforms: Map<string, any> = new Map();
-  propertyUniformNameMap: Map<string, string> = new Map();
+  uniforms!: Map<string, any>
+  propertyUniformNameMap!: Map<string, string>
 
   abstract updateProjectionMatrix(): void;
   abstract onRenderResize(newSize: Size): void;

@@ -55,11 +55,15 @@ export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
   @MapUniform("VPMatrixInverse")
   VPMatrixInverse: Matrix4 = new Matrix4()
 
+  @MapUniform("VPMatrixInverse")
+  VPMatrix: Matrix4 = new Matrix4()
+
+
   @MapUniform("u_aoRadius")
   aoRadius: number = 1
 
   decorate(graph: ShaderGraph) {
-    const VPMatrix = graph.getSharedUniform(Camera.ProjectionMatrix);
+    const VPMatrix = this.getPropertyUniform()
     const sampleCount = this.getPropertyUniform("sampleCount");
     const depthTex = texture("depthResult");
     graph

@@ -16,7 +16,6 @@ export class Application {
     this.el = canvas;
     this.engine = new RenderEngine(canvas);
     this.pipeline = new AdvanceStaticRenderPipeline(this.engine);
-    this.pipeline.updateCameraBaseDecorator(this.camera);
 
     this.camera.updateRenderRatio(this.engine);
 

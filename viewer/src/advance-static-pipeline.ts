@@ -10,7 +10,6 @@ import { createConf } from './conf';
 import { CopyShading } from '../../src/shading/pass-lib/copy';
 import { Nullable } from '../../src/type';
 import { DirectionalShadowMap } from '../../src/shadow-map/directional-shadowmap';
-import { PerspectiveCameraInstance } from '../../src/camera/perspective-camera';
 
 const copier = new Shading().decorate(new CopyShading())
 
@@ -44,9 +43,7 @@ export class AdvanceStaticRenderPipeline {
     this._enableTSSAO = value;
   }
   tssaoShading = new TSSAOShading();
-  tssaoShader: Shading = new Shading()
-    .decorate(PerspectiveCameraInstance)
-    .decorate(this.tssaoShading);
+  tssaoShader: Shading = new Shading().decorate(this.tssaoShading);
   
   tssaoHistory: PingPongTarget = pingpong('tssao');
 
@@ -54,10 +51,6 @@ export class AdvanceStaticRenderPipeline {
   composeShader: Shading = new Shading().decorate(this.composeShading);
   dof = new ProgressiveDof();
   depthShader = new Shading().decorate(new DepthShading()).decorate(this.dof);
-
-  updateCameraBaseDecorator(camera: PerspectiveCamera) {
-    this.tssaoShader.replaceDecorator(PerspectiveCameraInstance, camera);
-  }
 
   enableGraphDebugging = false;
 

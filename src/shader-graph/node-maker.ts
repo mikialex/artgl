@@ -61,23 +61,6 @@ export function constValue(value: ShaderConstType) {
   return new ShaderConstNode(value);
 }
 
-export function MVPWorld(graph: ShaderGraph) {
-  if (graph.getIfSharedUniform(Camera.WorldMatrixKey) !== undefined &&
-    graph.getIfSharedUniform(Camera.ProjectionMatrix) !== undefined
-  ) {
-    return VPTransform.make()
-      .input("VPMatrix", graph.getSharedUniform("VPMatrix"))
-      .input("position",
-        MTransform.make()
-          .input('MMatrix', graph.getSharedUniform("MMatrix"))
-          .input('position', attribute(CommonAttribute.position, GLDataType.floatVec3))
-      )
-  } else {
-    return vec4(attribute(CommonAttribute.position, GLDataType.floatVec3), constValue(1))
-  }
-
-}
-
 export function screenQuad() {
   return vec4(
     attribute(CommonAttribute.position, GLDataType.floatVec3),

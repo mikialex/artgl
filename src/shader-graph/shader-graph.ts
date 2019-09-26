@@ -92,7 +92,7 @@ export class ShaderGraph {
         this.declareFragNormal();
         ret = this.varyings.get(key);
       } else {
-        throw 'cant get vary'
+        throw `cant get vary <${key}>`
       }
     }
     return new ShaderVaryInputNode(key, ret!.type);

@@ -8,6 +8,7 @@ import { RenderEngine } from "../engine/render-engine";
 import { ShaderCommonUniformInputNode, ShaderTextureNode } from '../shader-graph/shader-node';
 import { uniformFromValue, texture } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
+import { PerspectiveCameraInstance } from "../camera/perspective-camera";
 
 export { MapUniform } from "./shading-util";
 
@@ -40,6 +41,10 @@ export interface ShaderUniformProvider {
 }
 
 export class Shading {
+  constructor() {
+    this.decorate(PerspectiveCameraInstance)
+  }
+
   uuid = generateUUID();
   graph = new ShaderGraph();
 
@@ -100,6 +105,7 @@ export class Shading {
     this._decorators = [];
     this._needRebuildShader = true;
     this._programConfigCache = null;
+    this.decorate(PerspectiveCameraInstance)
   }
 
   decorate(decorator: ShaderUniformDecorator, name?: string): Shading {
