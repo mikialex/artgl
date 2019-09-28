@@ -41,9 +41,6 @@ export interface ShaderUniformProvider {
 }
 
 export class Shading {
-  constructor() {
-    this.decorate(PerspectiveCameraInstance)
-  }
 
   uuid = generateUUID();
   graph = new ShaderGraph();
@@ -94,6 +91,10 @@ export class Shading {
     replaceFirst(this._decorators, oldDecorator, newDecorator);
   }
 
+  decoCamera() {
+    this.decorate(PerspectiveCameraInstance)
+  }
+
   reset() {
     this._decoratorObs.forEach((obs, dec) => {
       dec.notifyNeedRedecorate.remove(obs);
@@ -105,7 +106,6 @@ export class Shading {
     this._decorators = [];
     this._needRebuildShader = true;
     this._programConfigCache = null;
-    this.decorate(PerspectiveCameraInstance)
   }
 
   decorate(decorator: ShaderUniformDecorator, name?: string): Shading {

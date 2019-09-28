@@ -19,7 +19,7 @@ export function MVP(graph: ShaderGraph) {
       .input("VPMatrix", graph.getSharedUniform(Camera.ViewProjectionMatrix))
       .input("position",
         MTransform.make()
-          .input('MMatrix', graph.getSharedUniform("MMatrix"))
+          .input('MMatrix', graph.getSharedUniform(Camera.WorldMatrixKey))
           .input('position', attribute(CommonAttribute.position, GLDataType.floatVec3))
       )
   } else {

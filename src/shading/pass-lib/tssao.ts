@@ -55,7 +55,7 @@ export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
   @MapUniform("VPMatrixInverse")
   VPMatrixInverse: Matrix4 = new Matrix4()
 
-  @MapUniform("VPMatrixInverse")
+  @MapUniform("VPMatrix")
   VPMatrix: Matrix4 = new Matrix4()
 
 

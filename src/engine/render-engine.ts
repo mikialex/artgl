@@ -17,6 +17,8 @@ import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
 import { Vector4Like } from "../math/interface";
 import { Renderable } from "./interface";
+import { Camera } from "../core/camera";
+import { PerspectiveCamera } from "../camera/perspective-camera";
 
 export interface Size {
   width: number;
@@ -97,6 +99,12 @@ export class RenderEngine implements GLReleasable {
 
 
   //// low level resource binding
+  private activeCamera: Camera = new PerspectiveCamera()
+  useCamera(camera: Camera) {
+    this.activeCamera = camera;
+  }
+
+
 
   private lastUploadedShaderUniformProvider: Set<ShaderUniformProvider> = new Set();
   private lastProgramRendered: Nullable<GLProgram> = null;
