@@ -33,6 +33,7 @@ export default async function test(testBridge: TestBridge) {
   const camera = new PerspectiveCamera().updateRenderRatio(engine)
   camera.transform.position.set(0, 0, 15);
   camera.lookAt(new Vector3(0, 0, 0))
+  engine.useCamera(camera);
 
   function draw() {
     engine.setClearColor(new Vector4(0.9, 0.9, 0.9, 1.0))

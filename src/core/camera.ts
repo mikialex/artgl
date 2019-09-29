@@ -42,7 +42,11 @@ export abstract class Camera extends SceneNode
     super();
   }
 
-  @MapUniform('VPMatrix')
+  
+  @MapUniform(SceneNode.WorldMatrixKey)
+  renderObjectWorldMatrix = new Matrix4();
+
+  @MapUniform(Camera.ViewProjectionMatrix)
   _renderMatrix = new Matrix4();
   
   decorate(graph: ShaderGraph): void {

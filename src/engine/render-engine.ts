@@ -18,7 +18,8 @@ import { Interactor } from "../interact/interactor";
 import { Vector4Like } from "../math/interface";
 import { Renderable } from "./interface";
 import { Camera } from "../core/camera";
-import { PerspectiveCamera } from "../camera/perspective-camera";
+import { PerspectiveCamera, PerspectiveCameraInstance } from "../camera/perspective-camera";
+import { Matrix4 } from "../math";
 
 export interface Size {
   width: number;
@@ -100,6 +101,7 @@ export class RenderEngine implements GLReleasable {
 
   //// low level resource binding
   private activeCamera: Camera = new PerspectiveCamera()
+  renderObjectWorldMatrix = new Matrix4();
   useCamera(camera: Camera) {
     this.activeCamera = camera;
   }
@@ -113,6 +115,11 @@ export class RenderEngine implements GLReleasable {
   private currentProgram: Nullable<GLProgram> = null;
 
   useShading(shading: Nullable<Shading>, shadingParams?: ShadingParams) {
+
+    // todo
+    this.activeCamera.renderObjectWorldMatrix = this.renderObjectWorldMatrix
+
+
     if (shading === null) {
       this.currentShading = null;
       this.currentProgram = null;
@@ -133,6 +140,9 @@ export class RenderEngine implements GLReleasable {
       let overrideDecorator
       if (shadingParams !== undefined) {
         overrideDecorator = shadingParams.get(defaultDecorator)
+      }
+      if (overrideDecorator === undefined && defaultDecorator instanceof Camera) {
+        overrideDecorator = this.activeCamera
       }
       const decorator = overrideDecorator === undefined ? defaultDecorator : overrideDecorator;
       decorator.foreachProvider(provider => {
@@ -260,7 +270,9 @@ export class RenderEngine implements GLReleasable {
 
 
   private overrideShading: Nullable<Shading> = null;
-  public defaultShading: Shading = new Shading().decorate(new NormalShading());
+  public defaultShading: Shading = new Shading()
+    .decorate(PerspectiveCameraInstance)
+    .decorate(new NormalShading());
   setOverrideShading(shading: Nullable<Shading>): void {
     this.overrideShading = shading;
   }

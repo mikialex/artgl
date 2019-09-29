@@ -93,6 +93,7 @@ export class RenderObject extends SceneNode {
     const shading = engine.getRealUseShading(this);
 
     // prepare technique
+    engine.renderObjectWorldMatrix = this.worldMatrix;
     engine.useShading(shading, this.shadingParams);
 
     // prepare material

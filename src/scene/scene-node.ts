@@ -25,10 +25,8 @@ export class SceneNode {
   children: SceneNode[] = [];
 
   readonly transform: Transformation = new Transformation();
-  _worldMatrix = new Matrix4();
-  get worldMatrix() {
-    return this._worldMatrix;
-  }
+  
+  worldMatrix = new Matrix4();
 
   visible: boolean = true;
 
