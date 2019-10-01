@@ -93,6 +93,7 @@ export class Shading {
 
   decoCamera() {
     this.decorate(PerspectiveCameraInstance)
+    return this;
   }
 
   reset() {

@@ -37,6 +37,7 @@ export default async function test(testBridge: TestBridge) {
   const phong = new PhongShading<DirectionalLight | PointLight>([dirLight, pointLight]);
 
   let shading = new Shading()
+    .decoCamera()
     .decorate(phong)
     .decorate(ambient)
     .decorate(exposureController)
@@ -48,7 +49,8 @@ export default async function test(testBridge: TestBridge) {
 
   const camera = new PerspectiveCamera().updateRenderRatio(engine)
   camera.transform.position.set(2, 2, 2);
-  camera.lookAt(new Vector3(0, 0, 0))
+  camera.lookAt(new Vector3(0, 0, 0));
+  engine.useCamera(camera);
 
   function draw() {
     engine.setClearColor(new Vector4(0.9, 0.9, 0.9, 1.0))
@@ -93,7 +95,7 @@ export default async function test(testBridge: TestBridge) {
       onChange: (value: number) => {
         wireframe.screenSpaceRatio = value;
       },
-      editors: [
+      editors: [ 
         {
           type: 'slider',
           min: 0,

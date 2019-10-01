@@ -21,20 +21,20 @@ export class PerspectiveCamera extends Camera implements ScreenSpaceRayProvider 
   }
 
   
-  @ProjectionMatrixNeedUpdate<PerspectiveCamera>()
-  near: number;
+  @ProjectionMatrixNeedUpdate()
+  near: number = 0.1;
   
-  @ProjectionMatrixNeedUpdate<PerspectiveCamera>()
-  far: number;
+  @ProjectionMatrixNeedUpdate()
+  far: number = 2000;
 
-  @ProjectionMatrixNeedUpdate<PerspectiveCamera>()
-  fov: number;
+  @ProjectionMatrixNeedUpdate()
+  fov: number = 50;
   
-  @ProjectionMatrixNeedUpdate<PerspectiveCamera>()
-  aspect: number;
+  @ProjectionMatrixNeedUpdate()
+  aspect: number = 1;
   
-  @ProjectionMatrixNeedUpdate<PerspectiveCamera>()
-  zoom: number;
+  @ProjectionMatrixNeedUpdate()
+  zoom: number = 1;
 
   up = new Vector3(0, 1, 0); // todo change watch
 
@@ -51,7 +51,6 @@ export class PerspectiveCamera extends Camera implements ScreenSpaceRayProvider 
     const width = this.aspect * height;
     const left = - 0.5 * width;
     this._projectionMatrix.makePerspective(left, left + width, top, top - height, this.near, this.far);
-    this._projectionMatrixNeedUpdate = false;
   }
 
   lookAt(targetPosition: Vector3) {

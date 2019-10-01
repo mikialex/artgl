@@ -5,7 +5,7 @@ import { Observable } from './observable';
 import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform } from "./shading";
 import { ShaderCommonUniformInputNode } from "../shader-graph/shader-node";
 import { checkCreate, MapUniform } from "./shading-util";
-import { ShaderGraph } from "../shader-graph/shader-graph";
+import { ShaderGraph, WorldPositionFragVary } from "../shader-graph/shader-graph";
 import { VPTransform, MTransform } from "../shader-graph/built-in/transform";
 import { uniformFromValue, attribute, vec4, constValue } from "../shader-graph/node-maker";
 import { CommonAttribute } from "../webgl/attribute";
@@ -15,18 +15,27 @@ export function MVP(graph: ShaderGraph) {
   if (graph.getIfSharedUniform(Camera.WorldMatrixKey) !== undefined &&
     graph.getIfSharedUniform(Camera.ViewProjectionMatrix) !== undefined
   ) {
-    return VPTransform.make()
-      .input("VPMatrix", graph.getSharedUniform(Camera.ViewProjectionMatrix))
-      .input("position",
-        MTransform.make()
-          .input('MMatrix', graph.getSharedUniform(Camera.WorldMatrixKey))
-          .input('position', attribute(CommonAttribute.position, GLDataType.floatVec3))
-      )
+
+    const worldPosition = MTransform.make()
+      .input('MMatrix', graph.getSharedUniform(Camera.WorldMatrixKey))
+      .input('position', attribute(CommonAttribute.position, GLDataType.floatVec3))
+    return {
+      MVP: VPTransform.make()
+        .input("VPMatrix", graph.getSharedUniform(Camera.ViewProjectionMatrix))
+        .input("position", worldPosition),
+      worldPosition: worldPosition.swizzling('xyz')
+    }
   } else {
-    return vec4(attribute(CommonAttribute.position, GLDataType.floatVec3), constValue(1))
+    const rawPosition = vec4(attribute(CommonAttribute.position, GLDataType.floatVec3), constValue(1))
+    return {
+      MVP: rawPosition,
+      worldPosition: rawPosition.swizzling('xyz')
+    }
   }
 
 }
+
+
 
 /**
  * Camera is abstraction of a decoration of view projection matrix in a vertex graph
@@ -38,22 +47,19 @@ export abstract class Camera extends SceneNode
   static readonly WorldPositionKey = 'CameraWorldPosition'
   static readonly ViewProjectionMatrix = 'CameraViewProjectionMatrix'
 
-  constructor() {
-    super();
-  }
-
-  
   @MapUniform(SceneNode.WorldMatrixKey)
   renderObjectWorldMatrix = new Matrix4();
 
   @MapUniform(Camera.ViewProjectionMatrix)
   _renderMatrix = new Matrix4();
-  
+
   decorate(graph: ShaderGraph): void {
     graph.registerSharedUniform(Camera.WorldPositionKey, this.getPropertyUniform('_worldPosition'))
     graph.registerSharedUniform(Camera.ViewProjectionMatrix, this.getPropertyUniform('_renderMatrix'))
     graph.registerSharedUniform(SceneNode.WorldMatrixKey, uniformFromValue(SceneNode.WorldMatrixKey, this.worldMatrix))
-    graph.setVertexRoot(MVP(graph));
+    const { MVP: MVPResult, worldPosition } = MVP(graph)
+    graph.setVertexRoot(MVPResult);
+    graph.setVary(WorldPositionFragVary, worldPosition)
   }
   foreachProvider(visitor: (p: ShaderUniformProvider) => void): void {
     // trigger getter to update VP
@@ -76,7 +82,7 @@ export abstract class Camera extends SceneNode
   abstract updateProjectionMatrix(): void;
   abstract onRenderResize(newSize: Size): void;
 
-  projectionChanged() {
+  notifyProjectionChanged() {
     this._projectionMatrixNeedUpdate = true;
 
   }
@@ -118,9 +124,7 @@ export abstract class Camera extends SceneNode
 
   localTransformSyncVPUpdateId = -1;
   get viewProjectionMatrix(): Readonly<Matrix4> {
-    if (this.viewProjectionMatrixNeedUpdate ||
-      this.localTransformSyncVPUpdateId !== this.transform.transformChangedId
-      ) {
+    if (this.viewProjectionMatrixNeedUpdate) {
       // this._viewProjectionMatrix.multiplyMatrices(this.projectionMatrix, this.worldMatrixInverse); // todo
       this._viewProjectionMatrix.multiplyMatrices(this.projectionMatrix, this.transform.inverseMatrix);
       this.localTransformSyncVPUpdateId = this.transform.transformChangedId
@@ -153,25 +157,20 @@ export abstract class Camera extends SceneNode
 
 }
 
-export function ProjectionMatrixNeedUpdate<T extends Camera>() {
-  return (camera: T, key: keyof T) => {
-    let val = camera[key];
-    const getter = () => {
-      return val;
-    };
-    const setter = (value: any) => {
-      const oldValue = val;
-      val = value;
-      if (oldValue !== value) {
-        camera.projectionChanged();
-      }
-    };
+// https://dev.to/angular/decorators-do-not-work-as-you-might-expect-3gmj
+export function ProjectionMatrixNeedUpdate<T>() {
+  return (target: any, propertyKey: any): any => {
+    const key = Symbol();
 
-    Object.defineProperty(camera, key, {
-      get: getter,
-      set: setter,
-      enumerable: true,
-      configurable: true,
-    });
+    return {
+      get(): T {
+        return (this as any)[key];
+      },
+      set(newValue: T) {
+        (this as any)[key] = newValue;
+        (this as unknown as Camera).notifyProjectionChanged();
+      }
+    }
+
   };
 }

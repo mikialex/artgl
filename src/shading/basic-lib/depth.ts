@@ -13,9 +13,9 @@ float depthVary(vec4 worldPosition){
 export class DepthShading extends BaseEffectShading<DepthShading> {
 
   decorate(graph: ShaderGraph): void {
-    const worldPosition = MVP(graph)
-    graph.setVertexRoot(worldPosition)
-      .setVary("depth", depthV.make().input("worldPosition", worldPosition))
+    const { MVP: MVPResult } = MVP(graph)
+    graph.setVertexRoot(MVPResult)
+      .setVary("depth", depthV.make().input("worldPosition", MVPResult))
       .setFragmentRoot(
         depthPack.make().input("frag_depth", graph.getVary("depth"))
       )
