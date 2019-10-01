@@ -4,6 +4,7 @@ import { Material } from "../core/material";
 import { Nullable } from "../type";
 import { Shading } from "../core/shading";
 import { ShadingParams, RenderRange } from "../core/render-object";
+import { Vector4Like } from "../math/interface";
 
 export interface Renderable {
   render(engine: RenderEngine): void;
@@ -25,4 +26,11 @@ export interface IRenderEngine {
   setFullScreenViewPort(): void 
 
   ////
+  setClearColor(color: Vector4Like): void;
+  getClearColor(): Vector4Like;
+  clearColor(): void;
+
+  clearDepth(): void;
+
+
 }

@@ -16,31 +16,31 @@ export class Transformation{
     this._position.onChange = () => {
       this.matrixIsDirty = true;
       this.matrixInverseDirty = true;
-      this.transformChanged = true;
+      this.transformChangedId++;
     }
 
     this._scale.onChange = () => {
       this.matrixIsDirty = true;
       this.matrixInverseDirty = true;
-      this.transformChanged = true;
+      this.transformChangedId++;
     }
 
     this._rotation.onChangeCallback = () => {
       this.matrixIsDirty = true;
       this.matrixInverseDirty = true;
-      this.transformChanged = true;
+      this.transformChangedId++;
       this._quaternion.setFromEuler(this._rotation, false);
     }
 
     this._quaternion.onChangeCallback = () => {
       this.matrixIsDirty = true;
-      this.transformChanged = true;
+      this.transformChangedId++;
       this.matrixInverseDirty = true;
       this._rotation.setFromQuaternion(this._quaternion, this._rotation.order, false);
     }
   }
 
-  transformChanged: boolean = true;
+  transformChangedId = 0;
 
   private _matrix: Matrix4 = new Matrix4();
   private matrixIsDirty = true;
@@ -67,7 +67,7 @@ export class Transformation{
     this.eulerIsDirty = true;
     this.quaternionIsDirty = true;
     this.matrixInverseDirty = true;
-    this.transformChanged = true;
+    this.transformChangedId++;
   }
 
   get matrix(): Matrix4 {
@@ -126,7 +126,7 @@ export class Transformation{
   }
 
   copy(other: Transformation) {
-    this.transformChanged = true;
+    this.transformChangedId++;
 
     this._matrix.copy(other._matrix);
     this.matrixIsDirty = other.matrixIsDirty;

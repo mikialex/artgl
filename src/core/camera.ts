@@ -78,7 +78,6 @@ export abstract class Camera extends SceneNode
 
   projectionChanged() {
     this._projectionMatrixNeedUpdate = true;
-    this._viewProjectionMatrixNeedUpdate = true;
 
   }
 
@@ -98,28 +97,33 @@ export abstract class Camera extends SceneNode
     return this._projectionMatrix
   }
 
-  _worldMatrixInverse = new Matrix4();
-  _worldMatrixInverseNeedUpdate = true;
+  // todo
+  // _worldMatrixInverse = new Matrix4();
+  // _worldMatrixInverseNeedUpdate = true;
 
-  get worldMatrixInverse(): Readonly<Matrix4> {
-    if (this._worldMatrixInverseNeedUpdate) {
-      this.worldMatrix.getInverse(this._worldMatrixInverse, false);
-      this._worldMatrixInverseNeedUpdate = false;
-    }
-    return this._worldMatrixInverse;
-  }
+  // get worldMatrixInverse(): Readonly<Matrix4> {
+  //   if (this._worldMatrixInverseNeedUpdate) {
+  //     this.worldMatrix.getInverse(this._worldMatrixInverse, false);
+  //     this._worldMatrixInverseNeedUpdate = false;
+  //   }
+  //   return this._worldMatrixInverse;
+  // }
 
   _viewProjectionMatrix = new Matrix4();
-  _viewProjectionMatrixNeedUpdate = true;
 
   get viewProjectionMatrixNeedUpdate() {
-    return this._viewProjectionMatrixNeedUpdate;
+    return this.localTransformSyncVPUpdateId !== this.transform.transformChangedId ||
+      this._projectionMatrixNeedUpdate;
   }
 
+  localTransformSyncVPUpdateId = -1;
   get viewProjectionMatrix(): Readonly<Matrix4> {
-    if (this._viewProjectionMatrixNeedUpdate) {
-      this._viewProjectionMatrix.multiplyMatrices(this.projectionMatrix, this.worldMatrixInverse);
-      this._viewProjectionMatrixNeedUpdate = false;
+    if (this.viewProjectionMatrixNeedUpdate ||
+      this.localTransformSyncVPUpdateId !== this.transform.transformChangedId
+      ) {
+      // this._viewProjectionMatrix.multiplyMatrices(this.projectionMatrix, this.worldMatrixInverse); // todo
+      this._viewProjectionMatrix.multiplyMatrices(this.projectionMatrix, this.transform.inverseMatrix);
+      this.localTransformSyncVPUpdateId = this.transform.transformChangedId
     }
     return this._viewProjectionMatrix;
   }
@@ -142,7 +146,8 @@ export abstract class Camera extends SceneNode
     this.jitterPMatrix.copy(this.projectionMatrix);
     this.jitterPMatrix.elements[8] += ((2 * Math.random() - 1) / width);
     this.jitterPMatrix.elements[9] += ((2 * Math.random() - 1) / height);
-    this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.worldMatrixInverse);
+    // this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.worldMatrixInverse); // todo
+    this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.transform.inverseMatrix);
     return this.jitterPMatrix
   }
 

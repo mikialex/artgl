@@ -91,20 +91,20 @@ export class GLProgram {
     }
     this._indexUINT = value
   }
-
-  public forUniforms(cb: (uniform: GLUniform) => any): void {
+  
+  forUniforms(cb: (uniform: GLUniform) => any): void {
     for (const key in this.textures) {
       cb(this.uniforms[key]);
     }
   }
 
-  public forTextures(cb: (texture: GLTextureUniform) => any): void {
+  forTextures(cb: (texture: GLTextureUniform) => any): void {
     for (const key in this.textures) {
       cb(this.textures[key]);
     }
   }
 
-  public forAttributes(cb: (texture: GLAttribute) => boolean): void {
+  forAttributes(cb: (texture: GLAttribute) => boolean): void {
     for (const key in this.attributes) {
       if (!cb(this.attributes[key])) {
         return;
