@@ -35,7 +35,7 @@ export function MVP(graph: ShaderGraph) {
 
 }
 
-
+const tempMatrix = new Matrix4();
 
 /**
  * Camera is abstraction of a decoration of view projection matrix in a vertex graph
@@ -95,9 +95,26 @@ export abstract class Camera extends SceneNode
   _projectionMatrix = new Matrix4();
   _projectionMatrixNeedUpdate = true;
 
+  enableProjectionJitter = false;
+  jitterWidth =  100000;
+  jitterHeight =  100000;
+  jitter(width: number, height: number) {
+    this.enableProjectionJitter = true;
+    this.jitterWidth = width;
+    this.jitterHeight = height;
+    this.notifyProjectionChanged();
+    return this;
+  }
+
   get projectionMatrix(): Readonly<Matrix4> {
     if (this._projectionMatrixNeedUpdate) {
       this.updateProjectionMatrix();
+      if (this.enableProjectionJitter) {
+        
+    this._projectionMatrix.elements[8] += ((2 * Math.random() - 1) / this.jitterWidth);
+    this._projectionMatrix.elements[9] += ((2 * Math.random() - 1) / this.jitterHeight);
+      }
+
       this._projectionMatrixNeedUpdate = false;
     }
     return this._projectionMatrix
@@ -142,17 +159,6 @@ export abstract class Camera extends SceneNode
       this._worldPositionNeedUpdate = false;
     }
     return this._worldPosition;
-  }
-
-  private jitterPMatrix = new Matrix4();
-  private jitterVPMatrix = new Matrix4();
-  getJitteredViewProjectionMatrix(width: number, height: number): Readonly<Matrix4> {
-    this.jitterPMatrix.copy(this.projectionMatrix);
-    this.jitterPMatrix.elements[8] += ((2 * Math.random() - 1) / width);
-    this.jitterPMatrix.elements[9] += ((2 * Math.random() - 1) / height);
-    // this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.worldMatrixInverse); // todo
-    this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.transform.inverseMatrix);
-    return this.jitterPMatrix
   }
 
 }

@@ -69,7 +69,6 @@ export class AdvanceStaticRenderPipeline {
     this.tssaoHistory.tick();
   }
 
-  jitterMatrix = new Matrix4();
   render(scene: Scene, camera: PerspectiveCamera) {
 
     if (this.sampleCount >= 2) {
@@ -83,9 +82,7 @@ export class AdvanceStaticRenderPipeline {
       this.sampleCount = 0;
     } else {
       if (this._enableTAA) {
-        this.jitterMatrix = camera.getJitteredViewProjectionMatrix(
-          this.engine.renderer.width, this.engine.renderer.height
-        )
+        camera.jitter(this.engine.renderer.width, this.engine.renderer.height);
       }
     }
 
