@@ -4,7 +4,7 @@ import { RenderEngine, Size } from '../engine/render-engine';
 import { Observable } from './observable';
 import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform } from "./shading";
 import { ShaderCommonUniformInputNode } from "../shader-graph/shader-node";
-import { checkCreate, MapUniform } from "./shading-util";
+import { MapUniform } from "./shading-util";
 import { ShaderGraph, WorldPositionFragVary } from "../shader-graph/shader-graph";
 import { VPTransform, MTransform } from "../shader-graph/built-in/transform";
 import { uniformFromValue, attribute, vec4, constValue } from "../shader-graph/node-maker";

@@ -92,6 +92,7 @@ export class AdvanceStaticRenderPipeline {
     // if (this.sampleCount <= 100) {
     this.build(scene, camera);
     this.graph.build(this.composer);
+    this.engine.useCamera(camera);
     this.composer.render(this.engine, this.enableGraphDebugging);
     this.sampleCount++;
     // }

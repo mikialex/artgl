@@ -73,6 +73,7 @@ export class Transformation{
   get matrix(): Matrix4 {
     if (this.matrixIsDirty) {
       this._matrix.compose(this._position, this._quaternion, this._scale);
+      this.matrixIsDirty = false;
     }
     return this._matrix;
   }
@@ -80,6 +81,7 @@ export class Transformation{
   get inverseMatrix(): Matrix4{
     if (this.matrixInverseDirty) {
       this._matrixInverse.getInverse(this.matrix, false);
+      this.matrixInverseDirty = false;
     }
     return this._matrixInverse;
   }
@@ -123,6 +125,11 @@ export class Transformation{
       this.quaternionIsDirty = false;
     }
     return this._quaternion;
+  }
+
+  lookAt(targetPosition: Vector3, up: Vector3) {
+    tempMatrix.lookAt(this.position, targetPosition, up);
+    this.quaternion.setFromRotationMatrix(tempMatrix);
   }
 
   copy(other: Transformation) {

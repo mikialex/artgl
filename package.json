@@ -23,5 +23,7 @@
     "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "^3.3.6"
   },
-  "dependencies": {}
+  "dependencies": {
+    "reflect-metadata": "^0.1.13"
+  }
 }

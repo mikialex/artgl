@@ -3,8 +3,6 @@ import { Camera, ProjectionMatrixNeedUpdate } from "../core/camera";
 import { ScreenSpaceRayProvider, Raycaster } from "../core/raycaster";
 import { Size } from "../engine/render-engine";
 
-const tempMatrix = new Matrix4();
-
 export class PerspectiveCamera extends Camera implements ScreenSpaceRayProvider {
   constructor(near?: number, far?: number,
     fov?: number, aspect?: number, zoom?: number) {
@@ -54,8 +52,7 @@ export class PerspectiveCamera extends Camera implements ScreenSpaceRayProvider 
   }
 
   lookAt(targetPosition: Vector3) {
-    tempMatrix.lookAt(this.transform.position, targetPosition, this.up);
-    this.transform.quaternion.setFromRotationMatrix(tempMatrix);
+    this.transform.lookAt(targetPosition, this.up)
   }
 
   updateRaycaster(caster: Raycaster, xRate: number, yRate: number): void {
