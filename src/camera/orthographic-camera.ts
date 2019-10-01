@@ -25,25 +25,25 @@ export class OrthographicCamera extends Camera {
     this.updateProjectionMatrix();
   }
 
-  @ProjectionMatrixNeedUpdate()
+  @ProjectionMatrixNeedUpdate
   zoom: number;
 
-  @ProjectionMatrixNeedUpdate()
+  @ProjectionMatrixNeedUpdate
   near: number;
   
-  @ProjectionMatrixNeedUpdate()
+  @ProjectionMatrixNeedUpdate
   far: number;
 
-  @ProjectionMatrixNeedUpdate()
+  @ProjectionMatrixNeedUpdate
   left: number;
 
-  @ProjectionMatrixNeedUpdate()
+  @ProjectionMatrixNeedUpdate
   right: number;
 
-  @ProjectionMatrixNeedUpdate()
+  @ProjectionMatrixNeedUpdate
   top: number;
   
-  @ProjectionMatrixNeedUpdate()
+  @ProjectionMatrixNeedUpdate
   bottom: number;
   
   onRenderResize(size: Size) {

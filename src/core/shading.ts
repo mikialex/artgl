@@ -165,31 +165,23 @@ export class Shading {
 
 }
 
-export function MarkNeedRedecorate() {
-  return (target: ShaderUniformDecorator, key: string) => {
-    if (target.notifyNeedRedecorate === undefined) {
-      target.notifyNeedRedecorate = new Observable();
-    }
-    let val = (target as any)[key];
-    const getter = () => {
-      return val;
-    };
-    const setter = (value: any) => {
-      const oldValue = val;
-      val = value;
-      if (oldValue !== value) {
-        target.notifyNeedRedecorate.notifyObservers(target);
-      }
-    };
 
-    Object.defineProperty(target, key, {
-      get: getter,
-      set: setter,
-      enumerable: true,
-      configurable: true,
-    });
-  };
+export function MarkNeedRedecorate<T>(target: any, propertyKey: any): any{
+  const key = Symbol();
+  return {
+    get(): T {
+      return (this as any)[key];
+    },
+    set(newValue: T) {
+      const oldValue = (this as any)[key];
+      if (oldValue !== newValue) {
+        (this as any).notifyNeedRedecorate.notifyObservers((this as any));
+      }
+      (this as any)[key] = newValue;
+    }
+  }
 }
+
 
 export { BaseEffectShading } from './shading-base';
 

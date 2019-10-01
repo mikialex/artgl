@@ -21,19 +21,19 @@ export class PerspectiveCamera extends Camera implements ScreenSpaceRayProvider 
   }
 
   
-  @ProjectionMatrixNeedUpdate()
+  @ProjectionMatrixNeedUpdate
   near: number = 0.1;
   
-  @ProjectionMatrixNeedUpdate()
+  @ProjectionMatrixNeedUpdate
   far: number = 2000;
 
-  @ProjectionMatrixNeedUpdate()
+  @ProjectionMatrixNeedUpdate
   fov: number = 50;
   
-  @ProjectionMatrixNeedUpdate()
+  @ProjectionMatrixNeedUpdate
   aspect: number = 1;
   
-  @ProjectionMatrixNeedUpdate()
+  @ProjectionMatrixNeedUpdate
   zoom: number = 1;
 
   up = new Vector3(0, 1, 0); // todo change watch

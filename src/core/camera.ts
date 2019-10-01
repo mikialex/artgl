@@ -158,8 +158,7 @@ export abstract class Camera extends SceneNode
 }
 
 // https://dev.to/angular/decorators-do-not-work-as-you-might-expect-3gmj
-export function ProjectionMatrixNeedUpdate<T>() {
-  return (target: any, propertyKey: any): any => {
+export function ProjectionMatrixNeedUpdate<T>(target: any, propertyKey: any): any{
     const key = Symbol();
 
     return {
@@ -171,6 +170,4 @@ export function ProjectionMatrixNeedUpdate<T>() {
         (this as unknown as Camera).notifyProjectionChanged();
       }
     }
-
-  };
 }
