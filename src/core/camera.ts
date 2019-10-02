@@ -65,6 +65,8 @@ export abstract class Camera extends SceneNode
     // trigger getter to update VP
     this._renderMatrix = this.viewProjectionMatrix;
 
+    this._worldPosition = this.transform.position;
+
     return visitor(this);
   }
 
@@ -152,14 +154,15 @@ export abstract class Camera extends SceneNode
   @MapUniform("worldPosition")
   _worldPosition = new Vector3();
 
-  _worldPositionNeedUpdate = true;
-  get worldPosition(): Readonly<Vector3> {
-    if (this._worldPositionNeedUpdate) {
-      this.worldMatrix.getPosition(this._worldPosition)
-      this._worldPositionNeedUpdate = false;
-    }
-    return this._worldPosition;
-  }
+  // todo
+//   _worldPositionNeedUpdate = true;
+//   get worldPosition(): Readonly<Vector3> {
+//     if (this._worldPositionNeedUpdate) {
+//       this.worldMatrix.getPosition(this._worldPosition)
+//       this._worldPositionNeedUpdate = false;
+//     }
+//     return this._worldPosition;
+//   }
 
 }
 
