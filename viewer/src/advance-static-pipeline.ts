@@ -50,7 +50,8 @@ export class AdvanceStaticRenderPipeline {
   composeShading = new TSSAOBlendShading()
   composeShader: Shading = new Shading().decorate(this.composeShading);
   dof = new ProgressiveDof();
-  depthShader = new Shading().decorate(new DepthShading()).decorate(this.dof);
+  depthShader = new Shading().decoCamera()
+    .decorate(new DepthShading()).decorate(this.dof);
 
   enableGraphDebugging = false;
 
