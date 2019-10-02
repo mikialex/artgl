@@ -1,8 +1,8 @@
 import {
   RenderGraph, TAAShading, screen,
-  TSSAOShading, TSSAOBlendShading, Matrix4,
+  TSSAOShading, TSSAOBlendShading,
   DepthShading, Scene, RenderEngine, Shading, ProgressiveDof,
-  pass, pingpong, target, when, PingPongTarget, Texture, PerspectiveCamera, Camera
+  pass, pingpong, target, when, PingPongTarget, PerspectiveCamera,
 } from "../../src/artgl";
 import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
@@ -146,6 +146,7 @@ export class AdvanceStaticRenderPipeline {
         .overrideShading(this.tssaoShader)
         .disableColorClear()
         .beforeExecute(() => {
+          this.tssaoShading.VPMatrix = VP;
           this.tssaoShading.VPMatrixInverse = this.tssaoShading.VPMatrixInverse.getInverse(VP, true);
           this.tssaoShading.sampleCount = this.sampleCount;
         })
