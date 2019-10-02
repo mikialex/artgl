@@ -1,6 +1,5 @@
 import { MapUniform, BaseEffectShading } from "../../core/shading";
-import { InnerSupportUniform } from "../../webgl/uniform/uniform";
-import { texture, innerUniform, screenQuad } from "../../shader-graph/node-maker";
+import { texture, screenQuad } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
 import { unitDir } from "../../shader-graph/built-in/transform";
@@ -8,6 +7,7 @@ import { getWorldPosition, NDCxyToUV } from "../../shader-graph/built-in/transfo
 import { Matrix4 } from "../../math/index";
 import { rand2DT, rand } from "../../shader-graph/built-in/rand";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
+import { Camera } from "../../core/camera";
 
 const newSamplePosition = new ShaderFunction({
   source: `
@@ -55,11 +55,15 @@ export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
   @MapUniform("VPMatrixInverse")
   VPMatrixInverse: Matrix4 = new Matrix4()
 
+  @MapUniform("VPMatrix")
+  VPMatrix: Matrix4 = new Matrix4()
+
+
   @MapUniform("u_aoRadius")
   aoRadius: number = 1
 
   decorate(graph: ShaderGraph) {
-    const VPMatrix = innerUniform("VPMatrix");
+    const VPMatrix = this.getPropertyUniform('VPMatrix')
     const sampleCount = this.getPropertyUniform("sampleCount");
     const depthTex = texture("depthResult");
     graph

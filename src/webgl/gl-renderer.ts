@@ -25,7 +25,7 @@ export class GLRenderer implements GLReleasable {
     }
     this.gl = ctx;
     this.el = el;
-    this.glInfo = new GLInfo(ctx);
+    this.glInfo = new GLInfo(this);
     this.programManager = new GLProgramManager(this);
     this.framebufferManager = new GLFrameBufferManager(this);
     this.vaoManager = new GLVAOManager(this);

@@ -90,11 +90,10 @@ export class RenderObject extends SceneNode {
       return;
     }
 
-    engine.globalUniforms.MMatrix.setValue(this.worldMatrix);
-
     const shading = engine.getRealUseShading(this);
 
     // prepare technique
+    engine.renderObjectWorldMatrix = this.worldMatrix;
     engine.useShading(shading, this.shadingParams);
 
     // prepare material

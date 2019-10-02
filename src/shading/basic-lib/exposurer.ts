@@ -22,7 +22,7 @@ export class ExposureController extends BaseEffectShading<ExposureController> {
   @MapUniform("toneMappingWhitePoint")
   toneMappingWhitePoint: number = 1;
 
-  @MarkNeedRedecorate()
+  @MarkNeedRedecorate
   toneMapType: ToneMapType = ToneMapType.Uncharted2ToneMapping;
 
   getToneMapFunction() {

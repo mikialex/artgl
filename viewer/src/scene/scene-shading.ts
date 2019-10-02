@@ -28,6 +28,7 @@ export default function (app: Application) {
   const phong = new PhongShading<DirectionalLight | PointLight>([dirLight, pointLight]);
 
   let shading = new Shading()
+    .decoCamera()
     .decorate(app.pipeline.dof)
     .decorate(phong)
     .decorate(ambient)

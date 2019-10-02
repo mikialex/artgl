@@ -1,6 +1,6 @@
 import {
   RenderEngine, Mesh, PerspectiveCamera, OrbitController,
-  OBJLoader, Scene, Observable, Framer, Material, Geometry, Shading, RenderObject,
+  OBJLoader, Scene, Observable, Framer, Material, Geometry, Shading, RenderObject, Vector3,
 } from '../../src/artgl';
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
@@ -8,7 +8,6 @@ import createSceneShading from './scene/scene-shading';
 import { AdvanceStaticRenderPipeline } from './advance-static-pipeline';
 import { Raycaster } from '../../src/core/raycaster';
 import { SkyBackground } from '../../src/scene/background';
-import { Nullable } from '../../src/type';
 
 export const STATIC_SERVER = "http://localhost:3000/"
 
@@ -18,10 +17,12 @@ export class Application {
     this.engine = new RenderEngine(canvas);
     this.pipeline = new AdvanceStaticRenderPipeline(this.engine);
 
-    this.engine.camera.bindEngineRenderSize(this.engine);
-    this.engine.camera.transform.position.set(5, 5, 5)
+    this.camera = new PerspectiveCamera();
+    this.camera.transform.position.set(5, 5, 5);
+    this.camera.lookAt(new Vector3(0, 0, 0));
+    this.camera.updateRenderRatio(this.engine);
 
-    this.orbitController = new OrbitController(this.engine.camera as PerspectiveCamera);
+    this.orbitController = new OrbitController(this.camera);
     this.orbitController.registerInteractor(this.engine.interactor);
     this.createScene(this.scene);
 
@@ -32,6 +33,7 @@ export class Application {
     this.scene.background = new SkyBackground()
   }
 
+  camera: PerspectiveCamera;
   pipeline: AdvanceStaticRenderPipeline;
   engine: RenderEngine;
   framer: Framer = new Framer();
@@ -56,6 +58,7 @@ export class Application {
     const width = this.el.offsetWidth;
     const height = this.el.offsetHeight;
     this.engine.setSize(width, height);
+    this.camera.updateRenderRatio(this.engine);
     this.pipeline.resetSample();
   }
   notifyResize() {
@@ -68,7 +71,7 @@ export class Application {
     this.beforeRender.notifyObservers(this.engine);
     this.orbitController.update();
 
-    this.pipeline.render(this.scene);
+    this.pipeline.render(this.scene, this.camera);
 
     this.afterRender.notifyObservers(this.engine);
     this.engine.renderer.stat.reset();
@@ -77,7 +80,7 @@ export class Application {
 
   pick(x: number, y: number) {
 
-    this.raycaster.update(this.engine.camera as PerspectiveCamera, x * 2 - 1, y * 2 - 1);
+    this.raycaster.update(this.camera, x * 2 - 1, y * 2 - 1);
     const resultCast = this.raycaster.pickFirst(this.scene);
     if (resultCast !== undefined) {
       this.pipeline.dof.focusLength = resultCast.cameraDistance;
