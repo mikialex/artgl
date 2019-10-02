@@ -54,7 +54,7 @@ export class BarycentricWireFrame extends BaseEffectShading<BarycentricWireFrame
   @MapUniform("screenSpaceRatio")
   screenSpaceRatio: number = 0.5;
 
-  @MarkNeedRedecorate()
+  @MarkNeedRedecorate
   useScreenSpace: boolean = false;
 
   getWireFrameType(graph: ShaderGraph) {

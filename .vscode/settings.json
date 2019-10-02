@@ -9,6 +9,7 @@
     "Reinhard",
     "Renderable",
     "colorbuffer",
+    "depthbuffer",
     "drawcall",
     "exposurer",
     "framebuffers",

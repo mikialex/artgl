@@ -1,18 +1,14 @@
 import { GLRenderer } from "../webgl/gl-renderer";
 import { RenderObject, RenderRange, ShadingParams } from "../core/render-object";
-import { Camera } from "../core/camera";
-import { Matrix4 } from "../math/matrix4";
 import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
 import { Material } from "../core/material";
 import { GLTextureUniform } from "../webgl/uniform/uniform-texture";
-import { PerspectiveCamera } from "../camera/perspective-camera";
 import { Nullable, GLReleasable } from "../type";
-import { GlobalUniforms, createAllInnerSupportUniformProxy } from "./uniform-proxy";
 import { Observable } from "../core/observable";
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
-import { QuadSource, RenderSource } from './render-source';
+import { QuadSource } from './render-source';
 import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/vao";
@@ -21,6 +17,9 @@ import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
 import { Vector4Like } from "../math/interface";
 import { Renderable } from "./interface";
+import { Camera } from "../core/camera";
+import { PerspectiveCamera, PerspectiveCameraInstance } from "../camera/perspective-camera";
+import { Matrix4 } from "../math";
 
 export interface Size {
   width: number;
@@ -33,14 +32,7 @@ const quad = new QuadSource();
 export class RenderEngine implements GLReleasable {
   constructor(el: HTMLCanvasElement, ctxOptions?: any) {
     this.renderer = new GLRenderer(el, ctxOptions);
-    // if we have a element param, use it as the default camera's param for convenience
-    if (el !== undefined) {
-      (this.camera as PerspectiveCamera).aspect = el.width / el.height;
-    }
-
     this.interactor = new Interactor(el);
-
-    this.globalUniforms = createAllInnerSupportUniformProxy();
 
     this.preferVAO = true;
   }
@@ -85,78 +77,6 @@ export class RenderEngine implements GLReleasable {
   ////
 
 
-
-
-  //// camera related
-  _camera: Camera = new PerspectiveCamera();
-  public isCameraChanged = true;
-  get camera() { return this._camera };
-  set camera(camera) {
-    this._camera = camera;
-    this.isCameraChanged = true;
-  };
-  private cameraMatrixReverse = new Matrix4();
-  private ProjectionMatrix = new Matrix4();
-  private VPMatrix = new Matrix4();
-  private LastVPMatrix = new Matrix4();
-
-  private jitterPMatrix = new Matrix4();
-  private jitterVPMatrix = new Matrix4();
-
-  jitterProjectionMatrix() {
-    this.jitterPMatrix.copy(this.ProjectionMatrix);
-    this.jitterPMatrix.elements[8] += ((2 * Math.random() - 1) / this.renderer.width);
-    this.jitterPMatrix.elements[9] += ((2 * Math.random() - 1) / this.renderer.height);
-    this.jitterVPMatrix.multiplyMatrices(this.jitterPMatrix, this.cameraMatrixReverse);
-    this.globalUniforms.VPMatrix.setValue(this.jitterVPMatrix);
-  }
-
-  unJit() {
-    this.globalUniforms.VPMatrix.setValue(this.VPMatrix);
-  }
-
-  /**
-   * call this to update engine layer camera related render info
-   * such as matrix global uniform.
-   *
-   * @memberof RenderEngine
-   */
-  connectCamera() {
-    let needUpdateVP = false;
-    // 
-    if (this.camera.projectionMatrixNeedUpdate) {
-      this.camera.updateProjectionMatrix();
-      this.ProjectionMatrix.copy(this.camera.projectionMatrix);
-      needUpdateVP = true;
-    }
-    if (this.camera.transform.transformChanged) {
-      this.camera.transform.matrix;
-      this.camera.updateWorldMatrix(true);
-      this.cameraMatrixReverse.getInverse(this.camera.worldMatrix, true);
-
-      // TODO this should cal world position
-      this.globalUniforms.CameraWorldPosition.setValue(this.camera.transform.position)
-      needUpdateVP = true;
-    }
-
-    this.LastVPMatrix.copy(this.VPMatrix);
-    this.globalUniforms.LastVPMatrix.setValue(this.LastVPMatrix);
-
-    if (needUpdateVP) {
-      this.VPMatrix.multiplyMatrices(this.ProjectionMatrix, this.cameraMatrixReverse);
-      this.globalUniforms.VPMatrix.setValue(this.VPMatrix);
-      needUpdateVP = false;
-      this.isCameraChanged = true;
-    } else {
-      this.isCameraChanged = false;
-    }
-
-  }
-  ////
-
-
-
-
   //// render APIs
   render(source: Renderable) {
     source.render(this);
@@ -179,25 +99,29 @@ export class RenderEngine implements GLReleasable {
   ////
 
 
-
-
   //// low level resource binding
+  private activeCamera: Camera = new PerspectiveCamera()
+  renderObjectWorldMatrix = new Matrix4();
+  useCamera(camera: Camera) {
+    this.activeCamera = camera;
+  }
 
-  /**
-   * GlobalUniforms is store useful inner support uniforms
-   * Engine will update these values and auto bind them to
-   * program that you will draw as needed
-   *
-   */
-  readonly globalUniforms: GlobalUniforms
+
 
   private lastUploadedShaderUniformProvider: Set<ShaderUniformProvider> = new Set();
   private lastProgramRendered: Nullable<GLProgram> = null;
 
+  private currentShading: Nullable<Shading> = null;
   private currentProgram: Nullable<GLProgram> = null;
 
   useShading(shading: Nullable<Shading>, shadingParams?: ShadingParams) {
+
+    // todo
+    this.activeCamera.renderObjectWorldMatrix = this.renderObjectWorldMatrix
+
+
     if (shading === null) {
+      this.currentShading = null;
       this.currentProgram = null;
       return;
     }
@@ -209,14 +133,16 @@ export class RenderEngine implements GLReleasable {
     }
 
     this.currentProgram = program;
+    this.currentShading = shading;
     this.renderer.useProgram(program);
-
-    program.updateInnerGlobalUniforms(this); // TODO maybe minor optimize here
 
     shading._decorators.forEach(defaultDecorator => {
       let overrideDecorator
       if (shadingParams !== undefined) {
-        overrideDecorator =  shadingParams.get(defaultDecorator)
+        overrideDecorator = shadingParams.get(defaultDecorator)
+      }
+      if (overrideDecorator === undefined && defaultDecorator instanceof Camera) {
+        overrideDecorator = this.activeCamera
       }
       const decorator = overrideDecorator === undefined ? defaultDecorator : overrideDecorator;
       decorator.foreachProvider(provider => {
@@ -236,7 +162,7 @@ export class RenderEngine implements GLReleasable {
 
   }
 
-  useMaterial(shading: Shading, material?: Material, ) {
+  useMaterial(material?: Material) {
     if (this.currentProgram === null) {
       throw 'shading not exist'
     }
@@ -251,7 +177,7 @@ export class RenderEngine implements GLReleasable {
 
       // acquire texture from framebuffer
       if (glTexture === undefined) {
-        const framebufferName = shading.framebufferTextureMap[tex.name];
+        const framebufferName = this.currentShading!.framebufferTextureMap[tex.name];
         glTexture = this.renderer.framebufferManager.getFramebufferTexture(framebufferName);
       }
 
@@ -263,7 +189,7 @@ export class RenderEngine implements GLReleasable {
     })
   }
 
-  useGeometry(shading: Shading, geometry: Geometry) {
+  useGeometry(geometry: Geometry) {
 
     const program = this.currentProgram;
     if (program === null) {
@@ -286,7 +212,7 @@ export class RenderEngine implements GLReleasable {
     // vao check
     let vaoUnbindCallback: VAOCreateCallback | undefined;
     if (this._vaoEnabled) {
-      vaoUnbindCallback = this.renderer.vaoManager.connectGeometry(geometry, shading)
+      vaoUnbindCallback = this.renderer.vaoManager.connectGeometry(geometry, this.currentShading!)
       if (vaoUnbindCallback === undefined) {
         return;// vao has bind, geometry buffer is ok;
       }
@@ -344,7 +270,9 @@ export class RenderEngine implements GLReleasable {
 
 
   private overrideShading: Nullable<Shading> = null;
-  public defaultShading: Shading = new Shading().decorate(new NormalShading());
+  public defaultShading: Shading = new Shading()
+    .decorate(PerspectiveCameraInstance)
+    .decorate(new NormalShading());
   setOverrideShading(shading: Nullable<Shading>): void {
     this.overrideShading = shading;
   }

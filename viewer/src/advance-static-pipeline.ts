@@ -1,8 +1,8 @@
 import {
   RenderGraph, TAAShading, screen,
-  TSSAOShading, TSSAOBlendShading, Matrix4,
+  TSSAOShading, TSSAOBlendShading,
   DepthShading, Scene, RenderEngine, Shading, ProgressiveDof,
-  pass, pingpong, target, when, PingPongTarget, Texture
+  pass, pingpong, target, when, PingPongTarget, PerspectiveCamera,
 } from "../../src/artgl";
 import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
@@ -44,12 +44,14 @@ export class AdvanceStaticRenderPipeline {
   }
   tssaoShading = new TSSAOShading();
   tssaoShader: Shading = new Shading().decorate(this.tssaoShading);
+  
   tssaoHistory: PingPongTarget = pingpong('tssao');
 
   composeShading = new TSSAOBlendShading()
   composeShader: Shading = new Shading().decorate(this.composeShading);
   dof = new ProgressiveDof();
-  depthShader = new Shading().decorate(new DepthShading()).decorate(this.dof);
+  depthShader = new Shading().decoCamera()
+    .decorate(new DepthShading()).decorate(this.dof);
 
   enableGraphDebugging = false;
 
@@ -68,16 +70,7 @@ export class AdvanceStaticRenderPipeline {
     this.tssaoHistory.tick();
   }
 
-  getFramebufferByName(name: string) {
-    // const node = this.graph.getRenderTargetDependence(name)!;
-    // const fbo = this.composer.getFramebuffer(node);
-    // if (fbo === undefined) {
-    //   console.warn(`fbo ${name} has been optimized, to make it available, set keep content always true in render target node config`)
-    // }
-    // return fbo;
-  }
-
-  render(scene: Scene) {
+  render(scene: Scene, camera: PerspectiveCamera) {
 
     if (this.sampleCount >= 2) {
       if (!this._enableTAA) {
@@ -86,18 +79,18 @@ export class AdvanceStaticRenderPipeline {
       this.dof.updateSample();
     }
 
-    this.engine.connectCamera();
-    if (this.engine.isCameraChanged) {
+    if (camera.viewProjectionMatrixNeedUpdate) {
       this.sampleCount = 0;
     } else {
       if (this._enableTAA) {
-        this.engine.jitterProjectionMatrix();
+        camera.jitter(this.engine.renderer.width, this.engine.renderer.height);
       }
     }
 
     // if (this.sampleCount <= 100) {
-    this.build(scene);
+    this.build(scene, camera);
     this.graph.build(this.composer);
+    this.engine.useCamera(camera);
     this.composer.render(this.engine, this.enableGraphDebugging);
     this.sampleCount++;
     // }
@@ -111,14 +104,12 @@ export class AdvanceStaticRenderPipeline {
     }
   })
 
-  
-  depthShader2 = new Shading().decorate(new DepthShading()).decorate(this.dof);
-  private build(scene: Scene) {
+  private build(scene: Scene, camera: PerspectiveCamera) {
     this.updateTicks();
 
     const directionalShadowMapPass = pass("directionalShadowMapPass")
       .use(scene.renderScene)
-      .overrideShading(this.depthShader2)
+      .overrideShading(this.depthShader)
     
     this.directionalShadowMap.from(directionalShadowMapPass)
     
@@ -132,13 +123,12 @@ export class AdvanceStaticRenderPipeline {
     const depthResult = target("depthResult").needDepth().from(depthPass)
     const sceneResult = target("sceneResult").needDepth().from(scenePass)
 
+    const VP = camera.viewProjectionMatrix;
     const createTAA = () => {
       const taaPass = pass("taa").useQuad()
         .overrideShading(this.taaShader)
         .disableColorClear()
         .beforeExecute(() => {
-          this.engine.unJit();
-          const VP: Matrix4 = this.engine.globalUniforms.VPMatrix.value
           this.taaShading.VPMatrixInverse = this.taaShading.VPMatrixInverse.getInverse(VP, true); // TODO maybe add watch
           this.taaShading.sampleCount = this.sampleCount;
         })
@@ -156,7 +146,7 @@ export class AdvanceStaticRenderPipeline {
         .overrideShading(this.tssaoShader)
         .disableColorClear()
         .beforeExecute(() => {
-          const VP: Matrix4 = this.engine.globalUniforms.VPMatrix.value
+          this.tssaoShading.VPMatrix = VP;
           this.tssaoShading.VPMatrixInverse = this.tssaoShading.VPMatrixInverse.getInverse(VP, true);
           this.tssaoShading.sampleCount = this.sampleCount;
         })

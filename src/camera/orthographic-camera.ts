@@ -1,4 +1,4 @@
-import { Camera } from "../core/camera";
+import { Camera, ProjectionMatrixNeedUpdate } from "../core/camera";
 import { Size } from "../engine/render-engine";
 
 
@@ -25,13 +25,25 @@ export class OrthographicCamera extends Camera {
     this.updateProjectionMatrix();
   }
 
+  @ProjectionMatrixNeedUpdate
   zoom: number;
+
+  @ProjectionMatrixNeedUpdate
   near: number;
+  
+  @ProjectionMatrixNeedUpdate
   far: number;
 
+  @ProjectionMatrixNeedUpdate
   left: number;
+
+  @ProjectionMatrixNeedUpdate
   right: number;
+
+  @ProjectionMatrixNeedUpdate
   top: number;
+  
+  @ProjectionMatrixNeedUpdate
   bottom: number;
   
   onRenderResize(size: Size) {
@@ -50,6 +62,6 @@ export class OrthographicCamera extends Camera {
 		var top = cy + dy;
 		var bottom = cy - dy;
 
-		this.projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far );
+		this._projectionMatrix.makeOrthographic( left, right, top, bottom, this.near, this.far );
   }
 }

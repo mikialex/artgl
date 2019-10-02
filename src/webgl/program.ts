@@ -2,11 +2,10 @@ import { GLRenderer } from "./gl-renderer";
 import { GLShader, ShaderType } from "./shader";
 import { generateUUID } from "../math/uuid";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
-import { GLUniform, UniformDescriptor, getInnerUniformDescriptor, InnerUniformMapDescriptor } from "./uniform/uniform";
+import { GLUniform, UniformDescriptor } from "./uniform/uniform";
 import { AttributeDescriptor, GLAttribute } from "./attribute";
 import { Nullable } from "../type";
 import { GLTextureUniform, TextureDescriptor } from "./uniform/uniform-texture";
-import { RenderEngine } from "../engine/render-engine";
 
 export interface VaryingDescriptor {
   name: string,
@@ -16,8 +15,6 @@ export interface VaryingDescriptor {
 export interface GLProgramConfig {
   attributes: AttributeDescriptor[];
   uniforms?: UniformDescriptor[];
-  uniformsIncludes?: InnerUniformMapDescriptor[];
-  _hasUniformIncludesExpand?: boolean;
   varyings?: VaryingDescriptor[];
   textures?: TextureDescriptor[];
   vertexShaderString: string;
@@ -27,24 +24,18 @@ export interface GLProgramConfig {
   needDerivative?: boolean;
 }
 
-function fulfillProgramConfig(config: GLProgramConfig){
+function fulfillProgramConfig(config: GLProgramConfig) {
   if (config.useIndex === undefined) {
     config.useIndex = true;
   }
   if (config.uniforms === undefined) {
     config.uniforms = [];
   }
-  if (config.uniformsIncludes !== undefined && config._hasUniformIncludesExpand !== true) {
-    config.uniformsIncludes.forEach(ui => {
-      (config.uniforms as UniformDescriptor[]).push(getInnerUniformDescriptor(ui));
-    })
-    config._hasUniformIncludesExpand = true;
-  }
   return config;
 }
 
 
-export class GLProgram{
+export class GLProgram {
   constructor(renderer: GLRenderer, config: GLProgramConfig) {
     fulfillProgramConfig(config);
     this.renderer = renderer;
@@ -55,19 +46,13 @@ export class GLProgram{
 
     this.createProgram(this.vertexShader, this.fragmentShader);
     this.createGLResource(config);
-    
-    if (config.uniformsIncludes !== undefined) {
-      config.uniformsIncludes.forEach(des => {
-        this.globalUniforms.push(this.uniforms[des.name])
-      })
-    }
 
     this.config = config;
     if (config.useIndex !== undefined) {
       this.useIndexDraw = config.useIndex;
     }
   }
-  
+
   id: string = generateUUID();
 
   readonly renderer: GLRenderer;
@@ -80,14 +65,13 @@ export class GLProgram{
   };
 
   private config: GLProgramConfig;
-  
+
   getConfig(): Readonly<GLProgramConfig> {
     return this.config;
   }
 
   private attributes: { [index: string]: GLAttribute } = {};
   private uniforms: { [index: string]: GLUniform } = {};
-  private globalUniforms: GLUniform[] = [];
   private textures: { [index: string]: GLTextureUniform } = {};
 
   private vertexShader: GLShader;
@@ -108,19 +92,19 @@ export class GLProgram{
     this._indexUINT = value
   }
   
-  public forUniforms(cb: (uniform: GLUniform) => any): void {
+  forUniforms(cb: (uniform: GLUniform) => any): void {
     for (const key in this.textures) {
       cb(this.uniforms[key]);
     }
   }
 
-  public forTextures(cb: (texture: GLTextureUniform) => any): void {
+  forTextures(cb: (texture: GLTextureUniform) => any): void {
     for (const key in this.textures) {
       cb(this.textures[key]);
     }
   }
 
-  public forAttributes(cb: (texture: GLAttribute) => boolean): void {
+  forAttributes(cb: (texture: GLAttribute) => boolean): void {
     for (const key in this.attributes) {
       if (!cb(this.attributes[key])) {
         return;
@@ -185,7 +169,7 @@ export class GLProgram{
     this.textures[name].useTexture(webglTexture);
   }
 
-  setDrawRange(start:number, count:number) {
+  setDrawRange(start: number, count: number) {
     this.drawFrom = start;
     this.drawCount = count;
   }
@@ -199,12 +183,6 @@ export class GLProgram{
     if (uni !== undefined) {
       this.uniforms[name].set(data);
     }
-  }
-
-  updateInnerGlobalUniforms(engine: RenderEngine) {
-    this.globalUniforms.forEach(uni => {
-      uni.set(engine.globalUniforms[uni.innerGlobal!].value)
-    })
   }
 
   useIndexBuffer(buffer: WebGLBuffer) {

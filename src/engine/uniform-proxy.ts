@@ -1,5 +1,4 @@
 import { Matrix4, Vector3 } from "../math";
-import { InnerUniformMap } from "../webgl/uniform/uniform";
 
 /**
  * wrap class for uniform change cache and need update optimize
@@ -37,14 +36,4 @@ export interface GlobalUniforms {
   VPMatrix: UniformProxy<Matrix4>,
   CameraWorldPosition: UniformProxy<Vector3>,
   LastVPMatrix: UniformProxy<Matrix4>
-}
-
-
-export function createAllInnerSupportUniformProxy(): GlobalUniforms {
-  return {
-    MMatrix: new UniformProxy(InnerUniformMap.MMatrix.default),
-    VPMatrix: new UniformProxy(InnerUniformMap.VPMatrix.default),
-    CameraWorldPosition: new UniformProxy(InnerUniformMap.CameraWorldPosition.default),
-    LastVPMatrix: new UniformProxy(InnerUniformMap.LastVPMatrix.default),
-  }
 }

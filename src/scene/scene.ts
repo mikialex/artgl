@@ -108,9 +108,9 @@ export class Scene implements RenderSource, RayCastSource {
 
       // TODO optimize 
       if (node.parent !== null) {
-        node._worldMatrix.multiplyMatrices(node.parent._worldMatrix, node.transform.matrix);
+        node.worldMatrix.multiplyMatrices(node.parent.worldMatrix, node.transform.matrix);
       } else {
-        node._worldMatrix.copy(node.transform.matrix);
+        node.worldMatrix.copy(node.transform.matrix);
       }
 
       if (!node.visible) {

@@ -1,3 +1,5 @@
+import { GLRenderer } from "./gl-renderer";
+
 // https://github.com/pissang/claygl/blob/master/src/core/GLInfo.js
 
 export enum GLExtList {
@@ -27,8 +29,8 @@ const EXTENSION_LIST = Object.keys(GLExtList);
 const PARAMETER_NAMES = Object.keys(GLParamList);
 
 export class GLInfo {
-  constructor(gl: WebGLRenderingContext) {
-    this.gl = gl;
+  constructor(renderer: GLRenderer) {
+    this.gl = renderer.gl;
     this.createAllExtension();
     this.getAllParams();
     this.supportUintIndexDraw = this.getExtension(GLExtList.OES_element_index_uint) !== undefined;
