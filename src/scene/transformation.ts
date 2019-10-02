@@ -16,31 +16,31 @@ export class Transformation{
     this._position.onChange = () => {
       this.matrixIsDirty = true;
       this.matrixInverseDirty = true;
-      this.transformChanged = true;
+      this.transformChangedId++;
     }
 
     this._scale.onChange = () => {
       this.matrixIsDirty = true;
       this.matrixInverseDirty = true;
-      this.transformChanged = true;
+      this.transformChangedId++;
     }
 
     this._rotation.onChangeCallback = () => {
       this.matrixIsDirty = true;
       this.matrixInverseDirty = true;
-      this.transformChanged = true;
+      this.transformChangedId++;
       this._quaternion.setFromEuler(this._rotation, false);
     }
 
     this._quaternion.onChangeCallback = () => {
       this.matrixIsDirty = true;
-      this.transformChanged = true;
+      this.transformChangedId++;
       this.matrixInverseDirty = true;
       this._rotation.setFromQuaternion(this._quaternion, this._rotation.order, false);
     }
   }
 
-  transformChanged: boolean = true;
+  transformChangedId = 0;
 
   private _matrix: Matrix4 = new Matrix4();
   private matrixIsDirty = true;
@@ -67,12 +67,13 @@ export class Transformation{
     this.eulerIsDirty = true;
     this.quaternionIsDirty = true;
     this.matrixInverseDirty = true;
-    this.transformChanged = true;
+    this.transformChangedId++;
   }
 
   get matrix(): Matrix4 {
     if (this.matrixIsDirty) {
       this._matrix.compose(this._position, this._quaternion, this._scale);
+      this.matrixIsDirty = false;
     }
     return this._matrix;
   }
@@ -80,6 +81,7 @@ export class Transformation{
   get inverseMatrix(): Matrix4{
     if (this.matrixInverseDirty) {
       this._matrixInverse.getInverse(this.matrix, false);
+      this.matrixInverseDirty = false;
     }
     return this._matrixInverse;
   }
@@ -125,8 +127,13 @@ export class Transformation{
     return this._quaternion;
   }
 
+  lookAt(targetPosition: Vector3, up: Vector3) {
+    tempMatrix.lookAt(this.position, targetPosition, up);
+    this.quaternion.setFromRotationMatrix(tempMatrix);
+  }
+
   copy(other: Transformation) {
-    this.transformChanged = true;
+    this.transformChangedId++;
 
     this._matrix.copy(other._matrix);
     this.matrixIsDirty = other.matrixIsDirty;

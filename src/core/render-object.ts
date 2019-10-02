@@ -90,18 +90,17 @@ export class RenderObject extends SceneNode {
       return;
     }
 
-    engine.globalUniforms.MMatrix.setValue(this.worldMatrix);
-
     const shading = engine.getRealUseShading(this);
 
     // prepare technique
+    engine.renderObjectWorldMatrix = this.worldMatrix;
     engine.useShading(shading, this.shadingParams);
 
     // prepare material
-    engine.useMaterial(shading, this.material);
-
+    engine.useMaterial(this.material);
+    
     // prepare geometry
-    engine.useGeometry(shading, this.geometry);
+    engine.useGeometry(this.geometry);
 
     engine.useRange(this.geometry, this.range)
 
@@ -109,5 +108,7 @@ export class RenderObject extends SceneNode {
 
     // render
     engine.renderer.draw(this.drawMode);
+
+    engine.useShading(null);
   }
 }

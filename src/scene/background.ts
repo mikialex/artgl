@@ -24,7 +24,7 @@ export class SolidColorBackground extends Background{
 const domeSphere = new SphereGeometry()
 
 export class SkyBackground extends Background {
-  skyShading = new Shading().decorate(new SkyShading())
+  skyShading = new Shading().decoCamera().decorate(new SkyShading())
   domeMesh = new Mesh().g(domeSphere).s(this.skyShading)
 
   constructor() {

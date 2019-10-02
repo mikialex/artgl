@@ -1,15 +1,16 @@
 import {
-  ShaderAttributeInputNode, ShaderCommonUniformInputNode, ShaderInnerUniformInputNode,
+  ShaderAttributeInputNode, ShaderCommonUniformInputNode,
   ShaderTextureNode, ShaderNode, ShaderConstType, ShaderConstNode, ShaderCombineNode
 } from "./shader-node";
 import { GLDataType } from "../webgl/shader-util";
-import { InnerSupportUniform, InnerUniformMap } from "../webgl/uniform/uniform";
 import { GLTextureType } from "../webgl/uniform/uniform-texture";
 import { VPTransform, MTransform } from "./built-in/transform";
 import { Vector2 } from "../math/vector2";
 import { Vector3, Matrix4 } from "../math";
 import { Vector4 } from "../math/vector4";
 import { CommonAttribute } from "../webgl/attribute";
+import { ShaderGraph } from "./shader-graph";
+import { Camera } from "../core/camera";
 
 export function attribute(name: string, type: GLDataType) {
   return new ShaderAttributeInputNode({ name, type });
@@ -40,13 +41,6 @@ export function uniformFromValue(name: string, value: any) {
   }
 }
 
-export function innerUniform(type: InnerSupportUniform) {
-  return new ShaderInnerUniformInputNode({
-    name: 'inner' + InnerUniformMap[type].name,
-    mapInner: type,
-  })
-}
-
 export function value(value: ShaderConstType) {
   return new ShaderConstNode(value);
 }
@@ -63,18 +57,8 @@ export function vec4(...args: ShaderNode[]) {
   return new ShaderCombineNode(args, GLDataType.floatVec4)
 }
 
-export function constValue(value: any) {
+export function constValue(value: ShaderConstType) {
   return new ShaderConstNode(value);
-}
-
-export function MVPWorld() {
-  return VPTransform.make()
-    .input("VPMatrix", innerUniform("VPMatrix"))
-    .input("position",
-      MTransform.make()
-        .input('MMatrix', innerUniform("MMatrix"))
-        .input('position', attribute(CommonAttribute.position, GLDataType.floatVec3))
-    )
 }
 
 export function screenQuad() {

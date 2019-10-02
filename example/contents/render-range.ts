@@ -24,12 +24,12 @@ export default async function test(testBridge: TestBridge) {
 
   scene.root.addChild(mesh);
 
-  const camera = engine.camera as PerspectiveCamera;
+  const camera = new PerspectiveCamera().updateRenderRatio(engine)
   camera.transform.position.set(0, 0, 5);
   camera.lookAt(new Vector3(0, 0, 0))
+  engine.useCamera(camera);
 
   function draw() {
-    engine.connectCamera();
     engine.setClearColor(new Vector4(0.9, 0.9, 0.9, 1.0))
     engine.clearColor();
     engine.render(scene);
@@ -44,9 +44,9 @@ export default async function test(testBridge: TestBridge) {
   const orbitController = new OrbitController(camera as PerspectiveCamera);
   orbitController.registerInteractor(engine.interactor);
 
-  engine.camera.bindEngineRenderSize(engine);
   testBridge.resizeObserver.add((size) => {
     engine.setSize(size.width, size.height);
+    camera.updateRenderRatio(engine);
   })
 
   let allCount = range.count

@@ -15,6 +15,8 @@ interface TreeNode{
  * @class SceneNode
  */
 export class SceneNode {
+  static readonly WorldMatrixKey = "worldMatrix"
+
   uuid = generateUUID();
   scene: Nullable<Scene> = null;
   sceneNodeListIndex: number = -1;
@@ -23,10 +25,8 @@ export class SceneNode {
   children: SceneNode[] = [];
 
   readonly transform: Transformation = new Transformation();
-  _worldMatrix = new Matrix4();
-  get worldMatrix() {
-    return this._worldMatrix;
-  }
+  
+  worldMatrix = new Matrix4();
 
   visible: boolean = true;
 
@@ -125,15 +125,16 @@ export class SceneNode {
     return result;
   }
 
+  localTransformSyncWorldUpdateId = -1;
   updateWorldMatrix(force?: boolean): SceneNode  {
-    if (this.transform.transformChanged || force) {
+    if (this.transform.transformChangedId !== this.localTransformSyncWorldUpdateId || force) {
 
       if (this.parent === null) {
         this.worldMatrix.copy(this.transform.matrix);
       } else {
         this.worldMatrix.multiplyMatrices(this.parent.worldMatrix, this.transform.matrix);
       }
-      this.transform.transformChanged = false;
+      this.localTransformSyncWorldUpdateId = this.transform.transformChangedId;
       force = true;
     }
     var children = this.children;

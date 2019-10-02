@@ -1,10 +1,7 @@
 import { DAGNode } from "../core/dag-node";
 import { ShaderFunction } from "./shader-function";
 import { GLDataType } from "../webgl/shader-util";
-import {
-  InnerSupportUniform, UniformDescriptor,
-  InnerUniformMapDescriptor, InnerUniformMap
-} from "../webgl/uniform/uniform";
+import { UniformDescriptor } from "../webgl/uniform/uniform";
 import { AttributeDescriptor } from "../webgl/attribute";
 import { Vector2 } from "../math/vector2";
 import { Vector3 } from "../math/index";
@@ -65,7 +62,7 @@ export class ShaderFunctionNode extends ShaderNode {
     }
     if (dataType !== node.type) {
       console.warn(key)
-      console.warn("node:", this); 
+      console.warn("node:", this);
       console.warn("inputNode:", node);
       throw "constructFragmentGraph failed: type mismatch"
     }
@@ -103,14 +100,6 @@ export class ShaderVaryInputNode extends ShaderInputNode {
   constructor(name: string, type: GLDataType) {
     super(name, type);
   }
-}
-
-export class ShaderInnerUniformInputNode extends ShaderInputNode {
-  constructor(uni: InnerUniformMapDescriptor) {
-    super(uni.name, InnerUniformMap[uni.mapInner].type)
-    this.mapInner = uni.mapInner;
-  }
-  mapInner: InnerSupportUniform
 }
 
 export class ShaderAttributeInputNode extends ShaderInputNode {

@@ -11,9 +11,6 @@ export class Matrix4
   DataObject<Matrix4>,
   ArrayFlattenable<Matrix4>
 {
-  constructor() {
-
-  }
 
   copy(m: Matrix4) {
     var te = this.elements;
@@ -254,6 +251,11 @@ export class Matrix4
     te[13] = y;
     te[14] = z;
     return this;
+  }
+
+  getPosition(position: Vector3) {
+    var te = this.elements;
+    return position.set(te[12], te[13], te[14])
   }
 
   getMaxScaleOnAxis() {
