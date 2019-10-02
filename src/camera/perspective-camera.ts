@@ -56,9 +56,9 @@ export class PerspectiveCamera extends Camera implements ScreenSpaceRayProvider 
   }
 
   updateRaycaster(caster: Raycaster, xRate: number, yRate: number): void {
-    caster.worldRay.origin.setFromMatrixPosition(this.worldMatrix);
+    caster.worldRay.origin.setFromMatrixPosition(this.transform.matrix); //todo world
     caster.worldRay.direction.set(xRate, yRate, 0.5)
-      .unProject(this.worldMatrix, this.projectionMatrix)
+      .unProject(this.transform.matrix, this.projectionMatrix)
       .sub(caster.worldRay.origin)
       .normalize();
   }
