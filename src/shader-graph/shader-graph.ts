@@ -11,7 +11,6 @@ import { CommonAttribute } from "../webgl/attribute";
 import { Vector4 } from "../math";
 import { eyeDir } from "./built-in/transform";
 import { ChannelType } from "../core/material";
-import { GLTextureType } from "../webgl/uniform/uniform-texture";
 import { Nullable } from "../type";
 import { Camera } from "../core/camera";
 
