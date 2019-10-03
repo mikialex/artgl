@@ -1,10 +1,8 @@
-import { PureShading } from "../pure";
-import { NormalShading } from "../normal";
-import { DepthShading } from "../depth";
-import { Shading } from "../../../core/shading";
-import { DirectionalLight, PhongShading, PointLight } from "../../../artgl";
-import { Vector3 } from "../../../math";
-import { BarycentricWireFrame } from "../barycentric";
+
+import {
+  DirectionalLight, PhongShading, PointLight, Shading,
+  PureShading, NormalShading, DepthShading, Vector3, BarycentricWireFrame
+} from "../../../artgl";
 
 test('basic shader build no error', () => {
   const shading = new Shading().decorate(new PureShading());
@@ -33,7 +31,7 @@ test('phong shader build no error', () => {
   dirLight.direction = new Vector3(1, 1, -1).normalize();
 
   const phong = new PhongShading<DirectionalLight | PointLight>([dirLight, pointLight]);
-  const shading = new Shading().decorate(phong);
+  const shading = new Shading().decoCamera().decorate(phong);
   shading.getProgramConfig();
 });
 

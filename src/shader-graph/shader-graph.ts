@@ -131,7 +131,7 @@ export class ShaderGraph {
   getChannel(channelType: ChannelType): ShaderNode {
     if (!this.cachedReusedChannelNodes.has(channelType)) {
       this.cachedReusedChannelNodes.set(channelType,
-        texture(channelType, GLTextureType.texture2D))
+        texture(channelType))
     }
     return this.cachedReusedChannelNodes.get(channelType)!
   }

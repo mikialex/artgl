@@ -5,6 +5,7 @@ import { GLRenderer } from '../gl-renderer';
 
 export enum GLTextureType{
   texture2D,
+  textureCube,
 }
 
 export interface TextureDescriptor {

@@ -18,7 +18,8 @@ export const enum GLDataType{
   Mat3,
   Mat4,
   boolean,
-  sampler2D
+  sampler2D,
+  samplerCube
 }
 
 const shaderStringMap: { [index: string]: GLDataType } = {

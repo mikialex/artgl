@@ -13,7 +13,7 @@ interface TextureDescriptor {
   wrapT: TextureWrap;
 }
 
-const DefaultTextureDescriptor: TextureDescriptor  = {
+const DefaultTextureDescriptor: TextureDescriptor = {
   minFilter: TextureFilter.nearest,
   magFilter: TextureFilter.nearest,
   wrapS: TextureWrap.clampToEdge,
@@ -22,6 +22,7 @@ const DefaultTextureDescriptor: TextureDescriptor  = {
 
 const defaultRenderTargetTextureDescriptor = DefaultTextureDescriptor;
 
+type StoredTexture = Texture | CubeTexture;
 
 /**
  * responsible for webgl texture resource allocation and reallocation
@@ -30,7 +31,7 @@ const defaultRenderTargetTextureDescriptor = DefaultTextureDescriptor;
  * @export
  * @class GLTextureManager
  */
-export class GLTextureManager implements GLReleasable{
+export class GLTextureManager implements GLReleasable {
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
     this.slotManager = renderer.state.textureSlot;
@@ -39,19 +40,21 @@ export class GLTextureManager implements GLReleasable{
   }
   readonly renderer: GLRenderer;
   private slotManager: GLTextureSlot;
-  private textures: Map<Texture | CubeTexture, WebGLTexture> = new Map();
+  private textures: Map<StoredTexture, WebGLTexture> = new Map();
+  texturesVersion: Map<StoredTexture, number> = new Map();
 
-  getGLTexture(texture: Texture) {
+  getGLTexture(texture: StoredTexture) {
     return this.textures.get(texture);
   }
 
-  deleteGLTexture(texture: Texture) {
+  deleteGLTexture(texture: StoredTexture) {
     const glTexture = this.getGLTexture(texture);
     if (glTexture === undefined) {
-      return 
+      return
     }
     this.renderer.gl.deleteTexture(glTexture);
     this.textures.delete(texture);
+    this.texturesVersion.delete(texture);
   }
 
   createTextureForRenderTarget(texture: FramebufferAttachTexture) {
@@ -68,7 +71,7 @@ export class GLTextureManager implements GLReleasable{
     gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat,
       texture.width, texture.height, border,
       format, type, data);
-    
+
     this.textures.set(texture, glTexture);
 
     return glTexture;
@@ -95,16 +98,46 @@ export class GLTextureManager implements GLReleasable{
   }
 
   createWebGLCubeTexture(texture: CubeTexture): WebGLTexture {
+    texture.validateAllTextureSource();
+
     const glTexture = this.createEmptyWebGLTexture();
     this.updateTextureParameters(glTexture, texture)
-    // todo
+
+    const gl = this.renderer.gl;
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const format = gl.RGBA;
+    const type = gl.UNSIGNED_BYTE;
+
+    gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X,
+      level, internalFormat, format, type,
+      texture.positiveXMap!.source as TexImageSource);
+    gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
+      level, internalFormat, format, type,
+      texture.positiveYMap!.source as TexImageSource);
+    gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
+      level, internalFormat, format, type,
+      texture.positiveZMap!.source as TexImageSource);
+    gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
+      level, internalFormat, format, type,
+      texture.negativeXMap!.source as TexImageSource);
+    gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
+      level, internalFormat, format, type,
+      texture.negativeYMap!.source as TexImageSource);
+    gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
+      level, internalFormat, format, type,
+      texture.negativeZMap!.source as TexImageSource);
+
+    this.textures.set(texture, glTexture);
+    this.texturesVersion.set(texture, texture.getVersion())
+    return glTexture;
   }
-  
+
   createWebGLTexture(texture: Texture): WebGLTexture {
     const gl = this.renderer.gl;
     const glTexture = this.createEmptyWebGLTexture();
     this.updateTextureParameters(glTexture, texture)
-    if (texture.isDataTexture) { // which is a data texture
+    if (texture.isDataTexture) {
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
         texture.width, texture.height, 0,
         gl.RGBA, gl.UNSIGNED_BYTE, texture.renderUsedDataSource.source as ArrayBufferView);
@@ -117,13 +150,14 @@ export class GLTextureManager implements GLReleasable{
     }
 
     this.textures.set(texture, glTexture);
+    this.texturesVersion.set(texture, texture.getVersion())
     return glTexture;
   }
 
   uploadWebGLMipMap(glTexture: WebGLTexture) {
     const gl = this.renderer.gl;
     this.slotManager.bindTexture(gl.TEXTURE_2D, glTexture);
-    gl.generateMipmap(gl.TEXTURE_2D); 
+    gl.generateMipmap(gl.TEXTURE_2D);
   }
 
   uploadCustomMipMap(glTexture: WebGLTexture, sources: TextureSource[]) {

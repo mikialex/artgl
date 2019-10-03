@@ -4,21 +4,21 @@ import {
 } from "./shader-node";
 import { GLDataType } from "../webgl/shader-util";
 import { GLTextureType } from "../webgl/uniform/uniform-texture";
-import { VPTransform, MTransform } from "./built-in/transform";
 import { Vector2 } from "../math/vector2";
 import { Vector3, Matrix4 } from "../math";
 import { Vector4 } from "../math/vector4";
 import { CommonAttribute } from "../webgl/attribute";
-import { ShaderGraph } from "./shader-graph";
-import { Camera } from "../core/camera";
 
 export function attribute(name: string, type: GLDataType) {
   return new ShaderAttributeInputNode({ name, type });
 }
 
-export function texture(name: string, type?: GLTextureType) {
-  const t = type !== undefined ? type : GLTextureType.texture2D;
-  return new ShaderTextureNode(name, GLDataType.sampler2D, t);
+export function texture(name: string) {
+  return new ShaderTextureNode(name, GLDataType.sampler2D, GLTextureType.texture2D);
+}
+
+export function cubeTexture(name: string) {
+  return new ShaderTextureNode(name, GLDataType.samplerCube, GLTextureType.textureCube);
 }
 
 export function uniform(name: string, type: GLDataType) {
@@ -37,7 +37,7 @@ export function uniformFromValue(name: string, value: any) {
   } else if (value instanceof Matrix4) {
     return uniform(name, GLDataType.Mat4).default(value);
   } else {
-    throw "un support uniform value"
+    throw "unsupported uniform value"
   }
 }
 
