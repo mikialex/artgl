@@ -20,6 +20,8 @@ import { Renderable } from "./interface";
 import { Camera } from "../core/camera";
 import { PerspectiveCamera, PerspectiveCameraInstance } from "../camera/perspective-camera";
 import { Matrix4 } from "../math";
+import { Texture } from "../core/texture";
+import { CubeTexture } from "../core/texture-cube";
 
 export interface Size {
   width: number;
@@ -153,7 +155,11 @@ export class RenderEngine implements GLReleasable {
           return;
         }
         provider.uniforms.forEach((value, key) => {
-          program.setUniformIfExist(key, value); // maybe user defined, but not really in shader
+          if (value instanceof Texture || value instanceof CubeTexture) {
+            program.setTextureIfExist(key, value.getGLTexture(this));
+          } else {
+            program.setUniformIfExist(key, value);
+          }
         })
         provider.hasAnyUniformChanged = false;
         this.lastUploadedShaderUniformProvider.add(provider);
@@ -178,11 +184,14 @@ export class RenderEngine implements GLReleasable {
       // acquire texture from framebuffer
       if (glTexture === undefined) {
         const framebufferName = this.currentShading!.framebufferTextureMap[tex.name];
-        glTexture = this.renderer.framebufferManager.getFramebufferTexture(framebufferName);
+        if (framebufferName !== undefined) {
+          glTexture = this.renderer.framebufferManager.getFramebufferTexture(framebufferName);
+        }
       }
 
       if (glTexture === undefined) {
-        throw `texture <${tex.name}>bind failed, for framebuffer texture, setup program.framebufferTextureMap`
+        return
+        // throw `texture <${tex.name}>bind failed, for framebuffer texture, setup program.framebufferTextureMap`
       }
 
       tex.useTexture(glTexture);

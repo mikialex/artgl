@@ -65,11 +65,11 @@ export class GLTextureSlot {
     return slot;
   }
 
-  updateSlotTexture(webglTexture: WebGLTexture): number {
+  updateSlotTexture(webglTexture: WebGLTexture, bindType: GLTextureTypeRaw): number {
     const textureSlotToUpdate = this.findSlot(webglTexture);
     const textureSlotGLToUpdate = textureSlotMap[textureSlotToUpdate];
     this.activeTexture(textureSlotGLToUpdate);
-    this.bindTexture(GLTextureTypeRaw.texture2D, webglTexture);
+    this.bindTexture(bindType, webglTexture);
     return textureSlotToUpdate;
   }
 }

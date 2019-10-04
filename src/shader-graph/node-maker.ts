@@ -8,6 +8,8 @@ import { Vector2 } from "../math/vector2";
 import { Vector3, Matrix4 } from "../math";
 import { Vector4 } from "../math/vector4";
 import { CommonAttribute } from "../webgl/attribute";
+import { Texture } from "../artgl";
+import { CubeTexture } from "../core/texture-cube";
 
 export function attribute(name: string, type: GLDataType) {
   return new ShaderAttributeInputNode({ name, type });
@@ -23,6 +25,16 @@ export function cubeTexture(name: string) {
 
 export function uniform(name: string, type: GLDataType) {
   return new ShaderCommonUniformInputNode({ name, type });
+}
+
+export function textureFromValue(textureName:string, value: Texture | CubeTexture){
+  if (value instanceof Texture) {
+    return texture(textureName);
+  } else if (value instanceof CubeTexture) {
+    return cubeTexture(textureName);
+  }  else {
+    throw "unsupported uniform value"
+  }
 }
 
 export function uniformFromValue(name: string, value: any) {

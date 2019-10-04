@@ -3,8 +3,11 @@ import { Matrix4, Vector3 } from "../math/index";
 import { Vector2 } from "../math/vector2";
 import { Vector4 } from "../math/vector4";
 import { GLTextureType } from "./uniform/uniform-texture";
+import { Texture } from "../core/texture";
+import { CubeTexture } from "../core/texture-cube";
 
 export type GLData = number | Vector2 | Vector3 | Vector4 | Matrix4;
+export type GLTextureData = Texture | CubeTexture;
 
 export const enum GLDataType{
   float,

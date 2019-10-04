@@ -8,11 +8,11 @@ import { CullSide } from "../webgl/const";
 import { CubeTexture } from "../core/texture-cube";
 import { CubeEnvMapShading } from "../shading/basic-lib/cube-env-map";
 
-export abstract class Background{
+export abstract class Background {
   abstract render(engine: RenderEngine): void;
 }
 
-export class SolidColorBackground extends Background{
+export class SolidColorBackground extends Background {
   color: Vector4 = new Vector4(0.8, 0.8, 0.8, 1.0);
   private beforeColor: Vector4 = new Vector4();
 
@@ -42,9 +42,10 @@ export class SkyBackground extends Background {
 }
 
 export class CubeEnvrionmentMapBackGround extends Background {
-  
-  skyShading = new Shading().decoCamera().decorate(new CubeEnvMapShading())
-  private domeMesh = new Mesh().g(domeSphere).s(this.skyShading)
+
+  envMapDeco = new CubeEnvMapShading();
+  shading: Shading;
+  private domeMesh = new Mesh().g(domeSphere).s(this.shading)
 
   private _texture: CubeTexture
 
@@ -54,13 +55,16 @@ export class CubeEnvrionmentMapBackGround extends Background {
 
   set texture(texture: CubeTexture) {
     this._texture = texture;
+    this.envMapDeco.envMap = texture;
   }
 
   constructor(texture: CubeTexture) {
     super();
+    this.shading = new Shading().decoCamera().decorate(this.envMapDeco)
     this.domeMesh.transform.scale.setAll(100);
     this.domeMesh.updateWorldMatrix();
     this.domeMesh.state.cullSide = CullSide.CullFaceNone
+    this.domeMesh.g(domeSphere).s(this.shading)
 
     this._texture = texture;
     this.texture = texture;

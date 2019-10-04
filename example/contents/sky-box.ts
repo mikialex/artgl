@@ -19,10 +19,8 @@ export default async function test(testBridge: TestBridge) {
   const mesh = new Mesh();
 
   const geometry = new SphereGeometry();
-  mesh.geometry = geometry;
-
-  const range = RenderRange.fromStandardGeometry(geometry);
-  mesh.range = range;
+  mesh.g(geometry);
+  
   mesh.state.cullSide = CullSide.CullFaceNone;
 
   scene.root.addChild(mesh);
@@ -34,7 +32,9 @@ export default async function test(testBridge: TestBridge) {
   skyCube.positiveYMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/py.jpg"))
   skyCube.negativeZMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/nz.jpg"))
   skyCube.positiveZMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/pz.jpg"))
-  scene.background = new CubeEnvrionmentMapBackGround(skyCube);
+  const cubeEnv = new CubeEnvrionmentMapBackGround(skyCube);
+  cubeEnv.texture = skyCube;
+  scene.background = cubeEnv;
 
   const camera = new PerspectiveCamera().updateRenderRatio(engine)
   camera.transform.position.set(0, 0, 5);
@@ -44,7 +44,8 @@ export default async function test(testBridge: TestBridge) {
   function draw() {
     engine.setClearColor(new Vector4(0.9, 0.9, 0.9, 1.0))
     engine.clearColor();
-    engine.render(scene);
+    // engine.render(scene);
+    cubeEnv.render(engine);
   }
 
   draw();
@@ -60,24 +61,6 @@ export default async function test(testBridge: TestBridge) {
     engine.setSize(size.width, size.height);
     camera.updateRenderRatio(engine);
   })
-
-  let allCount = range.count
-
-  testBridge.testConfig = {
-    name: 'width',
-    value: range.count,
-    onChange: (value: number) => {
-      range.count = value;
-    },
-    editors: [
-      {
-        type: 'slider',
-        min: 0,
-        max: allCount,
-        step: 1
-      },
-    ]
-  }
 
   testBridge.framer.setFrame(() => {
     orbitController.update();

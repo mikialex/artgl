@@ -1,8 +1,11 @@
 import { shader } from "../../shader-graph/shader-function"
-import { BaseEffectShading, ShaderGraph, cubeTexture, WorldPositionFragVary } from "../../artgl"
+import { BaseEffectShading, ShaderGraph, WorldPositionFragVary } from "../../artgl"
+import { CubeTexture } from "../../core/texture-cube"
+import { MapUniform } from "../../core/shading"
 
 const sampleEnvMapAndNeedNormalize = shader(`
 vec4 sampleEnvMap(samplerCube envMap, vec3 dir){
+  // return vec4(1.0);
   return textureCube(envMap, normalize(dir));
 }
 `)
@@ -13,9 +16,12 @@ export class CubeEnvMapShading extends BaseEffectShading<CubeEnvMapShading> {
     graph
       .setFragmentRoot(
         sampleEnvMapAndNeedNormalize.make()
-          .input("envMap", cubeTexture('envMap'))
+          .input("envMap", this.getPropertyTexture('envMap'))
           .input("dir", graph.getVary(WorldPositionFragVary))
       )
   }
+
+  @MapUniform('envMap')
+  envMap: CubeTexture = new CubeTexture();
 
 }

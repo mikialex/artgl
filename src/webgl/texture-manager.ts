@@ -5,6 +5,7 @@ import { FramebufferAttachTexture } from "./gl-framebuffer";
 import { GLTextureSlot } from "./states/gl-texture-slot";
 import { TextureSource } from "../core/texture-source";
 import { CubeTexture } from "../core/texture-cube";
+import { GLTextureTypeRaw } from "./const";
 
 interface TextureDescriptor {
   minFilter: TextureFilter;
@@ -60,7 +61,7 @@ export class GLTextureManager implements GLReleasable {
   createTextureForRenderTarget(texture: FramebufferAttachTexture) {
     const gl = this.renderer.gl;
     const glTexture = this.createEmptyWebGLTexture()
-    this.updateTextureParameters(glTexture, defaultRenderTargetTextureDescriptor)
+    this.updateTextureParameters(glTexture, defaultRenderTargetTextureDescriptor, gl.TEXTURE_2D)
 
     this.slotManager.bindTexture(gl.TEXTURE_2D, glTexture);
     const internalFormat = gl.RGBA;
@@ -77,14 +78,18 @@ export class GLTextureManager implements GLReleasable {
     return glTexture;
   }
 
-  private updateTextureParameters(glTexture: WebGLTexture, description: TextureDescriptor)
+  private updateTextureParameters(
+    glTexture: WebGLTexture,
+    description: TextureDescriptor,
+    bindType: GLTextureTypeRaw
+  )
     : WebGLTexture {
     const gl = this.renderer.gl;
-    this.slotManager.bindTexture(gl.TEXTURE_2D, glTexture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, description.minFilter);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, description.magFilter);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, description.wrapS);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, description.wrapT);
+    this.slotManager.bindTexture(bindType, glTexture);
+    gl.texParameteri(bindType, gl.TEXTURE_MIN_FILTER, description.minFilter);
+    gl.texParameteri(bindType, gl.TEXTURE_MIN_FILTER, description.magFilter);
+    gl.texParameteri(bindType, gl.TEXTURE_WRAP_S, description.wrapS);
+    gl.texParameteri(bindType, gl.TEXTURE_WRAP_T, description.wrapT);
     return glTexture
   }
 
@@ -98,17 +103,18 @@ export class GLTextureManager implements GLReleasable {
   }
 
   createWebGLCubeTexture(texture: CubeTexture): WebGLTexture {
+    const gl = this.renderer.gl;
     texture.validateAllTextureSource();
 
     const glTexture = this.createEmptyWebGLTexture();
-    this.updateTextureParameters(glTexture, texture)
+    this.updateTextureParameters(glTexture, texture, gl.TEXTURE_CUBE_MAP)
 
-    const gl = this.renderer.gl;
     const level = 0;
     const internalFormat = gl.RGBA;
     const format = gl.RGBA;
     const type = gl.UNSIGNED_BYTE;
 
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X,
       level, internalFormat, format, type,
       texture.positiveXMap!.source as TexImageSource);
@@ -127,6 +133,7 @@ export class GLTextureManager implements GLReleasable {
     gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
       level, internalFormat, format, type,
       texture.negativeZMap!.source as TexImageSource);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
     this.textures.set(texture, glTexture);
     this.texturesVersion.set(texture, texture.getVersion())
@@ -136,7 +143,7 @@ export class GLTextureManager implements GLReleasable {
   createWebGLTexture(texture: Texture): WebGLTexture {
     const gl = this.renderer.gl;
     const glTexture = this.createEmptyWebGLTexture();
-    this.updateTextureParameters(glTexture, texture)
+    this.updateTextureParameters(glTexture, texture, gl.TEXTURE_2D)
     if (texture.isDataTexture) {
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
         texture.width, texture.height, 0,
