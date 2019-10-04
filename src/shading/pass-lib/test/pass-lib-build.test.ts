@@ -1,8 +1,4 @@
-import { CopyShading } from "../copy";
-import { TSSAOShading } from "../tssao";
-import { TSSAOBlendShading } from "../tssao-blend";
-import { TAAShading } from "../taa";
-import { Shading } from "../../../core/shading";
+import { Shading, TAAShading, TSSAOBlendShading, TSSAOShading, CopyShading } from "../../../artgl";
 
 test('copy shader build no error', () => {
   const copyShading = new Shading().decorate(new CopyShading());

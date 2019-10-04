@@ -2,9 +2,11 @@ import { GLProgram } from "../program";
 import { Nullable } from "../../type";
 import { GLTextureSlot } from "../states/gl-texture-slot";
 import { GLRenderer } from '../gl-renderer';
+import { GLTextureTypeRaw } from "../const";
 
 export enum GLTextureType{
   texture2D,
+  textureCube,
 }
 
 export interface TextureDescriptor {
@@ -29,6 +31,7 @@ export class GLTextureUniform{
     this.isActive = location !== null;
     this.location = location;
     this.currentActiveSlot = -1;
+    this.textureType = descriptor.type;
   }
   name: string;
   private gl: WebGLRenderingContext;
@@ -36,6 +39,7 @@ export class GLTextureUniform{
   private renderer: GLRenderer;
   private location: Nullable<WebGLUniformLocation>;
   isActive: boolean;
+  private textureType: GLTextureType
 
 
   webglTexture: Nullable<WebGLTexture> = null;
@@ -45,7 +49,14 @@ export class GLTextureUniform{
     if (!this.isActive) {
       return;
     }
-    const textureSlot = this.slotManager.updateSlotTexture(webglTexture);
+    
+    let textureSlot;
+    if (this.textureType === GLTextureType.texture2D) {
+      textureSlot = this.slotManager.updateSlotTexture(webglTexture, GLTextureTypeRaw.texture2D);
+    } else {
+      textureSlot = this.slotManager.updateSlotTexture(webglTexture, GLTextureTypeRaw.textureCubeMap);
+    }
+
     if (this.currentActiveSlot !== textureSlot) {
       this.renderer.stat.uniformUpload++;
       this.currentActiveSlot = textureSlot;

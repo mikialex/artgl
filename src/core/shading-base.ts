@@ -6,6 +6,9 @@ import {
 } from "./shading";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { ShaderCommonUniformInputNode, ShaderTextureNode } from "../shader-graph/shader-node";
+import { CubeTexture } from "./texture-cube";
+import { Texture } from "../artgl";
+import { textureFromValue } from "../shader-graph/node-maker";
 
 export abstract class BaseEffectShading<T>
   implements ShaderUniformProvider, ShaderUniformDecorator {
@@ -33,6 +36,26 @@ export abstract class BaseEffectShading<T>
 
   getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
     return getPropertyUniform(this, name)
+  }
+
+  getPropertyTexture(name: keyof T): ShaderTextureNode {
+    const textureNode = this.textureNodeCreated.get(name as string);
+    if (textureNode !== undefined) {
+      return textureNode;
+    }
+    const textureName = this.propertyUniformNameMap.get(name as string);
+  
+    if (textureName === undefined) {
+      throw `${name} uniform name not found, maybe forget decorator`
+    }
+  
+    const value = (this as unknown as T)[name];
+    if (value === undefined) {
+      throw "texture value not given"
+    }
+    const node = textureFromValue(textureName, value as unknown as Texture | CubeTexture);
+    this.textureNodeCreated.set(name as string, node);
+    return node;
   }
 
 }

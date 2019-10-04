@@ -2,8 +2,12 @@ import { GLProgramConfig } from "./program";
 import { Matrix4, Vector3 } from "../math/index";
 import { Vector2 } from "../math/vector2";
 import { Vector4 } from "../math/vector4";
+import { GLTextureType } from "./uniform/uniform-texture";
+import { Texture } from "../core/texture";
+import { CubeTexture } from "../core/texture-cube";
 
 export type GLData = number | Vector2 | Vector3 | Vector4 | Matrix4;
+export type GLTextureData = Texture | CubeTexture;
 
 export const enum GLDataType{
   float,
@@ -18,7 +22,8 @@ export const enum GLDataType{
   Mat3,
   Mat4,
   boolean,
-  sampler2D
+  sampler2D,
+  samplerCube
 }
 
 const shaderStringMap: { [index: string]: GLDataType } = {
@@ -29,7 +34,8 @@ const shaderStringMap: { [index: string]: GLDataType } = {
   'mat2': GLDataType.Mat2,
   'mat3': GLDataType.Mat3,
   'mat4': GLDataType.Mat4,
-  'sampler2D': GLDataType.sampler2D
+  'sampler2D': GLDataType.sampler2D,
+  'samplerCube': GLDataType.samplerCube
 }
 let reverseShaderStringMap: { [index: number]: string } = {};
 Object.keys(shaderStringMap).forEach(key => {
@@ -92,11 +98,19 @@ export function injectFragmentShaderHeaders(config: GLProgramConfig, shaderText:
   return injectText + shaderText;
 }
 
+function getTypeStringFromTextureType(type: GLTextureType) {
+  switch (type) {
+    case GLTextureType.texture2D: return 'sampler2D'
+    case GLTextureType.textureCube: return 'samplerCube'
+    default: throw 'not find type'
+  }
+}
+
 function generateTextureString(config: GLProgramConfig): string {
   let text = '';
   if (config.textures !== undefined) {
     config.textures.forEach(texture => {
-      text = text + 'uniform sampler2D' + ' ' + texture.name + ';\n';
+      text = text + 'uniform ' + getTypeStringFromTextureType(texture.type) + ' ' + texture.name + ';\n';
     })
   }
   return text;
