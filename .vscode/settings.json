@@ -20,6 +20,7 @@
     "raycast",
     "rendergraph",
     "shadowmap",
+    "skybox",
     "smoothstep",
     "tssao",
     "unintialize",

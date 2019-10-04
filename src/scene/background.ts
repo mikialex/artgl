@@ -6,6 +6,7 @@ import { SphereGeometry } from "../geometry/geo-lib/sphere-geometry";
 import { Mesh } from "../object/mesh";
 import { CullSide } from "../webgl/const";
 import { CubeTexture } from "../core/texture-cube";
+import { CubeEnvMapShading } from "../shading/basic-lib/cube-env-map";
 
 export abstract class Background{
   abstract render(engine: RenderEngine): void;
@@ -42,7 +43,7 @@ export class SkyBackground extends Background {
 
 export class CubeEnvrionmentMapBackGround extends Background {
   
-  skyShading = new Shading().decoCamera().decorate(new SkyShading())
+  skyShading = new Shading().decoCamera().decorate(new CubeEnvMapShading())
   private domeMesh = new Mesh().g(domeSphere).s(this.skyShading)
 
   private _texture: CubeTexture
@@ -60,7 +61,7 @@ export class CubeEnvrionmentMapBackGround extends Background {
     this.domeMesh.transform.scale.setAll(100);
     this.domeMesh.updateWorldMatrix();
     this.domeMesh.state.cullSide = CullSide.CullFaceNone
-    
+
     this._texture = texture;
     this.texture = texture;
   }

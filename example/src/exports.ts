@@ -2,6 +2,7 @@ import renderRange from '../contents/render-range'
 import testDrawPrimitive from '../contents/draw-primitives'
 import barycentric from '../contents/barycentric-wireframe'
 import texture from '../contents/texture'
+import skybox from '../contents/sky-box'
 import { TestBridge } from './test-bridge';
 
 type ConstructorTypeOf<T> = new (...args: any[]) => T;
@@ -44,7 +45,12 @@ export const examples: Example[] = [
     name: "texture",
     title: "Use texture",
     build: texture
-  }
+  },
+  {
+    name:  "Skybox",
+    title: "CubeMap skybox",
+    build: skybox
+  },
 ];
 
 
