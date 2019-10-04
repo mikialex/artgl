@@ -1,13 +1,13 @@
 // jest.config.js
 module.exports = {
-  verbose: true,
+  verbose: false,
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ["<rootDir>/src/"],
   collectCoverage: true,
   coverageReporters: [
     // "html", "lcov", "clover", "json",
-     "text", 
+    //  "text", 
   ],
   collectCoverageFrom: [
     "src/**/*.ts",

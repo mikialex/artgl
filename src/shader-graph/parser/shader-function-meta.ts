@@ -41,6 +41,7 @@ export function getDataType(input: string): GLDataType {
     case "mat3": return GLDataType.Mat3
     case "mat4": return GLDataType.Mat4
     case "sampler2D": return GLDataType.sampler2D
+    case "samplerCube": return GLDataType.samplerCube
 
     default: throw 'parse error'
   }

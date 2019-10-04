@@ -45,9 +45,12 @@ export class Texture implements GraphicResourceReleasable {
     this._dataSource = dataSource;
   }
 
-  private needUpdate: boolean = true;
+  private version = 0;
   setNeedUpdate() {
-    this.needUpdate = true;
+    this.version++;
+  }
+  getVersion() {
+    return this.version;
   }
 
   isDataTexture: boolean = false;
@@ -116,12 +119,12 @@ export class Texture implements GraphicResourceReleasable {
   getGLTexture(engine: RenderEngine): WebGLTexture {
     const glTexture = engine.renderer.textureManger.getGLTexture(this)
     if (glTexture === undefined) {
-      this.needUpdate = false;
+      this.setNeedUpdate();
       return engine.renderer.textureManger.createWebGLTexture(this)
     }
-    if (this.needUpdate) {
+    if (engine.renderer.textureManger.texturesVersion.get(this) !== this.version) {
       this.releaseGraphics(engine);
-      this.needUpdate = false;
+      this.setNeedUpdate();
       return engine.renderer.textureManger.createWebGLTexture(this)
     }
     return glTexture;
