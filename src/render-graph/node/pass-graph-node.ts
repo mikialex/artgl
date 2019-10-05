@@ -4,7 +4,7 @@ import { Nullable } from "../../type";
 import { RenderTargetNode } from "../exports";
 import { Vector4 } from "../../math";
 import { Observable } from "../../core/observable";
-import { Shading } from "../../artgl";
+import { Shading, ShadingParams } from "../../artgl";
 import { QuadSourceInstance } from "../../engine/render-source";
 
 export interface PassInputMapInfo{
@@ -71,6 +71,11 @@ export class PassGraphNode extends DAGNode {
     this._overrideShading = shading;
     return this;
   }
+  // _overrideShadingParameter: Nullable<ShadingParams> = null;
+  // overrideShadingParameter(param: Nullable<ShadingParams>) {
+  //   this._overrideShadingParameter = param;
+  //   return this;
+  // }
 
   _enableColorWrite: boolean = true;
   enableColorWrite() {

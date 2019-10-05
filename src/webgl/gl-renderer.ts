@@ -142,7 +142,7 @@ export class GLRenderer implements GLReleasable {
 
     this.state.textureSlot.resetSlotIndex();
 
-    // update draw stat // TODO support other draw type
+    // update draw stat
     this.stat.drawcall++;
     if (mode === DrawMode.TRIANGLES) {
       this.stat.faceDraw += (program.drawCount / 3 * program.instanceCount)

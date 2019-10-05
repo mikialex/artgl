@@ -115,6 +115,9 @@ export class Shading {
     }
 
     if (name !== undefined) {
+      if (this._namedDecoratorMap.has(name)) {
+        throw  `the named <${name}>'s name has been used before`
+      }
       this._namedDecoratorMap.set(name, decorator);
     }
 
