@@ -4,7 +4,7 @@ import { Nullable } from "../../type";
 import { RenderTargetNode } from "../exports";
 import { Vector4 } from "../../math";
 import { Observable } from "../../core/observable";
-import { Shading, ShadingParams } from "../../artgl";
+import { Shading } from "../../artgl";
 import { QuadSourceInstance } from "../../engine/render-source";
 
 export interface PassInputMapInfo{

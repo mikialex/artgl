@@ -167,7 +167,7 @@ export class GLTextureManager implements GLReleasable {
     gl.generateMipmap(gl.TEXTURE_2D);
   }
 
-  uploadCustomMipMap(glTexture: WebGLTexture, sources: TextureSource[]) {
+  uploadCustomMipMap(_glTexture: WebGLTexture, _sources: TextureSource[]) {
     // TODO
   }
 

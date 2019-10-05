@@ -1,4 +1,4 @@
-import { splitStrUntilChar, getDataType, getOneParam, getParamList, parseShaderFunctionMetaInfo, getFuncBody } from "./shader-function-meta";
+import { splitStrUntilChar, getDataType, getOneParam, getParamList, getFuncBody } from "./shader-function-meta";
 import { GLDataType } from "../../webgl/shader-util";
 
 test('split', () => {

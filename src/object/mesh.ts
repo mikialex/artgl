@@ -60,11 +60,11 @@ export class Mesh extends RenderObject
     return results;
   }
 
-  raycastIfHit(raycaster: Raycaster): boolean {
-    throw new Error("Method not implemented.");
+  raycastIfHit(_raycaster: Raycaster): boolean {
+    throw new Error("Method not implemented."); // todo
   }
 
-  raycastFirst(raycaster: Raycaster): RayCastResult {
+  raycastFirst(_raycaster: Raycaster): RayCastResult {
     throw new Error("Method not implemented.");
   }
 

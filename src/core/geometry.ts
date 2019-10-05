@@ -7,7 +7,6 @@ import { Face3 } from "../math/entity/face3";
 import { Line3 } from "../math/entity/line3";
 import { Vector3 } from "../math/vector3";
 import { Nullable } from "../type";
-import { GLProgram } from "../webgl/program";
 
 /**
  * geometry define what to draw

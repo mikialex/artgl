@@ -41,7 +41,7 @@ export class GLColorBuffer{
 
   // TODO premultiplied alpha
   currentClearColor: Vector4 = new Vector4();
-  setClearColor(newColor: Vector4Like, premultipliedAlpha?: boolean) {
+  setClearColor(newColor: Vector4Like, _premultipliedAlpha?: boolean) {
     if (!newColor.equals(this.currentClearColor)) {
       this.currentClearColor.copy(newColor);
       this.gl.clearColor(newColor.x, newColor.y, newColor.z, newColor.w);

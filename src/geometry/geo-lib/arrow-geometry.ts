@@ -1,5 +1,4 @@
 import { StandardGeometry } from "../standard-geometry";
-import { Vector3 } from '../../math';
 
 export class ArrowGeometry extends StandardGeometry {
   constructor() {

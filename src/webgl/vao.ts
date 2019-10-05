@@ -1,10 +1,15 @@
 import { GLRenderer } from "./gl-renderer";
 import { GLExtList } from "./gl-info";
-import { GLReleasable } from "../type";
+import { GLReleasable, Nullable } from "../type";
 import { Geometry } from "../core/geometry";
 import { Shading } from "../core/shading";
 
-type webglVAO = any;
+type webglVAO = WebGLVertexArrayObject ;
+interface webglVAOExt {
+  createVertexArrayOES(): webglVAO;
+  bindVertexArrayOES(vao: Nullable<webglVAO>): void;
+  deleteVertexArrayOES(vao: webglVAO): void;
+}
 
 export interface VAOCreateCallback {
   vao: webglVAO,
@@ -14,7 +19,7 @@ export interface VAOCreateCallback {
 export class GLVAOManager implements GLReleasable {
   readonly gl: WebGLRenderingContext;
   readonly renderer: GLRenderer;
-  readonly vaoExt: any;
+  readonly vaoExt: Nullable<webglVAOExt>;
   readonly isSupported: boolean;
 
   private vaoMap: Map<Shading, Map<Geometry, webglVAO>> = new Map();
@@ -64,8 +69,18 @@ export class GLVAOManager implements GLReleasable {
   }
 
   private createVAO(shading: Shading, geometry: Geometry): VAOCreateCallback {
-    const vao = this.vaoExt.createVertexArrayOES();
-    this.vaoExt.bindVertexArrayOES(vao);
+    let vao: Nullable<webglVAO>
+    if (this.renderer.ctxVersion === 2) {
+      const gl = (this.renderer.gl as WebGL2RenderingContext); 
+      vao = gl.createVertexArray();
+      gl.bindVertexArray(vao);
+    } else {
+      vao = this.vaoExt!.createVertexArrayOES();
+      this.vaoExt!.bindVertexArrayOES(vao);
+    }
+    if (vao === null) {
+      throw 'webgl vao create failed'
+    }
 
     let map = this.vaoMap.get(shading);
     if (map === undefined) {
@@ -79,12 +94,12 @@ export class GLVAOManager implements GLReleasable {
 
     return {
       vao, unbind: () => {
-        this.vaoExt.bindVertexArrayOES(null);
+        this.useVAO(null)
       }
     };
   }
 
-  deleteVAO(shading: Shading, geometry: Geometry) {
+  deleteVAOByShadingAndGeometry(shading: Shading, geometry: Geometry) {
     this.geometryVersionMap.delete(geometry);
     this.shadingVersionMap.delete(shading);
 
@@ -94,7 +109,7 @@ export class GLVAOManager implements GLReleasable {
     }
     let vao = map.get(geometry);
     if (vao !== undefined) {
-      this.vaoExt.deleteVertexArrayOES(vao)
+      this.deleteVAO(vao)
       map.delete(geometry);
     }
   }
@@ -104,9 +119,9 @@ export class GLVAOManager implements GLReleasable {
     this.vaoMap.forEach(map => {
       const vao = map.get(geometry);
       if (vao !== undefined) {
-        this.vaoExt.deleteVertexArrayOES(vao)
+        this.deleteVAO(vao)
       }
-      map.delete(vao);
+      map.delete(geometry);
     })
   }
 
@@ -115,18 +130,32 @@ export class GLVAOManager implements GLReleasable {
     const map = this.vaoMap.get(shading);
     if (map !== undefined) {
       map.forEach(vao => {
-        this.vaoExt.deleteVertexArrayOES(vao)
+        this.deleteVAO(vao)
       });
     }
     this.vaoMap.delete(shading);
   }
 
-  useVAO(vao: webglVAO) {
-    this.vaoExt.bindVertexArrayOES(vao);
+  deleteVAO(vao: webglVAO) {
+    if (this.renderer.ctxVersion === 2) {
+      const gl = (this.renderer.gl as WebGL2RenderingContext); 
+      gl.deleteVertexArray(vao);
+    } else {
+      this.vaoExt!.deleteVertexArrayOES(vao);
+    }
+  }
+
+  useVAO(vao: Nullable<webglVAO>) {
+    if (this.renderer.ctxVersion === 2) {
+      const gl = (this.renderer.gl as WebGL2RenderingContext); 
+      gl.bindVertexArray(vao);
+    } else {
+      this.vaoExt!.bindVertexArrayOES(vao);
+    }
   }
 
   releaseGL(): void {
-    this.vaoExt.bindVertexArrayOES(null);
+    this.useVAO(null);
     this.vaoMap = new Map();
     this.shadingVersionMap = new Map();
     this.geometryVersionMap = new Map();

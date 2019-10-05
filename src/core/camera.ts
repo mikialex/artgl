@@ -35,8 +35,6 @@ export function MVP(graph: ShaderGraph) {
 
 }
 
-const tempMatrix = new Matrix4();
-
 /**
  * Camera is abstraction of a decoration of view projection matrix in a vertex graph
  * Implementor should impl how matrix is calculate and how to react to render size change
@@ -167,7 +165,7 @@ export abstract class Camera extends SceneNode
 }
 
 // https://dev.to/angular/decorators-do-not-work-as-you-might-expect-3gmj
-export function ProjectionMatrixNeedUpdate<T>(target: any, propertyKey: any): any{
+export function ProjectionMatrixNeedUpdate<T>(_target: any, _propertyKey: any): any{
     const key = Symbol();
 
     return {

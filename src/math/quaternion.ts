@@ -10,7 +10,7 @@ export class Quaternion {
 
   constructor(x?: number, y?: number, z?: number, w?: number) {
     this._x = x || 0;
-    this._y = x || 0;
+    this._y = y || 0;
     this._z = z || 0;
     this._w = w || 1;
   }

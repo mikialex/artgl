@@ -1,7 +1,6 @@
 import { Texture } from "./texture";
 import { generateUUID } from "../math/uuid";
-import { Vector3, Vector4 } from "../math/index";
-import { Nullable } from "../type";
+import { Vector3 } from "../math/index";
 import { TextureSource } from "./texture-source";
 
 export const enum ChannelType {

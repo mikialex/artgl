@@ -1,4 +1,4 @@
-import { Vector3, Matrix4, MathUtil } from "../math/index";
+import { Vector3, MathUtil } from "../math/index";
 import { Camera, ProjectionMatrixNeedUpdate } from "../core/camera";
 import { ScreenSpaceRayProvider, Raycaster } from "../core/raycaster";
 import { Size } from "../engine/render-engine";
@@ -7,6 +7,7 @@ export class PerspectiveCamera extends Camera implements ScreenSpaceRayProvider 
   constructor(near?: number, far?: number,
     fov?: number, aspect?: number, zoom?: number) {
     super();
+    
     this.fov = fov !== undefined ? fov : 50;
     this.zoom = zoom !== undefined ? zoom : 1;
 

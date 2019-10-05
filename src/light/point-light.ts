@@ -1,6 +1,6 @@
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { Light } from "../core/light";
-import { WorldPositionFragVary, NormalFragVary, ShaderGraph } from "../shader-graph/shader-graph";
+import { WorldPositionFragVary, ShaderGraph } from "../shader-graph/shader-graph";
 import { MapUniform } from "../core/shading";
 import { Vector3 } from "../math";
 import { ShaderNode } from '../shader-graph/shader-node';

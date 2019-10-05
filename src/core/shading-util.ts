@@ -2,7 +2,7 @@ import { ShaderUniformProvider } from "./shading";
 
 import "reflect-metadata";
 
-const formatMetadataKey = Symbol("uniformMap");
+// const formatMetadataKey = Symbol("uniformMap");
 
 // function format(formatString: string) {
 //     return Reflect.metadata(formatMetadataKey, formatString);

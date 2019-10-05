@@ -7,7 +7,6 @@ import { getWorldPosition, NDCxyToUV } from "../../shader-graph/built-in/transfo
 import { Matrix4 } from "../../math/index";
 import { rand2DT, rand } from "../../shader-graph/built-in/rand";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
-import { Camera } from "../../core/camera";
 
 const newSamplePosition = new ShaderFunction({
   source: `

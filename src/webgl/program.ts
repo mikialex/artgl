@@ -1,7 +1,7 @@
 import { GLRenderer } from "./gl-renderer";
 import { GLShader, ShaderType } from "./shader";
 import { generateUUID } from "../math/uuid";
-import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData, GLTextureData } from "./shader-util";
+import { injectVertexShaderHeaders, injectFragmentShaderHeaders, GLDataType, GLData } from "./shader-util";
 import { GLUniform, UniformDescriptor } from "./uniform/uniform";
 import { AttributeDescriptor, GLAttribute } from "./attribute";
 import { Nullable } from "../type";

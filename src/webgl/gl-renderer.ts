@@ -1,5 +1,5 @@
 import { GLInfo, GLExtList } from "./gl-info";
-import { GLProgram, GLProgramConfig } from "./program";
+import { GLProgram } from "./program";
 import { GLProgramManager } from "./program-manager";
 import { GLAttributeBufferDataManager } from "./attribute-buffer-manager";
 import { GLState } from "./states/gl-state";
@@ -11,18 +11,33 @@ import { GLFramebuffer } from "./gl-framebuffer";
 import { GLStat } from "./gl-stat";
 import { GLVAOManager } from "./vao";
 
+export type WebGLCtx = WebGLRenderingContext | WebGL2RenderingContext
+
 export class GLRenderer implements GLReleasable {
-  constructor(el?: HTMLCanvasElement, options?: any) {
+  constructor(el?: HTMLCanvasElement, glOptions?: any, forceUseWebGL1?: boolean) {
     if (el === undefined) {
       el = document.createElement('canvas');
     }
-    options = { ...options };
-    options.antialias = false;
-    // options.preserveDrawingBuffer = true; // for screen shot
-    const ctx = el.getContext('webgl', options) as WebGLRenderingContext;
+    glOptions = { ...glOptions };
+    glOptions.antialias = false;
+
+    let ctx: WebGLCtx
+    if (forceUseWebGL1) {
+      ctx = el.getContext('webgl', glOptions) as WebGLRenderingContext;
+      this.ctxVersion = 1;
+    } else {
+      ctx = el.getContext('webgl2', glOptions) as WebGL2RenderingContext;
+      this.ctxVersion = 2;
+      if (ctx === null) {
+        console.warn('webgl2 context create failed, try to use webgl1')
+        ctx = el.getContext('webgl', glOptions) as WebGLRenderingContext;
+        this.ctxVersion = 1;
+      }
+    }
     if (ctx === null) {
       throw 'webgl context create failed';
     }
+
     this.gl = ctx;
     this.el = el;
     this.glInfo = new GLInfo(this);
@@ -39,7 +54,8 @@ export class GLRenderer implements GLReleasable {
 
     this.syncCanvasSize();
   }
-  readonly gl: WebGLRenderingContext;
+  readonly gl: WebGLCtx;
+  readonly ctxVersion: 1 | 2;
   readonly el: HTMLCanvasElement;
 
   readonly glInfo: GLInfo;

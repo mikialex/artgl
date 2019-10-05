@@ -46,7 +46,7 @@ export class OrthographicCamera extends Camera {
   @ProjectionMatrixNeedUpdate
   bottom: number;
   
-  onRenderResize(size: Size) {
+  onRenderResize(_size: Size) {
     // todo
     // this.aspect = size.width / size.height;
   }
