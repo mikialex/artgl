@@ -96,7 +96,13 @@ export class AdvanceStaticRenderPipeline {
     // }
   }
 
-  directionalShadowMap: RenderTargetNode = target("directionalShadowMap");
+  directionalShadowMap: RenderTargetNode =target("directionalShadowMap").needDepth()
+  .afterContentReceived(node => {
+    const shadowMapTextureFBOKey = this.composer.getFramebuffer(node)!.name
+    if (this.sceneShading !== null) {
+      this.sceneShading.defineFBOInput(shadowMapTextureFBOKey, 'directionalShadowMapTexture')
+    }
+  })
 
   private build(scene: Scene, camera: PerspectiveCamera) {
     this.updateTicks();
@@ -105,14 +111,8 @@ export class AdvanceStaticRenderPipeline {
       .use(scene.renderScene)
       .overrideShading(this.depthShader)
     
-    this.directionalShadowMap = target("directionalShadowMap").needDepth()
+    this.directionalShadowMap = this.directionalShadowMap
       .from(directionalShadowMapPass)
-      .afterContentReceived(node => {
-        const shadowMapTextureFBOKey = this.composer.getFramebuffer(node)!.name
-        if (this.sceneShading !== null) {
-          this.sceneShading.defineFBOInput(shadowMapTextureFBOKey, 'directionalShadowMapTexture')
-        }
-      })
     
     const depthPass = pass("depthPass").use(scene.renderScene)
       .overrideShading(this.depthShader)
