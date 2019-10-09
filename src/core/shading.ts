@@ -8,7 +8,6 @@ import { RenderEngine } from "../engine/render-engine";
 import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
 import { uniformFromValue } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
-import { PerspectiveCameraInstance } from "../camera/perspective-camera";
 
 export { MapUniform } from "./shading-util";
 
@@ -91,6 +90,8 @@ export class Shading {
   }
 
   decoCamera() {
+    // this to avoid circle dep
+    const  { PerspectiveCameraInstance } = require("../camera/perspective-camera");
     this.decorate(PerspectiveCameraInstance)
     return this;
   }
