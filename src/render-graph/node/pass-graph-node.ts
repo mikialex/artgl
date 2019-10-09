@@ -71,6 +71,11 @@ export class PassGraphNode extends DAGNode {
     this._overrideShading = shading;
     return this;
   }
+  // _overrideShadingParameter: Nullable<ShadingParams> = null;
+  // overrideShadingParameter(param: Nullable<ShadingParams>) {
+  //   this._overrideShadingParameter = param;
+  //   return this;
+  // }
 
   _enableColorWrite: boolean = true;
   enableColorWrite() {

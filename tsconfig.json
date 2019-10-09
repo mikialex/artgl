@@ -10,6 +10,8 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "strict": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
     "lib": [
       "es6",
       "dom"

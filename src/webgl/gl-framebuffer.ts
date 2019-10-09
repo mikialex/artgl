@@ -161,9 +161,9 @@ export class GLFramebuffer {
     this.webglDepthBuffer = null;
   }
 
-  attachTexture(texture: FramebufferAttachTexture, attachPoint: number) {
-    // TODO
-  }
+  // attachTexture(texture: FramebufferAttachTexture, attachPoint: number) {
+  //   // TODO
+  // }
 
   // read pixel info from this framebuffer
   // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels

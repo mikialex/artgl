@@ -1,4 +1,3 @@
-import { ShaderFunction } from "../shader-graph/shader-function";
 import { Light } from "../core/light";
 import { MapUniform } from "../core/shading";
 import { Vector3 } from "../math";

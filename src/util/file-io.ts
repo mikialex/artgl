@@ -12,7 +12,7 @@ export function downloadCanvasPNGImage(canvas: HTMLCanvasElement, name: string) 
 async function getStringContentFromFile(file: Blob) {
   const reader = new FileReader();
   return new Promise<string>(function (resolve, reject) {
-    reader.onload = function (e) {
+    reader.onload =  () => {
       const str = reader.result;
       resolve(str as string);
     };
@@ -36,6 +36,7 @@ export function openFile(): Promise<Blob> {
     input.addEventListener('change', func);
     temp = input;
     input.click();
+    if (temp === null) { }; // for pass not use check
   })
 }
 

@@ -2,7 +2,7 @@ import {
   RenderGraph, TAAShading, screen,
   TSSAOShading, TSSAOBlendShading,
   DepthShading, Scene, RenderEngine, Shading, ProgressiveDof,
-  pass, pingpong, target, when, PingPongTarget, PerspectiveCamera,
+  pass, pingpong, target, when, PingPongTarget, PerspectiveCamera, RenderTargetNode,
 } from "../../src/artgl";
 import { EffectComposer } from '../../src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
@@ -96,7 +96,7 @@ export class AdvanceStaticRenderPipeline {
     // }
   }
 
-  directionalShadowMap = target("directionalShadowMap").needDepth()
+  directionalShadowMap: RenderTargetNode =target("directionalShadowMap").needDepth()
   .afterContentReceived(node => {
     const shadowMapTextureFBOKey = this.composer.getFramebuffer(node)!.name
     if (this.sceneShading !== null) {
@@ -111,7 +111,8 @@ export class AdvanceStaticRenderPipeline {
       .use(scene.renderScene)
       .overrideShading(this.depthShader)
     
-    this.directionalShadowMap.from(directionalShadowMapPass)
+    this.directionalShadowMap = this.directionalShadowMap
+      .from(directionalShadowMapPass)
     
     const depthPass = pass("depthPass").use(scene.renderScene)
       .overrideShading(this.depthShader)

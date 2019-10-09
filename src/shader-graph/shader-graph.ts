@@ -12,7 +12,7 @@ import { Vector4 } from "../math";
 import { eyeDir } from "./built-in/transform";
 import { ChannelType } from "../core/material";
 import { Nullable } from "../type";
-import { Camera } from "../core/camera";
+import { Camera } from "../artgl";
 
 
 export const UvFragVary = "v_uv"

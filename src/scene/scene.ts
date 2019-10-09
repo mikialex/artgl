@@ -118,7 +118,7 @@ export class Scene implements RenderSource, RayCastSource {
       }
 
       if (node instanceof RenderObject) {
-        this.renderList.addRenderItem(node);
+        this.renderList.addRenderItem(node as RenderObject); //todo
       }
     });
 

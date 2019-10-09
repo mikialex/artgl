@@ -5,10 +5,9 @@ import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { Observable, Observer } from "./observable";
 import { RenderEngine } from "../engine/render-engine";
-import { ShaderCommonUniformInputNode, ShaderTextureNode } from '../shader-graph/shader-node';
-import { uniformFromValue, texture } from '../shader-graph/node-maker';
+import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
+import { uniformFromValue } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
-import { PerspectiveCameraInstance } from "../camera/perspective-camera";
 
 export { MapUniform } from "./shading-util";
 
@@ -29,7 +28,6 @@ export interface ShaderUniformDecorator {
 
 type propertyName = string;
 type uniformName = string;
-type textureShaderName = string;
 export interface ShaderUniformProvider {
 
   // mark any change in this uniform group
@@ -92,6 +90,8 @@ export class Shading {
   }
 
   decoCamera() {
+    // this to avoid circle dep
+    const  { PerspectiveCameraInstance } = require("../camera/perspective-camera");
     this.decorate(PerspectiveCameraInstance)
     return this;
   }
@@ -115,6 +115,9 @@ export class Shading {
     }
 
     if (name !== undefined) {
+      if (this._namedDecoratorMap.has(name)) {
+        throw  `the named <${name}>'s name has been used before`
+      }
       this._namedDecoratorMap.set(name, decorator);
     }
 
@@ -166,7 +169,7 @@ export class Shading {
 }
 
 
-export function MarkNeedRedecorate<T>(target: any, propertyKey: any): any{
+export function MarkNeedRedecorate<T>(_target: any, _propertyKey: any): any{
   const key = Symbol();
   return {
     get(): T {

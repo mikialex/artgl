@@ -6,7 +6,7 @@ import { Vector3 } from "../math";
 
 export class DirectionalLight extends Light<DirectionalLight> {
 
-  produceLightFragDir(graph: ShaderGraph): ShaderNode {
+  produceLightFragDir(_graph: ShaderGraph): ShaderNode {
     return this.getPropertyUniform("direction")
   }
   produceLightIntensity(_graph: ShaderGraph): ShaderNode {

@@ -23,7 +23,7 @@ export class Interactor{
   inputElement: HTMLElement;
   prev = new Vector2();
 
-  private controllers: Controller[] = [];
+  controllers: Controller[] = [];
 
   private bind(): void {
     const el = this.inputElement;
@@ -81,7 +81,7 @@ export class Interactor{
     if (!this.enabled) {
       return;
     }
-    this.groupEmit(this.mouseUpCallBacks);
+    this.groupEmit(this.mouseUpCallBacks, event);
     this.mouseButton = -1;
   }
 
