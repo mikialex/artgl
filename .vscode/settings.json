@@ -1,6 +1,7 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.tabSize": 2,
+  "files.associations": { "*.json": "jsonc" },
   "cSpell.words": [
     "ARTGL",
     "Cineon",
