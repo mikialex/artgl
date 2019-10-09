@@ -40,7 +40,7 @@ export function MVP(graph: ShaderGraph) {
  * Implementor should impl how matrix is calculate and how to react to render size change
  */
 export class CameraSelf
-  // extends BaseEffectShading<CameraSelf>
+  extends BaseEffectShading<CameraSelf>
   implements ShaderUniformProvider, ShaderUniformDecorator {
 
   static readonly WorldMatrixKey = 'WorldMatrix'
@@ -69,17 +69,6 @@ export class CameraSelf
 
     return visitor(this);
   }
-
-  getPropertyUniform(name: keyof Camera): ShaderCommonUniformInputNode {
-    return getPropertyUniform(this, name)
-  }
-
-  notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable();
-  nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
-
-  hasAnyUniformChanged: boolean = true;
-  uniforms!: Map<string, any>
-  propertyUniformNameMap!: Map<string, string>
 
   updateProjectionMatrix(): void {
     throw 'missing impl'
