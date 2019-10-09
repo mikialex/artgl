@@ -28,3 +28,27 @@ export class RefCountMap<T>{
   }
 
 }
+
+export class RefSetMap<K, V>{
+  map: Map<K, Set<V>> = new Map();
+
+  add(item: K, value: V) {
+    let old = this.map.get(item)
+    if (old !== undefined) {
+      old.add(value);
+    } else {
+      this.map.set(item, (new Set<V>()).add(value));
+    }
+  }
+
+  delete(item: K, value: V) {
+    let old = this.map.get(item)
+    if (old !== undefined) {
+      old.delete(value);
+      if (old.size === 0) {
+        this.map.delete(item);
+      }
+    }
+  }
+
+}

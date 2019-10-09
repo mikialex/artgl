@@ -1,5 +1,5 @@
 import { Geometry } from "./geometry";
-import { SceneNode } from "../scene/scene-node";
+import { SceneNode, ExtendWithSceneNode } from "../scene/scene-node";
 import { Material } from "./material";
 import { DrawMode } from "../webgl/const";
 import { DrawState } from "./draw-state";
@@ -53,7 +53,7 @@ export type ShadingParams = Map<ShaderUniformDecorator, ShaderUniformDecorator>
  * and many other draw config such as blending depth behavior defined in state object
  * engine will read these information and organize things properly
  */
-export class RenderObject extends SceneNode {
+export class RenderObjectSelf {
 
   material?: Material;
   geometry?: Geometry;
@@ -112,3 +112,7 @@ export class RenderObject extends SceneNode {
     engine.useShading(null);
   }
 }
+
+export interface RenderObjectSelf extends SceneNode { }
+export interface RenderObject extends SceneNode, RenderObjectSelf { }
+export const RenderObject = ExtendWithSceneNode(RenderObjectSelf)
