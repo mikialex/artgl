@@ -8,6 +8,7 @@
     "Envrionment",
     "Flattenable",
     "Interactor",
+    "Mixins",
     "Reinhard",
     "Renderable",
     "colorbuffer",

@@ -1,8 +1,8 @@
-import { SceneNode } from "../scene/scene-node";
+import { SceneNode, ExtendWithSceneNode } from "../scene/scene-node";
 import { Matrix4, Vector3 } from "../math/index";
 import { RenderEngine, Size } from '../engine/render-engine';
 import { Observable } from './observable';
-import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform } from "./shading";
+import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, BaseEffectShading } from "./shading";
 import { ShaderCommonUniformInputNode } from "../shader-graph/shader-node";
 import { MapUniform } from "./shading-util";
 import { ShaderGraph, WorldPositionFragVary } from "../shader-graph/shader-graph";
@@ -39,22 +39,24 @@ export function MVP(graph: ShaderGraph) {
  * Camera is abstraction of a decoration of view projection matrix in a vertex graph
  * Implementor should impl how matrix is calculate and how to react to render size change
  */
-export abstract class Camera extends SceneNode
+export class CameraSelf
+  extends BaseEffectShading<CameraSelf>
   implements ShaderUniformProvider, ShaderUniformDecorator {
 
+  static readonly WorldMatrixKey = 'WorldMatrix'
   static readonly WorldPositionKey = 'CameraWorldPosition'
   static readonly ViewProjectionMatrix = 'CameraViewProjectionMatrix'
 
-  @MapUniform(SceneNode.WorldMatrixKey)
+  @MapUniform(CameraSelf.WorldMatrixKey)
   renderObjectWorldMatrix = new Matrix4();
 
-  @MapUniform(Camera.ViewProjectionMatrix)
+  @MapUniform(CameraSelf.ViewProjectionMatrix)
   _renderMatrix = new Matrix4();
 
   decorate(graph: ShaderGraph): void {
-    graph.registerSharedUniform(Camera.WorldPositionKey, this.getPropertyUniform('_worldPosition'))
-    graph.registerSharedUniform(Camera.ViewProjectionMatrix, this.getPropertyUniform('_renderMatrix'))
-    graph.registerSharedUniform(SceneNode.WorldMatrixKey, uniformFromValue(SceneNode.WorldMatrixKey, this.worldMatrix))
+    graph.registerSharedUniform(CameraSelf.WorldPositionKey, this.getPropertyUniform('_worldPosition'))
+    graph.registerSharedUniform(CameraSelf.ViewProjectionMatrix, this.getPropertyUniform('_renderMatrix'))
+    graph.registerSharedUniform(CameraSelf.WorldMatrixKey, uniformFromValue(CameraSelf.WorldMatrixKey, this.worldMatrix))
     const { MVP: MVPResult, worldPosition } = MVP(graph)
     graph.setVertexRoot(MVPResult);
     graph.setVary(WorldPositionFragVary, worldPosition)
@@ -68,19 +70,12 @@ export abstract class Camera extends SceneNode
     return visitor(this);
   }
 
-  getPropertyUniform(name: keyof Camera): ShaderCommonUniformInputNode {
-    return getPropertyUniform(this, name)
+  updateProjectionMatrix(): void {
+    throw 'missing impl'
   }
-
-  notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable();
-  nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
-
-  hasAnyUniformChanged: boolean = true;
-  uniforms!: Map<string, any>
-  propertyUniformNameMap!: Map<string, string>
-
-  abstract updateProjectionMatrix(): void;
-  abstract onRenderResize(newSize: Size): void;
+  onRenderResize(newSize: Size): void {
+    throw 'missing impl'
+  }
 
   notifyProjectionChanged() {
     this._projectionMatrixNeedUpdate = true;
@@ -96,8 +91,8 @@ export abstract class Camera extends SceneNode
   _projectionMatrixNeedUpdate = true;
 
   enableProjectionJitter = false;
-  jitterWidth =  100000;
-  jitterHeight =  100000;
+  jitterWidth = 100000;
+  jitterHeight = 100000;
   jitter(width: number, height: number) {
     this.enableProjectionJitter = true;
     this.jitterWidth = width;
@@ -110,9 +105,9 @@ export abstract class Camera extends SceneNode
     if (this._projectionMatrixNeedUpdate) {
       this.updateProjectionMatrix();
       if (this.enableProjectionJitter) {
-        
-    this._projectionMatrix.elements[8] += ((2 * Math.random() - 1) / this.jitterWidth);
-    this._projectionMatrix.elements[9] += ((2 * Math.random() - 1) / this.jitterHeight);
+
+        this._projectionMatrix.elements[8] += ((2 * Math.random() - 1) / this.jitterWidth);
+        this._projectionMatrix.elements[9] += ((2 * Math.random() - 1) / this.jitterHeight);
       }
 
       this._projectionMatrixNeedUpdate = false;
@@ -153,28 +148,32 @@ export abstract class Camera extends SceneNode
   _worldPosition = new Vector3();
 
   // todo
-//   _worldPositionNeedUpdate = true;
-//   get worldPosition(): Readonly<Vector3> {
-//     if (this._worldPositionNeedUpdate) {
-//       this.worldMatrix.getPosition(this._worldPosition)
-//       this._worldPositionNeedUpdate = false;
-//     }
-//     return this._worldPosition;
-//   }
+  //   _worldPositionNeedUpdate = true;
+  //   get worldPosition(): Readonly<Vector3> {
+  //     if (this._worldPositionNeedUpdate) {
+  //       this.worldMatrix.getPosition(this._worldPosition)
+  //       this._worldPositionNeedUpdate = false;
+  //     }
+  //     return this._worldPosition;
+  //   }
 
 }
 
-// https://dev.to/angular/decorators-do-not-work-as-you-might-expect-3gmj
-export function ProjectionMatrixNeedUpdate<T>(_target: any, _propertyKey: any): any{
-    const key = Symbol();
+export interface CameraSelf extends SceneNode { }
+export interface Camera extends SceneNode, CameraSelf { }
+export const Camera = ExtendWithSceneNode(CameraSelf)
 
-    return {
-      get(): T {
-        return (this as any)[key];
-      },
-      set(newValue: T) {
-        (this as any)[key] = newValue;
-        (this as unknown as Camera).notifyProjectionChanged();
-      }
+// https://dev.to/angular/decorators-do-not-work-as-you-might-expect-3gmj
+export function ProjectionMatrixNeedUpdate<T>(_target: any, _propertyKey: any): any {
+  const key = Symbol();
+
+  return {
+    get(): T {
+      return (this as any)[key];
+    },
+    set(newValue: T) {
+      (this as any)[key] = newValue;
+      (this as unknown as Camera).notifyProjectionChanged();
     }
+  }
 }
