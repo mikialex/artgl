@@ -22,18 +22,6 @@ export const enum GLDataType {
   samplerCube
 }
 
-const shaderStringMap: { [index: string]: GLDataType } = {
-  'float': GLDataType.float,
-  'vec2': GLDataType.floatVec2,
-  'vec3': GLDataType.floatVec3,
-  'vec4': GLDataType.floatVec4,
-  'mat2': GLDataType.Mat2,
-  'mat3': GLDataType.Mat3,
-  'mat4': GLDataType.Mat4,
-  'sampler2D': GLDataType.sampler2D,
-  'samplerCube': GLDataType.samplerCube
-}
-
 interface tableInfo {
   type: GLDataType,
   stride: number,
@@ -71,7 +59,6 @@ export function getGLDataTypeStride(type: GLDataType) {
 export function GLDataType2ShaderString(type: GLDataType) {
   return GLDataTypeInfoReverse[type].name;
 }
-
 
 export function getDataTypeFromShaderString(str: string) {
   return GLDataTypeInfo[str].type;
