@@ -49,7 +49,7 @@ const GLDataTypeInfo: { [index: string]: tableInfo } = {
 
   // 'mat2': { type: GLDataType.Mat2, stride: 4, default: new Matrix2() }, // todo
   // 'mat3': { type: GLDataType.Mat3, stride: 9, default: new Matrix3() },
-  'mat4': { type: GLDataType.Mat3, stride: 16, default: new Matrix4() },
+  'mat4': { type: GLDataType.Mat4, stride: 16, default: new Matrix4() },
   'sampler2D': { type: GLDataType.sampler2D, stride: 0, default: null },
   'samplerCube': { type: GLDataType.samplerCube, stride: 0, default: null },
 }
