@@ -1,17 +1,10 @@
-import { splitStrUntilChar, getDataType, getOneParam, getParamList, getFuncBody } from "./shader-function-meta";
-import { GLDataType } from "../../webgl/shader-util";
+import { splitStrUntilChar, getOneParam, getParamList, getFuncBody } from "./shader-function-meta";
+import { GLDataType } from "../../core/data-type";
 
 test('split', () => {
   const [h, e] = splitStrUntilChar("asdfas dfsdf {sdfsdf } ", '{')
   expect(h).toBe("asdfas dfsdf ");
   expect(e).toBe("{sdfsdf } ");
-});
-
-test('get type', () => {
-  expect(getDataType("float")).toBe(GLDataType.float);
-  expect(getDataType("vec2")).toBe(GLDataType.floatVec2);
-  expect(getDataType("vec3")).toBe(GLDataType.floatVec3);
-  expect(getDataType("vec4")).toBe(GLDataType.floatVec4);
 });
 
 test('get one param', () => {

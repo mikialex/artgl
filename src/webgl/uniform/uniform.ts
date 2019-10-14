@@ -1,8 +1,8 @@
 import { GLProgram } from "../program";
 import { findUniformSetter, findUniformFlattener, findUniformDiffer, findUniformCopier } from "./uniform-util";
-import { GLDataType } from "../shader-util";
 import { GLRenderer } from '../gl-renderer';
 import { Nullable } from "../../type";
+import { GLDataType } from "../../core/data-type";
 
 export type uniformUploadType = number | Float32Array | number[]
 export type flattenerType = (value: any, receiveData?: uniformUploadType) => uniformUploadType;

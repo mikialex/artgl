@@ -1,15 +1,13 @@
 import { SceneNode, ExtendWithSceneNode } from "../scene/scene-node";
 import { Matrix4, Vector3 } from "../math/index";
 import { RenderEngine, Size } from '../engine/render-engine';
-import { Observable } from './observable';
-import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, BaseEffectShading } from "./shading";
-import { ShaderCommonUniformInputNode } from "../shader-graph/shader-node";
+import { ShaderUniformProvider, ShaderUniformDecorator, BaseEffectShading } from "./shading";
 import { MapUniform } from "./shading-util";
 import { ShaderGraph, WorldPositionFragVary } from "../shader-graph/shader-graph";
 import { VPTransform, MTransform } from "../shader-graph/built-in/transform";
 import { uniformFromValue, attribute, vec4, constValue } from "../shader-graph/node-maker";
 import { CommonAttribute } from "../webgl/attribute";
-import { GLDataType } from "../webgl/shader-util";
+import { GLDataType } from "./data-type";
 
 export function MVP(graph: ShaderGraph) {
   if (graph.getIfSharedUniform(Camera.WorldMatrixKey) !== undefined &&

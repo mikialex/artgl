@@ -11,6 +11,7 @@ export { Framer } from "./engine/framer";
 
 export * from "./core/render-object";
 export * from "./core/texture";
+export * from "./core/texture-cube";
 export { Mesh } from "./object/mesh";
 export { Line } from "./object/line";
 export { Points } from "./object/points";

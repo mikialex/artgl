@@ -1,7 +1,7 @@
-import { GLDataType, getGLDataTypeStride } from "./shader-util";
 import { GLProgram } from "./program";
 import { Nullable } from "../type";
 import { GLExtList } from "./gl-info";
+import { GLDataType, getGLDataTypeStride } from "../core/data-type";
 
 export const enum CommonAttribute {
   position = 'position',
