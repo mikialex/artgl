@@ -1,4 +1,5 @@
 import { Vector3, Matrix4 } from "../../math";
+import { Plane } from "./plane";
 
 export class Sphere {
   constructor(center?: Vector3, radius?: number) {
@@ -31,6 +32,10 @@ export class Sphere {
     this.center.applyMatrix4(matrix);
     this.radius = this.radius * matrix.getMaxScaleOnAxis();
     return this;
+  }
+
+  intersectsPlane(plane: Plane) {
+    return Math.abs(plane.distanceToPoint(this.center)) <= this.radius;
   }
 
 }

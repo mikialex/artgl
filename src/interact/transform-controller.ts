@@ -1,6 +1,7 @@
 import { SceneNode, Interactor } from "../artgl";
 import { Controller } from "./controller";
 import { Nullable } from "../type";
+import { Plane } from "../math/entity/plane";
 
 export class TransformController extends Controller  {
 
@@ -14,6 +15,8 @@ export class TransformController extends Controller  {
   }
 
   controlledNode: Nullable<SceneNode> = null;
+  restrictPlane: Plane = new Plane();
+
   select(node: SceneNode) {
     this.controlledNode = node;
   }
