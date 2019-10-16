@@ -1,7 +1,7 @@
 import { TestBridge } from '../src/test-bridge';
 import {
   Vector3, RenderRange, Vector4, RenderEngine, CullSide,
-  Scene, SphereGeometry, Mesh, PerspectiveCamera, OrbitController
+  Scene, SphereGeometry, Mesh, PerspectiveCamera, OrbitController, Shading, IBLEnvMap
 } from '../../src/artgl';
 import { CubeTexture } from '../../src/core/texture-cube';
 import { TextureSource } from '../../src/core/texture-source';
@@ -14,38 +14,39 @@ export default async function test(testBridge: TestBridge) {
   let canvas = testBridge.requestCanvas();
   const engine = new RenderEngine(canvas);
 
-  const scene = new Scene();
-
-  const mesh = new Mesh();
-
-  const geometry = new SphereGeometry();
-  mesh.g(geometry);
-  
-  mesh.state.cullSide = CullSide.CullFaceNone;
-
-  scene.root.addChild(mesh);
-
-  const skyCube = new CubeTexture();
-  skyCube.negativeXMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/nx.jpg"))
-  skyCube.positiveXMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/px.jpg"))
-  skyCube.negativeYMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/ny.jpg"))
-  skyCube.positiveYMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/py.jpg"))
-  skyCube.negativeZMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/nz.jpg"))
-  skyCube.positiveZMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/pz.jpg"))
-  const cubeEnv = new CubeEnvrionmentMapBackGround(skyCube);
-  cubeEnv.texture = skyCube;
-  scene.background = cubeEnv;
+  const skyCubeMap = new CubeTexture();
+  skyCubeMap.negativeXMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/nx.jpg"))
+  skyCubeMap.positiveXMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/px.jpg"))
+  skyCubeMap.negativeYMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/ny.jpg"))
+  skyCubeMap.positiveYMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/py.jpg"))
+  skyCubeMap.negativeZMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/nz.jpg"))
+  skyCubeMap.positiveZMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/pz.jpg"))
+  const cubeEnv = new CubeEnvrionmentMapBackGround(skyCubeMap);
+  cubeEnv.texture = skyCubeMap;
 
   const camera = new PerspectiveCamera().updateRenderRatio(engine)
   camera.transform.position.set(0, 0, 5);
   camera.lookAt(new Vector3(0, 0, 0))
   engine.useCamera(camera);
 
+  const scene = new Scene();
+
+  const geometry = new SphereGeometry();
+  const ibl = new IBLEnvMap()
+  ibl.envMap = skyCubeMap;
+  
+  let shading = new Shading()
+  .decoCamera()
+  .decorate(ibl)
+
+  const mesh = new Mesh().g(geometry).s(shading);
+  scene.root.addChild(mesh);
+  scene.background = cubeEnv;
+
   function draw() {
     engine.setClearColor(new Vector4(0.9, 0.9, 0.9, 1.0))
     engine.clearColor();
-    // engine.render(scene);
-    cubeEnv.render(engine);
+    engine.render(scene);
   }
 
   draw();

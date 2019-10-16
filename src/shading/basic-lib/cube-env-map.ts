@@ -3,9 +3,8 @@ import { BaseEffectShading, ShaderGraph, WorldPositionFragVary } from "../../art
 import { CubeTexture } from "../../core/texture-cube"
 import { MapUniform } from "../../core/shading"
 
-const sampleEnvMapAndNeedNormalize = shader(`
+export const sampleEnvMapAndNeedNormalize = shader(`
 vec4 sampleEnvMap(samplerCube envMap, vec3 dir){
-  // return vec4(1.0);
   return textureCube(envMap, normalize(dir));
 }
 `)
