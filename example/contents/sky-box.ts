@@ -1,7 +1,7 @@
 import { TestBridge } from '../src/test-bridge';
 import {
   Vector3, RenderRange, Vector4, RenderEngine, CullSide,
-  Scene, SphereGeometry, Mesh, PerspectiveCamera, OrbitController, Shading, IBLEnvMap
+  Scene, SphereGeometry, Mesh, PerspectiveCamera, OrbitController, Shading, IBLEnvMap, TorusKnotGeometry
 } from '../../src/artgl';
 import { CubeTexture } from '../../src/core/texture-cube';
 import { TextureSource } from '../../src/core/texture-source';
@@ -31,7 +31,7 @@ export default async function test(testBridge: TestBridge) {
 
   const scene = new Scene();
 
-  const geometry = new SphereGeometry();
+  const geometry = new TorusKnotGeometry();
   const ibl = new IBLEnvMap()
   ibl.envMap = skyCubeMap;
   
