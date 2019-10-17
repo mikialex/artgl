@@ -308,12 +308,6 @@ export class OBJLoader extends GeometryLoader{
 
     const geometry = StandardGeometry.create(
       this.indicesForArtgl, position, normal, uv);
-    
-    if (fileName) {
-      geometry.name = "ObjFile-" + fileName;
-    } else {
-      geometry.name = "ObjFile-unnamed";
-    }
 
     return geometry;
   }

@@ -15,12 +15,13 @@ export default async function test(testBridge: TestBridge) {
   const engine = new RenderEngine(canvas);
 
   const skyCubeMap = new CubeTexture();
-  skyCubeMap.negativeXMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/nx.jpg"))
-  skyCubeMap.positiveXMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/px.jpg"))
-  skyCubeMap.negativeYMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/ny.jpg"))
-  skyCubeMap.positiveYMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/py.jpg"))
-  skyCubeMap.negativeZMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/nz.jpg"))
-  skyCubeMap.positiveZMap = await TextureSource.fromUrl(testBridge.getResourceURL("img/skybox/pz.jpg"))
+  const skyName = 'storm'
+  skyCubeMap.negativeXMap = await TextureSource.fromUrl(testBridge.getResourceURL(`img/skybox/${skyName}/nx.jpg`))
+  skyCubeMap.positiveXMap = await TextureSource.fromUrl(testBridge.getResourceURL(`img/skybox/${skyName}/px.jpg`))
+  skyCubeMap.negativeYMap = await TextureSource.fromUrl(testBridge.getResourceURL(`img/skybox/${skyName}/ny.jpg`))
+  skyCubeMap.positiveYMap = await TextureSource.fromUrl(testBridge.getResourceURL(`img/skybox/${skyName}/py.jpg`))
+  skyCubeMap.negativeZMap = await TextureSource.fromUrl(testBridge.getResourceURL(`img/skybox/${skyName}/nz.jpg`))
+  skyCubeMap.positiveZMap = await TextureSource.fromUrl(testBridge.getResourceURL(`img/skybox/${skyName}/pz.jpg`))
   const cubeEnv = new CubeEnvrionmentMapBackGround(skyCubeMap);
   cubeEnv.texture = skyCubeMap;
 
@@ -31,13 +32,13 @@ export default async function test(testBridge: TestBridge) {
 
   const scene = new Scene();
 
-  const geometry = new TorusKnotGeometry();
+  const geometry = new TorusKnotGeometry(1, 0.4, 256, 32);
   const ibl = new IBLEnvMap()
   ibl.envMap = skyCubeMap;
-  
+
   let shading = new Shading()
-  .decoCamera()
-  .decorate(ibl)
+    .decoCamera()
+    .decorate(ibl)
 
   const mesh = new Mesh().g(geometry).s(shading);
   scene.root.addChild(mesh);
