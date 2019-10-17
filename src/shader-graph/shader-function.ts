@@ -64,16 +64,15 @@ export class ShaderFunction {
     return node;
   }
 
-  genShaderFunctionIncludeCode(resolvedFunction: Set<ShaderFunction>)
+  genShaderFunctionIncludeCode(resolvedFunction: Set<ShaderFunction>, isWebGL2: boolean)
     : { result: string, needDerivative: boolean } {
     let needDerivative = this.needDerivative;
 
     const builder = new CodeBuilder()
-    builder.reset();
 
     this.dependShaderFunction.forEach(func => {
       if (!resolvedFunction.has(func)) {
-        const result = func.genShaderFunctionIncludeCode(resolvedFunction);
+        const result = func.genShaderFunctionIncludeCode(resolvedFunction, isWebGL2);
         builder.writeBlock(result.result);
         needDerivative = needDerivative || result.needDerivative;
         resolvedFunction.add(func)
@@ -100,25 +99,34 @@ export class ShaderFunction {
 
     builder.writeLine(`${varType} ${define.name}(${functionInputs}){`)
     builder.addIndent()
-    builder.writeBlock(this.replaceFunctionCalls(define.source))
+    builder.writeBlock(this.convertSource(define.source, isWebGL2))
     builder.reduceIndent()
     builder.writeLine("}")
     return { result: builder.output(), needDerivative };
   }
 
-  // TODO maybe need check cycle depend
-  private replaceFunctionCalls(src: string) {
+  private convertSource(src: string, isWebGL2: boolean) {
     let source = src.slice();
+    
+  // func name maybe not same as func.define.name because function name auto deduplicate
+  // TODO maybe need check cycle depend
     this.dependShaderFunction.forEach(func => {
       if (func.name.trim() !== func.define.name.trim()) {
         replaceFunctionCallByName(source, func.name, func.define.name)
       }
     })
+
+    if (isWebGL2) {
+      source = replaceFunctionCallByName(source, 'texture2D', 'texture')
+      source = replaceFunctionCallByName(source, 'textureCube', 'texture')
+    }
+
     return source;
   }
 
 }
 
+// todo this maybe have better impl, that really check is function name
 function replaceFunctionCallByName(source: string, functionName: string, replaceName: string) {
-  return source.replace(new RegExp(functionName, 'g'), replaceName);
+  return source.split(functionName).join(replaceName)
 }

@@ -14,7 +14,7 @@ export default class Debug extends Vue {
     const tssaoShading = new TSSAOShading();
     const tssaoShader = new Shading().decorate(tssaoShading);
     console.log(tssaoShader)
-    console.log(tssaoShader.getProgramConfig());
+    console.log(tssaoShader.getProgramConfig(true));
   }
 }
 </script>

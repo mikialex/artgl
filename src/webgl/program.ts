@@ -20,7 +20,6 @@ export interface GLProgramConfig {
   textures?: TextureDescriptor[];
   vertexShaderString: string;
   fragmentShaderString: string;
-  autoInjectHeader: boolean;
   useIndex?: boolean;
   needDerivative?: boolean;
 }
@@ -43,7 +42,7 @@ export class GLProgram {
 
     this.vertexShader = new GLShader(this.renderer, ShaderType.vertex);
     this.fragmentShader = new GLShader(this.renderer, ShaderType.fragment);
-    this.compileShaders(config);
+    this.compileShaders(config, this.renderer.ctxVersion === 2);
 
     this.createProgram(this.vertexShader, this.fragmentShader);
     this.createGLResource(config);
@@ -113,13 +112,12 @@ export class GLProgram {
     }
   }
 
-  private compileShaders(conf: GLProgramConfig) {
+  private compileShaders(conf: GLProgramConfig, isWebGL2: boolean) {
     let vertexShaderString = conf.vertexShaderString;
     let fragmentShaderString = conf.fragmentShaderString;
-    if (conf.autoInjectHeader) {
-      vertexShaderString = injectVertexShaderHeaders(conf, conf.vertexShaderString);
-      fragmentShaderString = injectFragmentShaderHeaders(conf, conf.fragmentShaderString);
-    }
+    vertexShaderString = injectVertexShaderHeaders(conf, conf.vertexShaderString, isWebGL2);
+    fragmentShaderString = injectFragmentShaderHeaders(conf, conf.fragmentShaderString, isWebGL2);
+    
     this.vertexShader.compileShader(vertexShaderString);
     this.fragmentShader.compileShader(fragmentShaderString);
   }

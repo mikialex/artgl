@@ -144,13 +144,12 @@ export class ShaderGraph {
     return this;
   }
 
-  compile(): GLProgramConfig {
-    const { results, needDerivative } = genFragShader(this);
+  compile(isWebGL2: boolean): GLProgramConfig {
+    const { results, needDerivative } = genFragShader(this, isWebGL2);
     return {
       ...this.collectInputs(),
-      vertexShaderString: genVertexShader(this),
+      vertexShaderString: genVertexShader(this, isWebGL2),
       fragmentShaderString: results,
-      autoInjectHeader: true,
       needDerivative
     };
   }

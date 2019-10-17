@@ -120,7 +120,7 @@ export default class ShaderEditor extends Vue {
 
     const tssaoShading = new TSSAOShading();
     const tssaoShader = new Shading().decorate(tssaoShading);
-    tssaoShader.getProgramConfig();
+    tssaoShader.getProgramConfig(false);
     this.viewNodes = tssaoShader.graph.nodes.map(node => {
       return {
         node,

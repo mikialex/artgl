@@ -91,7 +91,7 @@ export class Shading {
 
   decoCamera() {
     // this to avoid circle dep
-    const  { PerspectiveCameraInstance } = require("../camera/perspective-camera");
+    const { PerspectiveCameraInstance } = require("../camera/perspective-camera");
     this.decorate(PerspectiveCameraInstance)
     return this;
   }
@@ -116,7 +116,7 @@ export class Shading {
 
     if (name !== undefined) {
       if (this._namedDecoratorMap.has(name)) {
-        throw  `the named <${name}>'s name has been used before`
+        throw `the named <${name}>'s name has been used before`
       }
       this._namedDecoratorMap.set(name, decorator);
     }
@@ -140,10 +140,10 @@ export class Shading {
     })
   }
 
-  getProgramConfig() {
+  getProgramConfig(isWebGl: boolean) {
     if (this._needRebuildShader) {
       this.build();
-      this._programConfigCache = this.graph.compile();
+      this._programConfigCache = this.graph.compile(isWebGl);
       this.afterShaderCompiled.notifyObservers(this._programConfigCache)
       this._needRebuildShader = false;
     }
@@ -154,7 +154,7 @@ export class Shading {
     if (this._needRebuildShader) {
       this.disposeProgram(engine);
     }
-    return  engine.getProgram(this);
+    return engine.getProgram(this);
   }
 
   framebufferTextureMap: { [index: string]: string } = {};
@@ -169,7 +169,7 @@ export class Shading {
 }
 
 
-export function MarkNeedRedecorate<T>(_target: any, _propertyKey: any): any{
+export function MarkNeedRedecorate<T>(_target: any, _propertyKey: any): any {
   const key = Symbol();
   return {
     get(): T {

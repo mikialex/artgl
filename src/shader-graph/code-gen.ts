@@ -9,17 +9,23 @@ import {
 import { GLDataType2ShaderString } from "../core/data-type";
 
 
-export function genFragShader(graph: ShaderGraph)
+export function genFragShader(graph: ShaderGraph, isWebGl2: boolean)
   : { results: string, needDerivative: boolean } {
   const builder = new CodeBuilder()
   builder.reset();
 
+  const gl2FragOutputName = 'fragColor'
+  if (isWebGl2) {
+    builder.writeLine(`out vec4 ${gl2FragOutputName};`)
+  }
   builder.writeLine("void main(){")
   builder.addIndent()
 
   const evaluatedNode = new Map<ShaderNode, varRecord>();
   const nodeDependList = graph.fragmentRoot.getTopologicalSortedList() as ShaderNode[];
-  const fragResult = codeGenGraph(nodeDependList, "gl_FragColor", evaluatedNode);
+  const fragResult = codeGenGraph(
+    nodeDependList, isWebGl2 ? gl2FragOutputName : "gl_FragColor", evaluatedNode, isWebGl2
+  );
   builder.writeBlock(fragResult.code)
   pushListToMap(evaluatedNode, fragResult.varList)
 
@@ -27,13 +33,13 @@ export function genFragShader(graph: ShaderGraph)
   builder.writeLine("}")
   const mainCode = builder.output();
 
-  const { functionsStr, needDerivative } = genShaderFunctionDepend(evaluatedNode);
+  const { functionsStr, needDerivative } = genShaderFunctionDepend(evaluatedNode, isWebGl2);
 
   return { results: functionsStr + mainCode, needDerivative };
 }
 
 
-export function genVertexShader(graph: ShaderGraph): string {
+export function genVertexShader(graph: ShaderGraph, isWebGl2: boolean): string {
   const builder = new CodeBuilder()
   builder.reset();
 
@@ -42,7 +48,7 @@ export function genVertexShader(graph: ShaderGraph): string {
 
   const evaluatedNode = new Map<ShaderNode, varRecord>();
   const nodeDependList = graph.vertexRoot.getTopologicalSortedList() as ShaderNode[];
-  const vertexResult = codeGenGraph(nodeDependList, "gl_Position", evaluatedNode)
+  const vertexResult = codeGenGraph(nodeDependList, "gl_Position", evaluatedNode, isWebGl2)
   pushListToMap(evaluatedNode, vertexResult.varList)
   builder.writeBlock(vertexResult.code)
   builder.writeLine("gl_PointSize = 5.0;") // TODO
@@ -50,7 +56,7 @@ export function genVertexShader(graph: ShaderGraph): string {
 
   graph.varyings.forEach((varyNode, key) => {
     const varyDependList = varyNode.getTopologicalSortedList() as ShaderNode[];
-    const varyResult = codeGenGraph(varyDependList, key, evaluatedNode);
+    const varyResult = codeGenGraph(varyDependList, key, evaluatedNode, isWebGl2);
     pushListToMap(evaluatedNode, varyResult.varList)
     builder.writeBlock(varyResult.code)
     builder.emptyLine()
@@ -60,7 +66,7 @@ export function genVertexShader(graph: ShaderGraph): string {
   builder.writeLine("}")
   const mainCode = builder.output();
 
-  const includedCode = genShaderFunctionDepend(evaluatedNode).functionsStr;
+  const includedCode = genShaderFunctionDepend(evaluatedNode, isWebGl2).functionsStr;
 
   return includedCode + mainCode
 }
@@ -74,7 +80,7 @@ function pushListToMap(map: Map<ShaderNode, varRecord>, list: varRecord[]) {
 }
 
 
-function genShaderFunctionDepend(nodes: Map<ShaderNode, varRecord>)
+function genShaderFunctionDepend(nodes: Map<ShaderNode, varRecord>, isWebGl2: boolean)
   : { functionsStr: string, needDerivative: boolean } {
   let needDerivative = false;
   let functionsStr = "\n";
@@ -87,7 +93,7 @@ function genShaderFunctionDepend(nodes: Map<ShaderNode, varRecord>)
 
   const resolvedFunction = new Set<ShaderFunction>();
   dependFunctions.forEach(func => {
-    const ret = func.genShaderFunctionIncludeCode(resolvedFunction);
+    const ret = func.genShaderFunctionIncludeCode(resolvedFunction, isWebGl2);
     needDerivative = needDerivative || ret.needDerivative
     functionsStr += ret.result
     functionsStr += "\n"
@@ -105,7 +111,8 @@ interface varRecord {
 function genTempVarExpFromShaderNode(
   node: ShaderNode,
   ctx: varRecord[],
-  preEvaluatedList: Map<ShaderNode, varRecord>
+  preEvaluatedList: Map<ShaderNode, varRecord>,
+  isWebGl2: boolean,
 ): string {
   function findRecordFromEvaluatedNode(node: ShaderNode) {
     let record: varRecord | undefined;
@@ -172,7 +179,11 @@ function genTempVarExpFromShaderNode(
   }
 
   if (node instanceof ShaderTextureFetchNode) {
-    return `texture2D(${node.source.name}, ${getParamKeyFromVarList(node.fetchByNode)})`
+    if (isWebGl2) {
+      return `texture(${node.source.name}, ${getParamKeyFromVarList(node.fetchByNode)})`
+    } else {
+      return `texture2D(${node.source.name}, ${getParamKeyFromVarList(node.fetchByNode)})`
+    }
   }
 
   if (node instanceof ShaderCombineNode) {
@@ -203,7 +214,8 @@ function genTempVarExpFromShaderNode(
 function codeGenGraph(
   nodeDependList: ShaderNode[],
   rootOutputName: string,
-  preEvaluatedList: Map<ShaderNode, varRecord>
+  preEvaluatedList: Map<ShaderNode, varRecord>,
+  isWebGl2: boolean
 ): {
   code: string,
   varList: varRecord[]
@@ -217,7 +229,7 @@ function codeGenGraph(
     varList.push({
       refedNode: nodeToGen,
       varKey: varName,
-      expression: genTempVarExpFromShaderNode(nodeToGen, varList, preEvaluatedList),
+      expression: genTempVarExpFromShaderNode(nodeToGen, varList, preEvaluatedList, isWebGl2),
     })
   })
   varList.forEach(varRc => {

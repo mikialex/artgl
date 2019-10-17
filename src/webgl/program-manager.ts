@@ -38,7 +38,7 @@ export class GLProgramManager implements GLReleasable {
   }
 
   private createProgram(shading: Shading): GLProgram {
-    const programConfig = shading.getProgramConfig()
+    const programConfig = shading.getProgramConfig(this.renderer.ctxVersion === 2);
     const program = new GLProgram(this.renderer, programConfig);
     this.programs.set(shading, program);
     this.programsVersion.set(shading, shading._version);
