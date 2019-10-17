@@ -1,6 +1,7 @@
 
 import { Vector3 } from '../../math/index';
 import { StandardGeometry } from '../standard-geometry';
+import { ShapeWillChange } from '../../core/geometry';
 
 
 export class SphereGeometry extends StandardGeometry {
@@ -18,14 +19,29 @@ export class SphereGeometry extends StandardGeometry {
 
     this.buildShape();
   }
-  name = 'SphereGeometry'
+  
+  @ShapeWillChange
   radius = 1;
+
+  @ShapeWillChange
   widthSegments = 10;
+
+  @ShapeWillChange
   heightSegments = 10;
+
+  @ShapeWillChange
   phiStart = 0;
+
+  @ShapeWillChange
   phiLength = Math.PI * 2;
+
+  @ShapeWillChange
   thetaStart = 0;
+  
+  @ShapeWillChange
   thetaLength = Math.PI * 2;
+
+  @ShapeWillChange
   thetaEnd: number;
 
   shape() {

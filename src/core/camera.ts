@@ -162,7 +162,7 @@ export interface Camera extends SceneNode, CameraSelf { }
 export const Camera = ExtendWithSceneNode(CameraSelf)
 
 // https://dev.to/angular/decorators-do-not-work-as-you-might-expect-3gmj
-export function ProjectionMatrixNeedUpdate<T>(_target: any, _propertyKey: any): any {
+export function ProjectionMatrixNeedUpdate<T>(_target: Camera, _propertyKey: any): any {
   const key = Symbol();
 
   return {

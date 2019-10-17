@@ -1,6 +1,7 @@
 
 import { Vector3 } from '../../math/index';
 import { StandardGeometry } from '../standard-geometry';
+import { ShapeWillChange } from '../../core/geometry';
 
 
 export class TorusKnotGeometry extends StandardGeometry {
@@ -24,12 +25,22 @@ export class TorusKnotGeometry extends StandardGeometry {
     this.buildShape();
   }
 
-  name = 'TorusKnotGeometry'
+  @ShapeWillChange
   radius = 1;
+
+  @ShapeWillChange
   tube = 0.4;
+
+  @ShapeWillChange
   tubularSegments = 64;
+
+  @ShapeWillChange
   radialSegments = 8;
+
+  @ShapeWillChange
   p = 2
+
+  @ShapeWillChange
   q = 3
 
 
