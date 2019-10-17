@@ -1,7 +1,7 @@
-import { GLDataType, getShaderTypeStringFromGLDataType } from "../webgl/shader-util";
 import { ShaderFunctionNode } from "./shader-node";
 import { parseShaderFunctionMetaInfo } from "./parser/shader-function-meta";
 import { CodeBuilder } from "./util/code-builder";
+import { GLDataType, GLDataType2ShaderString } from "../core/data-type";
 
 export interface ShaderFunctionDefine {
   source: string,
@@ -82,11 +82,11 @@ export class ShaderFunction {
     resolvedFunction.add(this)
 
     const define = this.define;
-    const varType = getShaderTypeStringFromGLDataType(define.returnType);
+    const varType = GLDataType2ShaderString(define.returnType);
     let functionInputs = "";
     const keys = Object.keys(define.inputs)
     keys.forEach((key, index) => {
-      const paramType = getShaderTypeStringFromGLDataType(define.inputs[key]);
+      const paramType = GLDataType2ShaderString(define.inputs[key]);
       const paramStr = `${paramType} ${key}`
       functionInputs += paramStr
       if (index !== keys.length - 1) {

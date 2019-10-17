@@ -51,7 +51,6 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { ShaderApplication } from "../shader-application";
 import {
   injectFragmentShaderHeaders,
-  GLDataType
 } from "../../../src/webgl/shader-util";
 import {
   ShaderGraph,
@@ -72,6 +71,7 @@ import {
   layoutGraph
 } from "../model/graph-view";
 import { Nullable } from "../../../src/type";
+import { GLDataType } from "../../../src/core/data-type";
 
 @Component({
   components: {

@@ -1,15 +1,13 @@
 import { SceneNode, ExtendWithSceneNode } from "../scene/scene-node";
 import { Matrix4, Vector3 } from "../math/index";
 import { RenderEngine, Size } from '../engine/render-engine';
-import { Observable } from './observable';
-import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, BaseEffectShading } from "./shading";
-import { ShaderCommonUniformInputNode } from "../shader-graph/shader-node";
+import { ShaderUniformProvider, ShaderUniformDecorator, BaseEffectShading } from "./shading";
 import { MapUniform } from "./shading-util";
 import { ShaderGraph, WorldPositionFragVary } from "../shader-graph/shader-graph";
 import { VPTransform, MTransform } from "../shader-graph/built-in/transform";
 import { uniformFromValue, attribute, vec4, constValue } from "../shader-graph/node-maker";
 import { CommonAttribute } from "../webgl/attribute";
-import { GLDataType } from "../webgl/shader-util";
+import { GLDataType } from "./data-type";
 
 export function MVP(graph: ShaderGraph) {
   if (graph.getIfSharedUniform(Camera.WorldMatrixKey) !== undefined &&
@@ -164,7 +162,7 @@ export interface Camera extends SceneNode, CameraSelf { }
 export const Camera = ExtendWithSceneNode(CameraSelf)
 
 // https://dev.to/angular/decorators-do-not-work-as-you-might-expect-3gmj
-export function ProjectionMatrixNeedUpdate<T>(_target: any, _propertyKey: any): any {
+export function ProjectionMatrixNeedUpdate<T>(_target: Camera, _propertyKey: any): any {
   const key = Symbol();
 
   return {

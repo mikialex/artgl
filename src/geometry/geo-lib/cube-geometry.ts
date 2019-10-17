@@ -1,5 +1,6 @@
 import { StandardGeometry } from "../standard-geometry";
 import { Vector3 } from "../../math";
+import { ShapeWillChange } from "../../core/geometry";
 
 // https://github.com/mrdoob/three.js/blob/dev/src/geometries/BoxGeometry.js
 
@@ -17,11 +18,22 @@ export class CubeGeometry extends StandardGeometry {
     this.buildShape();
   }
 
+  @ShapeWillChange
   width: number = 1;
+
+  @ShapeWillChange
   height: number = 1;
+
+  @ShapeWillChange
   depth: number = 1;
+
+  @ShapeWillChange
   widthSegments: number = 1;
+
+  @ShapeWillChange
   heightSegments: number = 1;
+
+  @ShapeWillChange
   depthSegments: number = 1;
 
   shape() {

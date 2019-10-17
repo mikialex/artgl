@@ -1,4 +1,5 @@
 import { Vector3 } from "../vector3";
+import { Plane } from "./plane";
 
 export class Box3 {
   constructor(min?: Vector3, max?: Vector3) {
@@ -42,5 +43,38 @@ export class Box3 {
     this.max.max(point);
     return this;
   }
+
+  intersectsPlane ( plane: Plane ) {
+
+		// We compute the minimum and maximum dot product values. If those values
+		// are on the same side (back or front) of the plane, then there is no intersection.
+    var min, max;
+    
+		if ( plane.normal.x > 0 ) {
+			min = plane.normal.x * this.min.x;
+			max = plane.normal.x * this.max.x;
+		} else {
+			min = plane.normal.x * this.max.x;
+			max = plane.normal.x * this.min.x;
+		}
+
+		if ( plane.normal.y > 0 ) {
+			min += plane.normal.y * this.min.y;
+			max += plane.normal.y * this.max.y;
+		} else {
+			min += plane.normal.y * this.max.y;
+			max += plane.normal.y * this.min.y;
+		}
+
+		if ( plane.normal.z > 0 ) {
+			min += plane.normal.z * this.min.z;
+			max += plane.normal.z * this.max.z;
+		} else {
+			min += plane.normal.z * this.max.z;
+			max += plane.normal.z * this.min.z;
+		}
+
+		return ( min <= - plane.constant && max >= - plane.constant );
+	}
 
 }

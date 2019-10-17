@@ -1,5 +1,5 @@
 import { ShaderFunctionDefine, ShaderFunctionParsedDefine } from "../shader-function";
-import { GLDataType } from "../../webgl/shader-util";
+import { getDataTypeFromShaderString, GLDataType } from "../../core/data-type";
 
 export function parseShaderFunctionMetaInfo(input: ShaderFunctionDefine)
   : ShaderFunctionParsedDefine {
@@ -31,27 +31,11 @@ export function splitStrUntilChar(str: string, char: string) {
   throw "split error"
 }
 
-export function getDataType(input: string): GLDataType {
-  switch (input.trim()) {
-    case "float": return GLDataType.float
-    case "vec2": return GLDataType.floatVec2
-    case "vec3": return GLDataType.floatVec3
-    case "vec4": return GLDataType.floatVec4
-    case "mat2": return GLDataType.Mat2
-    case "mat3": return GLDataType.Mat3
-    case "mat4": return GLDataType.Mat4
-    case "sampler2D": return GLDataType.sampler2D
-    case "samplerCube": return GLDataType.samplerCube
-
-    default: throw 'parse error'
-  }
-}
-
 export function getOneParam(input: string) {
   const split = input.trim().split(' ').filter(char => char !== "");
   return {
     name: split[1].trim(),
-    type: getDataType(split[0])
+    type: getDataTypeFromShaderString(split[0])
   }
 }
 
@@ -85,7 +69,7 @@ function getFuncHead(input: string) {
   const split = input.split(' ').filter(char => char.trim() !== "");
   return {
     name: split[1].trim(),
-    returnType: getDataType(split[0])
+    returnType: getDataTypeFromShaderString(split[0].trim())
   }
 
 }

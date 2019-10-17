@@ -1,4 +1,5 @@
 import { StandardGeometry } from '../standard-geometry';
+import { ShapeWillChange } from '../../core/geometry';
 
 export class PlaneGeometry extends StandardGeometry {
   constructor(width?: number, height?: number,
@@ -12,10 +13,17 @@ export class PlaneGeometry extends StandardGeometry {
 
     this.buildShape();
   }
-  name = 'PlaneGeometry'
+
+  @ShapeWillChange
   width: number;
+
+  @ShapeWillChange
   height: number;
+
+  @ShapeWillChange
   widthSegments: number;
+
+  @ShapeWillChange
   heightSegments: number;
 
   shape() {

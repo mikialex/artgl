@@ -11,6 +11,7 @@ export { Framer } from "./engine/framer";
 
 export * from "./core/render-object";
 export * from "./core/texture";
+export * from "./core/texture-cube";
 export { Mesh } from "./object/mesh";
 export { Line } from "./object/line";
 export { Points } from "./object/points";
@@ -46,6 +47,7 @@ export * from './light/exports';
 export { SphereGeometry } from "./geometry/geo-lib/sphere-geometry";
 export { PlaneGeometry } from "./geometry/geo-lib/plane-geometry";
 export { CubeGeometry } from "./geometry/geo-lib/cube-geometry";
+export { TorusKnotGeometry } from "./geometry/geo-lib/torus-knot-geometry"
 
 // technique lib
 export { NormalShading } from "./shading/basic-lib/normal";

@@ -2,7 +2,6 @@ import {
   ShaderAttributeInputNode, ShaderCommonUniformInputNode,
   ShaderTextureNode, ShaderNode, ShaderConstType, ShaderConstNode, ShaderCombineNode
 } from "./shader-node";
-import { GLDataType } from "../webgl/shader-util";
 import { GLTextureType } from "../webgl/uniform/uniform-texture";
 import { Vector2 } from "../math/vector2";
 import { Vector3, Matrix4 } from "../math";
@@ -10,6 +9,7 @@ import { Vector4 } from "../math/vector4";
 import { CommonAttribute } from "../webgl/attribute";
 import { Texture } from "../artgl";
 import { CubeTexture } from "../core/texture-cube";
+import { GLDataType } from "../core/data-type";
 
 export function attribute(name: string, type: GLDataType) {
   return new ShaderAttributeInputNode({ name, type });

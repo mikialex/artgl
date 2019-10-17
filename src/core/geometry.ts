@@ -16,7 +16,6 @@ import { Nullable } from "../type";
  * @class Geometry
  */
 export abstract class Geometry {
-  name: string = ""
   uuid = generateUUID();
 
   _bufferDatum: { [index: string]: BufferData } = {};
@@ -91,4 +90,16 @@ export abstract class Geometry {
 
 }
 
+export function ShapeWillChange<T>(_target: Geometry, _propertyKey: any): any {
+  const key = Symbol();
 
+  return {
+    get(): T {
+      return (this as any)[key];
+    },
+    set(newValue: T) {
+      (this as any)[key] = newValue;
+      (this as unknown as Geometry).notifyShapeChanged();
+    }
+  }
+}

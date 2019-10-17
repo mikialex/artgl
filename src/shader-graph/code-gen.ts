@@ -1,12 +1,12 @@
 import { ShaderGraph } from "./shader-graph";
 import { ShaderFunction } from "./shader-function";
-import { getShaderTypeStringFromGLDataType } from "../webgl/shader-util";
 import { findFirst } from "../util/array";
 import { CodeBuilder } from "./util/code-builder";
 import {
   ShaderFunctionNode, ShaderNode, ShaderInputNode, ShaderTextureFetchNode,
   ShaderCombineNode, ShaderConstNode, ShaderSwizzleNode
 } from "./shader-node";
+import { GLDataType2ShaderString } from "../core/data-type";
 
 
 export function genFragShader(graph: ShaderGraph)
@@ -227,7 +227,7 @@ function codeGenGraph(
     if (preEvaluatedList.has(varRc.refedNode)) {
       return;
     }
-    const varType = getShaderTypeStringFromGLDataType(varRc.refedNode.type);
+    const varType = GLDataType2ShaderString(varRc.refedNode.type);
     builder.writeLine(`${varType} ${varRc.varKey} = ${varRc.expression};`)
   })
 
