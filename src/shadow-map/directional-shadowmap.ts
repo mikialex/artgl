@@ -5,6 +5,7 @@ import { BaseEffectShading } from "../core/shading";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { ShaderGraph, WorldPositionFragVary, texture } from "../artgl";
 import { MapUniform } from "../core/shading-util";
+import { unPackDepth } from '../shader-graph/built-in/depth-pack';
 
 export abstract class ShadowMap<T> extends BaseEffectShading<T> {
 
@@ -19,9 +20,18 @@ const addShadow = new ShaderFunction({
     mat4 shadowMatrix,
     vec4 inputColor,
     ){
-      return vec4(1.0);
+      vec4 worldInShadowCameraNDC = vec4(worldPosition, 1.0) * shadowMatrix;
+      worldInShadowCameraNDC = worldInShadowCameraNDC / worldInShadowCameraNDC.w;
+      float worldDepth = worldInShadowCameraNDC.z;
+      float depthInShadowCamera = UnpackDepth(texture2D(shadowMap, worldInShadowCameraNDC.xy));
+      if(depthInShadowCamera < worldDepth){
+        return vec4(inputColor.rgb * 0.5, 1.0);
+      }else{
+        return inputColor;
+      }
   }
-  `
+  `,
+  dependFunction: [unPackDepth]
 })
 
 export class DirectionalShadowMap extends ShadowMap<DirectionalShadowMap> {
@@ -31,7 +41,8 @@ export class DirectionalShadowMap extends ShadowMap<DirectionalShadowMap> {
   }
 
   updateShadowMatrix() {
-    this.shadowCamera.transform.copy(this.light.transform);
+    // this.shadowCamera.transform.copy(this.light.transform); todo
+    // this.shadowCamera.transform.position.set(0, 0, 100);
 
     this.shadowMatrix.set(
     	0.5, 0.0, 0.0, 0.5,

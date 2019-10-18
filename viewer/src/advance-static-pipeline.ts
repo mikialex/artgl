@@ -111,11 +111,14 @@ export class AdvanceStaticRenderPipeline {
     this.updateTicks();
 
     // draw the shadow map
-    this.depthShader.params.set(PerspectiveCameraInstance, this.directionalShadowMap.getShadowCamera())
     const directionalShadowMapPass = pass("directionalShadowMapPass")
       .use(scene.renderScene)
       .overrideShading(this.depthShader)
-    this.depthShader.params.clear();
+      .beforeExecute(() => {
+        this.depthShader.params.set(PerspectiveCameraInstance, this.directionalShadowMap.getShadowCamera())
+      }).afterExecute(() => {
+        this.depthShader.params.clear();
+    })
     
     this.directionalShadowMapTarget = this.directionalShadowMapTarget
       .from(directionalShadowMapPass)
@@ -181,6 +184,16 @@ export class AdvanceStaticRenderPipeline {
             .input("copySource", AAedScene))
       )
     )
+
+    // this.graph.setScreenRoot(
+    //   screen().from(
+    //     when(
+    //       false, 
+    //       createTSSAO(),
+    //       pass("copy").useQuad().overrideShading(copier)
+    //         .input("copySource", this.directionalShadowMapTarget))
+    //   )
+    // )
 
   }
 }
