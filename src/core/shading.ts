@@ -38,6 +38,8 @@ export interface ShaderUniformProvider {
   propertyUniformNameMap: Map<propertyName, uniformName>;
 }
 
+export type ShadingParams = Map<ShaderUniformDecorator, ShaderUniformDecorator>
+
 export class Shading {
 
   uuid = generateUUID();
@@ -53,6 +55,8 @@ export class Shading {
   private _namedDecoratorMap: Map<string, ShaderUniformDecorator> = new Map();
   private _decoratorObs: Map<ShaderUniformDecorator, Observer<ShaderUniformDecorator>> = new Map();
 
+  params: ShadingParams = new Map();
+  
   getDecoratorByName(name: string) {
     return this._namedDecoratorMap.get(name)
   }

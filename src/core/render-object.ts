@@ -44,7 +44,6 @@ export const enum PrimitiveType {
 
 export type RenderablePrimitive = Line3 | Vector3 | Face3
 export type PrimitiveVisitor = (prim: RenderablePrimitive) => any
-export type ShadingParams = Map<ShaderUniformDecorator, ShaderUniformDecorator>
 
 /**
  * Class for one render drawcall description,  which is describe all drawable things
@@ -58,7 +57,6 @@ export class RenderObjectSelf {
   material?: Material;
   geometry?: Geometry;
   shading?: Shading;
-  shadingParams: ShadingParams = new Map();
   range?: RenderRange;
   state: DrawState =  new DrawState();
 
@@ -94,7 +92,7 @@ export class RenderObjectSelf {
 
     // prepare technique
     engine.renderObjectWorldMatrix = this.worldMatrix;
-    engine.useShading(shading, this.shadingParams);
+    engine.useShading(shading);
 
     // prepare material
     engine.useMaterial(this.material);

@@ -3,7 +3,7 @@ import { Geometry } from "../core/geometry";
 import { Material } from "../core/material";
 import { Nullable } from "../type";
 import { Shading } from "../core/shading";
-import { ShadingParams, RenderRange } from "../core/render-object";
+import { RenderRange } from "../core/render-object";
 import { Vector4Like } from "../math/interface";
 
 export interface Renderable {
@@ -18,7 +18,7 @@ export interface IRenderEngine {
   //// resource binding
   useGeometry(geometry: Geometry): void;
   useMaterial(material: Material): void;
-  useShading(shading: Nullable<Shading>, shadingParams?: ShadingParams): void;
+  useShading(shading: Nullable<Shading>): void;
   useRange(geometry: Geometry, range?: RenderRange): void;
 
   //// viewport

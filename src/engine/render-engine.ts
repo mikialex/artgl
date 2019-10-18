@@ -1,5 +1,5 @@
 import { GLRenderer } from "../webgl/gl-renderer";
-import { RenderObject, RenderRange, ShadingParams } from "../core/render-object";
+import { RenderObject, RenderRange } from "../core/render-object";
 import { GLProgram } from "../webgl/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
@@ -116,7 +116,7 @@ export class RenderEngine implements GLReleasable {
   private currentShading: Nullable<Shading> = null;
   private currentProgram: Nullable<GLProgram> = null;
 
-  useShading(shading: Nullable<Shading>, shadingParams?: ShadingParams) {
+  useShading(shading: Nullable<Shading>) {
 
     // todo
     this.activeCamera.renderObjectWorldMatrix = this.renderObjectWorldMatrix
@@ -138,6 +138,7 @@ export class RenderEngine implements GLReleasable {
     this.currentShading = shading;
     this.renderer.useProgram(program);
 
+    const shadingParams = shading.params;
     shading._decorators.forEach(defaultDecorator => {
       let overrideDecorator
       if (shadingParams !== undefined) {

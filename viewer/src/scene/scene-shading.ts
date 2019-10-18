@@ -15,8 +15,7 @@ export default function (app: Application) {
   const dirLight = new DirectionalLight();
   dirLight.color = new Vector3(0.3, 0.6, 0.8);
   dirLight.direction = new Vector3(1, 1, -1).normalize();
-
-  const dirShadow = new DirectionalShadowMap(dirLight);
+  app.pipeline.directionalShadowMap = new DirectionalShadowMap(dirLight);
 
   const ambient = new AmbientLight();
   ambient.color = new Vector3(0.3, 0.3, 0.4);

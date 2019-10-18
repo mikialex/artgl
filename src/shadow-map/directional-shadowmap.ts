@@ -47,6 +47,10 @@ export class DirectionalShadowMap extends ShadowMap<DirectionalShadowMap> {
   private light: DirectionalLight
   private shadowCamera: OrthographicCamera = new OrthographicCamera();
 
+  getShadowCamera(): Readonly<OrthographicCamera> {
+    return this.shadowCamera;
+  }
+
   @MapUniform('directionalShadowMapMatrix')
   shadowMatrix: Matrix4 = new Matrix4();
 

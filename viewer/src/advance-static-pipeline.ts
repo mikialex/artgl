@@ -10,6 +10,7 @@ import { createConf } from './conf';
 import { CopyShading } from '../../src/shading/pass-lib/copy';
 import { Nullable } from '../../src/type';
 import { DirectionalShadowMap } from '../../src/shadow-map/directional-shadowmap';
+import { PerspectiveCameraInstance } from '../../src/camera/perspective-camera';
 
 const copier = new Shading().decorate(new CopyShading())
 
@@ -96,7 +97,9 @@ export class AdvanceStaticRenderPipeline {
     // }
   }
 
-  directionalShadowMap: RenderTargetNode =target("directionalShadowMap").needDepth()
+  directionalShadowMap!: DirectionalShadowMap
+
+  directionalShadowMapTarget: RenderTargetNode =target("directionalShadowMap").needDepth()
   .afterContentReceived(node => {
     const shadowMapTextureFBOKey = this.composer.getFramebuffer(node)!.name
     if (this.sceneShading !== null) {
@@ -107,11 +110,14 @@ export class AdvanceStaticRenderPipeline {
   private build(scene: Scene, camera: PerspectiveCamera) {
     this.updateTicks();
 
+    // draw the shadow map
+    this.depthShader.params.set(PerspectiveCameraInstance, this.directionalShadowMap.getShadowCamera())
     const directionalShadowMapPass = pass("directionalShadowMapPass")
       .use(scene.renderScene)
       .overrideShading(this.depthShader)
+    this.depthShader.params.clear();
     
-    this.directionalShadowMap = this.directionalShadowMap
+    this.directionalShadowMapTarget = this.directionalShadowMapTarget
       .from(directionalShadowMapPass)
     
     const depthPass = pass("depthPass").use(scene.renderScene)
@@ -119,7 +125,7 @@ export class AdvanceStaticRenderPipeline {
 
     const scenePass = pass("scenePass")
       .use(scene.render)
-      .depend(this.directionalShadowMap)
+      .depend(this.directionalShadowMapTarget)
 
     const depthResult = target("depthResult").needDepth().from(depthPass)
     const sceneResult = target("sceneResult").needDepth().from(scenePass)
