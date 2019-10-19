@@ -59,12 +59,12 @@ export class Texture implements GraphicResourceReleasable {
   private _convertedResizedSource: Nullable<TextureSource> = null;
   get rawDataSource() { return this._dataSource }
   get convertedDataSource() { return this._convertedResizedSource }
-  get renderUsedDataSource(): TextureSource {
-    if (this._dataSource.isValid(this.needUsePOT)) {
+  getRenderUsedDataSource(isWebGL2: boolean): TextureSource {
+    if (this._dataSource.isValid(this.getNeedUsePOT(isWebGL2))) {
       return this._dataSource
     } else {
       if (this._convertedResizedSource === null) {
-        this._convertedResizedSource = this._dataSource.createPOTTextureSource(this.needUsePOT)
+        this._convertedResizedSource = this._dataSource.createPOTTextureSource(true)
       }
       return this._convertedResizedSource!
     }
@@ -85,7 +85,10 @@ export class Texture implements GraphicResourceReleasable {
     return this;
   }
 
-  get needUsePOT() {
+  getNeedUsePOT(isWebGL2: boolean) {
+    if (isWebGL2) {
+      return false;
+    }
     return this._wrapS !== TextureWrap.clampToEdge ||
       this._wrapT !== TextureWrap.clampToEdge ||
       this._magFilter !== TextureFilter.nearest ||
@@ -108,12 +111,12 @@ export class Texture implements GraphicResourceReleasable {
   private _minFilter: TextureFilter = TextureFilter.nearest
   get minFilter() { return this._minFilter }
 
-  get width() {
-    return this.renderUsedDataSource.width
+  get originalWidth() {
+    return this._dataSource.width
   }
 
-  get height() {
-    return this.renderUsedDataSource.height
+  get originalHeight() {
+    return this._dataSource.height
   }
 
   getGLTexture(engine: RenderEngine): WebGLTexture {

@@ -70,7 +70,7 @@ export class GLTextureManager implements GLReleasable {
     const type = gl.UNSIGNED_BYTE;
     const data = null;
     gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat,
-      texture.width, texture.height, border,
+      texture.originalWidth, texture.originalHeight, border,
       format, type, data);
 
     this.textures.set(texture, glTexture);
@@ -144,16 +144,17 @@ export class GLTextureManager implements GLReleasable {
     const gl = this.renderer.gl;
     const glTexture = this.createEmptyWebGLTexture();
     this.updateTextureParameters(glTexture, texture, gl.TEXTURE_2D)
+    const renderUsedDataSource = texture.getRenderUsedDataSource(this.renderer.ctxVersion === 2);
     if (texture.isDataTexture) {
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-        texture.width, texture.height, 0,
-        gl.RGBA, gl.UNSIGNED_BYTE, texture.renderUsedDataSource.source as ArrayBufferView);
+        renderUsedDataSource.width, renderUsedDataSource.height, 0,
+        gl.RGBA, gl.UNSIGNED_BYTE, renderUsedDataSource.source as ArrayBufferView);
     } else {
       gl.texImage2D(
         gl.TEXTURE_2D, 0,
         gl.RGBA, gl.RGBA,
         gl.UNSIGNED_BYTE,
-        texture.renderUsedDataSource.source as TexImageSource);
+        renderUsedDataSource.source as TexImageSource);
     }
 
     this.textures.set(texture, glTexture);
