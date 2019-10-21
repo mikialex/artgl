@@ -1,78 +1,72 @@
-// import { Controller } from "./controller";
-// import { Interactor } from "./interactor";
+import { Controller } from "./controller";
+import { Interactor } from "./interactor";
+import { SceneNode } from "../scene/scene-node";
+import { Vector3 } from "../math";
+import { Spherical } from "../math/spherical";
 
-// class FirstPersonController extends Controller{
-//   constructor(object) {
+export class FirstPersonController extends Controller{
+  constructor(object: SceneNode) {
+    super();
+    this.object = object
+  }
+
+  object: SceneNode;
+
+	movementSpeed = 1.0;
+	lookSpeed = 0.005;
+
+	lookVertical = true;
+	autoForward = false;
+
+	activeLook = true;
+
+	heightSpeed = false;
+	heightCoef = 1.0;
+	heightMin = 0.0;
+	heightMax = 1.0;
+
+	constrainVertical = false;
+	verticalMin = 0;
+	verticalMax = Math.PI;
+
+  mouseDragOn = false;
+  
+  private autoSpeedFactor = 0.0;
+
+	private mouseX = 0;
+	private mouseY = 0;
+
+	private moveForward = false;
+	private moveBackward = false;
+	private moveLeft = false;
+	private moveRight = false;
+
+	private viewHalfX = 0;
+  private viewHalfY = 0;
+  
+  private lat = 0;
+	private lon = 0;
+
+	private lookDirection = new Vector3();
+	private spherical = new Spherical();
+	private target = new Vector3();
+
+
+  registerInteractor(interactor: Interactor) {
+    if (this.interactor !== null) {
+      this.interactor.unbindControllerAllListener(this);
+    }
+    this.interactor = interactor;
     
-//   }
+    // this.interactor.bindLeftMouseMove(this, this.rotate);
+    // this.interactor.bindRightMouseMove(this, this.move);
+    // this.interactor.bindMouseWheel(this, this.zoom);
+  }
 
-//   public registerInteractor(interactor: Interactor) {
-//     if (this.interactor !== null) {
-//       this.interactor.unbindControllerAllListener(this);
-//     }
-//     this.interactor = interactor;
-    
-//     this.interactor.bindLeftMouseMove(this, this.rotate);
-//     this.interactor.bindRightMouseMove(this, this.move);
-//     this.interactor.bindMouseWheel(this, this.zoom);
-//   }
-
-// }
+}
 
 // THREE.FirstPersonControls = function ( object, domElement ) {
 
-// 	this.object = object;
-
-// 	this.domElement = ( domElement !== undefined ) ? domElement : document;
-
-// 	// API
-
-// 	this.enabled = true;
-
-// 	this.movementSpeed = 1.0;
-// 	this.lookSpeed = 0.005;
-
-// 	this.lookVertical = true;
-// 	this.autoForward = false;
-
-// 	this.activeLook = true;
-
-// 	this.heightSpeed = false;
-// 	this.heightCoef = 1.0;
-// 	this.heightMin = 0.0;
-// 	this.heightMax = 1.0;
-
-// 	this.constrainVertical = false;
-// 	this.verticalMin = 0;
-// 	this.verticalMax = Math.PI;
-
-// 	this.mouseDragOn = false;
-
-// 	// internals
-
-// 	this.autoSpeedFactor = 0.0;
-
-// 	this.mouseX = 0;
-// 	this.mouseY = 0;
-
-// 	this.moveForward = false;
-// 	this.moveBackward = false;
-// 	this.moveLeft = false;
-// 	this.moveRight = false;
-
-// 	this.viewHalfX = 0;
-// 	this.viewHalfY = 0;
-
-// 	// private variables
-
-// 	var lat = 0;
-// 	var lon = 0;
-
-// 	var lookDirection = new THREE.Vector3();
-// 	var spherical = new THREE.Spherical();
-// 	var target = new THREE.Vector3();
-
-// 	//
 
 // 	if ( this.domElement !== document ) {
 
