@@ -1,13 +1,13 @@
 <template>
   <div class="material-view">
-    <div v-if="appMaterials.length===0">no material found</div>
-    <MaterialPanel 
-    v-for="material in appMaterials" 
-    :key="material.uuid" 
-    :material="material" 
-    @deleteSelf="deleteMaterial(material)"
+    <div v-if="appMaterials.length===0" class="no-item-hint">no material found</div>
+    <MaterialPanel
+      v-for="material in appMaterials"
+      :key="material.uuid"
+      :material="material"
+      @deleteSelf="deleteMaterial(material)"
     />
-    <button @click="newMaterial">add new material</button>
+    <button @click="newMaterial" class="create-new">create a new material</button>
   </div>
 </template>
 
@@ -59,4 +59,37 @@ export default class MaterialViewPanel extends Vue {
 </script>
 
 <style scoped lang="scss">
+.material-view{
+  padding: 5px;
+  background: #eee;
+  height: 100%;
+}
+
+.no-item-hint{
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #aaa;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.create-new{
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  background: #fefefe;
+
+}
 </style>

@@ -12,6 +12,8 @@ export class FirstPersonController extends Controller {
     this.object = object
   }
 
+  reloadStates() {}
+
   object: SceneNode;
 
   movementSpeed = 1.0;
@@ -95,62 +97,63 @@ export class FirstPersonController extends Controller {
 
     }
   }
+  update() { }
 
+  // update() {
+  //   const delta = 1;
 
-  update(delta) {
+  //   if (this.heightSpeed) {
+  //     var y = MathUtil.clamp(this.object.transform.position.y, this.heightMin, this.heightMax);
+  //     var heightDelta = y - this.heightMin;
+  //     this.autoSpeedFactor = delta * (heightDelta * this.heightCoef);
+  //   } else {
+  //     this.autoSpeedFactor = 0.0;
+  //   }
 
-    if (this.heightSpeed) {
-      var y = MathUtil.clamp(this.object.transform.position.y, this.heightMin, this.heightMax);
-      var heightDelta = y - this.heightMin;
-      this.autoSpeedFactor = delta * (heightDelta * this.heightCoef);
-    } else {
-      this.autoSpeedFactor = 0.0;
-    }
+  //   const actualMoveSpeed = delta * this.movementSpeed;
 
-    const actualMoveSpeed = delta * this.movementSpeed;
+  //   if (this.moveForward || (this.autoForward && !this.moveBackward)) {
+  //     this.object.translateZ(- (actualMoveSpeed + this.autoSpeedFactor));
+  //   }
+  //   if (this.moveBackward) this.object.translateZ(actualMoveSpeed);
 
-    if (this.moveForward || (this.autoForward && !this.moveBackward)) {
-      this.object.translateZ(- (actualMoveSpeed + this.autoSpeedFactor));
-    }
-    if (this.moveBackward) this.object.translateZ(actualMoveSpeed);
+  //   if (this.moveLeft) this.object.translateX(- actualMoveSpeed);
+  //   if (this.moveRight) this.object.translateX(actualMoveSpeed);
 
-    if (this.moveLeft) this.object.translateX(- actualMoveSpeed);
-    if (this.moveRight) this.object.translateX(actualMoveSpeed);
+  //   if (this.moveUp) this.object.translateY(actualMoveSpeed);
+  //   if (this.moveDown) this.object.translateY(- actualMoveSpeed);
 
-    if (this.moveUp) this.object.translateY(actualMoveSpeed);
-    if (this.moveDown) this.object.translateY(- actualMoveSpeed);
+  //   var actualLookSpeed = delta * this.lookSpeed;
 
-    var actualLookSpeed = delta * this.lookSpeed;
+  //   if (!this.activeLook) {
+  //     actualLookSpeed = 0;
+  //   }
 
-    if (!this.activeLook) {
-      actualLookSpeed = 0;
-    }
+  //   var verticalLookRatio = 1;
 
-    var verticalLookRatio = 1;
+  //   if (this.constrainVertical) {
+  //     verticalLookRatio = Math.PI / (this.verticalMax - this.verticalMin);
+  //   }
 
-    if (this.constrainVertical) {
-      verticalLookRatio = Math.PI / (this.verticalMax - this.verticalMin);
-    }
+  //   this.lon -= this.mouseX * actualLookSpeed;
+  //   if (this.lookVertical) this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
 
-    this.lon -= this.mouseX * actualLookSpeed;
-    if (this.lookVertical) this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
+  //   this.lat = Math.max(- 85, Math.min(85, this.lat));
 
-    this.lat = Math.max(- 85, Math.min(85, this.lat));
+  //   var phi = MathUtil.degToRad(90 - this.lat);
+  //   var theta = MathUtil.degToRad(this.lon);
 
-    var phi = MathUtil.degToRad(90 - this.lat);
-    var theta = MathUtil.degToRad(this.lon);
+  //   if (this.constrainVertical) {
+  //     phi = MathUtil.mapLinear(phi, 0, Math.PI, this.verticalMin, this.verticalMax);
+  //   }
 
-    if (this.constrainVertical) {
-      phi = MathUtil.mapLinear(phi, 0, Math.PI, this.verticalMin, this.verticalMax);
-    }
+  //   var position = this.object.transform.position;
 
-    var position = this.object.transform.position;
+  //   targetPosition.setFromSphericalCoords(1, phi, theta).add(position);
 
-    targetPosition.setFromSphericalCoords(1, phi, theta).add(position);
+  //   this.object.transform.lookAt(targetPosition);
 
-    this.object.transform.lookAt(targetPosition);
-
-  };
+  // };
 
 
 

@@ -28,6 +28,10 @@ export class BufferData<T extends BufferDataType = BufferDataType>{
     return this.data.length / this.stride;
   }
 
+  get dataSize() {
+    return this.data.byteLength
+  }
+
   foreach(
     visitor: (data: BufferDataType, index: number, stride: number, countIndex: number) => any,
     start: number = 0, end: number = Number.MAX_VALUE

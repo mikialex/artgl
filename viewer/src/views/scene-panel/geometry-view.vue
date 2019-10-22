@@ -3,17 +3,18 @@
     <div v-for="geometry in geometrylist"
     :key="geometry.uuid"
     > 
-      <span>
-        {{geometry.name}}-{{geometry.uuid.slice(0, 6)}}
-      </span>
+      <div class="title">
+        {{geometry.constructor.name}}-{{geometry.uuid.slice(0, 6)}}
+      </div>
       
-      <!-- <div class="buffer-detail" v-if="expandDetail">
-        <div v-for ="bufferinfo in geometry._bufferDatum"
+      <div class="buffer-detail" v-if="expandDetail">
+        <div v-for ="(bufferinfo, index) in geometry._bufferDatum"
         :key="bufferinfo.name"
         >
-        {{bufferinfo.name}} - {{Math.ceil(bufferinfo.dataByteSize / 1024 * 10)/ 10}}KB
+        {{index}} - {{Math.ceil(bufferinfo.dataSize / 1024 * 10)/ 10}}KB
         </div>
-      </div> -->
+      </div>
+
     </div>
   </div>
 </template>
@@ -45,6 +46,13 @@ export default class GeometryViewPanel extends Vue {
 .buffer-detail{
   padding-left: 10px;
   background: #eee;
+}
+
+.title{
+  height: 30px;
+  padding-left: 5px;
+  display: flex;
+  align-items: center;
 }
 
 </style>
