@@ -32,8 +32,8 @@ export class Interactor{
     el.addEventListener('mousedown', this.onMouseDown, false);
     el.addEventListener('mouseup', this.onMouseUp, false);
     el.addEventListener('wheel', this.onMouseWheel, false);
-    // el.addEventListener('keydown', this.eventLoop, false);
-    // el.addEventListener('keyup', this.cancelLoop, false);
+    el.addEventListener('keydown', this.onKeyDown, false);
+    el.addEventListener('keyup', this.onKeyUp, false);
     el.addEventListener('contextmenu', this.preventContentMenu, false);
   }
   private unbind(): void {
@@ -43,14 +43,22 @@ export class Interactor{
     el.removeEventListener('mousedown', this.onMouseDown);
     el.removeEventListener('mouseup', this.onMouseUp);
     el.removeEventListener('wheel', this.onMouseWheel);
-    // el.removeEventListener('keydown', this.eventLoop);
-    // el.removeEventListener('keyup', this.cancelLoop);
+    el.removeEventListener('keydown', this.onKeyDown);
+    el.removeEventListener('keyup', this.onKeyUp);
     el.removeEventListener('contextmenu', this.preventContentMenu, false);
   }
 
   private preventContentMenu(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
+  }
+
+  private onKeyDown = (event: KeyboardEvent) => {
+
+  }
+
+  private onKeyUp = (event: KeyboardEvent) => {
+    
   }
 
   private onMouseMove = (event: MouseEvent) => {

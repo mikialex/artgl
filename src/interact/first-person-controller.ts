@@ -75,7 +75,7 @@ export class FirstPersonController extends Controller {
     }
   }
 
-  onKeyUp(event) {
+  onKeyUp(event: KeyboardEvent) {
     switch (event.keyCode) {
 
       case 38: /*up*/
