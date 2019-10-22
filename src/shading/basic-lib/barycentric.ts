@@ -23,7 +23,6 @@ vec4 addBarycentricWireFrame(
   else{
     return vec4(lineColor, 1);
   }
-  // return vec4(vec3(barycentric_co.x), 1.0);
 } 
 `)
 

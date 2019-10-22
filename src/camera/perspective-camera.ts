@@ -35,8 +35,6 @@ export class PerspectiveCamera extends Camera implements ScreenSpaceRayProvider 
   @ProjectionMatrixNeedUpdate
   zoom: number = 1;
 
-  up = new Vector3(0, 1, 0); // todo change watch
-
   get width() {
     return this.aspect * this.height;
   }
@@ -50,10 +48,6 @@ export class PerspectiveCamera extends Camera implements ScreenSpaceRayProvider 
     const width = this.aspect * height;
     const left = - 0.5 * width;
     this._projectionMatrix.makePerspective(left, left + width, top, top - height, this.near, this.far);
-  }
-
-  lookAt(targetPosition: Vector3) {
-    this.transform.lookAt(targetPosition, this.up)
   }
 
   updateRaycaster(caster: Raycaster, xRate: number, yRate: number): void {

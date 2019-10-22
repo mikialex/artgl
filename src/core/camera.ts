@@ -155,6 +155,12 @@ export class CameraSelf
   //     return this._worldPosition;
   //   }
 
+  up = new Vector3(0, 1, 0); // todo change watch
+  
+  lookAt(targetPosition: Vector3) {
+    this.transform.lookAt(targetPosition, this.up);
+  }
+
 }
 
 export interface CameraSelf extends SceneNode { }
