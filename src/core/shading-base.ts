@@ -28,7 +28,7 @@ export abstract class BaseEffectShading<T>
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator>
 
-  hasAnyUniformChanged: boolean = true;
+  _version = 0;
   propertyUniformNameMap: Map<string, string>;
   uniforms: Map<string, any>;
 

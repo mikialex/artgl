@@ -8,8 +8,8 @@ import { RenderEngine } from "../engine/render-engine";
 import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
 import { uniformFromValue } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
-
 export { MapUniform } from "./shading-util";
+
 
 export interface ShaderUniformDecorator {
   /**
@@ -26,20 +26,23 @@ export interface ShaderUniformDecorator {
   nodeCreated: Map<string, ShaderCommonUniformInputNode>;
 }
 
+
+
 type propertyName = string;
 type uniformName = string;
 export interface ShaderUniformProvider {
   uuid: string;
 
-  // mark any change in this uniform group
-  hasAnyUniformChanged: boolean;
+  _version: number;
 
   // mark the shader need recompile
   uniforms: Map<uniformName, any>;
   propertyUniformNameMap: Map<propertyName, uniformName>;
 }
 
+
 export type ShadingParams = Map<ShaderUniformDecorator, ShaderUniformDecorator>
+
 
 export class Shading {
 

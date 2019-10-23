@@ -17,15 +17,22 @@ export class GLUBOManager implements GLReleasable {
   private bindingPoints: Nullable<WebGLBuffer>[] = [];
 
   private UBOData: Map<ShaderUniformProvider, WebGLBuffer> = new Map();
+  private UBOVersionMap: Map<ShaderUniformProvider, number> = new Map();
 
   createUBO(provider: ShaderUniformProvider) {
     
   }
 
   deleteUBO(provider: ShaderUniformProvider) {
-    
+    const buffer = this.UBOData.get(provider);
   }
 
   releaseGL(): void {
+    this.UBOData.forEach(buffer => {
+      this.gl.deleteBuffer(buffer);
+    })
+    this.UBOData.clear();
+    this.UBOVersionMap.clear();
+    this.bindingPoints = this.bindingPoints.map(_ => null);
   }
 }

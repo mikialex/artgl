@@ -42,12 +42,6 @@ import "reflect-metadata";
 
 export function MapUniform(remapName: string) {
   return (target: ShaderUniformProvider, key: string) => {
-    // if (Object.getOwnPropertyDescriptor(target, 'uniforms') == null) {
-    //   return;
-    // }
-    // if (Object.getOwnPropertyDescriptor(target, 'propertyUniformNameMap') == null) {
-    //   return;
-    // }
     if (target.uniforms === undefined) {
       target.uniforms = new Map();
     }
@@ -61,7 +55,7 @@ export function MapUniform(remapName: string) {
     };
     const setter = (value: any) => {
       target.uniforms.set(remapName, value);
-      target.hasAnyUniformChanged = true;
+      target._version++;
       val = value;
     };
 

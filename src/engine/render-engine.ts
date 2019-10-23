@@ -110,7 +110,7 @@ export class RenderEngine implements GLReleasable {
 
 
 
-  private lastUploadedShaderUniformProvider: Set<ShaderUniformProvider> = new Set();
+  private lastUploadedShaderUniformProvider: Map<ShaderUniformProvider, number> = new Map();
   private lastProgramRendered: Nullable<GLProgram> = null;
 
   private currentShading: Nullable<Shading> = null;
@@ -149,8 +149,9 @@ export class RenderEngine implements GLReleasable {
       }
       const decorator = overrideDecorator === undefined ? defaultDecorator : overrideDecorator;
       decorator.foreachProvider(provider => {
-        if (this.lastUploadedShaderUniformProvider.has(provider)
-          && !provider.hasAnyUniformChanged
+        const syncedVersion = this.lastUploadedShaderUniformProvider.get(provider)
+        if (syncedVersion !== undefined
+          && syncedVersion === provider._version // no new change
         ) {
           // if we found this uniform provider has updated before and not changed, we can skip!
           return;
@@ -162,8 +163,7 @@ export class RenderEngine implements GLReleasable {
             program.setUniformIfExist(key, value);
           }
         })
-        provider.hasAnyUniformChanged = false;
-        this.lastUploadedShaderUniformProvider.add(provider);
+        this.lastUploadedShaderUniformProvider.set(provider, provider._version)
       })
     })
 

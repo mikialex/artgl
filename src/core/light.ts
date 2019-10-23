@@ -39,7 +39,7 @@ export abstract class Light<T> extends SceneNode
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable()
 
-  hasAnyUniformChanged: boolean = true;
+  _version = 0;
 
   uniforms: Map<string, any>;
 
