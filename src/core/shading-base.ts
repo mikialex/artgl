@@ -7,8 +7,9 @@ import {
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { ShaderCommonUniformInputNode, ShaderTextureNode } from "../shader-graph/shader-node";
 import { CubeTexture } from "./texture-cube";
-import { Texture } from "../artgl";
+import { Texture, generateUUID } from "../artgl";
 import { textureFromValue } from "../shader-graph/node-maker";
+import { generateUUIDNoHyphen } from "../math/uuid";
 
 export abstract class BaseEffectShading<T>
   implements ShaderUniformProvider, ShaderUniformDecorator {
@@ -18,6 +19,7 @@ export abstract class BaseEffectShading<T>
     this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
   }
 
+  uuid = generateUUIDNoHyphen();
   abstract decorate(graph: ShaderGraph): void;
 
   foreachProvider(visitor: (p: ShaderUniformProvider) => any) {

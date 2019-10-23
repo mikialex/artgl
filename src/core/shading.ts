@@ -29,6 +29,7 @@ export interface ShaderUniformDecorator {
 type propertyName = string;
 type uniformName = string;
 export interface ShaderUniformProvider {
+  uuid: string;
 
   // mark any change in this uniform group
   hasAnyUniformChanged: boolean;
