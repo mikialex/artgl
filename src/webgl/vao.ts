@@ -17,9 +17,9 @@ export interface VAOCreateCallback {
 }
 
 export class GLVAOManager implements GLReleasable {
-  readonly gl: WebGLRenderingContext;
-  readonly renderer: GLRenderer;
-  readonly vaoExt: Nullable<webglVAOExt>;
+  private gl: WebGLRenderingContext;
+  private renderer: GLRenderer;
+  private vaoExt: Nullable<webglVAOExt>;
   readonly isSupported: boolean;
 
   private vaoMap: Map<Shading, Map<Geometry, webglVAO>> = new Map();
@@ -71,7 +71,7 @@ export class GLVAOManager implements GLReleasable {
   private createVAO(shading: Shading, geometry: Geometry): VAOCreateCallback {
     let vao: Nullable<webglVAO>
     if (this.renderer.ctxVersion === 2) {
-      const gl = (this.renderer.gl as WebGL2RenderingContext); 
+      const gl = (this.gl as WebGL2RenderingContext); 
       vao = gl.createVertexArray();
       gl.bindVertexArray(vao);
     } else {
@@ -138,7 +138,7 @@ export class GLVAOManager implements GLReleasable {
 
   deleteVAO(vao: webglVAO) {
     if (this.renderer.ctxVersion === 2) {
-      const gl = (this.renderer.gl as WebGL2RenderingContext); 
+      const gl = (this.gl as WebGL2RenderingContext); 
       gl.deleteVertexArray(vao);
     } else {
       this.vaoExt!.deleteVertexArrayOES(vao);
@@ -147,7 +147,7 @@ export class GLVAOManager implements GLReleasable {
 
   useVAO(vao: Nullable<webglVAO>) {
     if (this.renderer.ctxVersion === 2) {
-      const gl = (this.renderer.gl as WebGL2RenderingContext); 
+      const gl = (this.gl as WebGL2RenderingContext); 
       gl.bindVertexArray(vao);
     } else {
       this.vaoExt!.bindVertexArrayOES(vao);
