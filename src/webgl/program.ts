@@ -13,6 +13,11 @@ export interface VaryingDescriptor {
   type: GLDataType
 }
 
+export interface UniformBlockDescriptor{
+  name: string,
+  uniforms: UniformDescriptor[]
+}
+
 export interface GLProgramConfig {
   attributes: AttributeDescriptor[];
   uniforms?: UniformDescriptor[];
@@ -22,6 +27,7 @@ export interface GLProgramConfig {
   fragmentShaderString: string;
   useIndex?: boolean;
   needDerivative?: boolean;
+  uniformBlocks?: UniformBlockDescriptor;
 }
 
 function fulfillProgramConfig(config: GLProgramConfig) {
@@ -92,23 +98,21 @@ export class GLProgram {
     this._indexUINT = value
   }
   
-  forUniforms(cb: (uniform: GLUniform) => any): void {
+  forUniforms(cb: (uniform: GLUniform) => void): void {
     for (const key in this.textures) {
       cb(this.uniforms[key]);
     }
   }
 
-  forTextures(cb: (texture: GLTextureUniform) => any): void {
+  forTextures(cb: (texture: GLTextureUniform) => void): void {
     for (const key in this.textures) {
       cb(this.textures[key]);
     }
   }
 
-  forAttributes(cb: (texture: GLAttribute) => boolean): void {
+  forAttributes(cb: (texture: GLAttribute) => void): void {
     for (const key in this.attributes) {
-      if (!cb(this.attributes[key])) {
-        return;
-      }
+      cb(this.attributes[key]);
     }
   }
 
@@ -154,14 +158,6 @@ export class GLProgram {
         this.textures[tex.name] = new GLTextureUniform(this, tex);
       })
     }
-  }
-
-  updateAttribute(name: string, data: WebGLBuffer) {
-    const attribute = this.attributes[name];
-    if (attribute === undefined) {
-      throw 'try to set a none exist attribute';
-    }
-    attribute.useBuffer(data);
   }
 
   setTexture(name: string, webglTexture: WebGLTexture) {

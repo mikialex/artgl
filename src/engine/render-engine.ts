@@ -236,7 +236,6 @@ export class RenderEngine implements GLReleasable {
       }
       const glBuffer = this.createOrUpdateAttributeBuffer(bufferData, false);
       att.useBuffer(glBuffer);
-      return true;
     })
 
     if (program.useIndexDraw) {
