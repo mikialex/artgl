@@ -10,6 +10,7 @@ import { GLFrameBufferManager } from "./framebuffer-manager";
 import { GLFramebuffer } from "./gl-framebuffer";
 import { GLStat } from "./gl-stat";
 import { GLVAOManager } from "./vao";
+import { GLUBOManager } from "./ubo";
 
 export type WebGLCtx = WebGLRenderingContext | WebGL2RenderingContext
 
@@ -21,6 +22,7 @@ export class GLRenderer implements GLReleasable {
     glOptions = { ...glOptions };
     glOptions.antialias = false;
 
+    this.uboManager = null;
     let ctx: WebGLCtx
     if (forceUseWebGL1) {
       ctx = el.getContext('webgl', glOptions) as WebGLRenderingContext;
@@ -28,10 +30,13 @@ export class GLRenderer implements GLReleasable {
     } else {
       ctx = el.getContext('webgl2', glOptions) as WebGL2RenderingContext;
       this.ctxVersion = 2;
+
       if (ctx === null) {
         console.warn('webgl2 context create failed, try to use webgl1')
         ctx = el.getContext('webgl', glOptions) as WebGLRenderingContext;
         this.ctxVersion = 1;
+      } else {
+        this.uboManager = new GLUBOManager(this);
       }
     }
     if (ctx === null) {
@@ -102,6 +107,7 @@ export class GLRenderer implements GLReleasable {
   readonly textureManger: GLTextureManager;
   readonly attributeBufferManager = new GLAttributeBufferDataManager(this);
   readonly vaoManager: GLVAOManager;
+  readonly uboManager: Nullable<GLUBOManager>;
   readonly framebufferManager: GLFrameBufferManager;
 
   useProgram(program: GLProgram) {
