@@ -3,7 +3,6 @@ import { findUniformSetter, findUniformFlattener, findUniformDiffer, findUniform
 import { GLRenderer } from '../gl-renderer';
 import { Nullable } from "../../type";
 import { UniformDescriptor, uniformUploadType, setterType, flattenerType, differType, copierType } from "../interface";
-import { ArrayFlattenable } from "../../math";
 import { GLData } from "../../core/data-type";
 
 export class GLUniform {
@@ -29,7 +28,7 @@ export class GLUniform {
       descriptor.copier : findUniformCopier(descriptor.type);
 
   }
-  name: string;
+  readonly name: string;
   private gl: WebGLRenderingContext;
   private programChangeId: number = -1;
   private renderer: GLRenderer;

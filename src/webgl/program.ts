@@ -41,13 +41,8 @@ export class GLProgram {
   id: string = generateUUID();
 
   readonly renderer: GLRenderer;
-  private program: Nullable<WebGLProgram> = null;
-  getProgram(): WebGLProgram {
-    if (this.program === null) {
-      throw 'program is broken'
-    }
-    return this.program
-  };
+  private program!: WebGLProgram;
+  getProgram(): WebGLProgram { return this.program };
 
   private config: GLProgramConfig;
 

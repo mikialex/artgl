@@ -31,6 +31,10 @@ export interface Size {
 const copyShading = new Shading().decorate(new CopyShading());
 const quad = new QuadSource();
 
+interface RenderEngineConstructConfig{
+  
+}
+
 export class RenderEngine implements GLReleasable {
   constructor(el: HTMLCanvasElement, ctxOptions?: any) {
     this.renderer = new GLRenderer(el, ctxOptions);
