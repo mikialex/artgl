@@ -13,12 +13,13 @@ export interface DataObject<T>{
   equals: (value: T) => boolean;
 }
 
-export interface ArrayFlattenable<T>{
+export interface ArrayFlattenable<T = {}>{
   fromArray: (array: number[], offset?: number) => T;
   toArray: (array?: number[], offset?: number) => number[];
+  getTypedArrayData: () => Readonly<Float32Array>;
 }
 
-export interface VectorDataObject<T>{
+export interface VectorDataObject<T = {}>{
   normalize: () => T;
   length: () => number;
   lengthManhattan: () => number;

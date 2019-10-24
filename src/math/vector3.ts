@@ -234,7 +234,7 @@ export class Vector3
     return dx * dx + dy * dy + dz * dz;
   }
 
-  getBuffer(): Float32Array {
+  getTypedArrayData(): Readonly<Float32Array> { // todo maybe cache
     return new Float32Array([this.x, this.y, this.z]);
   }
 

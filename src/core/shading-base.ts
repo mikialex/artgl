@@ -7,7 +7,7 @@ import {
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { ShaderCommonUniformInputNode, ShaderTextureNode } from "../shader-graph/shader-node";
 import { CubeTexture } from "./texture-cube";
-import { Texture, generateUUID } from "../artgl";
+import { Texture } from "../artgl";
 import { textureFromValue } from "../shader-graph/node-maker";
 import { generateUUIDNoHyphen } from "../math/uuid";
 
@@ -31,7 +31,7 @@ export abstract class BaseEffectShading<T>
   _version = 0;
   propertyUniformNameMap: Map<string, string>;
   uniforms: Map<string, any>;
-
+  uniformsByteSizeAll = 0;
 
   nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
   textureNodeCreated: Map<string, ShaderTextureNode> = new Map();

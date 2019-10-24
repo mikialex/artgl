@@ -42,7 +42,7 @@ export abstract class Light<T> extends SceneNode
   _version = 0;
 
   uniforms: Map<string, any>;
-
+  uniformsByteSizeAll = 0;
   propertyUniformNameMap: Map<string, string>;
   nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
 

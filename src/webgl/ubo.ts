@@ -8,11 +8,9 @@ export class GLUBOManager implements GLReleasable {
       throw 'WebGL UBO only support webgl2 context'
     }
     this.gl = renderer.gl as WebGL2RenderingContext;
-    this.renderer = renderer;
   }
 
   private gl: WebGL2RenderingContext;
-  private renderer: GLRenderer;
 
   private bindingPoints: Nullable<WebGLBuffer>[] = [];
 
@@ -20,12 +18,26 @@ export class GLUBOManager implements GLReleasable {
   private UBOVersionMap: Map<ShaderUniformProvider, number> = new Map();
 
   bindProviderTo(provider: ShaderUniformProvider, bindPoint: number) {
-    
-    // this.gl.bindBufferBase()
+    const ubo = this.getUBO(provider);
+    this.gl.bindBufferBase(this.gl.UNIFORM_BUFFER, 0, ubo);// todo
   }
 
   createUBO(provider: ShaderUniformProvider) {
-    
+    const gl = this.gl;
+    const buffer = gl.createBuffer();
+    if (buffer === null) {
+      throw 'Webgl create buffer failed for UBO';
+    }
+    gl.bindBuffer(gl.UNIFORM_BUFFER, buffer);
+    gl.bufferData(gl.UNIFORM_BUFFER, provider.uniformsByteSizeAll, gl.STATIC_DRAW);
+    let offset = 0;
+    // js map iterator is insert order
+    provider.uniforms.forEach((value) => {
+      const data = value.getTypedArrayData();
+      gl.bufferSubData(gl.UNIFORM_BUFFER, offset, data);
+      offset += data.byteLength;
+    });
+    return buffer;
   }
 
   getUBO(provider: ShaderUniformProvider) {

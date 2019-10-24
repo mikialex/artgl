@@ -1,5 +1,5 @@
 
-import { generateUUID } from "../math";
+import { generateUUID, ArrayFlattenable } from "../math";
 import { Nullable } from "../type";
 import { GLProgramConfig, GLProgram } from "../webgl/program";
 import { ShaderGraph } from "../shader-graph/shader-graph";
@@ -36,7 +36,8 @@ export interface ShaderUniformProvider {
   _version: number;
 
   // mark the shader need recompile
-  uniforms: Map<uniformName, any>;
+  uniforms: Map<uniformName, ArrayFlattenable>;
+  uniformsByteSizeAll: number;
   propertyUniformNameMap: Map<propertyName, uniformName>;
 }
 
