@@ -19,12 +19,40 @@ export class GLUBOManager implements GLReleasable {
   private UBOData: Map<ShaderUniformProvider, WebGLBuffer> = new Map();
   private UBOVersionMap: Map<ShaderUniformProvider, number> = new Map();
 
+  bindProviderTo(provider: ShaderUniformProvider, bindPoint: number) {
+    
+    // this.gl.bindBufferBase()
+  }
+
   createUBO(provider: ShaderUniformProvider) {
     
   }
 
-  deleteUBO(provider: ShaderUniformProvider) {
+  getUBO(provider: ShaderUniformProvider) {
+    const ubo = this.UBOData.get(provider);
+    if (ubo === undefined) {
+      return this.createUBO(provider);
+    } else {
+      if (provider._version !== this.UBOVersionMap.get(provider)) {
+        this.deleteUBO(provider, ubo);
+        return this.createUBO(provider);
+      } else {
+        return ubo;
+      }
+    }
+  }
+
+  deleteProviderUBO(provider: ShaderUniformProvider) {
     const buffer = this.UBOData.get(provider);
+    if (buffer !== undefined) {
+      this.deleteUBO(provider, buffer);
+    }
+  }
+
+  private deleteUBO(provider: ShaderUniformProvider, buffer: WebGLBuffer) {
+    this.gl.deleteBuffer(buffer);
+    this.UBOData.delete(provider);
+    this.UBOVersionMap.delete(provider);
   }
 
   releaseGL(): void {
