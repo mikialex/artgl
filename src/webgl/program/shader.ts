@@ -1,4 +1,4 @@
-import { GLRenderer } from "./gl-renderer";
+import { GLRenderer } from "../gl-renderer";
 
 export enum ShaderType {
   vertex,

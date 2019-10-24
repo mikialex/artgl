@@ -1,7 +1,7 @@
 
 import { generateUUID, ArrayFlattenable } from "../math";
 import { Nullable } from "../type";
-import { GLProgram } from "../webgl/program";
+import { GLProgram } from "../webgl/program/program";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { Observable, Observer } from "./observable";
 import { RenderEngine } from "../engine/render-engine";

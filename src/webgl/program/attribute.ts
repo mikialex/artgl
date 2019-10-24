@@ -1,8 +1,8 @@
 import { GLProgram } from "./program";
-import { Nullable } from "../type";
-import { GLExtList } from "./gl-info";
-import { GLDataType, getGLDataTypeStride } from "../core/data-type";
-import { AttributeDescriptor } from "./interface";
+import { Nullable } from "../../type";
+import { GLExtList } from "../gl-info";
+import { GLDataType, getGLDataTypeStride } from "../../core/data-type";
+import { AttributeDescriptor } from "../interface";
 
 export class GLAttribute {
   constructor(program: GLProgram, descriptor: AttributeDescriptor) {

@@ -1,6 +1,6 @@
-import { GLReleasable, Nullable } from "../type";
-import { GLRenderer } from "./gl-renderer";
-import { ShaderUniformProvider } from "../core/shading";
+import { GLReleasable, Nullable } from "../../type";
+import { GLRenderer } from "../gl-renderer";
+import { ShaderUniformProvider } from "../../core/shading";
 
 export class GLUBOManager implements GLReleasable {
   constructor(renderer: GLRenderer) {
@@ -17,9 +17,8 @@ export class GLUBOManager implements GLReleasable {
   private UBOData: Map<ShaderUniformProvider, WebGLBuffer> = new Map();
   private UBOVersionMap: Map<ShaderUniformProvider, number> = new Map();
 
-  bindProviderTo(provider: ShaderUniformProvider, bindPoint: number) {
-    const ubo = this.getUBO(provider);
-    this.gl.bindBufferBase(this.gl.UNIFORM_BUFFER, 0, ubo);// todo
+  bindProviderTo(ubo: WebGLBuffer, bindPoint: number) {
+    this.gl.bindBufferBase(this.gl.UNIFORM_BUFFER, bindPoint, ubo);
   }
 
   createUBO(provider: ShaderUniformProvider) {

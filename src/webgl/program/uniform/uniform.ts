@@ -1,9 +1,9 @@
 import { GLProgram } from "../program";
 import { findUniformSetter, findUniformFlattener, findUniformDiffer, findUniformCopier } from "./uniform-util";
-import { GLRenderer } from '../gl-renderer';
-import { Nullable } from "../../type";
-import { UniformDescriptor, uniformUploadType, setterType, flattenerType, differType, copierType } from "../interface";
-import { GLData } from "../../core/data-type";
+import { GLRenderer } from '../../gl-renderer';
+import { Nullable } from "../../../type";
+import { UniformDescriptor, uniformUploadType, setterType, flattenerType, differType, copierType } from "../../interface";
+import { GLData } from "../../../core/data-type";
 
 export class GLUniform {
   constructor(program: GLProgram, descriptor: UniformDescriptor) {

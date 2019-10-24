@@ -1,7 +1,7 @@
-import { GLRenderer } from "./gl-renderer";
-import { GLProgram } from "./program";
-import { GLReleasable } from '../type';
-import { Shading } from "../core/shading";
+import { GLRenderer } from "../gl-renderer";
+import { GLProgram } from "../program/program";
+import { GLReleasable } from '../../type';
+import { Shading } from "../../core/shading";
 
 export class GLProgramManager implements GLReleasable {
   constructor(renderer: GLRenderer) {

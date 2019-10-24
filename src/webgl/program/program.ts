@@ -1,13 +1,12 @@
-import { GLRenderer } from "./gl-renderer";
+import { GLRenderer } from "../gl-renderer";
 import { GLShader, ShaderType } from "./shader";
-import { generateUUID } from "../math/uuid";
-import { injectVertexShaderHeaders, injectFragmentShaderHeaders } from "./shader-util";
+import { generateUUID } from "../../math/uuid";
+import { injectVertexShaderHeaders, injectFragmentShaderHeaders } from "../shader-util";
 import { GLUniform } from "./uniform/uniform";
 import { GLAttribute } from "./attribute";
-import { Nullable } from "../type";
 import { GLTextureUniform } from "./uniform/uniform-texture";
-import { GLData } from "../core/data-type";
-import { GLProgramConfig } from "./interface";
+import { GLData } from "../../core/data-type";
+import { GLProgramConfig } from "../interface";
 
 function fulfillProgramConfig(config: GLProgramConfig) {
   if (config.useIndex === undefined) {
@@ -50,9 +49,9 @@ export class GLProgram {
     return this.config;
   }
 
-  private attributes: { [index: string]: GLAttribute } = {};
-  private uniforms: { [index: string]: GLUniform } = {};
-  private textures: { [index: string]: GLTextureUniform } = {};
+  readonly attributes: Map<string, GLAttribute> = new Map();
+  readonly uniforms: Map<string, GLUniform>= new Map();
+  readonly textures: Map<string, GLTextureUniform>= new Map();
 
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
@@ -72,24 +71,6 @@ export class GLProgram {
     this._indexUINT = value
   }
   
-  forUniforms(cb: (uniform: GLUniform) => void): void {
-    for (const key in this.textures) {
-      cb(this.uniforms[key]);
-    }
-  }
-
-  forTextures(cb: (texture: GLTextureUniform) => void): void {
-    for (const key in this.textures) {
-      cb(this.textures[key]);
-    }
-  }
-
-  forAttributes(cb: (texture: GLAttribute) => void): void {
-    for (const key in this.attributes) {
-      cb(this.attributes[key]);
-    }
-  }
-
   private compileShaders(conf: GLProgramConfig, isWebGL2: boolean) {
     let vertexShaderString = conf.vertexShaderString;
     let fragmentShaderString = conf.fragmentShaderString;
@@ -117,25 +98,14 @@ export class GLProgram {
   }
 
   private createGLResource(config: GLProgramConfig) {
-    if (config.attributes !== undefined) {
-      config.attributes.forEach(att => {
-        this.attributes[att.name] = new GLAttribute(this, att)
-      })
-    }
+    config.attributes.forEach(att => this.attributes.set(att.name, new GLAttribute(this, att)));
+
     if (config.uniforms !== undefined) {
-      config.uniforms.forEach(uni => {
-        this.uniforms[uni.name] = new GLUniform(this, uni)
-      })
+      config.uniforms.forEach(uni => this.uniforms.set(uni.name, new GLUniform(this, uni)));
     }
     if (config.textures !== undefined) {
-      config.textures.forEach(tex => {
-        this.textures[tex.name] = new GLTextureUniform(this, tex);
-      })
+      config.textures.forEach(tex => this.textures.set(tex.name, new GLTextureUniform(this, tex)));
     }
-  }
-
-  setTexture(name: string, webglTexture: WebGLTexture) {
-    this.textures[name].useTexture(webglTexture);
   }
 
   setDrawRange(start: number, count: number) {
@@ -144,20 +114,20 @@ export class GLProgram {
   }
 
   setUniform(name: string, data: GLData) {
-    this.uniforms[name].set(data);
+    this.uniforms.get(name)!.set(data);
   }
 
   setUniformIfExist(name: string, data: GLData) {
-    const uni = this.uniforms[name];
+    const uni = this.uniforms.get(name);
     if (uni !== undefined) {
-      this.uniforms[name].set(data);
+      uni.set(data);
     }
   }
 
   setTextureIfExist(name: string, data: WebGLTexture) {
-    const tex = this.textures[name];
+    const tex = this.textures.get(name);
     if (tex !== undefined) {
-      this.textures[name].useTexture(data);
+      tex.useTexture(data);
     }
   }
 

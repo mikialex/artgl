@@ -1,16 +1,16 @@
 import { GLInfo, GLExtList } from "./gl-info";
-import { GLProgram } from "./program";
-import { GLProgramManager } from "./program-manager";
-import { GLAttributeBufferDataManager } from "./attribute-buffer-manager";
+import { GLProgram } from "./program/program";
+import { GLProgramManager } from "./resource-manager/program-manager";
+import { GLAttributeBufferDataManager } from "./resource-manager/attribute-buffer-manager";
 import { GLState } from "./states/gl-state";
 import { DrawMode } from "./const";
 import { Nullable, GLReleasable } from "../type";
-import { GLTextureManager } from "./texture-manager";
-import { GLFrameBufferManager } from "./framebuffer-manager";
+import { GLTextureManager } from "./resource-manager/texture-manager";
+import { GLFrameBufferManager } from "./resource-manager/framebuffer-manager";
 import { GLFramebuffer } from "./gl-framebuffer";
 import { GLStat } from "./gl-stat";
-import { GLVAOManager } from "./vao";
-import { GLUBOManager } from "./ubo";
+import { GLVAOManager } from "./resource-manager/vao";
+import { GLUBOManager } from "./resource-manager/ubo";
 
 export type WebGLCtx = WebGLRenderingContext | WebGL2RenderingContext
 

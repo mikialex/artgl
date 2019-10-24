@@ -1,5 +1,5 @@
-import { GLFramebuffer } from "./gl-framebuffer";
-import { GLRenderer } from "./gl-renderer";
+import { GLFramebuffer } from "../gl-framebuffer";
+import { GLRenderer } from "../gl-renderer";
 
 export class GLFrameBufferManager {
   constructor(renderer: GLRenderer) {

@@ -1,17 +1,17 @@
 import { GLRenderer } from "../webgl/gl-renderer";
 import { RenderObject, RenderRange } from "../core/render-object";
-import { GLProgram } from "../webgl/program";
+import { GLProgram } from "../webgl/program/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
 import { Material } from "../core/material";
-import { GLTextureUniform } from "../webgl/uniform/uniform-texture";
+import { GLTextureUniform } from "../webgl/program/uniform/uniform-texture";
 import { Nullable, GLReleasable } from "../type";
 import { Observable } from "../core/observable";
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
 import { QuadSource } from './render-source';
 import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
-import { VAOCreateCallback } from "../webgl/vao";
+import { VAOCreateCallback } from "../webgl/resource-manager/vao";
 import { Vector4 } from "../math/vector4";
 import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
@@ -32,7 +32,7 @@ const copyShading = new Shading().decorate(new CopyShading());
 const quad = new QuadSource();
 
 interface RenderEngineConstructConfig{
-  
+
 }
 
 export class RenderEngine implements GLReleasable {
@@ -177,7 +177,7 @@ export class RenderEngine implements GLReleasable {
     if (this.currentProgram === null) {
       throw 'shading not exist'
     }
-    this.currentProgram.forTextures((tex: GLTextureUniform) => {
+    this.currentProgram.textures.forEach((tex: GLTextureUniform) => {
       let glTexture: WebGLTexture | undefined;
 
       // acquire texture from material
@@ -233,7 +233,7 @@ export class RenderEngine implements GLReleasable {
     }
 
     // common procedure
-    program.forAttributes(att => {
+    program.attributes.forEach(att => {
       const bufferData = geometry.getBuffer(att.name);
       if (bufferData === undefined) {
         throw `program needs an attribute named ${att.name}, but cant find in geometry data`;
