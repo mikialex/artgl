@@ -1,7 +1,6 @@
-import { GLProgramConfig } from "./program";
-import { GLTextureType } from "./uniform/uniform-texture";
-import { GLDataType2ShaderString, GLDataToShaderString } from "../core/data-type";
+import { GLDataType2ShaderString } from "../core/data-type";
 import { ShaderUniformProvider } from "../artgl";
+import { GLProgramConfig, GLTextureType } from "./interface";
 
 export function injectVertexShaderHeaders(
   config: GLProgramConfig,
@@ -110,19 +109,19 @@ export function getShaderUniformProviderUBOKey(provider: ShaderUniformProvider) 
   return provider.uuid + provider.constructor.name;
 }
 
-export function generateUBOLayoutForShaderUniformProvider(provider: ShaderUniformProvider) {
-  let contentStr = "";
-  provider.uniforms.forEach((value, key) => {
-    const uniformName = provider.propertyUniformNameMap.get(key);
-    contentStr += `  ${GLDataToShaderString(value)} ${uniformName};\n`;
-  })
+// export function generateUBOLayoutForShaderUniformProvider(provider: ShaderUniformProvider) {
+//   let contentStr = "";
+//   provider.uniforms.forEach((value, key) => {
+//     const uniformName = provider.propertyUniformNameMap.get(key);
+//     contentStr += `  ${GLDataToShaderString(value)} ${uniformName};\n`;
+//   })
 
-  const layoutStr =
-    `
-layout (std140) uniform ${getShaderUniformProviderUBOKey(provider)}
-{
-${contentStr}
-};
-`;
-  return layoutStr;
-}
+//   const layoutStr =
+//     `
+// layout (std140) uniform ${getShaderUniformProviderUBOKey(provider)}
+// {
+// ${contentStr}
+// };
+// `;
+//   return layoutStr;
+// }

@@ -2,21 +2,7 @@ import { GLProgram } from "./program";
 import { Nullable } from "../type";
 import { GLExtList } from "./gl-info";
 import { GLDataType, getGLDataTypeStride } from "../core/data-type";
-
-export const enum CommonAttribute {
-  position = 'position',
-  normal = 'normal',
-  color = 'color',
-  uv = 'uv',
-  baryCentric = 'baryCentric'
-}
-
-export interface AttributeDescriptor {
-  name: string,
-  type: GLDataType,
-  asInstance?: boolean, // default false
-  instanceDivisor?: number // default 1
-}
+import { AttributeDescriptor } from "./interface";
 
 export class GLAttribute {
   constructor(program: GLProgram, descriptor: AttributeDescriptor) {

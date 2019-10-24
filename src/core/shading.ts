@@ -1,13 +1,14 @@
 
 import { generateUUID, ArrayFlattenable } from "../math";
 import { Nullable } from "../type";
-import { GLProgramConfig, GLProgram } from "../webgl/program";
+import { GLProgram } from "../webgl/program";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { Observable, Observer } from "./observable";
 import { RenderEngine } from "../engine/render-engine";
 import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
 import { uniformFromValue } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
+import { GLProgramConfig } from "../webgl/interface";
 export { MapUniform } from "./shading-util";
 
 
@@ -61,7 +62,7 @@ export class Shading {
   private _decoratorObs: Map<ShaderUniformDecorator, Observer<ShaderUniformDecorator>> = new Map();
 
   params: ShadingParams = new Map();
-  
+
   getDecoratorByName(name: string) {
     return this._namedDecoratorMap.get(name)
   }

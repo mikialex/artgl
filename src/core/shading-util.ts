@@ -1,45 +1,5 @@
 import { ShaderUniformProvider } from "./shading";
 
-import "reflect-metadata";
-
-// const formatMetadataKey = Symbol("uniformMap");
-
-// function format(formatString: string) {
-//     return Reflect.metadata(formatMetadataKey, formatString);
-// }
-
-// function getFormat(target: any, propertyKey: string) {
-//     return Reflect.getMetadata(formatMetadataKey, target, propertyKey);
-// }
-
-// function ParamTypes(...types) {
-//   return (target, propertyKey) => {
-//     const symParamTypes = Symbol.for("design:paramtypes");
-//     if (propertyKey === undefined) {
-//       target[symParamTypes] = types;
-//     }
-//     else {
-//       const symProperties = Symbol.for("design:properties");
-//       let properties, property;
-//       if (Object.prototype.hasOwnProperty.call(target, symProperties)) {
-//         properties = target[symProperties];
-//       }
-//       else {
-//         properties = target[symProperties] = {};
-//       }
-//       if (Object.prototype.hasOwnProperty.call(properties, propertyKey)) {
-//         property = properties[propertyKey];
-//       }
-//       else {
-//         property = properties[propertyKey] = {};
-//       }
-//       property[symParamTypes] = types;
-//     }
-//   };
-// }
-
-
-
 export function MapUniform(remapName: string) {
   return (target: ShaderUniformProvider, key: string) => {
     if (target.uniforms === undefined) {

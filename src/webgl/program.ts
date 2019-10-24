@@ -2,33 +2,12 @@ import { GLRenderer } from "./gl-renderer";
 import { GLShader, ShaderType } from "./shader";
 import { generateUUID } from "../math/uuid";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders } from "./shader-util";
-import { GLUniform, UniformDescriptor } from "./uniform/uniform";
-import { AttributeDescriptor, GLAttribute } from "./attribute";
+import { GLUniform } from "./uniform/uniform";
+import { GLAttribute } from "./attribute";
 import { Nullable } from "../type";
-import { GLTextureUniform, TextureDescriptor } from "./uniform/uniform-texture";
-import { GLDataType, GLData } from "../core/data-type";
-
-export interface VaryingDescriptor {
-  name: string,
-  type: GLDataType
-}
-
-export interface UniformBlockDescriptor{
-  name: string,
-  uniforms: UniformDescriptor[]
-}
-
-export interface GLProgramConfig {
-  attributes: AttributeDescriptor[];
-  uniforms?: UniformDescriptor[];
-  varyings?: VaryingDescriptor[];
-  textures?: TextureDescriptor[];
-  vertexShaderString: string;
-  fragmentShaderString: string;
-  useIndex?: boolean;
-  needDerivative?: boolean;
-  uniformBlocks?: UniformBlockDescriptor;
-}
+import { GLTextureUniform } from "./uniform/uniform-texture";
+import { GLData } from "../core/data-type";
+import { GLProgramConfig } from "./interface";
 
 function fulfillProgramConfig(config: GLProgramConfig) {
   if (config.useIndex === undefined) {

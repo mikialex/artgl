@@ -251,6 +251,10 @@ export class Vector2
     return array;
   }
 
+  getTypedArrayData(): Readonly<Float32Array> {
+    return new Float32Array([this.x, this.y]);
+  }
+
   static flatten(v: Vector2, array: number[]) {
     return v.toArray(array, 0);
   }

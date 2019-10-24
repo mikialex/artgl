@@ -3,16 +3,7 @@ import { Nullable } from "../../type";
 import { GLTextureSlot } from "../states/gl-texture-slot";
 import { GLRenderer } from '../gl-renderer';
 import { GLTextureTypeRaw } from "../const";
-
-export enum GLTextureType{
-  texture2D,
-  textureCube,
-}
-
-export interface TextureDescriptor {
-  name: string,
-  type: GLTextureType,
-}
+import { TextureDescriptor, GLTextureType } from "../interface";
 
 /**
  * for texture uniform uploading

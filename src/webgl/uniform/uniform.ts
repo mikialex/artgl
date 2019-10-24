@@ -2,28 +2,9 @@ import { GLProgram } from "../program";
 import { findUniformSetter, findUniformFlattener, findUniformDiffer, findUniformCopier } from "./uniform-util";
 import { GLRenderer } from '../gl-renderer';
 import { Nullable } from "../../type";
-import { GLDataType } from "../../core/data-type";
-
-export type uniformUploadType = number | Float32Array | number[]
-export type flattenerType = (value: any, receiveData?: uniformUploadType) => uniformUploadType;
-export type setterType = (gl: WebGLRenderingContext, location: WebGLUniformLocation, data: uniformUploadType) => void
-export type copierType = (newValue: uniformUploadType, target: uniformUploadType) => uniformUploadType;
-export type differType = (newValue: uniformUploadType, oldValue: uniformUploadType) => boolean;
-
-export interface UniformDescriptor {
-  name: string,
-  type: GLDataType,
-  default?: any,
-  flattener?: flattenerType
-  setter?: setterType,
-  copier?: copierType,
-  differ?: differType
-}
-
-
-export function createUniform(program: GLProgram, descriptor: UniformDescriptor): GLUniform {
-  return new GLUniform(program, descriptor);
-}
+import { UniformDescriptor, uniformUploadType, setterType, flattenerType, differType, copierType } from "../interface";
+import { ArrayFlattenable } from "../../math";
+import { GLData } from "../../core/data-type";
 
 export class GLUniform {
   constructor(program: GLProgram, descriptor: UniformDescriptor) {
@@ -63,7 +44,7 @@ export class GLUniform {
   private copier: copierType;
   private isActive: boolean;
 
-  set(value: any): void {
+  set(value: GLData): void {
     if (!this.isActive) {
       return;
     }

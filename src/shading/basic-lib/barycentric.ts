@@ -1,10 +1,10 @@
 import { BaseEffectShading, MapUniform, MarkNeedRedecorate } from "../../core/shading";
 import { ShaderGraph } from "../../shader-graph/shader-graph";
 import { constValue, attribute } from "../../shader-graph/node-maker";
-import { CommonAttribute } from "../../webgl/attribute";
 import { ShaderFunction, shader } from "../../shader-graph/shader-function";
 import { Vector3 } from "../../math";
 import { GLDataType } from "../../core/data-type";
+import { CommonAttribute } from "../../webgl/interface";
 
 const addBarycentricWireFrame = shader(`
 vec4 addBarycentricWireFrame(

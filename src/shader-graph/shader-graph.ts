@@ -1,4 +1,3 @@
-import { GLProgramConfig, VaryingDescriptor } from "../webgl/program";
 import { genFragShader, genVertexShader } from "./code-gen";
 import {
   ShaderInputNode, ShaderTextureNode, ShaderFunctionNode,
@@ -6,13 +5,13 @@ import {
   ShaderCommonUniformInputNode, ShaderNode,
 } from "./shader-node";
 import { attribute, constValue, texture } from "./node-maker";
-import { CommonAttribute } from "../webgl/attribute";
 import { Vector4 } from "../math";
 import { eyeDir } from "./built-in/transform";
 import { ChannelType } from "../core/material";
 import { Nullable } from "../type";
 import { Camera } from "../artgl";
 import { GLDataType } from "../core/data-type";
+import { GLProgramConfig, VaryingDescriptor, CommonAttribute } from "../webgl/interface";
 
 
 export const UvFragVary = "v_uv"

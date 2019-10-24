@@ -20,9 +20,9 @@ export class Vector4
   y: number;
   z: number;
   w: number;
-  isVector4:true = true;
+  isVector4: true = true;
 
-  clone(){
+  clone() {
     return new Vector4(this.x, this.y, this.z, this.w);
   }
 
@@ -38,7 +38,7 @@ export class Vector4
     return ((v.x === this.x) && (v.y === this.y) && (v.z === this.z) && (v.w === this.w));
   }
 
-  set (x: number, y: number, z: number, w: number) {
+  set(x: number, y: number, z: number, w: number) {
     this.x = x;
     this.y = y;
     this.z = z;
@@ -46,7 +46,7 @@ export class Vector4
     return this;
   }
 
-  setScalar (scalar: number) {
+  setScalar(scalar: number) {
     this.x = scalar;
     this.y = scalar;
     this.z = scalar;
@@ -54,27 +54,27 @@ export class Vector4
     return this;
   }
 
-  setX (x: number) {
+  setX(x: number) {
     this.x = x;
     return this;
   }
 
-  setY (y: number) {
+  setY(y: number) {
     this.y = y;
     return this;
   }
 
-  setZ (z: number) {
+  setZ(z: number) {
     this.z = z;
     return this;
   }
 
-  setW (w: number) {
+  setW(w: number) {
     this.w = w;
     return this;
   }
 
-  setComponent (index: number, value: number) {
+  setComponent(index: number, value: number) {
     switch (index) {
       case 0: this.x = value; break;
       case 1: this.y = value; break;
@@ -85,7 +85,7 @@ export class Vector4
     return this;
   }
 
-  getComponent (index: number) {
+  getComponent(index: number) {
     switch (index) {
       case 0: return this.x;
       case 1: return this.y;
@@ -95,7 +95,7 @@ export class Vector4
     }
   }
 
-  setAxisAngleFromQuaternion (q: Quaternion) {
+  setAxisAngleFromQuaternion(q: Quaternion) {
     // http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
     // q is assumed to be normalized
     this.w = 2 * Math.acos(q.w);
@@ -113,7 +113,7 @@ export class Vector4
   }
 
 
-  add (v: Vector4) {
+  add(v: Vector4) {
     this.x += v.x;
     this.y += v.y;
     this.z += v.z;
@@ -121,7 +121,7 @@ export class Vector4
     return this;
   }
 
-  addScalar (s: number) {
+  addScalar(s: number) {
     this.x += s;
     this.y += s;
     this.z += s;
@@ -129,7 +129,7 @@ export class Vector4
     return this;
   }
 
-  addVectors (a: Vector4, b: Vector4) {
+  addVectors(a: Vector4, b: Vector4) {
     this.x = a.x + b.x;
     this.y = a.y + b.y;
     this.z = a.z + b.z;
@@ -137,7 +137,7 @@ export class Vector4
     return this;
   }
 
-  addScaledVector (v: Vector4, s: number) {
+  addScaledVector(v: Vector4, s: number) {
     this.x += v.x * s;
     this.y += v.y * s;
     this.z += v.z * s;
@@ -145,7 +145,7 @@ export class Vector4
     return this;
   }
 
-  sub (v: Vector4) {
+  sub(v: Vector4) {
     this.x -= v.x;
     this.y -= v.y;
     this.z -= v.z;
@@ -153,7 +153,7 @@ export class Vector4
     return this;
   }
 
-  subScalar (s: number) {
+  subScalar(s: number) {
     this.x -= s;
     this.y -= s;
     this.z -= s;
@@ -162,7 +162,7 @@ export class Vector4
 
   }
 
-  subVectors (a: Vector4, b: Vector4) {
+  subVectors(a: Vector4, b: Vector4) {
     this.x = a.x - b.x;
     this.y = a.y - b.y;
     this.z = a.z - b.z;
@@ -171,7 +171,7 @@ export class Vector4
 
   }
 
-  multiplyScalar (scalar: number) {
+  multiplyScalar(scalar: number) {
     this.x *= scalar;
     this.y *= scalar;
     this.z *= scalar;
@@ -179,7 +179,7 @@ export class Vector4
     return this;
   }
 
-  applyMatrix4 (m: Matrix4) {
+  applyMatrix4(m: Matrix4) {
     var x = this.x, y = this.y, z = this.z, w = this.w;
     var e = m.elements;
     this.x = e[0] * x + e[4] * y + e[8] * z + e[12] * w;
@@ -189,11 +189,11 @@ export class Vector4
     return this;
   }
 
-  divideScalar (scalar: number) {
+  divideScalar(scalar: number) {
     return this.multiplyScalar(1 / scalar);
   }
 
-  min (v: Vector4) {
+  min(v: Vector4) {
     this.x = Math.min(this.x, v.x);
     this.y = Math.min(this.y, v.y);
     this.z = Math.min(this.z, v.z);
@@ -201,7 +201,7 @@ export class Vector4
     return this;
   }
 
-  max (v: Vector4) {
+  max(v: Vector4) {
     this.x = Math.max(this.x, v.x);
     this.y = Math.max(this.y, v.y);
     this.z = Math.max(this.z, v.z);
@@ -209,7 +209,7 @@ export class Vector4
     return this;
   }
 
-  clamp (min: Vector4, max: Vector4) {
+  clamp(min: Vector4, max: Vector4) {
     // assumes min < max, componentwise
     this.x = Math.max(min.x, Math.min(max.x, this.x));
     this.y = Math.max(min.y, Math.min(max.y, this.y));
@@ -218,18 +218,18 @@ export class Vector4
     return this;
   }
 
-  clampScalar (minVal: number, maxVal: number) {
-      tempMin.set(minVal, minVal, minVal, minVal);
-      tempMax.set(maxVal, maxVal, maxVal, maxVal);
-      return this.clamp(tempMin, tempMax);
-    };
+  clampScalar(minVal: number, maxVal: number) {
+    tempMin.set(minVal, minVal, minVal, minVal);
+    tempMax.set(maxVal, maxVal, maxVal, maxVal);
+    return this.clamp(tempMin, tempMax);
+  };
 
-  clampLength (min:  number, max:  number) {
+  clampLength(min: number, max: number) {
     var length = this.length();
     return this.divideScalar(length || 1).multiplyScalar(Math.max(min, Math.min(max, length)));
   }
 
-  floor () {
+  floor() {
     this.x = Math.floor(this.x);
     this.y = Math.floor(this.y);
     this.z = Math.floor(this.z);
@@ -237,7 +237,7 @@ export class Vector4
     return this;
   }
 
-  ceil () {
+  ceil() {
     this.x = Math.ceil(this.x);
     this.y = Math.ceil(this.y);
     this.z = Math.ceil(this.z);
@@ -245,7 +245,7 @@ export class Vector4
     return this;
   }
 
-  round () {
+  round() {
     this.x = Math.round(this.x);
     this.y = Math.round(this.y);
     this.z = Math.round(this.z);
@@ -253,7 +253,7 @@ export class Vector4
     return this;
   }
 
-  roundToZero () {
+  roundToZero() {
     this.x = (this.x < 0) ? Math.ceil(this.x) : Math.floor(this.x);
     this.y = (this.y < 0) ? Math.ceil(this.y) : Math.floor(this.y);
     this.z = (this.z < 0) ? Math.ceil(this.z) : Math.floor(this.z);
@@ -261,7 +261,7 @@ export class Vector4
     return this;
   }
 
-  negate () {
+  negate() {
     this.x = - this.x;
     this.y = - this.y;
     this.z = - this.z;
@@ -269,31 +269,31 @@ export class Vector4
     return this;
   }
 
-  dot (v: Vector4) {
+  dot(v: Vector4) {
     return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
   }
 
-  lengthSq () {
+  lengthSq() {
     return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
   }
 
-  length () {
+  length() {
     return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
   }
 
-  lengthManhattan () {
+  lengthManhattan() {
     return Math.abs(this.x) + Math.abs(this.y) + Math.abs(this.z) + Math.abs(this.w);
   }
 
-  normalize () {
+  normalize() {
     return this.divideScalar(this.length() || 1);
   }
 
-  setLength (length: number) {
+  setLength(length: number) {
     return this.normalize().multiplyScalar(length);
   }
 
-  lerp (v: Vector4, alpha: number) {
+  lerp(v: Vector4, alpha: number) {
     this.x += (v.x - this.x) * alpha;
     this.y += (v.y - this.y) * alpha;
     this.z += (v.z - this.z) * alpha;
@@ -301,7 +301,7 @@ export class Vector4
     return this;
   }
 
-  lerpVectors (v1: Vector4, v2: Vector4, alpha: number) {
+  lerpVectors(v1: Vector4, v2: Vector4, alpha: number) {
     return this.subVectors(v2, v1).multiplyScalar(alpha).add(v1);
   }
 
@@ -421,7 +421,7 @@ export class Vector4
     return this;
   }
 
-  fromArray (array: number[], offset?: number) {
+  fromArray(array: number[], offset?: number) {
     if (offset === undefined) offset = 0;
     this.x = array[offset];
     this.y = array[offset + 1];
@@ -430,7 +430,7 @@ export class Vector4
     return this;
   }
 
-  toArray (array?: number[], offset?: number) {
+  toArray(array?: number[], offset?: number) {
     if (array === undefined) array = [];
     if (offset === undefined) offset = 0;
     array[offset] = this.x;
@@ -440,10 +440,15 @@ export class Vector4
     return array;
   }
 
+
+  getTypedArrayData(): Readonly<Float32Array> {
+    return new Float32Array([this.x, this.y, this.z, this.w]);
+  }
+
   static flatten(v: Vector4, array: number[]) {
     return v.toArray(array, 0);
   }
-  
+
 }
 
 

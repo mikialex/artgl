@@ -1,8 +1,8 @@
 import { Matrix4, Vector3 } from "../../math/index";
 import { Vector2 } from "../../math/vector2";
 import { Vector4 } from "../../math/vector4";
-import { flattenerType, copierType, differType } from "./uniform";
 import { GLDataType } from "../../core/data-type";
+import { differType, copierType, flattenerType } from "../interface";
 
 export function findUniformSetter(type: GLDataType): any {
   switch (type) {

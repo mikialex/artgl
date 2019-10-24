@@ -1,12 +1,8 @@
 import { DAGNode } from "../core/dag-node";
 import { ShaderFunction } from "./shader-function";
-import { UniformDescriptor } from "../webgl/uniform/uniform";
-import { AttributeDescriptor } from "../webgl/attribute";
-import { Vector2 } from "../math/vector2";
-import { Vector3 } from "../math/index";
-import { Vector4 } from "../math/vector4";
-import { GLTextureType } from "../webgl/uniform/uniform-texture";
+import { Vector2, Vector3, Vector4 } from "../math";
 import { GLDataType } from "../core/data-type";
+import { UniformDescriptor, AttributeDescriptor, GLTextureType } from "../webgl/interface";
 
 let shaderNodeGUIDCount = 0;
 
