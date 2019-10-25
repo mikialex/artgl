@@ -75,7 +75,7 @@ export class GLRenderer implements GLReleasable {
   enableUniformDiff: boolean = true;
 
   // width height is render size, not element size
-  private _width = 100; 
+  private _width = 100;
   get width() { return this._width };
   private _height = 100;
   get height() { return this._height };

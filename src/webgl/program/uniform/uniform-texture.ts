@@ -5,13 +5,8 @@ import { GLRenderer } from '../../gl-renderer';
 import { GLTextureTypeRaw } from "../../const";
 import { TextureDescriptor, GLTextureType } from "../../interface";
 
-/**
- * for texture uniform uploading
- * 
- * @export
- * @class GLTextureUniform
- */
-export class GLTextureUniform{
+
+export class GLTextureUniform {
   constructor(program: GLProgram, descriptor: TextureDescriptor, location: WebGLUniformLocation) {
     this.renderer = program.renderer;
     this.slotManager = program.renderer.state.textureSlot;
@@ -35,7 +30,7 @@ export class GLTextureUniform{
   }
 
   useTexture(webglTexture: WebGLTexture): void {
-    
+
     let textureSlot;
     if (this.textureType === GLTextureType.texture2D) {
       textureSlot = this.slotManager.updateSlotTexture(webglTexture, GLTextureTypeRaw.texture2D);

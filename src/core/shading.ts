@@ -159,7 +159,10 @@ export class Shading {
     })
   }
 
-  getProgramConfig(isWebGL2: boolean) {
+  getProgramConfig(isWebGL2?: boolean) {
+    if (isWebGL2 === undefined) { // just for debug convenience
+      isWebGL2 = true;
+    }
     if (this._needRebuildShader) {
       this.build();
       this._programConfigCache = this.graph.compile(isWebGL2);

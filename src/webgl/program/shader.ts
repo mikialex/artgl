@@ -12,7 +12,7 @@ export class GLShader {
     this.type = type;
     var shader = gl.createShader(type === ShaderType.vertex ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER);
     if (shader === null) {
-      throw 'webgl shader create failed';
+      throw 'Webgl shader create failed';
     }
     this.shader = shader;
   }

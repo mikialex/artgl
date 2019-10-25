@@ -5,6 +5,7 @@ import {
   setterType, differType, copierType
 } from "./uniform-util";
 import { GLRenderer } from "../../../artgl";
+import { Nullable } from "../../../type";
 
 export class GLUniform {
   constructor(
@@ -28,13 +29,14 @@ export class GLUniform {
   private renderer: GLRenderer;
 
   private location!: WebGLUniformLocation;
-  value: any;
+  value: Nullable<uniformUploadType> = null;
   private lastReceiveData?: uniformUploadType;
   private setter: setterType;
   private differ: differType;
   private copier: copierType;
 
   set(value: uniformUploadType): void {
+    this.value = value;
 
     let programSwitched = false;
     if (this.programChangeId !== this.renderer._programChangeId) {
@@ -42,7 +44,7 @@ export class GLUniform {
       this.programChangeId = this.renderer._programChangeId;
     }
 
-    if (this.renderer.enableUniformDiff && !programSwitched && this.lastReceiveData!== undefined) {
+    if (this.renderer.enableUniformDiff && !programSwitched && this.lastReceiveData !== undefined) {
       if (this.differ(value, this.lastReceiveData)) {
         this.setter(this.gl, this.location, value);
         this.renderer.stat.uniformUpload++;

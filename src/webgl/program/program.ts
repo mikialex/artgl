@@ -5,8 +5,8 @@ import { injectVertexShaderHeaders, injectFragmentShaderHeaders } from "../shade
 import { GLUniform } from "./uniform/uniform";
 import { GLAttribute } from "./attribute";
 import { GLTextureUniform } from "./uniform/uniform-texture";
-import { GLData } from "../../core/data-type";
 import { GLProgramConfig, uniformUploadType } from "../interface";
+import { GLUniformBlock } from "./uniform/uniform-block";
 
 function fulfillProgramConfig(config: GLProgramConfig) {
   if (config.useIndex === undefined) {
@@ -29,7 +29,7 @@ export class GLProgram {
     this.compileShaders(config, this.renderer.ctxVersion === 2);
 
     this.createProgram(this.vertexShader, this.fragmentShader);
-    this.createGLResource(config);
+    this.createGLParam(config);
 
     this.config = config;
     if (config.useIndex !== undefined) {
@@ -50,8 +50,9 @@ export class GLProgram {
   }
 
   readonly attributes: Map<string, GLAttribute> = new Map();
-  readonly uniforms: Map<string, GLUniform>= new Map();
-  readonly textures: Map<string, GLTextureUniform>= new Map();
+  readonly uniforms: Map<string, GLUniform> = new Map();
+  readonly uniformBlocks: Map<string, GLUniformBlock> = new Map();
+  readonly textures: Map<string, GLTextureUniform> = new Map();
 
   private vertexShader: GLShader;
   private fragmentShader: GLShader;
@@ -70,13 +71,13 @@ export class GLProgram {
     }
     this._indexUINT = value
   }
-  
+
   private compileShaders(conf: GLProgramConfig, isWebGL2: boolean) {
     let vertexShaderString = conf.vertexShaderString;
     let fragmentShaderString = conf.fragmentShaderString;
     vertexShaderString = injectVertexShaderHeaders(conf, conf.vertexShaderString, isWebGL2);
     fragmentShaderString = injectFragmentShaderHeaders(conf, conf.fragmentShaderString, isWebGL2);
-    
+
     this.vertexShader.compileShader(vertexShaderString);
     this.fragmentShader.compileShader(fragmentShaderString);
   }
@@ -97,9 +98,10 @@ export class GLProgram {
     }
   }
 
-  private createGLResource(config: GLProgramConfig) {
+  private createGLParam(config: GLProgramConfig) {
     const gl = this.renderer.gl;
     const program = this.getProgram();
+
     config.attributes.forEach(att => {
       const location = gl.getAttribLocation(program, att.name);
       if (location === -1) {
@@ -119,6 +121,7 @@ export class GLProgram {
         this.uniforms.set(uni.name, new GLUniform(this, uni, location));
       });
     }
+
     if (config.textures !== undefined) {
       config.textures.forEach(tex => {
         const location = gl.getUniformLocation(program, tex.name);
@@ -129,6 +132,21 @@ export class GLProgram {
         this.textures.set(tex.name, new GLTextureUniform(this, tex, location));
       });
     }
+
+    if (config.uniformBlocks !== undefined) {
+      if (this.renderer.ctxVersion !== 2) {
+        throw `You can only use UBO in WebGL2 context`;
+      }
+      config.uniformBlocks.forEach(ub => {
+        const index = (gl as WebGL2RenderingContext).getUniformBlockIndex(program, ub.name);
+        if (index === null) { // todo check is null or -1??
+          console.warn(`Uniform blocks <${ub.name}> not really used in shader: `, config);
+          return;
+        }
+        this.uniformBlocks.set(ub.name, new GLUniformBlock(this, ub, index));
+      });
+    }
+
   }
 
   setDrawRange(start: number, count: number) {
