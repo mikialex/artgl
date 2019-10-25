@@ -1,6 +1,8 @@
 import { Vector3 } from "../math";
 import { Quaternion } from "./quaternion";
 import { DataObject, ArrayFlattenable } from "./index";
+import { uniformUploadType } from "../webgl/interface";
+import { UniformValueProvider } from "../core/shading";
 
 const tempX: Vector3 = new Vector3();
 const tempY: Vector3 = new Vector3();
@@ -9,7 +11,8 @@ const tempZ: Vector3 = new Vector3();
 export class Matrix4
   implements
   DataObject<Matrix4>,
-  ArrayFlattenable<Matrix4>
+  ArrayFlattenable<Matrix4>,
+  UniformValueProvider
 {
 
   copy(m: Matrix4) {
@@ -386,8 +389,11 @@ export class Matrix4
     return this.elements;
   }
 
-  static flatten(v: Matrix4, array: number[]) {
-    return v.toArray(array, 0);
+  updateUniformUploadData(value: uniformUploadType):uniformUploadType {
+    return this.toArray(value as number[], 0);
+  }
+  provideUniformUploadData(): uniformUploadType {
+    return this.toArray();
   }
 
 

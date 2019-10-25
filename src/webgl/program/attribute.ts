@@ -27,7 +27,7 @@ export class GLAttribute {
   
   readonly name: string;
   readonly gl: WebGLRenderingContext;
-  private angleInstanceExt: Nullable<ANGLE_instanced_arrays> = null;
+  private angleInstanceExt: Nullable<ANGLE_instanced_arrays>  = null;
   readonly location: number;
   readonly type: GLDataType;
 

@@ -8,7 +8,7 @@ import { RenderEngine } from "../engine/render-engine";
 import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
 import { uniformFromValue } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
-import { GLProgramConfig } from "../webgl/interface";
+import { GLProgramConfig, uniformUploadType } from "../webgl/interface";
 export { MapUniform } from "./shading-util";
 
 
@@ -27,7 +27,16 @@ export interface ShaderUniformDecorator {
   nodeCreated: Map<string, ShaderCommonUniformInputNode>;
 }
 
+export interface UniformGroup{
+  value: UniformValueProvider,
+  uploadCache: uniformUploadType,
+  isUploadCacheDirty: boolean,
+}
 
+export interface UniformValueProvider{
+  updateUniformUploadData(value: uniformUploadType): uniformUploadType;
+  provideUniformUploadData(): uniformUploadType;
+}
 
 type propertyName = string;
 type uniformName = string;
@@ -37,7 +46,7 @@ export interface ShaderUniformProvider {
   _version: number;
 
   // mark the shader need recompile
-  uniforms: Map<uniformName, ArrayFlattenable>;
+  uniforms: Map<uniformName, UniformGroup>;
   uniformsByteSizeAll: number;
   propertyUniformNameMap: Map<propertyName, uniformName>;
 }
@@ -150,10 +159,10 @@ export class Shading {
     })
   }
 
-  getProgramConfig(isWebGl: boolean) {
+  getProgramConfig(isWebGL2: boolean) {
     if (this._needRebuildShader) {
       this.build();
-      this._programConfigCache = this.graph.compile(isWebGl);
+      this._programConfigCache = this.graph.compile(isWebGL2);
       this.afterShaderCompiled.notifyObservers(this._programConfigCache)
       this._needRebuildShader = false;
     }

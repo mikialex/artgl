@@ -164,7 +164,10 @@ export class RenderEngine implements GLReleasable {
           if (value instanceof Texture || value instanceof CubeTexture) {
             program.setTextureIfExist(key, value.getGLTexture(this));
           } else {
-            program.setUniformIfExist(key, value);
+            if (value.isUploadCacheDirty) {
+              value.uploadCache = value.value.updateUniformUploadData(value.uploadCache);
+            }
+            program.setUniformIfExist(key, value.uploadCache);
           }
         })
         this.lastUploadedShaderUniformProvider.set(provider, provider._version)

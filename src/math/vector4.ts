@@ -2,12 +2,15 @@ import { DataObject, ArrayFlattenable, VectorDataObject } from "./index";
 import { Matrix4 } from "./matrix4";
 import { Quaternion } from "./quaternion";
 import { Vector4Like } from "./interface";
+import { UniformValueProvider } from "../artgl";
+import { uniformUploadType } from "../webgl/interface";
 
 export class Vector4
   implements
   DataObject<Vector4>,
   VectorDataObject<Vector4>,
-  ArrayFlattenable<Vector4>
+  ArrayFlattenable<Vector4>,
+  UniformValueProvider
 {
   constructor(x?: number, y?: number, z?: number, w?: number) {
     this.x = x || 0;
@@ -440,13 +443,15 @@ export class Vector4
     return array;
   }
 
-
   getTypedArrayData(): Readonly<Float32Array> {
     return new Float32Array([this.x, this.y, this.z, this.w]);
   }
 
-  static flatten(v: Vector4, array: number[]) {
-    return v.toArray(array, 0);
+  updateUniformUploadData(value: uniformUploadType):uniformUploadType {
+    return this.toArray(value as number[], 0);
+  }
+  provideUniformUploadData(): uniformUploadType {
+    return this.toArray();
   }
 
 }

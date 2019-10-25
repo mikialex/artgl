@@ -1,11 +1,14 @@
 import { DataObject, VectorDataObject, ArrayFlattenable } from "./index";
 import { Vector3 } from "./vector3";
+import { uniformUploadType } from "../webgl/interface";
+import { UniformValueProvider } from "../artgl";
 
 export class Vector2
   implements
   DataObject<Vector2>,
   VectorDataObject<Vector2>,
-  ArrayFlattenable<Vector2>
+  ArrayFlattenable<Vector2>,
+  UniformValueProvider
 {
   constructor(x?: number, y?: number) {
     this.x = x || 0;
@@ -255,8 +258,11 @@ export class Vector2
     return new Float32Array([this.x, this.y]);
   }
 
-  static flatten(v: Vector2, array: number[]) {
-    return v.toArray(array, 0);
+  updateUniformUploadData(value: uniformUploadType):uniformUploadType {
+    return this.toArray(value as number[], 0);
+  }
+  provideUniformUploadData(): uniformUploadType {
+    return this.toArray();
   }
 
 }

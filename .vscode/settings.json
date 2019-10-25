@@ -19,6 +19,7 @@
     "exposurer",
     "framebuffers",
     "fwidth",
+    "highp",
     "phong",
     "pingpong",
     "raycast",

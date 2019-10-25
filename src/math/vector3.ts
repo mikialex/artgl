@@ -4,12 +4,15 @@ import { Spherical } from './spherical';
 import { DataObject, VectorDataObject, ArrayFlattenable } from './index';
 import { Vector3Like } from './interface';
 import { Matrix3 } from './matrix3';
+import { UniformValueProvider } from '../artgl';
+import { uniformUploadType } from '../webgl/interface';
 
 export class Vector3
   implements
   DataObject<Vector3>,
   VectorDataObject<Vector3>,
-  ArrayFlattenable<Vector3>
+  ArrayFlattenable<Vector3>,
+  UniformValueProvider
 {
   x: number;
   y: number;
@@ -255,7 +258,11 @@ export class Vector3
     return array;
   }
 
-  static flatten(v: Vector3, array: number[]) {
-    return v.toArray(array, 0);
+  updateUniformUploadData(value: uniformUploadType):uniformUploadType {
+    return this.toArray(value as number[], 0);
   }
+  provideUniformUploadData(): uniformUploadType {
+    return this.toArray();
+  }
+
 }

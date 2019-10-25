@@ -1,4 +1,4 @@
-import { ShaderUniformProvider } from "./shading";
+import { ShaderUniformProvider, UniformValueProvider, UniformGroup } from "./shading";
 
 export function MapUniform(remapName: string) {
   return (target: ShaderUniformProvider, key: string) => {
@@ -9,14 +9,20 @@ export function MapUniform(remapName: string) {
       target.propertyUniformNameMap = new Map();
     }
 
-    let val = (target as any)[key];
+    let value =  (target as any)[key]
+    const group: UniformGroup = {
+      value,
+      uploadCache: value.provideUniformUploadData(),
+      isUploadCacheDirty: true,
+    }
     const getter = () => {
-      return val;
+      return group.value;
     };
-    const setter = (value: any) => {
-      target.uniforms.set(remapName, value);
+    const setter = (v: UniformValueProvider) => {
+      group.value = v;
+      group.isUploadCacheDirty = true;
       target._version++;
-      val = value;
+      value = v;
     };
 
     target.propertyUniformNameMap.set(key, remapName);
