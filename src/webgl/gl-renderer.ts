@@ -66,13 +66,16 @@ export class GLRenderer implements GLReleasable {
   readonly glInfo: GLInfo;
   private angleInstanceExt: Nullable<ANGLE_instanced_arrays> = null;
 
-  // enable this will cause great performance issue
-  // only enable this in develope 
+  /**
+   * Check gl error after every drawcall.
+   * Enable this will cause great performance issue,
+   * only enable this in development mode
+   */
   enableRenderErrorCatch: boolean = false;
   enableUniformDiff: boolean = true;
 
   // width height is render size, not element size
-  private _width = 100;
+  private _width = 100; 
   get width() { return this._width };
   private _height = 100;
   get height() { return this._height };

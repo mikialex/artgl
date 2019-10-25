@@ -6,7 +6,7 @@ import { GLUniform } from "./uniform/uniform";
 import { GLAttribute } from "./attribute";
 import { GLTextureUniform } from "./uniform/uniform-texture";
 import { GLData } from "../../core/data-type";
-import { GLProgramConfig } from "../interface";
+import { GLProgramConfig, uniformUploadType } from "../interface";
 
 function fulfillProgramConfig(config: GLProgramConfig) {
   if (config.useIndex === undefined) {
@@ -66,7 +66,7 @@ export class GLProgram {
   _indexUINT: boolean = false;
   set indexUINT(value: boolean) {
     if (value && !this._indexUINT && !this.renderer.glInfo.supportUintIndexDraw) {
-      throw "your webgl not support uint draw"
+      throw "Your webgl not support uint index buffer draw"
     }
     this._indexUINT = value
   }
@@ -85,7 +85,7 @@ export class GLProgram {
     const gl = this.renderer.gl;
     const program = gl.createProgram();
     if (program === null) {
-      throw 'webgl program create failed';
+      throw 'Webgl program create failed';
     }
     this.program = program;
     gl.attachShader(this.program, vertexShader.shader);
@@ -98,13 +98,36 @@ export class GLProgram {
   }
 
   private createGLResource(config: GLProgramConfig) {
-    config.attributes.forEach(att => this.attributes.set(att.name, new GLAttribute(this, att)));
+    const gl = this.renderer.gl;
+    const program = this.getProgram();
+    config.attributes.forEach(att => {
+      const location = gl.getAttribLocation(program, att.name);
+      if (location === -1) {
+        console.warn(`Attribute <${att.name}> not really used in shader: `, config);
+        return;
+      }
+      this.attributes.set(att.name, new GLAttribute(this, att, location))
+    });
 
     if (config.uniforms !== undefined) {
-      config.uniforms.forEach(uni => this.uniforms.set(uni.name, new GLUniform(this, uni)));
+      config.uniforms.forEach(uni => {
+        const location = gl.getUniformLocation(program, uni.name);
+        if (location === null) {
+          console.warn(`Uniform <${uni.name}> not really used in shader: `, config);
+          return;
+        }
+        this.uniforms.set(uni.name, new GLUniform(this, uni, location));
+      });
     }
     if (config.textures !== undefined) {
-      config.textures.forEach(tex => this.textures.set(tex.name, new GLTextureUniform(this, tex)));
+      config.textures.forEach(tex => {
+        const location = gl.getUniformLocation(program, tex.name);
+        if (location === null) {
+          console.warn(`Texture <${tex.name}> not really used in shader: `, config);
+          return;
+        }
+        this.textures.set(tex.name, new GLTextureUniform(this, tex, location));
+      });
     }
   }
 
@@ -113,11 +136,11 @@ export class GLProgram {
     this.drawCount = count;
   }
 
-  setUniform(name: string, data: GLData) {
+  setUniform(name: string, data: uniformUploadType) {
     this.uniforms.get(name)!.set(data);
   }
 
-  setUniformIfExist(name: string, data: GLData) {
+  setUniformIfExist(name: string, data: uniformUploadType) {
     const uni = this.uniforms.get(name);
     if (uni !== undefined) {
       uni.set(data);

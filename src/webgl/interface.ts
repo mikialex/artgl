@@ -11,19 +11,11 @@ export interface TextureDescriptor {
 }
 
 export type uniformUploadType = number | Float32Array | number[]
-export type flattenerType = (value: any, receiveData?: uniformUploadType) => uniformUploadType;
-export type setterType = (gl: WebGLRenderingContext, location: WebGLUniformLocation, data: uniformUploadType) => void
-export type copierType = (newValue: uniformUploadType, target: uniformUploadType) => uniformUploadType;
-export type differType = (newValue: uniformUploadType, oldValue: uniformUploadType) => boolean;
 
 export interface UniformDescriptor {
   name: string,
   type: GLDataType,
-  default?: any,
-  flattener?: flattenerType
-  setter?: setterType,
-  copier?: copierType,
-  differ?: differType
+  default?: uniformUploadType
 }
 
 export interface VaryingDescriptor {
