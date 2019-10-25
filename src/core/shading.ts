@@ -28,7 +28,7 @@ export interface ShaderUniformDecorator {
 }
 
 export interface UniformGroup{
-  value: UniformValueProvider,
+  value: UniformValueProvider | number,
   uploadCache: uniformUploadType,
   isUploadCacheDirty: boolean,
 }

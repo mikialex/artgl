@@ -32,9 +32,9 @@ export class GLUBOManager implements GLReleasable {
     let offset = 0;
     // js map iterator is insert order
     provider.uniforms.forEach((value) => {
-      const data = value.getTypedArrayData();
-      gl.bufferSubData(gl.UNIFORM_BUFFER, offset, data);
-      offset += data.byteLength;
+      // const data = value.value.getTypedArrayData();
+      // gl.bufferSubData(gl.UNIFORM_BUFFER, offset, data);
+      // offset += data.byteLength;
     });
     return buffer;
   }

@@ -9,20 +9,30 @@ export function MapUniform(remapName: string) {
       target.propertyUniformNameMap = new Map();
     }
 
-    let value =  (target as any)[key]
+    let value = undefined!;
     const group: UniformGroup = {
       value,
-      uploadCache: value.provideUniformUploadData(),
+      uploadCache: value,
       isUploadCacheDirty: true,
     }
+    target.uniforms.set(remapName, group);
     const getter = () => {
       return group.value;
     };
-    const setter = (v: UniformValueProvider) => {
+    const setter = (v: UniformValueProvider | number) => {
       group.value = v;
-      group.isUploadCacheDirty = true;
+      if (group.uploadCache === undefined) {
+        if (typeof v !== 'number') {
+          group.uploadCache = v.provideUniformUploadData();
+        }
+      }
+      if (typeof v === 'number') {
+        group.uploadCache = v;
+        group.isUploadCacheDirty = false;
+      } else {
+        group.isUploadCacheDirty = true;
+      }
       target._version++;
-      value = v;
     };
 
     target.propertyUniformNameMap.set(key, remapName);

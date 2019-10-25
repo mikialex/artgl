@@ -13,7 +13,7 @@ import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/resource-manager/vao";
 import { Vector4 } from "../math/vector4";
-import { Shading, ShaderUniformProvider } from "../core/shading";
+import { Shading, ShaderUniformProvider, UniformValueProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
 import { Vector4Like } from "../math/interface";
 import { Renderable } from "./interface";
@@ -165,7 +165,9 @@ export class RenderEngine implements GLReleasable {
             program.setTextureIfExist(key, value.getGLTexture(this));
           } else {
             if (value.isUploadCacheDirty) {
-              value.uploadCache = value.value.updateUniformUploadData(value.uploadCache);
+              value.uploadCache = (value.value as UniformValueProvider)
+                .updateUniformUploadData(value.uploadCache);
+              value.isUploadCacheDirty = false;
             }
             program.setUniformIfExist(key, value.uploadCache);
           }
