@@ -33,6 +33,7 @@ export function MapUniform(remapName: string) {
         group.isUploadCacheDirty = true;
       }
       target._version++;
+      target.blockedBufferNeedUpdate = true;
     };
 
     target.propertyUniformNameMap.set(key, remapName);

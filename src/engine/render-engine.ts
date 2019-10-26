@@ -32,20 +32,30 @@ const copyShading = new Shading().decorate(new CopyShading());
 const quad = new QuadSource();
 
 interface RenderEngineConstructConfig{
-
+  el: HTMLCanvasElement;
+  useUBO?: boolean;
+  preferVAO?: boolean;
 }
 
 export class RenderEngine implements GLReleasable {
-  constructor(el: HTMLCanvasElement, ctxOptions?: any) {
-    this.renderer = new GLRenderer(el, ctxOptions);
-    this.interactor = new Interactor(el);
+  constructor(config: RenderEngineConstructConfig) {
+    this.renderer = new GLRenderer(config.el);
+    this.interactor = new Interactor(config.el);
 
-    this.preferVAO = true;
+    this.preferVAO = config.preferVAO !== undefined ? config.preferVAO : true;
+    const supportUBO = this.renderer.ctxVersion === 2;
+    if (config.useUBO !== undefined) {
+      if (!supportUBO && config.useUBO) {
+        console.warn(`ubo support is disabled, since your ctx cant support webgl2`)
+      }
+    }
+    this.UBOEnabled = supportUBO && config.useUBO !== false;
   }
 
   readonly interactor: Interactor
 
   readonly renderer: GLRenderer;
+  readonly UBOEnabled: boolean;
 
   _preferVAO: boolean = true;
   _vaoEnabled: boolean = false;

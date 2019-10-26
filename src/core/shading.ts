@@ -19,7 +19,7 @@ export interface ShaderUniformDecorator {
   decorate(graph: ShaderGraph): void;
 
   /**
-   * one UniformProvider can have others provider depends and inject, return them in a array
+   * one UniformProvider can have others provider depends and inject, visit them all
    */
   foreachProvider(visitor: (p: ShaderUniformProvider) => any): void;
 
@@ -48,6 +48,8 @@ export interface ShaderUniformProvider {
   // mark the shader need recompile
   uniforms: Map<uniformName, UniformGroup>;
   uniformsByteSizeAll: number;
+  blockedBufferNeedUpdate: boolean;
+  blockedBuffer: Nullable<Float32Array>;
   propertyUniformNameMap: Map<propertyName, uniformName>;
 }
 

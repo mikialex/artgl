@@ -31,7 +31,9 @@ export abstract class BaseEffectShading<T>
   _version = 0;
   propertyUniformNameMap: Map<string, string>;
   uniforms: Map<string, any>;
+  blockedBufferNeedUpdate = true;
   uniformsByteSizeAll = 0;
+  blockedBuffer = null;
 
   nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
   textureNodeCreated: Map<string, ShaderTextureNode> = new Map();
