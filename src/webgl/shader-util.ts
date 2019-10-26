@@ -1,6 +1,5 @@
 import { GLDataType2ShaderString } from "../core/data-type";
-import { ShaderUniformProvider } from "../artgl";
-import { GLProgramConfig, GLTextureType } from "./interface";
+import { GLProgramConfig, GLTextureType, UniformBlockDescriptor } from "./interface";
 
 export function injectVertexShaderHeaders(
   config: GLProgramConfig,
@@ -14,13 +13,14 @@ export function injectVertexShaderHeaders(
   injectText += generateAttributeString(config, isWebGL2);
   injectText += generateUniformString(config);
   injectText += generateVaryingString(config, isWebGL2, false);
+  injectText += generateUBOString(config, isWebGL2);
   return injectText + shaderText;
 }
 
 export function injectFragmentShaderHeaders(
   config: GLProgramConfig,
   shaderText: string,
-  isWebGL2: boolean
+  isWebGL2: boolean 
 ) {
   let injectText = '';
   if (isWebGL2) {
@@ -33,6 +33,7 @@ export function injectFragmentShaderHeaders(
   injectText += generateUniformString(config);
   injectText += generateVaryingString(config, isWebGL2, true);
   injectText += generateTextureString(config);
+  injectText += generateUBOString(config, isWebGL2);
   return injectText + shaderText;
 }
 
@@ -73,13 +74,42 @@ function generateAttributeString(config: GLProgramConfig, isWebGL2: boolean): st
 function generateUniformString(config: GLProgramConfig): string {
   let text = '';
   if (config.uniforms !== undefined) {
-    for (const key in config.uniforms) {
-      const uni = config.uniforms[key];
+    config.uniforms.forEach(uni => {
       const typeStr = GLDataType2ShaderString(uni.type);
       text = text + 'uniform ' + typeStr + ' ' + uni.name + ';\n';
-    }
+    })
   }
   return text;
+}
+
+function generateUBOString(config: GLProgramConfig, isWebGL2: boolean): string {
+  if (!isWebGL2) {
+    throw 'ubo is ony support in webgl2'
+  }
+  let text = '';
+  if (config.uniformBlocks !== undefined) {
+    config.uniformBlocks.forEach(ub => {
+      text += generateOneUBOString(ub);
+    })
+  }
+  return text;
+}
+
+function generateOneUBOString(des: UniformBlockDescriptor) {
+  let contentStr = "";
+  des.uniforms.forEach(uni => {
+    contentStr += `  ${GLDataType2ShaderString(uni.type)} ${uni.name};\n`;
+  })
+
+  const layoutStr =
+    `
+layout (std140) uniform ${des.name}
+{
+${contentStr}
+};
+
+`;
+  return layoutStr;
 }
 
 function generateVaryingString(
@@ -104,24 +134,3 @@ function generateVaryingString(
   }
   return text;
 }
-
-export function getShaderUniformProviderUBOKey(provider: ShaderUniformProvider) {
-  return provider.uuid + provider.constructor.name;
-}
-
-// export function generateUBOLayoutForShaderUniformProvider(provider: ShaderUniformProvider) {
-//   let contentStr = "";
-//   provider.uniforms.forEach((value, key) => {
-//     const uniformName = provider.propertyUniformNameMap.get(key);
-//     contentStr += `  ${GLDataToShaderString(value)} ${uniformName};\n`;
-//   })
-
-//   const layoutStr =
-//     `
-// layout (std140) uniform ${getShaderUniformProviderUBOKey(provider)}
-// {
-// ${contentStr}
-// };
-// `;
-//   return layoutStr;
-// }
