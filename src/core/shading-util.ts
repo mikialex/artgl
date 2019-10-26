@@ -12,6 +12,7 @@ export function MapUniform(remapName: string) {
     let value = undefined!;
     const group: UniformGroup = {
       value,
+      blockedBufferStartIndex: 0,
       uploadCache: value,
       isUploadCacheDirty: true,
     }
@@ -23,15 +24,17 @@ export function MapUniform(remapName: string) {
       group.value = v;
       if (group.uploadCache === undefined) {
         if (typeof v !== 'number') {
-          group.uploadCache = v.provideUniformUploadData();
+          group.uploadCache = v.provideUniformUploadData() as number[];
+          group.blockedBufferStartIndex = target.uniformsSizeAll;
+          target.uniformsSizeAll += group.uploadCache.length;
+        } else {
+          group.uploadCache = v;
+          group.blockedBufferStartIndex = target.uniformsSizeAll;
+          target.uniformsSizeAll++;
         }
       }
-      if (typeof v === 'number') {
-        group.uploadCache = v;
-        group.isUploadCacheDirty = false;
-      } else {
-        group.isUploadCacheDirty = true;
-      }
+      group.isUploadCacheDirty = true;
+      
       target._version++;
       target.blockedBufferNeedUpdate = true;
     };

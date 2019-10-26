@@ -19,7 +19,7 @@ export abstract class BaseEffectShading<T>
     this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
   }
 
-  uuid = generateUUIDNoHyphen();
+  blockedBufferName = generateUUIDNoHyphen();
   abstract decorate(graph: ShaderGraph): void;
 
   foreachProvider(visitor: (p: ShaderUniformProvider) => any) {
@@ -32,7 +32,7 @@ export abstract class BaseEffectShading<T>
   propertyUniformNameMap: Map<string, string>;
   uniforms: Map<string, any>;
   blockedBufferNeedUpdate = true;
-  uniformsByteSizeAll = 0;
+  uniformsSizeAll = 0;
   blockedBuffer = null;
 
   nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();

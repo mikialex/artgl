@@ -31,6 +31,7 @@ export interface UniformGroup{
   value: UniformValueProvider | number,
   uploadCache: uniformUploadType,
   isUploadCacheDirty: boolean,
+  blockedBufferStartIndex: number,
 }
 
 export interface UniformValueProvider{
@@ -41,13 +42,13 @@ export interface UniformValueProvider{
 type propertyName = string;
 type uniformName = string;
 export interface ShaderUniformProvider {
-  uuid: string;
+  blockedBufferName: string;
 
   _version: number;
 
   // mark the shader need recompile
   uniforms: Map<uniformName, UniformGroup>;
-  uniformsByteSizeAll: number;
+  uniformsSizeAll: number;
   blockedBufferNeedUpdate: boolean;
   blockedBuffer: Nullable<Float32Array>;
   propertyUniformNameMap: Map<propertyName, uniformName>;

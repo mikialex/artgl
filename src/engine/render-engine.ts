@@ -154,14 +154,18 @@ export class RenderEngine implements GLReleasable {
 
     const shadingParams = shading.params;
     shading._decorators.forEach(defaultDecorator => {
+
       let overrideDecorator
+      // decorator override use
       if (shadingParams !== undefined) {
         overrideDecorator = shadingParams.get(defaultDecorator)
       }
+      // decoCamera support
       if (overrideDecorator === undefined && defaultDecorator instanceof Camera) {
         overrideDecorator = this.activeCamera
       }
       const decorator = overrideDecorator === undefined ? defaultDecorator : overrideDecorator;
+
       decorator.foreachProvider(provider => {
         const syncedVersion = this.lastUploadedShaderUniformProvider.get(provider)
         if (syncedVersion !== undefined
@@ -170,18 +174,41 @@ export class RenderEngine implements GLReleasable {
           // if we found this uniform provider has updated before and not changed, we can skip!
           return;
         }
+
+        if (this.UBOEnabled) { // when use ubo, check ubo buffer exist and create, each source length is ok;
+          if (provider.blockedBuffer === null) { // this only done once, todo move to other
+            provider.blockedBuffer = new Float32Array(provider.uniformsSizeAll);
+          }
+        }
+
         provider.uniforms.forEach((value, key) => {
           if (value instanceof Texture || value instanceof CubeTexture) {
             program.setTextureIfExist(key, value.getGLTexture(this));
           } else {
             if (value.isUploadCacheDirty) {
-              value.uploadCache = (value.value as UniformValueProvider)
-                .updateUniformUploadData(value.uploadCache);
+              if (this.UBOEnabled) { // when use ubo, we update ubo buffer
+                if (typeof value.value === 'number') {
+                  provider.blockedBuffer![value.blockedBufferStartIndex] = value.value;
+                } else {
+                  value.value.updateUniformUploadData(provider.blockedBuffer!, value.blockedBufferStartIndex);
+                }
+              } else { // else, we update each flatten uniform array and directly upload
+                if (typeof value.value === 'number') {
+                  value.uploadCache = value.value;
+                } else {
+                  value.uploadCache = value.value.updateUniformUploadData(value.uploadCache);
+                }
+                program.setUniformIfExist(key, value.uploadCache);
+              }
               value.isUploadCacheDirty = false;
             }
-            program.setUniformIfExist(key, value.uploadCache);
           }
         })
+        if (this.UBOEnabled) { // when use ubo, we final do ubo recreate and upload
+          // provider _version has make sure we can get refreshed one
+          const ubo = this.renderer.uboManager!.getUBO(provider);
+          program.setUBO()
+        }
         this.lastUploadedShaderUniformProvider.set(provider, provider._version)
       })
     })

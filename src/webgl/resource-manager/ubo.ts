@@ -21,21 +21,14 @@ export class GLUBOManager implements GLReleasable {
     this.gl.bindBufferBase(this.gl.UNIFORM_BUFFER, bindPoint, ubo);
   }
 
-  createUBO(provider: ShaderUniformProvider) {
+  private createUBO(provider: ShaderUniformProvider) {
     const gl = this.gl;
     const buffer = gl.createBuffer();
     if (buffer === null) {
       throw 'Webgl create buffer failed for UBO';
     }
     gl.bindBuffer(gl.UNIFORM_BUFFER, buffer);
-    gl.bufferData(gl.UNIFORM_BUFFER, provider.uniformsByteSizeAll, gl.STATIC_DRAW);
-    let offset = 0;
-    // js map iterator is insert order
-    provider.uniforms.forEach((value) => {
-      // const data = value.value.getTypedArrayData();
-      // gl.bufferSubData(gl.UNIFORM_BUFFER, offset, data);
-      // offset += data.byteLength;
-    });
+    gl.bufferData(gl.UNIFORM_BUFFER, provider.blockedBuffer, gl.STATIC_DRAW);
     return buffer;
   }
 
