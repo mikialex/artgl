@@ -1,8 +1,9 @@
 import { DAGNode } from "../core/dag-node";
 import { ShaderFunction } from "./shader-function";
-import { Vector2, Vector3, Vector4 } from "../math";
+import { Vector2, Vector3, Vector4, ArrayFlattenable } from "../math";
 import { GLDataType } from "../core/data-type";
 import { UniformDescriptor, AttributeDescriptor, GLTextureType } from "../webgl/interface";
+import { Nullable } from "../type";
 
 let shaderNodeGUIDCount = 0;
 
@@ -79,14 +80,14 @@ export class ShaderInputNode extends ShaderNode {
   name: string;
 }
 
-export class ShaderCommonUniformInputNode extends ShaderInputNode {
+export class ShaderUniformInputNode extends ShaderInputNode {
   constructor(des: UniformDescriptor) {
     super(des.name, des.type);
   }
 
-  defaultValue: any;
+  defaultValue: Nullable<ArrayFlattenable> = null;
 
-  default(value: any): ShaderCommonUniformInputNode {
+  default(value: ArrayFlattenable): ShaderUniformInputNode {
     this.defaultValue = value;
     return this;
   }

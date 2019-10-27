@@ -5,7 +5,7 @@ import { GLProgram } from "../webgl/program/program";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { Observable, Observer } from "./observable";
 import { RenderEngine } from "../engine/render-engine";
-import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
+import { ShaderUniformInputNode } from '../shader-graph/shader-node';
 import { uniformFromValue } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
 import { GLProgramConfig, uniformUploadType } from "../webgl/interface";
@@ -24,7 +24,7 @@ export interface ShaderUniformDecorator {
   foreachProvider(visitor: (p: ShaderUniformProvider) => any): void;
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator>;
-  nodeCreated: Map<string, ShaderCommonUniformInputNode>;
+  nodeCreated: Map<string, ShaderUniformInputNode>;
 }
 
 export interface UniformGroup{
@@ -209,7 +209,7 @@ export function MarkNeedRedecorate<T>(_target: any, _propertyKey: any): any {
 export { BaseEffectShading } from './shading-base';
 
 export function getPropertyUniform<T, K extends ShaderUniformDecorator & ShaderUniformProvider>
-  (env: K, name: keyof T): ShaderCommonUniformInputNode {
+  (env: K, name: keyof T): ShaderUniformInputNode {
   const uniformNode = env.nodeCreated.get(name as string);
   if (uniformNode !== undefined) {
     return uniformNode;
@@ -221,10 +221,14 @@ export function getPropertyUniform<T, K extends ShaderUniformDecorator & ShaderU
   }
 
   const value = (env as unknown as T)[name];
-  if (value === undefined) {
-    throw "uniform value not given"
+  if (!checkValue(value)) {
+    throw "uniform value not valid, expect array flattenable "
   }
   const node = uniformFromValue(uniformName, value);
   env.nodeCreated.set(name as string, node);
   return node;
+}
+
+function checkValue(value: any): value is ArrayFlattenable {
+  return value && value.toArray !== undefined && value.fromArray !== undefined;
 }

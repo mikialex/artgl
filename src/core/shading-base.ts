@@ -5,7 +5,7 @@ import {
   ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform
 } from "./shading";
 import { ShaderGraph } from "../shader-graph/shader-graph";
-import { ShaderCommonUniformInputNode, ShaderTextureNode } from "../shader-graph/shader-node";
+import { ShaderUniformInputNode, ShaderTextureNode } from "../shader-graph/shader-node";
 import { CubeTexture } from "./texture-cube";
 import { Texture } from "../artgl";
 import { textureFromValue } from "../shader-graph/node-maker";
@@ -35,10 +35,10 @@ export abstract class BaseEffectShading<T>
   uniformsSizeAll = 0;
   blockedBuffer = null;
 
-  nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
+  nodeCreated: Map<string, ShaderUniformInputNode> = new Map();
   textureNodeCreated: Map<string, ShaderTextureNode> = new Map();
 
-  getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
+  getPropertyUniform(name: keyof T): ShaderUniformInputNode {
     return getPropertyUniform(this, name)
   }
 

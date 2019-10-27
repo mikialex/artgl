@@ -1,8 +1,8 @@
 import {
-  ShaderAttributeInputNode, ShaderCommonUniformInputNode,
+  ShaderAttributeInputNode, ShaderUniformInputNode,
   ShaderTextureNode, ShaderNode, ShaderConstType, ShaderConstNode, ShaderCombineNode
 } from "./shader-node";
-import { Vector2, Vector3, Matrix4, Vector4 } from "../math";
+import { Vector2, Vector3, Matrix4, Vector4, ArrayFlattenable } from "../math";
 import { Texture } from "../artgl";
 import { CubeTexture } from "../core/texture-cube";
 import { GLDataType } from "../core/data-type";
@@ -21,7 +21,7 @@ export function cubeTexture(name: string) {
 }
 
 export function uniform(name: string, type: GLDataType) {
-  return new ShaderCommonUniformInputNode({ name, type });
+  return new ShaderUniformInputNode({ name, type });
 }
 
 export function textureFromValue(textureName:string, value: Texture | CubeTexture){
@@ -34,7 +34,7 @@ export function textureFromValue(textureName:string, value: Texture | CubeTextur
   }
 }
 
-export function uniformFromValue(name: string, value: any) {
+export function uniformFromValue(name: string, value: ArrayFlattenable) {
   if (typeof value === "number") {
     return uniform(name, GLDataType.float).default(value);
   } else if (value instanceof Vector2) {
@@ -78,7 +78,7 @@ export function screenQuad() {
 }
 
 export function makeInstance(
-  node: ShaderCommonUniformInputNode | ShaderAttributeInputNode
+  node: ShaderUniformInputNode | ShaderAttributeInputNode
 ) {
   return new ShaderAttributeInputNode({
     name: node.name, type: node.type

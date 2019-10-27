@@ -2,7 +2,7 @@ import { genFragShader, genVertexShader } from "./code-gen";
 import {
   ShaderInputNode, ShaderTextureNode, ShaderFunctionNode,
   ShaderAttributeInputNode, ShaderVaryInputNode,
-  ShaderCommonUniformInputNode, ShaderNode,
+  ShaderUniformInputNode, ShaderNode,
 } from "./shader-node";
 import { attribute, constValue, texture } from "./node-maker";
 import { Vector4 } from "../math";
@@ -96,7 +96,7 @@ export class ShaderGraph {
     return new ShaderVaryInputNode(key, ret!.type);
   }
 
-  private sharedUniformNodes: Map<string, ShaderCommonUniformInputNode> = new Map();
+  private sharedUniformNodes: Map<string, ShaderUniformInputNode> = new Map();
   getSharedUniform(uniformKey: string) {
     const re = this.sharedUniformNodes.get(uniformKey)
     if (re === undefined) {
@@ -111,7 +111,7 @@ export class ShaderGraph {
   getIfSharedUniform(uniformKey: string) {
     return this.sharedUniformNodes.get(uniformKey);
   }
-  registerSharedUniform(uniformKey: string, node: ShaderCommonUniformInputNode) {
+  registerSharedUniform(uniformKey: string, node: ShaderUniformInputNode) {
     this.sharedUniformNodes.set(uniformKey, node);
   }
 
@@ -189,13 +189,13 @@ export class ShaderGraph {
         }
       });
 
-    const uniforms = (inputNodes as ShaderCommonUniformInputNode[])
-      .filter(node => node instanceof ShaderCommonUniformInputNode)
-      .map((node: ShaderCommonUniformInputNode) => {
+    const uniforms = (inputNodes as ShaderUniformInputNode[])
+      .filter(node => node instanceof ShaderUniformInputNode)
+      .map((node: ShaderUniformInputNode) => {
         return {
           name: node.name,
           type: node.type,
-          default: node.defaultValue
+          default: node.defaultValue !== null ? node.defaultValue.toArray() : undefined,
         }
       });
 
