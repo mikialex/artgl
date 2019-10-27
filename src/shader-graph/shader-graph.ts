@@ -192,10 +192,18 @@ export class ShaderGraph {
     const uniforms = (inputNodes as ShaderUniformInputNode[])
       .filter(node => node instanceof ShaderUniformInputNode)
       .map((node: ShaderUniformInputNode) => {
+        let defaultV;
+        if (node.defaultValue !== null) {
+          if (typeof node.defaultValue === 'number') {
+            defaultV = node.defaultValue
+          } else {
+            defaultV = node.defaultValue.toArray()
+          }
+        }
         return {
           name: node.name,
           type: node.type,
-          default: node.defaultValue !== null ? node.defaultValue.toArray() : undefined,
+          default: defaultV,
         }
       });
 

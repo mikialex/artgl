@@ -229,6 +229,9 @@ export function getPropertyUniform<T, K extends ShaderUniformDecorator & ShaderU
   return node;
 }
 
-function checkValue(value: any): value is ArrayFlattenable {
+function checkValue(value: any): value is ArrayFlattenable | number {
+  if (typeof value === "number") {
+    return true;
+  }
   return value && value.toArray !== undefined && value.fromArray !== undefined;
 }

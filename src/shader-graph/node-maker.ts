@@ -34,7 +34,7 @@ export function textureFromValue(textureName:string, value: Texture | CubeTextur
   }
 }
 
-export function uniformFromValue(name: string, value: ArrayFlattenable) {
+export function uniformFromValue(name: string, value: ArrayFlattenable | number) {
   if (typeof value === "number") {
     return uniform(name, GLDataType.float).default(value);
   } else if (value instanceof Vector2) {

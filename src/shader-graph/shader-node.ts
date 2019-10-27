@@ -85,9 +85,9 @@ export class ShaderUniformInputNode extends ShaderInputNode {
     super(des.name, des.type);
   }
 
-  defaultValue: Nullable<ArrayFlattenable> = null;
+  defaultValue: Nullable<ArrayFlattenable | number> = null;
 
-  default(value: ArrayFlattenable): ShaderUniformInputNode {
+  default(value: ArrayFlattenable | number): ShaderUniformInputNode {
     this.defaultValue = value;
     return this;
   }
