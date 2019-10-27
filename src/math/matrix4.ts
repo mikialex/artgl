@@ -1,8 +1,7 @@
 import { Vector3 } from "../math";
 import { Quaternion } from "./quaternion";
 import { DataObject, ArrayFlattenable } from "./index";
-import { uniformUploadType } from "../webgl/interface";
-import { UniformValueProvider } from "../core/shading";
+import { FloatArray } from "../type";
 
 const tempX: Vector3 = new Vector3();
 const tempY: Vector3 = new Vector3();
@@ -11,8 +10,7 @@ const tempZ: Vector3 = new Vector3();
 export class Matrix4
   implements
   DataObject<Matrix4>,
-  ArrayFlattenable<Matrix4>,
-  UniformValueProvider
+  ArrayFlattenable<Matrix4>
 {
 
   copy(m: Matrix4) {
@@ -346,7 +344,7 @@ export class Matrix4
     return this;
   }
 
-  toArray(array?: number[], offset?: number) {
+  toArray(array?: FloatArray, offset?: number) {
 
     if (offset === undefined) offset = 0;
     if (array === undefined) array = [];
@@ -377,23 +375,12 @@ export class Matrix4
 
   }
 
-  fromArray(array: ArrayLike<number>, offset?: number) {
+  fromArray(array: FloatArray, offset?: number) {
     if (offset === undefined) offset = 0;
     for (var i = 0; i < 16; i++) {
       this.elements[i] = array[i + offset];
     }
     return this;
-  }
-
-  getTypedArrayData(): Readonly<Float32Array> {
-    return this.elements;
-  }
-
-  updateUniformUploadData(value: uniformUploadType):uniformUploadType {
-    return this.toArray(value as number[], 0);
-  }
-  provideUniformUploadData(): uniformUploadType {
-    return this.toArray();
   }
 
 

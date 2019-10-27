@@ -5,7 +5,7 @@ import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
 import { Material } from "../core/material";
 import { GLTextureUniform } from "../webgl/program/uniform/uniform-texture";
-import { Nullable, GLReleasable } from "../type";
+import { Nullable, GLReleasable, FloatArray } from "../type";
 import { Observable } from "../core/observable";
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
 import { QuadSource } from './render-source';
@@ -13,7 +13,7 @@ import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
 import { VAOCreateCallback } from "../webgl/resource-manager/vao";
 import { Vector4 } from "../math/vector4";
-import { Shading, ShaderUniformProvider, UniformValueProvider } from "../core/shading";
+import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
 import { Vector4Like } from "../math/interface";
 import { Renderable } from "./interface";
@@ -190,13 +190,13 @@ export class RenderEngine implements GLReleasable {
                 if (typeof value.value === 'number') {
                   provider.blockedBuffer![value.blockedBufferStartIndex] = value.value;
                 } else {
-                  value.value.updateUniformUploadData(provider.blockedBuffer!, value.blockedBufferStartIndex);
+                  value.value.toArray(provider.blockedBuffer!, value.blockedBufferStartIndex);
                 }
               } else { // else, we update each flatten uniform array and directly upload
                 if (typeof value.value === 'number') {
                   value.uploadCache = value.value;
                 } else {
-                  value.uploadCache = value.value.updateUniformUploadData(value.uploadCache);
+                  value.uploadCache = value.value.toArray(value.uploadCache as FloatArray);
                 }
                 program.setUniformIfExist(key, value.uploadCache);
               }
@@ -207,7 +207,7 @@ export class RenderEngine implements GLReleasable {
         if (this.UBOEnabled) { // when use ubo, we final do ubo recreate and upload
           // provider _version has make sure we can get refreshed one
           const ubo = this.renderer.uboManager!.getUBO(provider);
-          program.setUBO()
+          program.setUBO(provider.blockedBufferName, ubo);
         }
         this.lastUploadedShaderUniformProvider.set(provider, provider._version)
       })

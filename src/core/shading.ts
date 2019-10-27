@@ -28,15 +28,10 @@ export interface ShaderUniformDecorator {
 }
 
 export interface UniformGroup{
-  value: UniformValueProvider | number,
+  value: ArrayFlattenable | number,
   uploadCache: uniformUploadType,
   isUploadCacheDirty: boolean,
   blockedBufferStartIndex: number,
-}
-
-export interface UniformValueProvider{
-  updateUniformUploadData(value: uniformUploadType): uniformUploadType;
-  provideUniformUploadData(): uniformUploadType;
 }
 
 type propertyName = string;

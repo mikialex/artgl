@@ -1,13 +1,11 @@
 import { Matrix4 } from './matrix4';
-import { uniformUploadType } from '../webgl/interface';
 import { DataObject, ArrayFlattenable } from '.';
-import { UniformValueProvider } from '../artgl';
+import { FloatArray } from '../type';
 
 export class Matrix3
 implements
 DataObject<Matrix3>,
-ArrayFlattenable<Matrix3>,
-UniformValueProvider
+ArrayFlattenable<Matrix3>
 {
 
   elements: Float32Array = new Float32Array([
@@ -245,7 +243,7 @@ UniformValueProvider
     return true;
   }
 
-  fromArray(array: ArrayLike<number>, offset?: number) {
+  fromArray(array: FloatArray, offset?: number) {
 
     if (offset === undefined) offset = 0;
 
@@ -259,7 +257,7 @@ UniformValueProvider
 
   }
 
-  toArray(array?: number[], offset?: number) {
+  toArray(array?: FloatArray, offset?: number) {
 
     if (array === undefined) array = [];
     if (offset === undefined) offset = 0;
@@ -280,17 +278,6 @@ UniformValueProvider
 
     return array;
 
-  }
-
-  getTypedArrayData(): Readonly<Float32Array> {
-    return this.elements;
-  }
-
-  updateUniformUploadData(value: uniformUploadType):uniformUploadType {
-    return this.toArray(value as number[], 0);
-  }
-  provideUniformUploadData(): uniformUploadType {
-    return this.toArray();
   }
 
 }

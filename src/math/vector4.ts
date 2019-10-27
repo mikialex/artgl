@@ -2,15 +2,13 @@ import { DataObject, ArrayFlattenable, VectorDataObject } from "./index";
 import { Matrix4 } from "./matrix4";
 import { Quaternion } from "./quaternion";
 import { Vector4Like } from "./interface";
-import { UniformValueProvider } from "../artgl";
-import { uniformUploadType } from "../webgl/interface";
+import { FloatArray } from "../type";
 
 export class Vector4
   implements
   DataObject<Vector4>,
   VectorDataObject<Vector4>,
-  ArrayFlattenable<Vector4>,
-  UniformValueProvider
+  ArrayFlattenable<Vector4>
 {
   constructor(x?: number, y?: number, z?: number, w?: number) {
     this.x = x || 0;
@@ -424,7 +422,7 @@ export class Vector4
     return this;
   }
 
-  fromArray(array: number[], offset?: number) {
+  fromArray(array: FloatArray, offset?: number) {
     if (offset === undefined) offset = 0;
     this.x = array[offset];
     this.y = array[offset + 1];
@@ -433,7 +431,7 @@ export class Vector4
     return this;
   }
 
-  toArray(array?: number[], offset?: number) {
+  toArray(array?: FloatArray, offset?: number) {
     if (array === undefined) array = [];
     if (offset === undefined) offset = 0;
     array[offset] = this.x;
@@ -441,17 +439,6 @@ export class Vector4
     array[offset + 2] = this.z;
     array[offset + 3] = this.w;
     return array;
-  }
-
-  getTypedArrayData(): Readonly<Float32Array> {
-    return new Float32Array([this.x, this.y, this.z, this.w]);
-  }
-
-  updateUniformUploadData(value: uniformUploadType):uniformUploadType {
-    return this.toArray(value as number[], 0);
-  }
-  provideUniformUploadData(): uniformUploadType {
-    return this.toArray();
   }
 
 }

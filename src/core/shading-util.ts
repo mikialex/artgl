@@ -1,4 +1,5 @@
-import { ShaderUniformProvider, UniformValueProvider, UniformGroup } from "./shading";
+import { ShaderUniformProvider, UniformGroup } from "./shading";
+import { ArrayFlattenable } from "../math";
 
 export function MapUniform(remapName: string) {
   return (target: ShaderUniformProvider, key: string) => {
@@ -20,11 +21,11 @@ export function MapUniform(remapName: string) {
     const getter = () => {
       return group.value;
     };
-    const setter = (v: UniformValueProvider | number) => {
+    const setter = (v: ArrayFlattenable | number) => {
       group.value = v;
       if (group.uploadCache === undefined) {
         if (typeof v !== 'number') {
-          group.uploadCache = v.provideUniformUploadData() as number[];
+          group.uploadCache = v.toArray();
           group.blockedBufferStartIndex = target.uniformsSizeAll;
           target.uniformsSizeAll += group.uploadCache.length;
         } else {

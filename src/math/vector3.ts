@@ -4,15 +4,13 @@ import { Spherical } from './spherical';
 import { DataObject, VectorDataObject, ArrayFlattenable } from './index';
 import { Vector3Like } from './interface';
 import { Matrix3 } from './matrix3';
-import { UniformValueProvider } from '../artgl';
-import { uniformUploadType } from '../webgl/interface';
+import { FloatArray } from '../type';
 
 export class Vector3
   implements
   DataObject<Vector3>,
   VectorDataObject<Vector3>,
-  ArrayFlattenable<Vector3>,
-  UniformValueProvider
+  ArrayFlattenable<Vector3>
 {
   x: number;
   y: number;
@@ -237,11 +235,7 @@ export class Vector3
     return dx * dx + dy * dy + dz * dz;
   }
 
-  getTypedArrayData(): Readonly<Float32Array> { // todo maybe cache
-    return new Float32Array([this.x, this.y, this.z]);
-  }
-
-  fromArray(array: number[], offset?: number) {
+  fromArray(array: FloatArray, offset?: number) {
     if (offset === undefined) offset = 0;
     this.x = array[offset];
     this.y = array[offset + 1];
@@ -249,20 +243,13 @@ export class Vector3
     return this;
   }
 
-  toArray(array?: number[], offset?: number) {
+  toArray(array?: FloatArray, offset?: number) {
     if (array === undefined) array = [];
     if (offset === undefined) offset = 0;
     array[offset] = this.x;
     array[offset + 1] = this.y;
     array[offset + 2] = this.z;
     return array;
-  }
-
-  updateUniformUploadData(value: uniformUploadType):uniformUploadType {
-    return this.toArray(value as number[], 0);
-  }
-  provideUniformUploadData(): uniformUploadType {
-    return this.toArray();
   }
 
 }

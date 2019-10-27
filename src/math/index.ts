@@ -1,6 +1,9 @@
+import { FloatArray } from '../type';
+
 export { Vector2 } from './vector2';
 export { Vector3 } from './vector3';
 export { Vector4 } from './vector4';
+export { Matrix3 } from "./matrix3";
 export { Matrix4 } from "./matrix4";
 export { Euler } from "./euler";
 export { Quaternion } from './quaternion';
@@ -14,9 +17,8 @@ export interface DataObject<T>{
 }
 
 export interface ArrayFlattenable<T = {}>{
-  fromArray: (array: number[], offset?: number) => T;
-  toArray: (array?: number[], offset?: number) => number[];
-  getTypedArrayData: () => Readonly<Float32Array>;
+  fromArray: (array: FloatArray, offset?: number) => T;
+  toArray: (array?: FloatArray, offset?: number) => FloatArray;
 }
 
 export interface VectorDataObject<T = {}>{
