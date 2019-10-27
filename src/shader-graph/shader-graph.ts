@@ -11,7 +11,7 @@ import { ChannelType } from "../core/material";
 import { Nullable } from "../type";
 import { Camera } from "../artgl";
 import { GLDataType } from "../core/data-type";
-import { GLProgramConfig, VaryingDescriptor, CommonAttribute } from "../webgl/interface";
+import { GLProgramConfig, VaryingDescriptor, CommonAttribute, UniformDescriptor, UniformBlockDescriptor } from "../webgl/interface";
 
 
 export const UvFragVary = "v_uv"
@@ -143,10 +143,12 @@ export class ShaderGraph {
     return this;
   }
 
-  compile(isWebGL2: boolean): GLProgramConfig {
+  compile(isWebGL2: boolean, useVBO: boolean): GLProgramConfig {
+    if (!isWebGL2) { useVBO = false; }
+
     const { results, needDerivative } = genFragShader(this, isWebGL2);
     return {
-      ...this.collectInputs(),
+      ...this.collectInputs(useVBO),
       vertexShaderString: genVertexShader(this, isWebGL2),
       fragmentShaderString: results,
       needDerivative
@@ -174,7 +176,7 @@ export class ShaderGraph {
     return nodeList
   }
 
-  collectInputs() {
+  collectInputs(useUBO: boolean) {
     const nodes = this.nodes;
     const inputNodes = nodes.filter(
       n => n instanceof ShaderInputNode
@@ -189,23 +191,46 @@ export class ShaderGraph {
         }
       });
 
-    const uniforms = (inputNodes as ShaderUniformInputNode[])
-      .filter(node => node instanceof ShaderUniformInputNode)
-      .map((node: ShaderUniformInputNode) => {
-        let defaultV;
-        if (node.defaultValue !== null) {
-          if (typeof node.defaultValue === 'number') {
-            defaultV = node.defaultValue
-          } else {
-            defaultV = node.defaultValue.toArray()
-          }
+    function toUniDes(node: ShaderUniformInputNode): UniformDescriptor {
+      let defaultV;
+      if (node.defaultValue !== null) {
+        if (typeof node.defaultValue === 'number') {
+          defaultV = node.defaultValue
+        } else {
+          defaultV = node.defaultValue.toArray()
         }
-        return {
-          name: node.name,
-          type: node.type,
-          default: defaultV,
+      }
+      return {
+        name: node.name,
+        type: node.type,
+        default: defaultV,
+      }
+    }
+
+    const blockMap = new Map<string, ShaderUniformInputNode[]>();
+    const uniforms: UniformDescriptor[] = [];
+    (inputNodes as ShaderUniformInputNode[])
+      .filter(node => node instanceof ShaderUniformInputNode)
+      .forEach((node: ShaderUniformInputNode) => {
+        if (node.blockTag !== null && useUBO) {
+          let blockUniforms = blockMap.get(node.blockTag);
+          if (blockUniforms === undefined) {
+            blockMap.set(node.blockTag, [node]);
+          } else {
+            blockUniforms.push(node);
+          }
+        } else {
+          uniforms.push(toUniDes(node));
         }
       });
+
+    const blocks: UniformBlockDescriptor[] = [];
+    blockMap.forEach((nodes, name) => {
+      blocks.push({
+        name: name,
+        uniforms: nodes.map(node => toUniDes(node))
+      })
+    })
 
     const textures = (inputNodes as ShaderTextureNode[])
       .filter(node => node instanceof ShaderTextureNode)
@@ -224,7 +249,7 @@ export class ShaderGraph {
       })
     })
 
-    return { attributes, uniforms, textures, varyings }
+    return { attributes, uniforms, textures, varyings, blockMap }
   }
 
 }

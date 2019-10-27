@@ -157,13 +157,16 @@ export class Shading {
     })
   }
 
-  getProgramConfig(isWebGL2?: boolean) {
+  getProgramConfig(isWebGL2: boolean, useUBO: boolean) {
     if (isWebGL2 === undefined) { // just for debug convenience
       isWebGL2 = true;
     }
+    if (useUBO === undefined) { // just for debug convenience
+      useUBO = true;
+    }
     if (this._needRebuildShader) {
       this.build();
-      this._programConfigCache = this.graph.compile(isWebGL2);
+      this._programConfigCache = this.graph.compile(isWebGL2, useUBO);
       this.afterShaderCompiled.notifyObservers(this._programConfigCache)
       this._needRebuildShader = false;
     }
@@ -226,6 +229,7 @@ export function getPropertyUniform<T, K extends ShaderUniformDecorator & ShaderU
   }
   const node = uniformFromValue(uniformName, value);
   env.nodeCreated.set(name as string, node);
+  node.blockTag = env.blockedBufferName;
   return node;
 }
 
