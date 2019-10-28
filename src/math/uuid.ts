@@ -25,5 +25,5 @@ export function generateUUIDNoHyphen(): string{
     rnd = rnd >> 4;
     uuid[i] = chars[(i === 19) ? (r & 0x3) | 0x8 : r];
   }
-  return uuid.join('');
+  return "v" + uuid.join('');
 }

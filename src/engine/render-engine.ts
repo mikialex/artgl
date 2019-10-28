@@ -37,6 +37,10 @@ interface RenderEngineConstructConfig{
   preferVAO?: boolean;
 }
 
+const uboKeys = new Array(100).fill("").map((_, index) => {
+  return 'ubo' + index;
+})
+
 export class RenderEngine implements GLReleasable {
   constructor(config: RenderEngineConstructConfig) {
     this.renderer = new GLRenderer(config.el);
@@ -153,6 +157,7 @@ export class RenderEngine implements GLReleasable {
     this.renderer.useProgram(program);
 
     const shadingParams = shading.params;
+    let providerCount = 0;
     shading._decorators.forEach(defaultDecorator => {
 
       let overrideDecorator
@@ -207,9 +212,10 @@ export class RenderEngine implements GLReleasable {
         if (this.UBOEnabled) { // when use ubo, we final do ubo recreate and upload
           // provider _version has make sure we can get refreshed one
           const ubo = this.renderer.uboManager!.getUBO(provider);
-          program.setUBO(provider.blockedBufferName, ubo);
+          program.setUBOIfExist(uboKeys[providerCount], ubo);
         }
         this.lastUploadedShaderUniformProvider.set(provider, provider._version)
+        providerCount++;
       })
     })
 
@@ -400,7 +406,7 @@ export class RenderEngine implements GLReleasable {
 
   //  GL resource acquisition
   getProgram(shading: Shading) {
-    return this.renderer.programManager.getProgram(shading);
+    return this.renderer.programManager.getProgram(shading, this.vaoEnabled);
   }
 
   deleteProgram(shading: Shading) {

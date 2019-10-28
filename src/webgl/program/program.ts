@@ -162,6 +162,14 @@ export class GLProgram {
     this.uniformBlocks.get(name)!.set(ubo);
   }
 
+  setUBOIfExist(name: string, ubo: WebGLBuffer) {
+    const b = this.uniformBlocks.get(name);
+    if (b !== undefined) {
+      b.set(ubo);
+    }
+  }
+
+
   setUniformIfExist(name: string, data: uniformUploadType) {
     const uni = this.uniforms.get(name);
     if (uni !== undefined) {

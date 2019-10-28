@@ -152,12 +152,17 @@ export class Shading {
   afterShaderCompiled: Observable<GLProgramConfig> = new Observable();
   build() {
     this.graph.reset()
+    let providerCount = 0;
     this._decorators.forEach(decorator => {
+      decorator.foreachProvider(p => {
+        p.blockedBufferName = "ubo" + providerCount;
+        providerCount++;
+      })
       decorator.decorate(this.graph);
     })
   }
 
-  getProgramConfig(isWebGL2: boolean, useUBO: boolean) {
+  getProgramConfig(isWebGL2?: boolean, useUBO?: boolean) {
     if (isWebGL2 === undefined) { // just for debug convenience
       isWebGL2 = true;
     }

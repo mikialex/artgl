@@ -224,9 +224,9 @@ export class ShaderGraph {
         }
       });
 
-    const blocks: UniformBlockDescriptor[] = [];
+    const uniformBlocks: UniformBlockDescriptor[] = [];
     blockMap.forEach((nodes, name) => {
-      blocks.push({
+      uniformBlocks.push({
         name: name,
         uniforms: nodes.map(node => toUniDes(node))
       })
@@ -249,7 +249,7 @@ export class ShaderGraph {
       })
     })
 
-    return { attributes, uniforms, textures, varyings, blockMap }
+    return { attributes, uniforms, textures, varyings, uniformBlocks }
   }
 
 }
