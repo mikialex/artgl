@@ -1,5 +1,5 @@
 import { GLProgram } from "../program";
-import { UniformBlockDescriptor } from "../../interface";
+import { UniformBlockDescriptor, UniformDescriptor } from "../../interface";
 import { GLRenderer } from "../../gl-renderer";
 import { GLUBOManager } from "../../resource-manager/ubo";
 import { Nullable } from "../../../type";
@@ -11,6 +11,7 @@ export class GLUniformBlock{
     uniformBlockIndex: number
   ) {
     this.name = descriptor.name;
+    this.blockedUniforms = descriptor.uniforms;
     this.renderer = program.renderer;
     this.UBOManager = this.renderer.uboManager!;
     this.gl = program.renderer.gl as WebGL2RenderingContext;
@@ -25,6 +26,7 @@ export class GLUniformBlock{
   readonly uniformBlockIndex: number;
   readonly bindPoint: number;
   private UBOManager: GLUBOManager;
+  private blockedUniforms: UniformDescriptor[];
 
   ubo: Nullable<WebGLBuffer> = null;
 
