@@ -9,6 +9,9 @@ export function MapUniform(remapName: string) {
     if (target.propertyUniformNameMap === undefined) {
       target.propertyUniformNameMap = new Map();
     }
+    if (target.uniformsSizeAll === undefined) {
+      target.uniformsSizeAll = 0;
+    }
 
     let value = undefined!;
     const group: UniformGroup = {

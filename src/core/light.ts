@@ -16,6 +16,7 @@ export abstract class Light<T> extends SceneNode
   constructor() {
     super();
 
+    this.uniformsSizeAll = checkCreate((this as any).uniformsSizeAll, 0);
     this.uniforms = checkCreate((this as any).uniforms, new Map());
     this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
     this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
@@ -43,7 +44,7 @@ export abstract class Light<T> extends SceneNode
   _version = 0;
   blockedBufferName = generateUUIDNoHyphen();
   uniforms: Map<string, any>;
-  uniformsSizeAll = 0;
+  uniformsSizeAll: number;
   blockedBufferNeedUpdate = true;
   blockedBuffer = null;
 
