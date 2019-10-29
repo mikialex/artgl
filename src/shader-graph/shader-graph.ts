@@ -9,8 +9,8 @@ import { Vector4 } from "../math";
 import { eyeDir } from "./built-in/transform";
 import { ChannelType } from "../core/material";
 import { Nullable } from "../type";
-import { Camera } from "../artgl";
-import { GLDataType } from "../core/data-type";
+import { Camera, ShaderUniformProvider } from "../artgl";
+import { GLDataType, valueToGLType, valueToFlatted } from "../core/data-type";
 import { GLProgramConfig, VaryingDescriptor, CommonAttribute, UniformDescriptor, UniformBlockDescriptor } from "../webgl/interface";
 
 
@@ -207,30 +207,16 @@ export class ShaderGraph {
       }
     }
 
-    const blockMap = new Map<string, ShaderUniformInputNode[]>();
     const uniforms: UniformDescriptor[] = [];
     (inputNodes as ShaderUniformInputNode[])
       .filter(node => node instanceof ShaderUniformInputNode)
       .forEach((node: ShaderUniformInputNode) => {
         if (node.blockTag !== null && useUBO) {
-          let blockUniforms = blockMap.get(node.blockTag);
-          if (blockUniforms === undefined) {
-            blockMap.set(node.blockTag, [node]);
-          } else {
-            blockUniforms.push(node);
-          }
+          // todo
         } else {
           uniforms.push(toUniDes(node));
         }
       });
-
-    const uniformBlocks: UniformBlockDescriptor[] = [];
-    blockMap.forEach((nodes, name) => {
-      uniformBlocks.push({
-        name: name,
-        uniforms: nodes.map(node => toUniDes(node))
-      })
-    })
 
     const textures = (inputNodes as ShaderTextureNode[])
       .filter(node => node instanceof ShaderTextureNode)
@@ -249,8 +235,34 @@ export class ShaderGraph {
       })
     })
 
-    return { attributes, uniforms, textures, varyings, uniformBlocks }
+    return { attributes, uniforms, textures, varyings }
   }
 
 }
 
+function toUniDes(node: ShaderUniformInputNode): UniformDescriptor {
+  let defaultV;
+  if (node.defaultValue !== null) {
+    if (typeof node.defaultValue === 'number') {
+      defaultV = node.defaultValue
+    } else {
+      defaultV = node.defaultValue.toArray()
+    }
+  }
+  return {
+    name: node.name,
+    type: node.type,
+    default: defaultV,
+  }
+}
+
+function convertProviderToBlockUniformDescriptor(p: ShaderUniformProvider) {
+  const unis = [];
+  p.uniforms.forEach((u, name) => {
+    unis.push({
+      name: name,
+      type: valueToGLType(u.value),
+      default: valueToFlatted(u.value),
+    })
+  })
+}
