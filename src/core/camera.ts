@@ -45,6 +45,8 @@ export class CameraSelf
   static readonly WorldPositionKey = 'CameraWorldPosition'
   static readonly ViewProjectionMatrix = 'CameraViewProjectionMatrix'
 
+  shouldProxyedByUBO = false; // todo fix
+
   @MapUniform(CameraSelf.WorldMatrixKey)
   renderObjectWorldMatrix = new Matrix4();
 

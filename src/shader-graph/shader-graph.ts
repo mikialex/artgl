@@ -148,7 +148,10 @@ export class ShaderGraph {
 
     const uniformBlocks: UniformBlockDescriptor[] = [];
     providerMap.forEach((keyIndex, provider) => {
-      uniformBlocks.push(convertProviderToBlockUniformDescriptor(provider, keyIndex));
+      const des = makeBlockUniformDescriptorFromProvider(provider, keyIndex);
+      if (des !== null) {
+        uniformBlocks.push();
+      }
     })
 
     const { results, needDerivative } = genFragShader(this, isWebGL2);
@@ -217,8 +220,12 @@ export class ShaderGraph {
     (inputNodes as ShaderUniformInputNode[])
       .filter(node => node instanceof ShaderUniformInputNode)
       .forEach((node: ShaderUniformInputNode) => {
-        if (!node.wouldBeProxyedByUBO && !useUBO) {
+        if (!useUBO) {
           uniforms.push(toUniDes(node));
+        } else {
+          if (!node.wouldBeProxyedByUBO) {
+            uniforms.push(toUniDes(node));
+          }
         }
       });
 
@@ -244,7 +251,8 @@ export class ShaderGraph {
 
 }
 
-function convertProviderToBlockUniformDescriptor(p: ShaderUniformProvider, providerIndex: number): UniformBlockDescriptor {
+function makeBlockUniformDescriptorFromProvider(
+  p: ShaderUniformProvider, providerIndex: number): Nullable<UniformBlockDescriptor> {
   const uniforms: UniformDescriptor[] = [];
   p.uniforms.forEach((u, name) => {
     uniforms.push({
@@ -253,6 +261,9 @@ function convertProviderToBlockUniformDescriptor(p: ShaderUniformProvider, provi
       default: valueToFlatted(u.value),
     })
   })
+  if (uniforms.length === 0) {
+    return null;
+  }
   return {
     name: "ubo" + providerIndex,
     uniforms
