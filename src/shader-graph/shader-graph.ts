@@ -148,9 +148,12 @@ export class ShaderGraph {
 
     const uniformBlocks: UniformBlockDescriptor[] = [];
     providerMap.forEach((keyIndex, provider) => {
+      if (!provider.shouldProxyedByUBO) {
+        return;
+      }
       const des = makeBlockUniformDescriptorFromProvider(provider, keyIndex);
       if (des !== null) {
-        uniformBlocks.push();
+        uniformBlocks.push(des);
       }
     })
 

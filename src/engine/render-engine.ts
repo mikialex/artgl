@@ -209,7 +209,9 @@ export class RenderEngine implements GLReleasable {
             }
           }
         })
-        if (this.UBOEnabled) { // when use ubo, we final do ubo recreate and upload
+        if (this.UBOEnabled && provider.shouldProxyedByUBO &&
+          provider.blockedBuffer !== null &&
+          provider.blockedBuffer.length !== 0) { // when use ubo, we final do ubo recreate and upload
           // provider _version has make sure we can get refreshed one
           const ubo = this.renderer.uboManager!.getUBO(provider);
           program.setUBOIfExist(uboKeys[providerCount], ubo);

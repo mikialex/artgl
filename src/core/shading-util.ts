@@ -5,10 +5,22 @@ import "reflect-metadata";
 const CLASS_META = 'classMetaData';
 const UNIFORM_META = 'uniformMetaData';
 
-export function ShadingComponent(): ClassDecorator {
-  return function (constructor: Function) {
-    console.log('-- decorator invoked --');
-    constructor.prototype.wheels = numOfWheels;
+export function ShadingComponent() {
+  return function _ShadingComponent<T extends {new(...args: any[]): {}}>(constr: T){
+    return class extends constr {
+      constructor(...args: any[]) {
+        super(...args);
+
+        const info = Reflect.getMetadata(UNIFORM_META, this) as UniformProviderCache
+        if (info === undefined) {
+          return
+        }
+        console.log(info)
+        info.uniforms.forEach((_uniformName, propertyKey) => { 
+          (this as any)[propertyKey] = (this as any)[propertyKey];
+        })
+      }
+    }
   }
 }
 
@@ -29,7 +41,7 @@ export function Uniform(uniformName: string): PropertyDecorator {
   }
 }
 
-export function createUniformProviderCache(provider: any) {
+export function createUniformProviderCache(provider: ShaderUniformProvider) {
   const info = Reflect.getMetadata(UNIFORM_META, provider) as UniformProviderCache
   if (info === undefined) {
     return
@@ -69,14 +81,14 @@ export function createUniformProviderCache(provider: any) {
 export function MapUniform(remapName: string) {
   return (target: ShaderUniformProvider, key: string) => {
 
-    // let cached: UniformProviderCache = Reflect.getMetadata(UNIFORM_META, target);
-    // if (cached === undefined) {
-    //   cached = {
-    //     uniforms: new Map()
-    //   }
-    //   Reflect.defineMetadata(UNIFORM_META, cached ,target);
-    // }
-    // cached.uniforms.set(key as string, remapName);
+    let cached: UniformProviderCache = Reflect.getMetadata(UNIFORM_META, target);
+    if (cached === undefined) {
+      cached = {
+        uniforms: new Map()
+      }
+      Reflect.defineMetadata(UNIFORM_META, cached ,target);
+    }
+    cached.uniforms.set(key as string, remapName);
 
 
 

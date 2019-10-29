@@ -72,7 +72,7 @@ export class GLRenderer implements GLReleasable {
    * Enable this will cause great performance issue,
    * only enable this in development mode
    */
-  enableRenderErrorCatch: boolean = false;
+  enableRenderErrorCatch: boolean = true;
   enableUniformDiff: boolean = true;
 
   // width height is render size, not element size

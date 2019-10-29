@@ -16,7 +16,7 @@ export default class Debug extends Vue {
     console.log("debug")
 
     const test = new TestS();
-    console.log(createUniformProviderCache(test));
+    // console.log(createUniformProviderCache(test));
   }
 }
 </script>

@@ -13,7 +13,6 @@ import { textureFromValue } from "../shader-graph/node-maker";
 export abstract class BaseEffectShading<T>
   implements ShaderUniformProvider, ShaderUniformDecorator {
   constructor() {
-    this.uniformsSizeAll = checkCreate((this as any).uniformsSizeAll, 0);
     this.uniforms = checkCreate((this as any).uniforms, new Map());
     this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
     this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
@@ -32,7 +31,7 @@ export abstract class BaseEffectShading<T>
   propertyUniformNameMap: Map<string, string>;
   uniforms: Map<string, any>;
   blockedBufferNeedUpdate = true;
-  uniformsSizeAll: number;
+  uniformsSizeAll!: number;
   blockedBuffer = null;
 
   nodeCreated: Map<string, ShaderUniformInputNode> = new Map();

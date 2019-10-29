@@ -29,6 +29,7 @@ export class TestS extends BaseEffectShading<TestS>{
 
 }
 
+
 export class ProgressiveDof extends BaseEffectShading<ProgressiveDof> {
 
   @MapUniform("dof_coc")
