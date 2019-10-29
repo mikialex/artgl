@@ -1,8 +1,85 @@
 import { ShaderUniformProvider, UniformGroup } from "./shading";
 import { ArrayFlattenable } from "../math";
+import "reflect-metadata";
+
+const CLASS_META = 'classMetaData';
+const UNIFORM_META = 'uniformMetaData';
+
+export function ShadingComponent(): ClassDecorator {
+  return function (constructor: Function) {
+    console.log('-- decorator invoked --');
+    constructor.prototype.wheels = numOfWheels;
+  }
+}
+
+interface UniformProviderCache{
+  uniforms: Map<string, string>
+}
+
+export function Uniform(uniformName: string): PropertyDecorator {
+  return (target, key) => {
+    let cached: UniformProviderCache = Reflect.getMetadata(UNIFORM_META, target);
+    if (cached === undefined) {
+      cached = {
+        uniforms: new Map()
+      }
+      Reflect.defineMetadata(UNIFORM_META, cached ,target);
+    }
+    cached.uniforms.set(key as string, uniformName);
+  }
+}
+
+export function createUniformProviderCache(provider: any) {
+  const info = Reflect.getMetadata(UNIFORM_META, provider) as UniformProviderCache
+  if (info === undefined) {
+    return
+  }
+
+  let indexCount = 0;
+  const propertyCache = new Map();
+  info.uniforms.forEach((uniformName, propertyKey) => {
+    const v = (provider as any)[propertyKey];
+    if (!v) {
+      throw 'value is not valid';
+    }
+    let uploadCache;
+    const blockedBufferStartIndex = indexCount;
+    if (typeof v !== 'number') {
+      uploadCache = v.toArray();
+      indexCount += uploadCache.length;
+    } else {
+      uploadCache = v;
+      indexCount++;
+    }
+    propertyCache.set(propertyKey, {
+      blockedBufferStartIndex,
+      uploadCache,
+      uniformName
+    })
+  })
+  const blockBuffer = new Float32Array(indexCount);
+
+  return {
+    propertyCache,
+    blockBuffer,
+  }
+
+}
 
 export function MapUniform(remapName: string) {
   return (target: ShaderUniformProvider, key: string) => {
+
+    // let cached: UniformProviderCache = Reflect.getMetadata(UNIFORM_META, target);
+    // if (cached === undefined) {
+    //   cached = {
+    //     uniforms: new Map()
+    //   }
+    //   Reflect.defineMetadata(UNIFORM_META, cached ,target);
+    // }
+    // cached.uniforms.set(key as string, remapName);
+
+
+
     if (target.uniforms === undefined) {
       target.uniforms = new Map();
     }

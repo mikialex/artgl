@@ -2,6 +2,7 @@ import { BaseEffectShading, MapUniform } from "../../core/shading";
 import { ShaderGraph } from "../../artgl";
 import { Vector2 } from "../../math/vector2";
 import { ShaderFunction } from "../../shader-graph/shader-function";
+import { ShadingComponent, Uniform } from "../../core/shading-util";
 
 const progressiveDof = new ShaderFunction({
   source: `
@@ -18,6 +19,15 @@ const progressiveDof = new ShaderFunction({
   `
 })
 
+
+@ShadingComponent()
+export class TestS extends BaseEffectShading<TestS>{
+  decorate(graph: ShaderGraph) { }
+
+  @Uniform("dof_coc")
+  coc = new Vector2();
+
+}
 
 export class ProgressiveDof extends BaseEffectShading<ProgressiveDof> {
 
