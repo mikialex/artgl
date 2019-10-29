@@ -7,7 +7,6 @@ import { ShaderFunction } from "../shader-graph/shader-function";
 import { Observable } from "./observable";
 import { Vector3 } from '../math';
 import { checkCreate } from "./shading-util";
-import { generateUUIDNoHyphen } from "../math/uuid";
 
 // TODO I cant figure out right multi inheritance impl with strong type, code duplicate 
 
@@ -42,7 +41,7 @@ export abstract class Light<T> extends SceneNode
   notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable()
 
   _version = 0;
-  blockedBufferName = generateUUIDNoHyphen();
+  shouldProxyedByUBO = true;
   uniforms: Map<string, any>;
   uniformsSizeAll: number;
   blockedBufferNeedUpdate = true;

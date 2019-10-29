@@ -11,6 +11,7 @@
     "GLVAO",
     "Interactor",
     "Mixins",
+    "Proxyed",
     "Reinhard",
     "Renderable",
     "colorbuffer",

@@ -37,7 +37,7 @@ export interface UniformGroup{
 type propertyName = string;
 type uniformName = string;
 export interface ShaderUniformProvider {
-  blockedBufferName: string;
+  shouldProxyedByUBO: boolean;
 
   _version: number;
 
@@ -150,16 +150,18 @@ export class Shading {
   }
 
   afterShaderCompiled: Observable<GLProgramConfig> = new Observable();
-  build() {
+  private build() {
     this.graph.reset()
     let providerCount = 0;
+    const providerIndexMap = new Map<ShaderUniformProvider, number>();
     this._decorators.forEach(decorator => {
       decorator.foreachProvider(p => {
-        p.blockedBufferName = "ubo" + providerCount;
+        providerIndexMap.set(p, providerCount);
         providerCount++;
       })
       decorator.decorate(this.graph);
     })
+    return providerIndexMap;
   }
 
   getProgramConfig(isWebGL2?: boolean, useUBO?: boolean) {
@@ -170,8 +172,8 @@ export class Shading {
       useUBO = true;
     }
     if (this._needRebuildShader) {
-      this.build();
-      this._programConfigCache = this.graph.compile(isWebGL2, useUBO);
+      const providerIndexMap = this.build();
+      this._programConfigCache = this.graph.compile(isWebGL2, useUBO, providerIndexMap);
       this.afterShaderCompiled.notifyObservers(this._programConfigCache)
       this._needRebuildShader = false;
     }
@@ -234,7 +236,8 @@ export function getPropertyUniform<T, K extends ShaderUniformDecorator & ShaderU
   }
   const node = uniformFromValue(uniformName, value);
   env.nodeCreated.set(name as string, node);
-  node.blockTag = env.blockedBufferName;
+  node.wouldBeProxyedByUBO = env.shouldProxyedByUBO;
+  
   return node;
 }
 

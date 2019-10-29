@@ -86,8 +86,8 @@ export class ShaderUniformInputNode extends ShaderInputNode {
   }
 
   defaultValue: Nullable<ArrayFlattenable | number> = null;
-  blockTag: Nullable<string> = null;
-
+  wouldBeProxyedByUBO = false;
+  
   default(value: ArrayFlattenable | number): ShaderUniformInputNode {
     this.defaultValue = value;
     return this;

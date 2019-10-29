@@ -143,12 +143,18 @@ export class ShaderGraph {
     return this;
   }
 
-  compile(isWebGL2: boolean, useVBO: boolean): GLProgramConfig {
+  compile(isWebGL2: boolean, useVBO: boolean, providerMap: Map<ShaderUniformProvider, number>): GLProgramConfig {
     if (!isWebGL2) { useVBO = false; }
+
+    const uniformBlocks: UniformBlockDescriptor[] = [];
+    providerMap.forEach((keyIndex, provider) => {
+      uniformBlocks.push(convertProviderToBlockUniformDescriptor(provider, keyIndex));
+    })
 
     const { results, needDerivative } = genFragShader(this, isWebGL2);
     return {
       ...this.collectInputs(useVBO),
+      uniformBlocks,
       vertexShaderString: genVertexShader(this, isWebGL2),
       fragmentShaderString: results,
       needDerivative
@@ -211,9 +217,7 @@ export class ShaderGraph {
     (inputNodes as ShaderUniformInputNode[])
       .filter(node => node instanceof ShaderUniformInputNode)
       .forEach((node: ShaderUniformInputNode) => {
-        if (node.blockTag !== null && useUBO) {
-          // todo
-        } else {
+        if (!node.wouldBeProxyedByUBO && !useUBO) {
           uniforms.push(toUniDes(node));
         }
       });
@@ -240,29 +244,17 @@ export class ShaderGraph {
 
 }
 
-function toUniDes(node: ShaderUniformInputNode): UniformDescriptor {
-  let defaultV;
-  if (node.defaultValue !== null) {
-    if (typeof node.defaultValue === 'number') {
-      defaultV = node.defaultValue
-    } else {
-      defaultV = node.defaultValue.toArray()
-    }
-  }
-  return {
-    name: node.name,
-    type: node.type,
-    default: defaultV,
-  }
-}
-
-function convertProviderToBlockUniformDescriptor(p: ShaderUniformProvider) {
-  const unis = [];
+function convertProviderToBlockUniformDescriptor(p: ShaderUniformProvider, providerIndex: number): UniformBlockDescriptor {
+  const uniforms: UniformDescriptor[] = [];
   p.uniforms.forEach((u, name) => {
-    unis.push({
+    uniforms.push({
       name: name,
       type: valueToGLType(u.value),
       default: valueToFlatted(u.value),
     })
   })
+  return {
+    name: "ubo" + providerIndex,
+    uniforms
+  }
 }
