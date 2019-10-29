@@ -2,6 +2,7 @@ import { BaseEffectShading, MapUniform, ShaderUniformProvider } from "../../core
 import { ShaderGraph, NormalFragVary } from "../../shader-graph/shader-graph";
 import { Light, collectLightNodes } from "../../core/light";
 import { ShaderFunction } from "../../shader-graph/shader-function";
+import { ShadingComponent } from "../../core/shading-util";
 
 const phongShading = new ShaderFunction({
   source: `
@@ -21,6 +22,7 @@ const phongShading = new ShaderFunction({
   `
 })
 
+@ShadingComponent()
 export class PhongShading<T> extends BaseEffectShading<PhongShading<T>> {
   constructor(lights: Array<Light<T>>) {
     super();

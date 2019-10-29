@@ -3,6 +3,7 @@ import { Matrix4 } from "../../math/matrix4";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { texture, screenQuad } from "../../shader-graph/node-maker";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
+import { ShadingComponent } from "../../core/shading-util";
 
 const TAAMix = new ShaderFunction({
   source:
@@ -16,6 +17,7 @@ const TAAMix = new ShaderFunction({
     `
 })
 
+@ShadingComponent()
 export class TAAShading extends BaseEffectShading<TAAShading> {
 
   @MapUniform("VPMatrixInverse")

@@ -2,8 +2,10 @@ import { Light } from "../core/light";
 import { ShaderGraph, ShaderNode } from "../artgl";
 import { MapUniform } from "../core/shading";
 import { Vector3 } from "../math";
+import { ShadingComponent } from "../core/shading-util";
 
 
+@ShadingComponent()
 export class DirectionalLight extends Light<DirectionalLight> {
 
   produceLightFragDir(_graph: ShaderGraph): ShaderNode {

@@ -7,6 +7,7 @@ import { getWorldPosition, NDCxyToUV } from "../../shader-graph/built-in/transfo
 import { Matrix4 } from "../../math/index";
 import { rand2DT, rand } from "../../shader-graph/built-in/rand";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
+import { ShadingComponent } from "../../core/shading-util";
 
 const newSamplePosition = new ShaderFunction({
   source: `
@@ -46,6 +47,7 @@ const tssaoMix = new ShaderFunction({
   `
 })
 
+@ShadingComponent()
 export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
   
   @MapUniform("u_sampleCount")

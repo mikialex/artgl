@@ -3,6 +3,7 @@ import { ShaderGraph, WorldPositionFragVary } from "../../shader-graph/shader-gr
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { Vector3 } from "../../math";
 import { Uncharted2Helper } from "../../shader-graph/built-in/tone-mapping";
+import { ShadingComponent } from "../../core/shading-util";
 
 
 const rayleighPhase = new ShaderFunction({
@@ -167,6 +168,7 @@ const BetaM = new ShaderFunction({
   `
 })
 
+@ShadingComponent()
 export class SkyShading extends BaseEffectShading<SkyShading> {
   constructor() {
     super();

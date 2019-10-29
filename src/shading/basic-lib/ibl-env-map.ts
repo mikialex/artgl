@@ -4,6 +4,7 @@ import { NormalFragVary, ShaderGraph } from "../../shader-graph/shader-graph";
 import { CubeTexture } from "../../artgl";
 import { sampleEnvMapAndNeedNormalize } from "./cube-env-map";
 import { ShaderTextureNode } from "../../shader-graph/shader-node";
+import { ShadingComponent } from "../../core/shading-util";
 
 const reflect = new ShaderFunction({
   source:
@@ -12,6 +13,7 @@ const reflect = new ShaderFunction({
     }`
 })
 
+@ShadingComponent()
 export class IBLEnvMap extends BaseEffectShading<IBLEnvMap> {
 
   static produceIBLEnvMapColor(graph: ShaderGraph, envMapTexture: ShaderTextureNode) {

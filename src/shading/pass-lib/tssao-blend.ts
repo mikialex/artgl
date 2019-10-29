@@ -2,6 +2,7 @@ import { BaseEffectShading, MapUniform } from "../../core/shading";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { texture, screenQuad } from "../../shader-graph/node-maker";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
+import { ShadingComponent } from "../../core/shading-util";
 
 const tssaoBlend = new ShaderFunction({
   source: `
@@ -23,6 +24,7 @@ const tssaoBlend = new ShaderFunction({
   `
 })
 
+@ShadingComponent()
 export class TSSAOBlendShading extends BaseEffectShading<TSSAOBlendShading> {
 
   @MapUniform("u_sampleCount")

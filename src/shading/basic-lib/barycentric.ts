@@ -5,6 +5,7 @@ import { ShaderFunction, shader } from "../../shader-graph/shader-function";
 import { Vector3 } from "../../math";
 import { GLDataType } from "../../core/data-type";
 import { CommonAttribute } from "../../webgl/interface";
+import { ShadingComponent } from "../../core/shading-util";
 
 const addBarycentricWireFrame = shader(`
 vec4 addBarycentricWireFrame(
@@ -45,6 +46,7 @@ const addBarycentricWireFrameScreenSpace = new ShaderFunction({
 })
 
 
+@ShadingComponent()
 export class BarycentricWireFrame extends BaseEffectShading<BarycentricWireFrame> {
 
   @MapUniform("barycentricLine_threshold")

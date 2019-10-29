@@ -2,6 +2,7 @@ import { shader } from "../../shader-graph/shader-function"
 import { BaseEffectShading, ShaderGraph, WorldPositionFragVary } from "../../artgl"
 import { CubeTexture } from "../../core/texture-cube"
 import { MapUniform } from "../../core/shading"
+import { ShadingComponent } from "../../core/shading-util"
 
 export const sampleEnvMapAndNeedNormalize = shader(`
 vec4 sampleEnvMap(samplerCube envMap, vec3 dir){
@@ -9,6 +10,7 @@ vec4 sampleEnvMap(samplerCube envMap, vec3 dir){
 }
 `)
 
+@ShadingComponent()
 export class CubeEnvMapShading extends BaseEffectShading<CubeEnvMapShading> {
 
   decorate(graph: ShaderGraph): void {

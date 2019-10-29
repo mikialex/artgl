@@ -143,12 +143,12 @@ export class ShaderGraph {
     return this;
   }
 
-  compile(isWebGL2: boolean, useVBO: boolean, providerMap: Map<ShaderUniformProvider, number>): GLProgramConfig {
-    if (!isWebGL2) { useVBO = false; }
+  compile(isWebGL2: boolean, useUBO: boolean, providerMap: Map<ShaderUniformProvider, number>): GLProgramConfig {
+    if (!isWebGL2) { useUBO = false; }
 
     const uniformBlocks: UniformBlockDescriptor[] = [];
     providerMap.forEach((keyIndex, provider) => {
-      if (!provider.shouldProxyedByUBO) {
+      if (!provider.shouldProxyedByUBO || !useUBO) {
         return;
       }
       const des = makeBlockUniformDescriptorFromProvider(provider, keyIndex);
@@ -159,7 +159,7 @@ export class ShaderGraph {
 
     const { results, needDerivative } = genFragShader(this, isWebGL2);
     return {
-      ...this.collectInputs(useVBO),
+      ...this.collectInputs(useUBO),
       uniformBlocks,
       vertexShaderString: genVertexShader(this, isWebGL2),
       fragmentShaderString: results,

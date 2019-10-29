@@ -5,6 +5,7 @@ import { MapUniform } from "../core/shading";
 import { Vector3 } from "../math";
 import { ShaderNode } from '../shader-graph/shader-node';
 import { dir3D } from '../shader-graph/built-in/transform';
+import { ShadingComponent } from "../core/shading-util";
 
 const pointLightShading = new ShaderFunction({
   source:
@@ -24,6 +25,7 @@ const pointLightShading = new ShaderFunction({
 })
 
 
+@ShadingComponent()
 export class PointLight extends Light<PointLight> {
 
   produceLightFragDir(graph: ShaderGraph): ShaderNode {

@@ -2,7 +2,7 @@ import { SceneNode, ExtendWithSceneNode } from "../scene/scene-node";
 import { Matrix4, Vector3 } from "../math/index";
 import { RenderEngine, Size } from '../engine/render-engine';
 import { ShaderUniformProvider, ShaderUniformDecorator, BaseEffectShading } from "./shading";
-import { MapUniform } from "./shading-util";
+import { MapUniform, ShadingComponent } from "./shading-util";
 import { ShaderGraph, WorldPositionFragVary } from "../shader-graph/shader-graph";
 import { VPTransform, MTransform } from "../shader-graph/built-in/transform";
 import { uniformFromValue, attribute, vec4, constValue } from "../shader-graph/node-maker";
@@ -37,6 +37,7 @@ export function MVP(graph: ShaderGraph) {
  * Camera is abstraction of a decoration of view projection matrix in a vertex graph
  * Implementor should impl how matrix is calculate and how to react to render size change
  */
+@ShadingComponent()
 export class CameraSelf
   extends BaseEffectShading<CameraSelf>
   implements ShaderUniformProvider, ShaderUniformDecorator {

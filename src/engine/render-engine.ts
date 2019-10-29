@@ -52,8 +52,10 @@ export class RenderEngine implements GLReleasable {
       if (!supportUBO && config.useUBO) {
         console.warn(`ubo support is disabled, since your ctx cant support webgl2`)
       }
+    } else {
+      config.useUBO = false;
     }
-    this.UBOEnabled = supportUBO && config.useUBO !== false;
+    this.UBOEnabled = supportUBO && config.useUBO;
   }
 
   readonly interactor: Interactor
@@ -62,19 +64,19 @@ export class RenderEngine implements GLReleasable {
   readonly UBOEnabled: boolean;
 
   _preferVAO: boolean = true;
-  _vaoEnabled: boolean = false;
-  get vaoEnabled(): boolean { return this._vaoEnabled };
+  _VAOEnabled: boolean = false;
+  get VAOEnabled(): boolean { return this._VAOEnabled };
   get preferVAO(): boolean { return this._preferVAO };
   set preferVAO(val: boolean) {
     this._preferVAO = val;
     if (val) {
       if (!this.renderer.vaoManager.isSupported) {
-        console.warn(`prefer vao is set to true, but your environment cant support vao, vaoEnabled is false`)
+        console.warn(`prefer vao is set to true, but your environment cant support vao, VAOEnabled is false`)
       }
-      this._vaoEnabled = true
+      this._VAOEnabled = true
     } else {
       this.renderer.vaoManager.releaseGL();
-      this._vaoEnabled = false
+      this._VAOEnabled = false
     }
   }
 
@@ -275,7 +277,7 @@ export class RenderEngine implements GLReleasable {
 
     // vao check
     let vaoUnbindCallback: VAOCreateCallback | undefined;
-    if (this._vaoEnabled) {
+    if (this._VAOEnabled) {
       vaoUnbindCallback = this.renderer.vaoManager.connectGeometry(geometry, this.currentShading!)
       if (vaoUnbindCallback === undefined) {
         return;// vao has bind, geometry buffer is ok;
@@ -302,7 +304,7 @@ export class RenderEngine implements GLReleasable {
     }
 
     // create vao
-    if (this._vaoEnabled) {
+    if (this._VAOEnabled) {
       if (vaoUnbindCallback! !== undefined) {
         vaoUnbindCallback.unbind();
         this.renderer.vaoManager.useVAO(vaoUnbindCallback.vao)
@@ -408,7 +410,7 @@ export class RenderEngine implements GLReleasable {
 
   //  GL resource acquisition
   getProgram(shading: Shading) {
-    return this.renderer.programManager.getProgram(shading, this.vaoEnabled);
+    return this.renderer.programManager.getProgram(shading, this.UBOEnabled);
   }
 
   deleteProgram(shading: Shading) {

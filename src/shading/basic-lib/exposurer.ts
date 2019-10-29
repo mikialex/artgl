@@ -5,6 +5,7 @@ import {
   controlExposureShading, OptimizedCineonToneMapping, ReinhardToneMapping,
   ACESFilmicToneMapping, Uncharted2ToneMapping
 } from "../../shader-graph/built-in/tone-mapping";
+import { ShadingComponent } from "../../core/shading-util";
 
 export enum ToneMapType {
   Linear = "Linear",
@@ -14,6 +15,7 @@ export enum ToneMapType {
   ACESFilmicToneMapping = "ACESFilmicToneMapping"
 }
 
+@ShadingComponent()
 export class ExposureController extends BaseEffectShading<ExposureController> {
 
   @MapUniform("toneMappingExposure")
