@@ -79,63 +79,75 @@ export function createUniformProviderCache(provider: ShaderUniformProvider) {
 }
 
 export function MapUniform(remapName: string) {
-  return (target: ShaderUniformProvider, key: string) => {
+  return (target: ShaderUniformProvider, propertyKey: string) => {
 
-    let cached: UniformProviderCache = Reflect.getMetadata(UNIFORM_META, target);
-    if (cached === undefined) {
-      cached = {
-        uniforms: new Map()
-      }
-      Reflect.defineMetadata(UNIFORM_META, cached ,target);
-    }
-    cached.uniforms.set(key as string, remapName);
+    // let cached: UniformProviderCache = Reflect.getMetadata(UNIFORM_META, target);
+    // if (cached === undefined) {
+    //   cached = {
+    //     uniforms: new Map()
+    //   }
+    //   Reflect.defineMetadata(UNIFORM_META, cached ,target);
+    // }
+    // cached.uniforms.set(key as string, remapName);
 
 
 
-    if (target.uniforms === undefined) {
-      target.uniforms = new Map();
-    }
-    if (target.propertyUniformNameMap === undefined) {
-      target.propertyUniformNameMap = new Map();
-    }
-    if (target.uniformsSizeAll === undefined) {
-      target.uniformsSizeAll = 0;
-    }
-    if (target._version === undefined) {
-      target._version = 0;
-    }
+    // if (target.uniforms === undefined) {
+    //   target.uniforms = new Map();
+    // }
+    // if (target.propertyUniformNameMap === undefined) {
+    //   target.propertyUniformNameMap = new Map();
+    // }
+    // if (target.uniformsSizeAll === undefined) {
+    //   target.uniformsSizeAll = 0;
+    // }
+    // if (target._version === undefined) {
+    //   target._version = 0;
+    // }
 
-    let value = undefined!;
-    const group: UniformGroup = {
-      value,
-      blockedBufferStartIndex: 0,
-      uploadCache: value,
-      isUploadCacheDirty: true,
-    }
-    target.uniforms.set(remapName, group);
-    const getter = () => {
-      return group.value;
-    };
-    const setter = (v: ArrayFlattenable | number) => {
-      group.value = v;
-      if (group.uploadCache === undefined) {
-        if (typeof v !== 'number') {
-          group.uploadCache = v.toArray();
-          group.blockedBufferStartIndex = target.uniformsSizeAll;
-          target.uniformsSizeAll += group.uploadCache.length;
-        } else {
-          group.uploadCache = v;
-          group.blockedBufferStartIndex = target.uniformsSizeAll;
-          target.uniformsSizeAll++;
-        }
-      }
-      group.isUploadCacheDirty = true;
+    // let value = undefined!;
+    // const group: UniformGroup = {
+    //   value,
+    //   blockedBufferStartIndex: 0,
+    //   uploadCache: value,
+    //   isUploadCacheDirty: true,
+    // }
+    // target.uniforms.set(remapName, group);
+    // const getter = () => {
+    //   return group.value;
+    // };
+    // const setter = (v: ArrayFlattenable | number) => {
+    //   group.value = v;
+    //   if (group.uploadCache === undefined) {
+    //     if (typeof v !== 'number') {
+    //       group.uploadCache = v.toArray();
+    //       group.blockedBufferStartIndex = target.uniformsSizeAll;
+    //       target.uniformsSizeAll += group.uploadCache.length;
+    //     } else {
+    //       group.uploadCache = v;
+    //       group.blockedBufferStartIndex = target.uniformsSizeAll;
+    //       target.uniformsSizeAll++;
+    //     }
+    //   }
+    //   group.isUploadCacheDirty = true;
       
-      target._version++;
-      target.blockedBufferNeedUpdate = true;
-    };
+    //   target._version++;
+    //   target.blockedBufferNeedUpdate = true;
+    // };
 
-    target.propertyUniformNameMap.set(key, remapName);
+    // target.propertyUniformNameMap.set(key, remapName);
+
+    const key = Symbol();
+
+    return {
+      get() {
+        return (this as any)[key];
+      },
+      set(newValue: any) {
+        (this as any)[key] = newValue;
+        (this as any).notifyProjectionChanged();
+      }
+    }
 
     Object.defineProperty(target, key, {
       get: getter,
