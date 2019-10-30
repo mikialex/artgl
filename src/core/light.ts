@@ -1,24 +1,16 @@
 import { SceneNode } from "../scene/scene-node";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { constValue, vec4 } from "../shader-graph/node-maker";
-import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform } from "./shading";
+import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, ProviderUploadCache } from "./shading";
 import { ShaderUniformInputNode, ShaderNode } from "../shader-graph/shader-node";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { Observable } from "./observable";
 import { Vector3 } from '../math';
-import { checkCreate } from "./shading-util";
 
 // TODO I cant figure out right multi inheritance impl with strong type, code duplicate 
 
 export abstract class Light<T> extends SceneNode
   implements ShaderUniformProvider, ShaderUniformDecorator {
-  constructor() {
-    super();
-
-    this.uniforms = checkCreate((this as any).uniforms, new Map());
-    this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
-    this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
-  }
 
   decorate(decorated: ShaderGraph): void {
     decorated
@@ -39,14 +31,9 @@ export abstract class Light<T> extends SceneNode
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable()
 
-  _version!: number;
   shouldProxyedByUBO = true;
-  uniforms: Map<string, any>;
-  uniformsSizeAll!: number;
-  blockedBufferNeedUpdate = true;
-  blockedBuffer = null;
+  uploadCache!: ProviderUploadCache;
 
-  propertyUniformNameMap: Map<string, string>;
   nodeCreated: Map<string, ShaderUniformInputNode> = new Map();
 
   getPropertyUniform(name: keyof T): ShaderUniformInputNode {

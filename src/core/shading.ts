@@ -32,6 +32,14 @@ export interface UniformGroup{
   uploadCache: uniformUploadType,
   isUploadCacheDirty: boolean,
   blockedBufferStartIndex: number,
+  uniformName: uniformName
+}
+
+export interface ProviderUploadCache {
+  blockedBuffer: Nullable<Float32Array>;
+  uniforms: Map<propertyName, UniformGroup>;
+  blockedBufferNeedUpdate: boolean;
+  _version: number;
 }
 
 type propertyName = string;
@@ -39,14 +47,7 @@ type uniformName = string;
 export interface ShaderUniformProvider {
   shouldProxyedByUBO: boolean;
 
-  _version: number;
-
-  // mark the shader need recompile
-  uniforms: Map<uniformName, UniformGroup>;
-  uniformsSizeAll: number;
-  blockedBufferNeedUpdate: boolean;
-  blockedBuffer: Nullable<Float32Array>;
-  propertyUniformNameMap: Map<propertyName, uniformName>;
+  uploadCache: ProviderUploadCache;
 }
 
 

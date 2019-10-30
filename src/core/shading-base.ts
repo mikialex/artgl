@@ -1,8 +1,6 @@
-
-import { checkCreate } from "./shading-util";
 import { Observable } from "./observable";
 import {
-  ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform
+  ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, ProviderUploadCache
 } from "./shading";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { ShaderUniformInputNode, ShaderTextureNode } from "../shader-graph/shader-node";
@@ -12,11 +10,6 @@ import { textureFromValue } from "../shader-graph/node-maker";
 
 export abstract class BaseEffectShading<T>
   implements ShaderUniformProvider, ShaderUniformDecorator {
-  constructor() {
-    this.uniforms = checkCreate((this as any).uniforms, new Map());
-    this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
-    this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
-  }
 
   shouldProxyedByUBO = true;
   abstract decorate(graph: ShaderGraph): void;
@@ -25,14 +18,8 @@ export abstract class BaseEffectShading<T>
     return visitor(this);
   }
 
-  notifyNeedRedecorate: Observable<ShaderUniformDecorator>
-
-  _version!: number;
-  propertyUniformNameMap: Map<string, string>;
-  uniforms: Map<string, any>;
-  blockedBufferNeedUpdate = true;
-  uniformsSizeAll!: number;
-  blockedBuffer = null;
+  notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable();
+  uploadCache!: ProviderUploadCache
 
   nodeCreated: Map<string, ShaderUniformInputNode> = new Map();
   textureNodeCreated: Map<string, ShaderTextureNode> = new Map();
