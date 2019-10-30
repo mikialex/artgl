@@ -1,7 +1,7 @@
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { Light } from "../core/light";
 import { WorldPositionFragVary, ShaderGraph } from "../shader-graph/shader-graph";
-import { MapUniform } from "../core/shading";
+import { Uniform } from "../core/shading";
 import { Vector3 } from "../math";
 import { ShaderNode } from '../shader-graph/shader-node';
 import { dir3D } from '../shader-graph/built-in/transform';
@@ -41,13 +41,13 @@ export class PointLight extends Light<PointLight> {
       .input("radius", this.getPropertyUniform('radius'))
   }
 
-  @MapUniform("u_pointLight_color")
+  @Uniform("u_pointLight_color")
   color: Vector3 = new Vector3(1, 1, 1)
 
   // TODO bind this to scene node transformation
-  @MapUniform("u_pointLight_lightPosition")
+  @Uniform("u_pointLight_lightPosition")
   position: Vector3 = new Vector3(0, 0, 0)
 
-  @MapUniform("u_pointLight_lightRadius")
+  @Uniform("u_pointLight_lightRadius")
   radius: number = 3
 }

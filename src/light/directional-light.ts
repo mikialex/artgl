@@ -1,6 +1,6 @@
 import { Light } from "../core/light";
 import { ShaderGraph, ShaderNode } from "../artgl";
-import { MapUniform } from "../core/shading";
+import { Uniform } from "../core/shading";
 import { Vector3 } from "../math";
 import { ShadingComponent } from "../core/shading-util";
 
@@ -15,10 +15,10 @@ export class DirectionalLight extends Light<DirectionalLight> {
     return this.getPropertyUniform("color")
   }
 
-  @MapUniform("u_directionalLight_color")
+  @Uniform("u_directionalLight_color")
   color: Vector3 = new Vector3(1, 1, 1)
 
-  @MapUniform("u_directionalLight_direction")
+  @Uniform("u_directionalLight_direction")
   direction: Vector3 = new Vector3(1, 1, 1).normalize()
 
 }

@@ -1,4 +1,4 @@
-import { BaseEffectShading, MapUniform } from "../../core/shading";
+import { BaseEffectShading, Uniform } from "../../core/shading";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { texture, screenQuad } from "../../shader-graph/node-maker";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
@@ -27,16 +27,16 @@ const tssaoBlend = new ShaderFunction({
 @ShadingComponent()
 export class TSSAOBlendShading extends BaseEffectShading<TSSAOBlendShading> {
 
-  @MapUniform("u_sampleCount")
+  @Uniform("u_sampleCount")
   sampleCount: number = 0;
 
-  @MapUniform("u_tssaoComposeRate")
+  @Uniform("u_tssaoComposeRate")
   tssaoComposeRate: number = 1;
 
-  @MapUniform("u_tssaoShowThreshold")
+  @Uniform("u_tssaoShowThreshold")
   tssaoShowThreshold: number = 200;
 
-  @MapUniform("u_tssaoComposeThreshold")
+  @Uniform("u_tssaoComposeThreshold")
   tssaoComposeThreshold: number = 0.5;
 
   decorate(graph: ShaderGraph) {

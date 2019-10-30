@@ -1,4 +1,4 @@
-import { MapUniform, BaseEffectShading } from "../../core/shading";
+import { Uniform, BaseEffectShading } from "../../core/shading";
 import { texture, screenQuad } from "../../shader-graph/node-maker";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
@@ -50,17 +50,17 @@ const tssaoMix = new ShaderFunction({
 @ShadingComponent()
 export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
   
-  @MapUniform("u_sampleCount")
+  @Uniform("u_sampleCount")
   sampleCount: number = 0;
 
-  @MapUniform("VPMatrixInverse")
+  @Uniform("VPMatrixInverse")
   VPMatrixInverse: Matrix4 = new Matrix4()
 
-  @MapUniform("VPMatrix")
+  @Uniform("VPMatrix")
   VPMatrix: Matrix4 = new Matrix4()
 
 
-  @MapUniform("u_aoRadius")
+  @Uniform("u_aoRadius")
   aoRadius: number = 1
 
   decorate(graph: ShaderGraph) {

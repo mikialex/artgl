@@ -5,11 +5,13 @@ import { GLProgram } from "../webgl/program/program";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { Observable, Observer } from "./observable";
 import { RenderEngine } from "../engine/render-engine";
-import { ShaderUniformInputNode } from '../shader-graph/shader-node';
-import { uniformFromValue } from '../shader-graph/node-maker';
+import { ShaderUniformInputNode, ShaderTextureNode } from '../shader-graph/shader-node';
+import { uniformFromValue, textureFromValue } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
 import { GLProgramConfig, uniformUploadType } from "../webgl/interface";
-export { MapUniform } from "./shading-util";
+import { UNIFORM_META, UNIFORM_TEXTURE_META } from "./shading-util";
+import { Texture, CubeTexture } from "../artgl";
+export { Uniform } from "./shading-util";
 
 
 export interface ShaderUniformDecorator {
@@ -25,6 +27,7 @@ export interface ShaderUniformDecorator {
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator>;
   nodeCreated: Map<string, ShaderUniformInputNode>;
+  textureNodeCreated: Map<string, ShaderTextureNode>;
 }
 
 export interface UniformGroup{
@@ -36,7 +39,7 @@ export interface UniformGroup{
 }
 
 export interface ProviderUploadCache {
-  blockedBuffer: Nullable<Float32Array>;
+  blockedBuffer: Float32Array;
   uniforms: Map<propertyName, UniformGroup>;
   blockedBufferNeedUpdate: boolean;
   _version: number;
@@ -225,7 +228,9 @@ export function getPropertyUniform<T, K extends ShaderUniformDecorator & ShaderU
   if (uniformNode !== undefined) {
     return uniformNode;
   }
-  const uniformName = env.propertyUniformNameMap.get(name as string);
+
+  const propertyUniformNameMap = Reflect.getMetadata(UNIFORM_META, env)
+  const uniformName = propertyUniformNameMap.get(name as string);
 
   if (uniformName === undefined) {
     throw `${name} uniform name not found, maybe forget decorator`
@@ -240,6 +245,28 @@ export function getPropertyUniform<T, K extends ShaderUniformDecorator & ShaderU
   node.wouldBeProxyedByUBO = env.shouldProxyedByUBO;
   
   return node;
+}
+
+export function getPropertyTexture<T, K extends ShaderUniformDecorator & ShaderUniformProvider>
+  (env: K, name: keyof T): ShaderTextureNode {
+    const textureNode = env.textureNodeCreated.get(name as string);
+    if (textureNode !== undefined) {
+      return textureNode;
+    }
+    const propertyUniformTextureNameMap = Reflect.getMetadata(UNIFORM_TEXTURE_META, env)
+    const textureName = propertyUniformTextureNameMap.get(name as string);
+  
+    if (textureName === undefined) {
+      throw `${name} uniform name not found, maybe forget decorator`
+    }
+  
+    const value = (env as unknown as T)[name];
+    if (value === undefined) {
+      throw "texture value not given"
+    }
+    const node = textureFromValue(textureName, value as unknown as Texture | CubeTexture);
+    env.textureNodeCreated.set(name as string, node);
+    return node;
 }
 
 function checkValue(value: any): value is ArrayFlattenable | number {

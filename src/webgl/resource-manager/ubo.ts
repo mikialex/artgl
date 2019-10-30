@@ -28,7 +28,7 @@ export class GLUBOManager implements GLReleasable {
       throw 'Webgl create buffer failed for UBO';
     }
     gl.bindBuffer(gl.UNIFORM_BUFFER, buffer);
-    gl.bufferData(gl.UNIFORM_BUFFER, provider.blockedBuffer, gl.STATIC_DRAW);
+    gl.bufferData(gl.UNIFORM_BUFFER, provider.uploadCache.blockedBuffer, gl.STATIC_DRAW);
     return buffer;
   }
 
@@ -37,7 +37,7 @@ export class GLUBOManager implements GLReleasable {
     if (ubo === undefined) {
       return this.createUBO(provider);
     } else {
-      if (provider._version !== this.UBOVersionMap.get(provider)) {
+      if (provider.uploadCache._version !== this.UBOVersionMap.get(provider)) {
         this.deleteUBO(provider, ubo);
         return this.createUBO(provider);
       } else {

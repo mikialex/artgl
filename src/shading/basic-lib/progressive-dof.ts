@@ -1,8 +1,8 @@
-import { BaseEffectShading, MapUniform } from "../../core/shading";
+import { BaseEffectShading, Uniform } from "../../core/shading";
 import { ShaderGraph } from "../../artgl";
 import { Vector2 } from "../../math/vector2";
 import { ShaderFunction } from "../../shader-graph/shader-function";
-import { ShadingComponent, Uniform } from "../../core/shading-util";
+import { ShadingComponent } from "../../core/shading-util";
 
 const progressiveDof = new ShaderFunction({
   source: `
@@ -24,7 +24,6 @@ const progressiveDof = new ShaderFunction({
 export class TestS extends BaseEffectShading<TestS>{
   decorate(graph: ShaderGraph) { }
 
-  @Uniform("dof_coc")
   coc = new Vector2();
 
 }
@@ -33,7 +32,7 @@ export class TestS extends BaseEffectShading<TestS>{
 @ShadingComponent()
 export class ProgressiveDof extends BaseEffectShading<ProgressiveDof> {
 
-  @MapUniform("dof_coc")
+  @Uniform("dof_coc")
   coc = new Vector2();
 
   updateSample() {
@@ -43,7 +42,7 @@ export class ProgressiveDof extends BaseEffectShading<ProgressiveDof> {
 
   blurRadius = 0.005
 
-  @MapUniform("dof_focus")
+  @Uniform("dof_focus")
   focusLength = 0;
 
   decorate(graph: ShaderGraph) {

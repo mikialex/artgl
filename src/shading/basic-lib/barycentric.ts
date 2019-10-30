@@ -1,4 +1,4 @@
-import { BaseEffectShading, MapUniform, MarkNeedRedecorate } from "../../core/shading";
+import { BaseEffectShading, Uniform, MarkNeedRedecorate } from "../../core/shading";
 import { ShaderGraph } from "../../shader-graph/shader-graph";
 import { constValue, attribute } from "../../shader-graph/node-maker";
 import { ShaderFunction, shader } from "../../shader-graph/shader-function";
@@ -49,10 +49,10 @@ const addBarycentricWireFrameScreenSpace = new ShaderFunction({
 @ShadingComponent()
 export class BarycentricWireFrame extends BaseEffectShading<BarycentricWireFrame> {
 
-  @MapUniform("barycentricLine_threshold")
+  @Uniform("barycentricLine_threshold")
   barycentricLine_threshold: number = 0.01;
 
-  @MapUniform("screenSpaceRatio")
+  @Uniform("screenSpaceRatio")
   screenSpaceRatio: number = 0.5;
 
   @MarkNeedRedecorate

@@ -257,7 +257,7 @@ export class ShaderGraph {
 function makeBlockUniformDescriptorFromProvider(
   p: ShaderUniformProvider, providerIndex: number): Nullable<UniformBlockDescriptor> {
   const uniforms: UniformDescriptor[] = [];
-  p.uniforms.forEach((u, name) => {
+  p.uploadCache.uniforms.forEach((u, name) => {
     uniforms.push({
       name: name,
       type: valueToGLType(u.value),

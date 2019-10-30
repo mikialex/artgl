@@ -1,7 +1,7 @@
 import { shader } from "../../shader-graph/shader-function"
 import { BaseEffectShading, ShaderGraph, WorldPositionFragVary } from "../../artgl"
 import { CubeTexture } from "../../core/texture-cube"
-import { MapUniform } from "../../core/shading"
+import { Uniform } from "../../core/shading"
 import { ShadingComponent } from "../../core/shading-util"
 
 export const sampleEnvMapAndNeedNormalize = shader(`
@@ -22,7 +22,7 @@ export class CubeEnvMapShading extends BaseEffectShading<CubeEnvMapShading> {
       )
   }
 
-  @MapUniform('envMap')
+  @Uniform('envMap')
   envMap: CubeTexture = new CubeTexture();
 
 }

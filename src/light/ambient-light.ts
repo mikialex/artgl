@@ -1,5 +1,5 @@
 import { Light } from "../core/light";
-import { MapUniform } from "../core/shading";
+import { Uniform } from "../core/shading";
 import { Vector3 } from "../math";
 import { ShaderGraph, NormalFragVary } from "../shader-graph/shader-graph";
 import { ShaderNode } from '../shader-graph/shader-node';
@@ -15,7 +15,7 @@ export class AmbientLight extends Light<AmbientLight> {
     return this.getPropertyUniform('color')
   }
 
-  @MapUniform("color")
+  @Uniform("color")
   color: Vector3 = new Vector3(1, 1, 1)
 
 }

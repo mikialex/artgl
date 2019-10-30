@@ -2,7 +2,8 @@ import { ShaderUniformProvider } from "./shading";
 import { valueToFlatted } from "./data-type";
 import "reflect-metadata";
 
-const UNIFORM_META = 'uniformMetaData';
+export const UNIFORM_META = 'uniformMetaData';
+export const UNIFORM_TEXTURE_META = 'uniformTextureMetaData';
 
 export function ShadingComponent() {
   return function _ShadingComponent
@@ -22,7 +23,7 @@ export function ShadingComponent() {
         info.uniforms.forEach((uniformName, propertyKey) => { 
           const value = (this as any)[propertyKey]
           const uniformGroup = {
-            value,
+            value, // todo maybe not need this ref, go reflect in useShading
             uploadCache: valueToFlatted(value),
             isUploadCacheDirty: true,
             blockedBufferStartIndex: 0,
@@ -55,8 +56,8 @@ interface UniformProviderCache{
   uniforms: Map<string, string>
 }
 
-export function MapUniform(remapName: string) {
-  return (target: ShaderUniformProvider, propertyKey: string) => {
+export function Uniform(remapName: string) {
+  return (target: ShaderUniformProvider, propertyKey: string): any => {
 
     // mark metadata;
     let cached: UniformProviderCache = Reflect.getMetadata(UNIFORM_META, target);
@@ -79,6 +80,26 @@ export function MapUniform(remapName: string) {
         (this as any).notifyUniformChange(propertyKey, newValue);
       }
     }
+  };
+}
+
+interface UniformTextureProviderCache{
+  textures: Map<string, string>
+}
+
+export function Texture(remapName: string) {
+  return (target: ShaderUniformProvider, propertyKey: string): any => {
+
+    // mark metadata;
+    let cached: UniformTextureProviderCache = Reflect.getMetadata(UNIFORM_TEXTURE_META, target);
+    if (cached === undefined) {
+      cached = {
+        textures: new Map()
+      }
+      Reflect.defineMetadata(UNIFORM_TEXTURE_META, cached ,target);
+    }
+    cached.textures.set(propertyKey, remapName);
+
   };
 }
 

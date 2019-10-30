@@ -1,4 +1,4 @@
-import { BaseEffectShading, MapUniform } from "../../core/shading";
+import { BaseEffectShading, Uniform } from "../../core/shading";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { NormalFragVary, ShaderGraph } from "../../shader-graph/shader-graph";
 import { CubeTexture } from "../../artgl";
@@ -33,7 +33,7 @@ export class IBLEnvMap extends BaseEffectShading<IBLEnvMap> {
       )
   }
 
-  @MapUniform('envMap')
+  @Uniform('envMap')
   envMap: CubeTexture = new CubeTexture();
 
 }

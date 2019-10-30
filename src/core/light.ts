@@ -2,7 +2,7 @@ import { SceneNode } from "../scene/scene-node";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { constValue, vec4 } from "../shader-graph/node-maker";
 import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, ProviderUploadCache } from "./shading";
-import { ShaderUniformInputNode, ShaderNode } from "../shader-graph/shader-node";
+import { ShaderUniformInputNode, ShaderNode, ShaderTextureNode } from "../shader-graph/shader-node";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { Observable } from "./observable";
 import { Vector3 } from '../math';
@@ -35,6 +35,7 @@ export abstract class Light<T> extends SceneNode
   uploadCache!: ProviderUploadCache;
 
   nodeCreated: Map<string, ShaderUniformInputNode> = new Map();
+  textureNodeCreated: Map<string, ShaderTextureNode> = new Map();
 
   getPropertyUniform(name: keyof T): ShaderUniformInputNode {
     return getPropertyUniform(this, name)

@@ -2,7 +2,7 @@ import { SceneNode, ExtendWithSceneNode } from "../scene/scene-node";
 import { Matrix4, Vector3 } from "../math/index";
 import { RenderEngine, Size } from '../engine/render-engine';
 import { ShaderUniformProvider, ShaderUniformDecorator, BaseEffectShading } from "./shading";
-import { MapUniform, ShadingComponent } from "./shading-util";
+import { Uniform, ShadingComponent } from "./shading-util";
 import { ShaderGraph, WorldPositionFragVary } from "../shader-graph/shader-graph";
 import { VPTransform, MTransform } from "../shader-graph/built-in/transform";
 import { uniformFromValue, attribute, vec4, constValue } from "../shader-graph/node-maker";
@@ -48,10 +48,10 @@ export class CameraSelf
 
   shouldProxyedByUBO = false; // todo fix
 
-  @MapUniform(CameraSelf.WorldMatrixKey)
+  @Uniform(CameraSelf.WorldMatrixKey)
   renderObjectWorldMatrix = new Matrix4();
 
-  @MapUniform(CameraSelf.ViewProjectionMatrix)
+  @Uniform(CameraSelf.ViewProjectionMatrix)
   _renderMatrix = new Matrix4();
 
   decorate(graph: ShaderGraph): void {
@@ -145,7 +145,7 @@ export class CameraSelf
     return this._viewProjectionMatrix;
   }
 
-  @MapUniform("worldPosition")
+  @Uniform("worldPosition")
   _worldPosition = new Vector3();
 
   // todo

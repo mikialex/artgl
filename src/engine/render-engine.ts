@@ -176,28 +176,22 @@ export class RenderEngine implements GLReleasable {
       decorator.foreachProvider(provider => {
         const syncedVersion = this.lastUploadedShaderUniformProvider.get(provider)
         if (syncedVersion !== undefined
-          && syncedVersion === provider._version // no new change
+          && syncedVersion === provider.uploadCache._version // no new change
         ) {
           // if we found this uniform provider has updated before and not changed, we can skip!
           return;
         }
 
-        if (this.UBOEnabled) { // when use ubo, check ubo buffer exist and create, each source length is ok;
-          if (provider.blockedBuffer === null) { // this only done once, todo move to other
-            provider.blockedBuffer = new Float32Array(provider.uniformsSizeAll);
-          }
-        }
-
-        provider.uniforms.forEach((value, key) => {
+        provider.uploadCache.uniforms.forEach((value, key) => {
           if (value instanceof Texture || value instanceof CubeTexture) {
             program.setTextureIfExist(key, value.getGLTexture(this));
           } else {
             if (value.isUploadCacheDirty) {
               if (this.UBOEnabled) { // when use ubo, we update ubo buffer
                 if (typeof value.value === 'number') {
-                  provider.blockedBuffer![value.blockedBufferStartIndex] = value.value;
+                  provider.uploadCache.blockedBuffer![value.blockedBufferStartIndex] = value.value;
                 } else {
-                  value.value.toArray(provider.blockedBuffer!, value.blockedBufferStartIndex);
+                  value.value.toArray(provider.uploadCache.blockedBuffer, value.blockedBufferStartIndex);
                 }
               } else { // else, we update each flatten uniform array and directly upload
                 if (typeof value.value === 'number') {
@@ -211,14 +205,15 @@ export class RenderEngine implements GLReleasable {
             }
           }
         })
+
+        // when use ubo, we final do ubo recreate and upload
         if (this.UBOEnabled && provider.shouldProxyedByUBO &&
-          provider.blockedBuffer !== null &&
-          provider.blockedBuffer.length !== 0) { // when use ubo, we final do ubo recreate and upload
+          provider.uploadCache.blockedBuffer.length !== 0) { 
           // provider _version has make sure we can get refreshed one
           const ubo = this.renderer.uboManager!.getUBO(provider);
           program.setUBOIfExist(uboKeys[providerCount], ubo);
         }
-        this.lastUploadedShaderUniformProvider.set(provider, provider._version)
+        this.lastUploadedShaderUniformProvider.set(provider, provider.uploadCache._version)
         providerCount++;
       })
     })
