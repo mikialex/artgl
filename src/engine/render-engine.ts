@@ -53,7 +53,7 @@ export class RenderEngine implements GLReleasable {
         console.warn(`ubo support is disabled, since your ctx cant support webgl2`)
       }
     } else {
-      config.useUBO = false;
+      config.useUBO = true;
     }
     this.UBOEnabled = supportUBO && config.useUBO;
   }

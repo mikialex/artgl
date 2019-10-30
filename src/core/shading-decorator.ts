@@ -17,7 +17,6 @@ export function ShadingComponent() {
         if (info === undefined) {
           return
         }
-        console.log(info)
 
         const uniforms = new Map();
         info.uniforms.forEach((uniformName, propertyKey) => { 

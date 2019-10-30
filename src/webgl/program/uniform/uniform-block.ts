@@ -46,7 +46,7 @@ export class GLUniformBlock{
       this.program.getProgram(), this.bindPoint,
       this.gl.UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES)
     
-    const offsets = this.gl.getActiveUniformBlockParameter(
+    const offsets = this.gl.getActiveUniforms(
       this.program.getProgram(), index,
       this.gl.UNIFORM_OFFSET)
     
