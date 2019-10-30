@@ -31,7 +31,7 @@ export interface Size {
 const copyShading = new Shading().decorate(new CopyShading());
 const quad = new QuadSource();
 
-interface RenderEngineConstructConfig{
+interface RenderEngineConstructConfig {
   el: HTMLCanvasElement;
   useUBO?: boolean;
   preferVAO?: boolean;
@@ -190,10 +190,10 @@ export class RenderEngine implements GLReleasable {
           if (layouts === undefined) {
             provider.uploadCache.blockedBuffer = new Float32Array(0); // this mark for checked
           } else {
-            provider.uploadCache.blockedBuffer = new Float32Array(layouts.all);
+            provider.uploadCache.blockedBuffer = new Float32Array(layouts.all / 4);
             let i = 0;
             provider.uploadCache.uniforms.forEach((g) => { // this is inset order, is same like shader
-              g.blockedBufferStartIndex = layouts.offsets[i];
+              g.blockedBufferStartIndex = layouts.offsets[i] / 4;
               i++;
             })
           }
@@ -223,14 +223,14 @@ export class RenderEngine implements GLReleasable {
               }
               program.setUniformIfExist(value.uniformName, value.uploadCache);
             }
-          
+
           }
         })
 
         // when use ubo, we final do ubo recreate and upload
         if (this.UBOEnabled && provider.shouldProxyedByUBO &&
           provider.uploadCache.uniforms.size !== 0 // no uniform provide by this provider
-        ) { 
+        ) {
           // provider _version has make sure we can get refreshed one
           const ubo = this.renderer.uboManager!.getUBO(provider);
           program.setUBOIfExist(uboKeys[providerCount], ubo);
