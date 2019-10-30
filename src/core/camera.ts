@@ -2,12 +2,12 @@ import { SceneNode, ExtendWithSceneNode } from "../scene/scene-node";
 import { Matrix4, Vector3 } from "../math/index";
 import { RenderEngine, Size } from '../engine/render-engine';
 import { ShaderUniformProvider, ShaderUniformDecorator, BaseEffectShading } from "./shading";
-import { MapUniform } from "./shading-util";
+import { Uniform, ShadingComponent } from "./shading-decorator";
 import { ShaderGraph, WorldPositionFragVary } from "../shader-graph/shader-graph";
 import { VPTransform, MTransform } from "../shader-graph/built-in/transform";
 import { uniformFromValue, attribute, vec4, constValue } from "../shader-graph/node-maker";
-import { CommonAttribute } from "../webgl/attribute";
 import { GLDataType } from "./data-type";
+import { CommonAttribute } from "../webgl/interface";
 
 export function MVP(graph: ShaderGraph) {
   if (graph.getIfSharedUniform(Camera.WorldMatrixKey) !== undefined &&
@@ -37,6 +37,7 @@ export function MVP(graph: ShaderGraph) {
  * Camera is abstraction of a decoration of view projection matrix in a vertex graph
  * Implementor should impl how matrix is calculate and how to react to render size change
  */
+@ShadingComponent()
 export class CameraSelf
   extends BaseEffectShading<CameraSelf>
   implements ShaderUniformProvider, ShaderUniformDecorator {
@@ -45,10 +46,12 @@ export class CameraSelf
   static readonly WorldPositionKey = 'CameraWorldPosition'
   static readonly ViewProjectionMatrix = 'CameraViewProjectionMatrix'
 
-  @MapUniform(CameraSelf.WorldMatrixKey)
+  shouldProxyedByUBO = false; // todo fix
+
+  @Uniform(CameraSelf.WorldMatrixKey)
   renderObjectWorldMatrix = new Matrix4();
 
-  @MapUniform(CameraSelf.ViewProjectionMatrix)
+  @Uniform(CameraSelf.ViewProjectionMatrix)
   _renderMatrix = new Matrix4();
 
   decorate(graph: ShaderGraph): void {
@@ -142,7 +145,7 @@ export class CameraSelf
     return this._viewProjectionMatrix;
   }
 
-  @MapUniform("worldPosition")
+  @Uniform("worldPosition")
   _worldPosition = new Vector3();
 
   // todo
@@ -154,6 +157,12 @@ export class CameraSelf
   //     }
   //     return this._worldPosition;
   //   }
+
+  up = new Vector3(0, 1, 0); // todo change watch
+  
+  lookAt(targetPosition: Vector3) {
+    this.transform.lookAt(targetPosition, this.up);
+  }
 
 }
 

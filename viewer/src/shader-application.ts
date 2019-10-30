@@ -7,7 +7,7 @@ import {
 export class ShaderApplication {
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-    this.engine = new RenderEngine(canvas);
+    this.engine = new RenderEngine({ el: canvas });
 
     this.camera.transform.position.set(20, 10, 10)
     this.camera.updateRenderRatio(this.engine);

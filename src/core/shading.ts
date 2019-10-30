@@ -1,15 +1,18 @@
 
-import { generateUUID } from "../math";
+import { generateUUID, ArrayFlattenable } from "../math";
 import { Nullable } from "../type";
-import { GLProgramConfig, GLProgram } from "../webgl/program";
+import { GLProgram } from "../webgl/program/program";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { Observable, Observer } from "./observable";
 import { RenderEngine } from "../engine/render-engine";
-import { ShaderCommonUniformInputNode } from '../shader-graph/shader-node';
-import { uniformFromValue } from '../shader-graph/node-maker';
+import { ShaderUniformInputNode, ShaderTextureNode } from '../shader-graph/shader-node';
+import { uniformFromValue, textureFromValue } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
+import { GLProgramConfig, uniformUploadType } from "../webgl/interface";
+import { UNIFORM_META, UNIFORM_TEXTURE_META } from "./shading-decorator";
+import { Texture, CubeTexture } from "../artgl";
+export { Uniform } from "./shading-decorator";
 
-export { MapUniform } from "./shading-util";
 
 export interface ShaderUniformDecorator {
   /**
@@ -18,25 +21,41 @@ export interface ShaderUniformDecorator {
   decorate(graph: ShaderGraph): void;
 
   /**
-   * one UniformProvider can have others provider depends and inject, return them in a array
+   * one UniformProvider can have others provider depends and inject, visit them all
    */
   foreachProvider(visitor: (p: ShaderUniformProvider) => any): void;
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator>;
-  nodeCreated: Map<string, ShaderCommonUniformInputNode>;
+  nodeCreated: Map<string, ShaderUniformInputNode>;
+  textureNodeCreated: Map<string, ShaderTextureNode>;
+}
+
+export interface UniformGroup{
+  value: ArrayFlattenable | number,
+  uploadCache: uniformUploadType,
+  isUploadCacheDirty: boolean,
+  blockedBufferStartIndex: number,
+  uniformName: uniformName
+}
+
+export interface ProviderUploadCache {
+  blockedBuffer: Nullable<Float32Array>;
+  uniforms: Map<propertyName, UniformGroup>;
+  blockedBufferNeedUpdate: boolean;
+  _version: number;
 }
 
 type propertyName = string;
 type uniformName = string;
 export interface ShaderUniformProvider {
+  shouldProxyedByUBO: boolean;
 
-  // mark any change in this uniform group
-  hasAnyUniformChanged: boolean;
-
-  // mark the shader need recompile
-  uniforms: Map<uniformName, any>;
-  propertyUniformNameMap: Map<propertyName, uniformName>;
+  uploadCache: ProviderUploadCache;
 }
+
+
+export type ShadingParams = Map<ShaderUniformDecorator, ShaderUniformDecorator>
+
 
 export class Shading {
 
@@ -52,6 +71,8 @@ export class Shading {
   private _decoratorSlot: Set<ShaderUniformDecorator> = new Set();
   private _namedDecoratorMap: Map<string, ShaderUniformDecorator> = new Map();
   private _decoratorObs: Map<ShaderUniformDecorator, Observer<ShaderUniformDecorator>> = new Map();
+
+  params: ShadingParams = new Map();
 
   getDecoratorByName(name: string) {
     return this._namedDecoratorMap.get(name)
@@ -91,7 +112,7 @@ export class Shading {
 
   decoCamera() {
     // this to avoid circle dep
-    const  { PerspectiveCameraInstance } = require("../camera/perspective-camera");
+    const { PerspectiveCameraInstance } = require("../camera/perspective-camera");
     this.decorate(PerspectiveCameraInstance)
     return this;
   }
@@ -116,7 +137,7 @@ export class Shading {
 
     if (name !== undefined) {
       if (this._namedDecoratorMap.has(name)) {
-        throw  `the named <${name}>'s name has been used before`
+        throw `the named <${name}>'s name has been used before`
       }
       this._namedDecoratorMap.set(name, decorator);
     }
@@ -133,17 +154,30 @@ export class Shading {
   }
 
   afterShaderCompiled: Observable<GLProgramConfig> = new Observable();
-  build() {
+  private build() {
     this.graph.reset()
+    let providerCount = 0;
+    const providerIndexMap = new Map<ShaderUniformProvider, number>();
     this._decorators.forEach(decorator => {
+      decorator.foreachProvider(p => {
+        providerIndexMap.set(p, providerCount);
+        providerCount++;
+      })
       decorator.decorate(this.graph);
     })
+    return providerIndexMap;
   }
 
-  getProgramConfig() {
+  getProgramConfig(isWebGL2?: boolean, useUBO?: boolean) {
+    if (isWebGL2 === undefined) { // just for debug convenience
+      isWebGL2 = true;
+    }
+    if (useUBO === undefined) { // just for debug convenience
+      useUBO = true;
+    }
     if (this._needRebuildShader) {
-      this.build();
-      this._programConfigCache = this.graph.compile();
+      const providerIndexMap = this.build();
+      this._programConfigCache = this.graph.compile(isWebGL2, useUBO, providerIndexMap);
       this.afterShaderCompiled.notifyObservers(this._programConfigCache)
       this._needRebuildShader = false;
     }
@@ -154,7 +188,7 @@ export class Shading {
     if (this._needRebuildShader) {
       this.disposeProgram(engine);
     }
-    return  engine.getProgram(this);
+    return engine.getProgram(this);
   }
 
   framebufferTextureMap: { [index: string]: string } = {};
@@ -169,7 +203,7 @@ export class Shading {
 }
 
 
-export function MarkNeedRedecorate<T>(_target: any, _propertyKey: any): any{
+export function MarkNeedRedecorate<T>(_target: any, _propertyKey: any): any {
   const key = Symbol();
   return {
     get(): T {
@@ -189,22 +223,55 @@ export function MarkNeedRedecorate<T>(_target: any, _propertyKey: any): any{
 export { BaseEffectShading } from './shading-base';
 
 export function getPropertyUniform<T, K extends ShaderUniformDecorator & ShaderUniformProvider>
-  (env: K, name: keyof T): ShaderCommonUniformInputNode {
+  (env: K, name: keyof T): ShaderUniformInputNode {
   const uniformNode = env.nodeCreated.get(name as string);
   if (uniformNode !== undefined) {
     return uniformNode;
   }
-  const uniformName = env.propertyUniformNameMap.get(name as string);
+
+  const propertyUniformNameMap = Reflect.getMetadata(UNIFORM_META, env).uniforms
+  const uniformName = propertyUniformNameMap.get(name as string);
 
   if (uniformName === undefined) {
     throw `${name} uniform name not found, maybe forget decorator`
   }
 
   const value = (env as unknown as T)[name];
-  if (value === undefined) {
-    throw "uniform value not given"
+  if (!checkValue(value)) {
+    throw "uniform value not valid, expect array flattenable "
   }
   const node = uniformFromValue(uniformName, value);
   env.nodeCreated.set(name as string, node);
+  node.wouldBeProxyedByUBO = env.shouldProxyedByUBO;
+  
   return node;
+}
+
+export function getPropertyTexture<T, K extends ShaderUniformDecorator & ShaderUniformProvider>
+  (env: K, name: keyof T): ShaderTextureNode {
+    const textureNode = env.textureNodeCreated.get(name as string);
+    if (textureNode !== undefined) {
+      return textureNode;
+    }
+    const propertyUniformTextureNameMap = Reflect.getMetadata(UNIFORM_TEXTURE_META, env).textures
+    const textureName = propertyUniformTextureNameMap.get(name as string);
+  
+    if (textureName === undefined) {
+      throw `${name} uniform name not found, maybe forget decorator`
+    }
+  
+    const value = (env as unknown as T)[name];
+    if (value === undefined) {
+      throw "texture value not given"
+    }
+    const node = textureFromValue(textureName, value as unknown as Texture | CubeTexture);
+    env.textureNodeCreated.set(name as string, node);
+    return node;
+}
+
+function checkValue(value: any): value is ArrayFlattenable | number {
+  if (typeof value === "number") {
+    return true;
+  }
+  return value && value.toArray !== undefined && value.fromArray !== undefined;
 }

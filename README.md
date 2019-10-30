@@ -1,25 +1,29 @@
 
-ArtGL is a TypeScript WebGL framework.
+# ArtGL, a TypeScript Web3D framework
 
 ## Design & Features
 
-### easy and clear
+### Easy and clear
 
 As easy as three.js. You can regard this project as a better three.js, maybe with better design and better code quality. Many code referenced from three.js :)
 
-### extendable architecture
+### Extendable architecture
 
 Instead of making a specific renderer for specific usage, or a general renderer that hard to extent features, artgl is a  framework for general usage. You can easily customize it, extent it to meet you requirements.
 
-### declarative render pipeline by renderGraph API
+### Declarative render pipeline by renderGraph API
 
 Build your post-process pipeline use rendergraph api, we will handle everything about render procedure. Auto support FBO reuse. Make multi pass rendering, add custom optimizer, tweaking effects, debug performance, more delightful than before.
 
-### expressive shading abstraction by shaderGraph API
+### Expressive shading abstraction by shaderGraph API
 
-We also use graph as the shader fragment linker. Its a revolutionary improvement of composability in shader source and shader computation abstraction.  No more confusing #define #include. Make shader effect development productive and provide a sound abstraction in artgl shading model.
+We also use graph as the shader fragment linker. Its a revolutionary improvement of composability in shader source and shader computation abstraction.  No more confusing #define #include. Make shader effect development productive and provide a sound abstraction in artgl shading model. **You can write shader effect in component style**, and freely compose them, publish them, organize your code better than before.
 
-### experimental WebAssembly accelerated scene render data computation 
+### Alway use advance WebGL API, and auto downgrade
+
+When WebGL2 supports, it would be used, or we will **auto** downgrade to 1 (try our best). When VAO or UBO support, we **auto** support and auto downgrade gracefully.
+
+### Experimental WebAssembly accelerated scene render data computation
 
 Performance matters.
 
@@ -57,7 +61,51 @@ Some old post maybe not meet the current design, just for reference;
 
 ## Some samples here
 
+### ShaderGraph API
+
+Its a typical shader effect component:
+
+```ts
+
+@ShadingComponent()
+export class PhongShading<T> extends BaseEffectShading<PhongShading<T>> {
+  constructor(lights: Array<Light<T>>) {
+    super();
+    this.lights = lights
+  }
+
+  decorate(graph: ShaderGraph): void {
+    graph.setFragmentRoot(
+      collectLightNodes<T>(this.lights,
+        (light) => {
+        return phongShading.make()
+        .input("lightDir", light.produceLightFragDir(graph))
+        .input("lightIntensity", light.produceLightIntensity(graph))
+        .input("surfaceNormal", graph.getVary(NormalFragVary))
+        .input("eyeDir", graph.getEyeDir())
+        .input("shininess", this.getPropertyUniform("shininess"))
+      })
+    )
+  }
+
+  foreachProvider(visitor: (p: ShaderUniformProvider) => any) {
+    visitor(this);
+    this.lights.forEach(light => {
+      visitor(light);
+    })
+  }
+
+  lights: Array<Light<T>>
+
+  @Uniform("shininess")
+  shininess: number = 15;
+
+}
+```
+
 ### Shading API
+
+And you can use the things above in shading api:
 
 Decorate shading with any other shading decorator. Provide uniform block with extendable shading provider.
 
@@ -90,46 +138,7 @@ Decorate shading with any other shading decorator. Provide uniform block with ex
 
 ```
 
-### ShaderGraph API
-
-```ts
-export class PhongShading<T> extends BaseEffectShading<PhongShading<T>> {
-  constructor(lights: Array<Light<T>>) {
-    super();
-    this.lights = lights
-  }
-
-  decorate(graph: ShaderGraph): void {
-    graph.setFragmentRoot(
-      collectLightNodes<T>(this.lights,
-        (light) => {
-        return phongShading.make()
-        .input("lightDir", light.produceLightFragDir(graph))
-        .input("lightIntensity", light.produceLightIntensity(graph))
-        .input("surfaceNormal", graph.getVary(NormalFragVary))
-        .input("eyeDir", graph.getEyeDir())
-        .input("shininess", this.getPropertyUniform("shininess"))
-      })
-    )
-  }
-
-  foreachProvider(visitor: (p: ShaderUniformProvider) => any) {
-    visitor(this);
-    this.lights.forEach(light => {
-      visitor(light);
-    })
-  }
-
-  lights: Array<Light<T>>
-
-  @MapUniform("shininess")
-  shininess: number = 15;
-
-}
-```
-
 ### RenderGraph API
-
 
 ```ts
 const depthPass = pass("depthPass").use(scene.renderScene)
@@ -148,7 +157,7 @@ const createTAA = () => {
     .beforeExecute(() => {
       this.engine.unJit();
       const VP: Matrix4 = this.engine.globalUniforms.VPMatrix.value
-      this.taaShading.VPMatrixInverse = this.taaShading.VPMatrixInverse.getInverse(VP, true); // TODO maybe add watch
+      this.taaShading.VPMatrixInverse = this.taaShading.VPMatrixInverse.getInverse(VP, true);
       this.taaShading.sampleCount = this.sampleCount;
     })
     .input("sceneResult", sceneResult)

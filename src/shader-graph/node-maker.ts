@@ -1,15 +1,12 @@
 import {
-  ShaderAttributeInputNode, ShaderCommonUniformInputNode,
+  ShaderAttributeInputNode, ShaderUniformInputNode,
   ShaderTextureNode, ShaderNode, ShaderConstType, ShaderConstNode, ShaderCombineNode
 } from "./shader-node";
-import { GLTextureType } from "../webgl/uniform/uniform-texture";
-import { Vector2 } from "../math/vector2";
-import { Vector3, Matrix4 } from "../math";
-import { Vector4 } from "../math/vector4";
-import { CommonAttribute } from "../webgl/attribute";
+import { Vector2, Vector3, Matrix4, Vector4, ArrayFlattenable } from "../math";
 import { Texture } from "../artgl";
 import { CubeTexture } from "../core/texture-cube";
-import { GLDataType } from "../core/data-type";
+import { GLDataType, valueToGLType } from "../core/data-type";
+import { GLTextureType, CommonAttribute } from "../webgl/interface";
 
 export function attribute(name: string, type: GLDataType) {
   return new ShaderAttributeInputNode({ name, type });
@@ -24,7 +21,7 @@ export function cubeTexture(name: string) {
 }
 
 export function uniform(name: string, type: GLDataType) {
-  return new ShaderCommonUniformInputNode({ name, type });
+  return new ShaderUniformInputNode({ name, type });
 }
 
 export function textureFromValue(textureName:string, value: Texture | CubeTexture){
@@ -37,20 +34,8 @@ export function textureFromValue(textureName:string, value: Texture | CubeTextur
   }
 }
 
-export function uniformFromValue(name: string, value: any) {
-  if (typeof value === "number") {
-    return uniform(name, GLDataType.float).default(value);
-  } else if (value instanceof Vector2) {
-    return uniform(name, GLDataType.floatVec2).default(value);
-  } else if (value instanceof Vector3) {
-    return uniform(name, GLDataType.floatVec3).default(value);
-  } else if (value instanceof Vector4) {
-    return uniform(name, GLDataType.floatVec4).default(value);
-  } else if (value instanceof Matrix4) {
-    return uniform(name, GLDataType.Mat4).default(value);
-  } else {
-    throw "unsupported uniform value"
-  }
+export function uniformFromValue(name: string, value: ArrayFlattenable | number) {
+  return uniform(name, valueToGLType(value)).default(value);
 }
 
 export function value(value: ShaderConstType) {
@@ -81,7 +66,7 @@ export function screenQuad() {
 }
 
 export function makeInstance(
-  node: ShaderCommonUniformInputNode | ShaderAttributeInputNode
+  node: ShaderUniformInputNode | ShaderAttributeInputNode
 ) {
   return new ShaderAttributeInputNode({
     name: node.name, type: node.type

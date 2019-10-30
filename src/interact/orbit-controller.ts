@@ -3,20 +3,17 @@ import { Spherical } from "../math/spherical";
 import { Interactor } from "./interactor";
 import { Vector2 } from "../math/vector2";
 import { Vector3, MathUtil } from "../math/index";
-import { PerspectiveCamera } from "../camera/perspective-camera";
+import { Camera } from "../artgl";
 
 
 const tempVec = new Vector3();
 
 export class OrbitController extends Controller {
 
-  constructor(public camera: PerspectiveCamera) {
+  constructor(public camera: Camera) {
     super();
     this.camera = camera;
-
-    const v = new Vector3();
-    v.copy(camera.transform.position).sub(this.spherical.center);
-    this.spherical.setFromVector(v);
+    this.reloadStates();
   }
 
   spherical: Spherical = new Spherical();
@@ -39,6 +36,9 @@ export class OrbitController extends Controller {
   rotateDampingFactor = 0.1;
   panDampingFactor = 0.1;
 
+  viewWidth = window.innerWidth;
+  viewHeight = window.innerHeight;
+
 
   public registerInteractor(interactor: Interactor) {
     if (this.interactor !== null) {
@@ -53,11 +53,9 @@ export class OrbitController extends Controller {
 
   // operate methods
   rotate = (offset: Vector2) => {
-    const viewWidth = this.camera.width * 5000;
-    const viewHeight = this.camera.height * 5000;
 
-    this.sphericalDelta.polar += offset.y / viewHeight * Math.PI * this.rotateAngleFactor
-    this.sphericalDelta.azim += offset.x / viewWidth * Math.PI * this.rotateAngleFactor
+    this.sphericalDelta.polar += offset.y / this.viewHeight * Math.PI * this.rotateAngleFactor
+    this.sphericalDelta.azim += offset.x / this.viewWidth * Math.PI * this.rotateAngleFactor
 
     this.needUpdate = true;
   }
@@ -75,6 +73,12 @@ export class OrbitController extends Controller {
   }
 
   public needUpdate: boolean = true;
+
+  
+  reloadStates(): void {
+    tempVec.copy(this.camera.transform.position).sub(this.spherical.center);
+    this.spherical.setFromVector(tempVec);
+  }
 
 
   public update() {

@@ -1,61 +1,32 @@
-
-import { checkCreate } from "./shading-util";
 import { Observable } from "./observable";
 import {
-  ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform
+  ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, ProviderUploadCache, getPropertyTexture
 } from "./shading";
 import { ShaderGraph } from "../shader-graph/shader-graph";
-import { ShaderCommonUniformInputNode, ShaderTextureNode } from "../shader-graph/shader-node";
-import { CubeTexture } from "./texture-cube";
-import { Texture } from "../artgl";
-import { textureFromValue } from "../shader-graph/node-maker";
+import { ShaderUniformInputNode, ShaderTextureNode } from "../shader-graph/shader-node";
 
 export abstract class BaseEffectShading<T>
   implements ShaderUniformProvider, ShaderUniformDecorator {
-  constructor() {
-    this.uniforms = checkCreate((this as any).uniforms, new Map());
-    this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
-    this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
-  }
 
+  shouldProxyedByUBO = true;
   abstract decorate(graph: ShaderGraph): void;
 
   foreachProvider(visitor: (p: ShaderUniformProvider) => any) {
     return visitor(this);
   }
 
-  notifyNeedRedecorate: Observable<ShaderUniformDecorator>
+  notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable();
+  uploadCache!: ProviderUploadCache
 
-  hasAnyUniformChanged: boolean = true;
-  propertyUniformNameMap: Map<string, string>;
-  uniforms: Map<string, any>;
-
-
-  nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
+  nodeCreated: Map<string, ShaderUniformInputNode> = new Map();
   textureNodeCreated: Map<string, ShaderTextureNode> = new Map();
 
-  getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
+  getPropertyUniform(name: keyof T): ShaderUniformInputNode {
     return getPropertyUniform(this, name)
   }
 
   getPropertyTexture(name: keyof T): ShaderTextureNode {
-    const textureNode = this.textureNodeCreated.get(name as string);
-    if (textureNode !== undefined) {
-      return textureNode;
-    }
-    const textureName = this.propertyUniformNameMap.get(name as string);
-  
-    if (textureName === undefined) {
-      throw `${name} uniform name not found, maybe forget decorator`
-    }
-  
-    const value = (this as unknown as T)[name];
-    if (value === undefined) {
-      throw "texture value not given"
-    }
-    const node = textureFromValue(textureName, value as unknown as Texture | CubeTexture);
-    this.textureNodeCreated.set(name as string, node);
-    return node;
+    return getPropertyTexture(this, name);
   }
 
 }

@@ -10,6 +10,7 @@ import { createConf } from './conf';
 import { CopyShading } from '../../src/shading/pass-lib/copy';
 import { Nullable } from '../../src/type';
 import { DirectionalShadowMap } from '../../src/shadow-map/directional-shadowmap';
+import { PerspectiveCameraInstance } from '../../src/camera/perspective-camera';
 
 const copier = new Shading().decorate(new CopyShading())
 
@@ -96,7 +97,9 @@ export class AdvanceStaticRenderPipeline {
     // }
   }
 
-  directionalShadowMap: RenderTargetNode =target("directionalShadowMap").needDepth()
+  directionalShadowMap!: DirectionalShadowMap
+
+  directionalShadowMapTarget: RenderTargetNode =target("directionalShadowMap").needDepth()
   .afterContentReceived(node => {
     const shadowMapTextureFBOKey = this.composer.getFramebuffer(node)!.name
     if (this.sceneShading !== null) {
@@ -107,19 +110,28 @@ export class AdvanceStaticRenderPipeline {
   private build(scene: Scene, camera: PerspectiveCamera) {
     this.updateTicks();
 
-    const directionalShadowMapPass = pass("directionalShadowMapPass")
-      .use(scene.renderScene)
-      .overrideShading(this.depthShader)
+    // // draw the shadow map
+    // const directionalShadowMapPass = pass("directionalShadowMapPass")
+    //   .use(scene.renderScene)
+    //   .overrideShading(this.depthShader)
+    //   .beforeExecute(() => {
+    //     this.depthShader.params.set(PerspectiveCameraInstance, this.directionalShadowMap.getShadowCamera())
+    //   }).afterExecute(() => {
+    //     this.depthShader.params.clear();
+    // })
     
-    this.directionalShadowMap = this.directionalShadowMap
-      .from(directionalShadowMapPass)
+    // this.directionalShadowMapTarget = this.directionalShadowMapTarget
+    //   .from(directionalShadowMapPass)
     
     const depthPass = pass("depthPass").use(scene.renderScene)
+      .beforeExecute(() => {
+        let a = 1;
+    })
       .overrideShading(this.depthShader)
 
     const scenePass = pass("scenePass")
       .use(scene.render)
-      .depend(this.directionalShadowMap)
+      // .depend(this.directionalShadowMapTarget)
 
     const depthResult = target("depthResult").needDepth().from(depthPass)
     const sceneResult = target("sceneResult").needDepth().from(scenePass)
@@ -130,7 +142,6 @@ export class AdvanceStaticRenderPipeline {
         .overrideShading(this.taaShader)
         .disableColorClear()
         .beforeExecute(() => {
-          this.taaShading.VPMatrixInverse = this.taaShading.VPMatrixInverse.getInverse(VP, true); // TODO maybe add watch
           this.taaShading.sampleCount = this.sampleCount;
         })
         .input("sceneResult", sceneResult)
@@ -148,7 +159,7 @@ export class AdvanceStaticRenderPipeline {
         .disableColorClear()
         .beforeExecute(() => {
           this.tssaoShading.VPMatrix = VP;
-          this.tssaoShading.VPMatrixInverse = this.tssaoShading.VPMatrixInverse.getInverse(VP, true);
+          this.tssaoShading.VPMatrixInverse = this.tssaoShading.VPMatrixInverse.getInverse(VP, true);// TODO maybe add watch
           this.tssaoShading.sampleCount = this.sampleCount;
         })
         .input("depthResult", depthResult)
@@ -175,6 +186,16 @@ export class AdvanceStaticRenderPipeline {
             .input("copySource", AAedScene))
       )
     )
+
+    // this.graph.setScreenRoot(
+    //   screen().from(
+    //     when(
+    //       false, 
+    //       createTSSAO(),
+    //       pass("copy").useQuad().overrideShading(copier)
+    //         .input("copySource", sceneResult))
+    //   )
+    // )
 
   }
 }

@@ -2,11 +2,24 @@
 import { Interactor } from "./interactor";
 import { Nullable } from "../type";
 
-// controller is about how to manipulate camera easily
-export class Controller{
-  constructor() {
+export abstract class Controller{
+
+  interactor: Nullable<Interactor> = null;
+
+  private _enabled = true;
+
+  get enabled() {
+    return this._enabled;
   }
 
-  public interactor: Nullable<Interactor> = null;
+  set enabled(value: boolean) {
+    if (value) {
+      this.reloadStates();
+    }
+    this._enabled = value;
+  }
 
+  abstract reloadStates(): void;
+
+  abstract update(): void;
 }

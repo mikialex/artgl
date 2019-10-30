@@ -1,8 +1,9 @@
-import { Matrix4, Vector3 } from "../../math/index";
-import { Vector2 } from "../../math/vector2";
-import { Vector4 } from "../../math/vector4";
-import { flattenerType, copierType, differType } from "./uniform";
-import { GLDataType } from "../../core/data-type";
+import { uniformUploadType } from "../../interface";
+import { GLDataType } from "../../../core/data-type";
+
+export type setterType = (gl: WebGLRenderingContext, location: WebGLUniformLocation, data: uniformUploadType) => void
+export type copierType = (newValue: uniformUploadType, target: uniformUploadType) => uniformUploadType;
+export type differType = (newValue: uniformUploadType, oldValue: uniformUploadType) => boolean;
 
 export function findUniformSetter(type: GLDataType): any {
   switch (type) {
@@ -82,27 +83,5 @@ export function findUniformCopier(type: GLDataType): copierType {
   } else {
     return copyArray as copierType
   }
-}
-
-export function findUniformFlattener(type: GLDataType): flattenerType {
-  switch (type) {
-    case GLDataType.float: return (v: number) => v;
-    case GLDataType.floatVec2: return Vector2.flatten as flattenerType;
-    case GLDataType.floatVec3: return Vector3.flatten as flattenerType;
-    case GLDataType.floatVec4: return Vector4.flatten as flattenerType;
-
-    case GLDataType.Mat2: throw 'not support yet'; // _MAT2
-    case GLDataType.Mat3: throw 'not support yet' // _MAT3
-    case GLDataType.Mat4: return Matrix4.flatten as flattenerType // _MAT4
-
-    // case 0x8b5e: case 0x8d66: return setValueT1; // SAMPLER_2D, SAMPLER_EXTERNAL_OES
-    // case 0x8b60: return setValueT6; // SAMPLER_CUBE
-
-    // case 0x1404: case 0x8b56: return setValue1i; // INT, BOOL
-    // case 0x8b53: case 0x8b57: return setValue2iv; // _VEC2
-    // case 0x8b54: case 0x8b58: return setValue3iv; // _VEC3
-    // case 0x8b55: case 0x8b59: return setValue4iv; // _VEC4
-  }
-  throw 'uniform flattener not found'
 }
 

@@ -114,6 +114,8 @@ export default class ScenePanel extends Vue {
 .scene-panel {
   border: 1px solid #ddd;
   width: 300px;
+  min-width: 300px;
+  max-width: 300px;
   font-size: 14px;
 }
 

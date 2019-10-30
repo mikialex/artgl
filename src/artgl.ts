@@ -2,7 +2,7 @@
 
 // low level gl layer
 export { GLRenderer } from "./webgl/gl-renderer";
-export { GLProgram } from "./webgl/program";
+export { GLProgram } from "./webgl/program/program";
 export * from "./webgl/const";
 
 // artgl engine layer

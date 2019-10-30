@@ -1,17 +1,17 @@
 import { GLRenderer } from "../webgl/gl-renderer";
-import { RenderObject, RenderRange, ShadingParams } from "../core/render-object";
-import { GLProgram } from "../webgl/program";
+import { RenderObject, RenderRange } from "../core/render-object";
+import { GLProgram } from "../webgl/program/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
 import { Material } from "../core/material";
-import { GLTextureUniform } from "../webgl/uniform/uniform-texture";
-import { Nullable, GLReleasable } from "../type";
+import { GLTextureUniform } from "../webgl/program/uniform/uniform-texture";
+import { Nullable, GLReleasable, FloatArray } from "../type";
 import { Observable } from "../core/observable";
 import { GLFramebuffer } from '../webgl/gl-framebuffer';
 import { QuadSource } from './render-source';
 import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
-import { VAOCreateCallback } from "../webgl/vao";
+import { VAOCreateCallback } from "../webgl/resource-manager/vao";
 import { Vector4 } from "../math/vector4";
 import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
@@ -31,32 +31,52 @@ export interface Size {
 const copyShading = new Shading().decorate(new CopyShading());
 const quad = new QuadSource();
 
-export class RenderEngine implements GLReleasable {
-  constructor(el: HTMLCanvasElement, ctxOptions?: any) {
-    this.renderer = new GLRenderer(el, ctxOptions);
-    this.interactor = new Interactor(el);
+interface RenderEngineConstructConfig {
+  el: HTMLCanvasElement;
+  useUBO?: boolean;
+  preferVAO?: boolean;
+}
 
-    this.preferVAO = true;
+const uboKeys = new Array(100).fill("").map((_, index) => {
+  return 'ubo' + index;
+})
+
+export class RenderEngine implements GLReleasable {
+  constructor(config: RenderEngineConstructConfig) {
+    this.renderer = new GLRenderer(config.el);
+    this.interactor = new Interactor(config.el);
+
+    this.preferVAO = config.preferVAO !== undefined ? config.preferVAO : true;
+    const supportUBO = this.renderer.ctxVersion === 2;
+    if (config.useUBO !== undefined) {
+      if (!supportUBO && config.useUBO) {
+        console.warn(`ubo support is disabled, since your ctx cant support webgl2`)
+      }
+    } else {
+      config.useUBO = true;
+    }
+    this.UBOEnabled = supportUBO && config.useUBO;
   }
 
   readonly interactor: Interactor
 
   readonly renderer: GLRenderer;
+  readonly UBOEnabled: boolean;
 
   _preferVAO: boolean = true;
-  _vaoEnabled: boolean = false;
-  get vaoEnabled(): boolean { return this._vaoEnabled };
+  _VAOEnabled: boolean = false;
+  get VAOEnabled(): boolean { return this._VAOEnabled };
   get preferVAO(): boolean { return this._preferVAO };
   set preferVAO(val: boolean) {
     this._preferVAO = val;
     if (val) {
       if (!this.renderer.vaoManager.isSupported) {
-        console.warn(`prefer vao is set to true, but your environment cant support vao, vaoEnabled is false`)
+        console.warn(`prefer vao is set to true, but your environment cant support vao, VAOEnabled is false`)
       }
-      this._vaoEnabled = true
+      this._VAOEnabled = true
     } else {
       this.renderer.vaoManager.releaseGL();
-      this._vaoEnabled = false
+      this._VAOEnabled = false
     }
   }
 
@@ -110,13 +130,13 @@ export class RenderEngine implements GLReleasable {
 
 
 
-  private lastUploadedShaderUniformProvider: Set<ShaderUniformProvider> = new Set();
+  private lastUploadedShaderUniformProvider: Map<ShaderUniformProvider, number> = new Map();
   private lastProgramRendered: Nullable<GLProgram> = null;
 
   private currentShading: Nullable<Shading> = null;
   private currentProgram: Nullable<GLProgram> = null;
 
-  useShading(shading: Nullable<Shading>, shadingParams?: ShadingParams) {
+  useShading(shading: Nullable<Shading>) {
 
     // todo
     this.activeCamera.renderObjectWorldMatrix = this.renderObjectWorldMatrix
@@ -138,31 +158,85 @@ export class RenderEngine implements GLReleasable {
     this.currentShading = shading;
     this.renderer.useProgram(program);
 
+    const shadingParams = shading.params;
+    let providerCount = 0;
     shading._decorators.forEach(defaultDecorator => {
+
       let overrideDecorator
+      // decorator override use
       if (shadingParams !== undefined) {
         overrideDecorator = shadingParams.get(defaultDecorator)
       }
+      // decoCamera support
       if (overrideDecorator === undefined && defaultDecorator instanceof Camera) {
         overrideDecorator = this.activeCamera
       }
       const decorator = overrideDecorator === undefined ? defaultDecorator : overrideDecorator;
+
       decorator.foreachProvider(provider => {
-        if (this.lastUploadedShaderUniformProvider.has(provider)
-          && !provider.hasAnyUniformChanged
+        if (provider.uploadCache === undefined) { // some provider not provide uniform
+          return;
+        }
+        const syncedVersion = this.lastUploadedShaderUniformProvider.get(provider)
+        if (syncedVersion !== undefined
+          && syncedVersion === provider.uploadCache._version // no new change
         ) {
           // if we found this uniform provider has updated before and not changed, we can skip!
           return;
         }
-        provider.uniforms.forEach((value, key) => {
-          if (value instanceof Texture || value instanceof CubeTexture) {
-            program.setTextureIfExist(key, value.getGLTexture(this));
+
+        if (provider.uploadCache.blockedBuffer === null) {
+          const layouts = program.queryUBOLayoutIfExist(uboKeys[providerCount]);
+          if (layouts === undefined) {
+            provider.uploadCache.blockedBuffer = new Float32Array(0); // this mark for checked
           } else {
-            program.setUniformIfExist(key, value);
+            provider.uploadCache.blockedBuffer = new Float32Array(layouts.all / 4);
+            let i = 0;
+            provider.uploadCache.uniforms.forEach((g) => { // this is inset order, is same like shader
+              g.blockedBufferStartIndex = layouts.offsets[i] / 4;
+              i++;
+            })
+          }
+        }
+
+        provider.uploadCache.uniforms.forEach((value, key) => {
+          if (value instanceof Texture || value instanceof CubeTexture) {
+            program.setTextureIfExist(value.uniformName, value.getGLTexture(this));
+          } else {
+            if (this.UBOEnabled && provider.shouldProxyedByUBO) { // when use ubo, we update ubo buffer
+              if (value.isUploadCacheDirty) {
+                if (typeof value.value === 'number') {
+                  provider.uploadCache.blockedBuffer![value.blockedBufferStartIndex] = value.value;
+                } else {
+                  value.value.toArray(provider.uploadCache.blockedBuffer!, value.blockedBufferStartIndex);
+                }
+                value.isUploadCacheDirty = false;
+              }
+            } else { // else, we update each flatten uniform array and directly upload
+              if (value.isUploadCacheDirty) {
+                if (typeof value.value === 'number') {
+                  value.uploadCache = value.value;
+                } else {
+                  value.uploadCache = value.value.toArray(value.uploadCache as FloatArray);
+                }
+                value.isUploadCacheDirty = false;
+              }
+              program.setUniformIfExist(value.uniformName, value.uploadCache);
+            }
+
           }
         })
-        provider.hasAnyUniformChanged = false;
-        this.lastUploadedShaderUniformProvider.add(provider);
+
+        // when use ubo, we final do ubo recreate and upload
+        if (this.UBOEnabled && provider.shouldProxyedByUBO &&
+          provider.uploadCache.uniforms.size !== 0 // no uniform provide by this provider
+        ) {
+          // provider _version has make sure we can get refreshed one
+          const ubo = this.renderer.uboManager!.getUBO(provider);
+          program.setUBOIfExist(uboKeys[providerCount], ubo);
+        }
+        this.lastUploadedShaderUniformProvider.set(provider, provider.uploadCache._version)
+        providerCount++;
       })
     })
 
@@ -172,7 +246,7 @@ export class RenderEngine implements GLReleasable {
     if (this.currentProgram === null) {
       throw 'shading not exist'
     }
-    this.currentProgram.forTextures((tex: GLTextureUniform) => {
+    this.currentProgram.textures.forEach((tex: GLTextureUniform) => {
       let glTexture: WebGLTexture | undefined;
 
       // acquire texture from material
@@ -220,7 +294,7 @@ export class RenderEngine implements GLReleasable {
 
     // vao check
     let vaoUnbindCallback: VAOCreateCallback | undefined;
-    if (this._vaoEnabled) {
+    if (this._VAOEnabled) {
       vaoUnbindCallback = this.renderer.vaoManager.connectGeometry(geometry, this.currentShading!)
       if (vaoUnbindCallback === undefined) {
         return;// vao has bind, geometry buffer is ok;
@@ -228,14 +302,13 @@ export class RenderEngine implements GLReleasable {
     }
 
     // common procedure
-    program.forAttributes(att => {
+    program.attributes.forEach(att => {
       const bufferData = geometry.getBuffer(att.name);
       if (bufferData === undefined) {
         throw `program needs an attribute named ${att.name}, but cant find in geometry data`;
       }
       const glBuffer = this.createOrUpdateAttributeBuffer(bufferData, false);
       att.useBuffer(glBuffer);
-      return true;
     })
 
     if (program.useIndexDraw) {
@@ -248,7 +321,7 @@ export class RenderEngine implements GLReleasable {
     }
 
     // create vao
-    if (this._vaoEnabled) {
+    if (this._VAOEnabled) {
       if (vaoUnbindCallback! !== undefined) {
         vaoUnbindCallback.unbind();
         this.renderer.vaoManager.useVAO(vaoUnbindCallback.vao)
@@ -354,7 +427,7 @@ export class RenderEngine implements GLReleasable {
 
   //  GL resource acquisition
   getProgram(shading: Shading) {
-    return this.renderer.programManager.getProgram(shading);
+    return this.renderer.programManager.getProgram(shading, this.UBOEnabled);
   }
 
   deleteProgram(shading: Shading) {

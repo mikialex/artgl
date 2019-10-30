@@ -1,8 +1,9 @@
-import { BaseEffectShading, MapUniform } from "../../core/shading";
+import { BaseEffectShading, Uniform } from "../../core/shading";
 import { Matrix4 } from "../../math/matrix4";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { texture, screenQuad } from "../../shader-graph/node-maker";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
+import { ShadingComponent } from "../../core/shading-decorator";
 
 const TAAMix = new ShaderFunction({
   source:
@@ -12,26 +13,14 @@ const TAAMix = new ShaderFunction({
     // return vec4(newColor * rate + (1.0 - rate) * oldColor, 1.0);
     
     return vec4((oldColor * sampleCount + newColor) / (sampleCount + 1.0), 1.0);
-
-    // need figure out how to clamp color
-    // if(sampleCount < 0.1){
-    //   // vec3 clampedOldColor = getClampColor(v_uv, oldColor);
-    //   // return vec4(newColor * rate + (1.0 - rate) * clampedOldColor, 1.0);
-    //   return vec4(newColor * rate + (1.0 - rate) * oldColor, 1.0);
-    // } else{
-    //   return vec4((oldColor * sampleCount + newColor) / (sampleCount + 1.0), 1.0);
-    // }
-
   }
     `
 })
 
+@ShadingComponent()
 export class TAAShading extends BaseEffectShading<TAAShading> {
 
-  @MapUniform("VPMatrixInverse")
-  VPMatrixInverse: Matrix4 = new Matrix4()
-
-  @MapUniform("u_sampleCount")
+  @Uniform("u_sampleCount")
   sampleCount: number = 0;
 
   decorate(graph: ShaderGraph) {
@@ -40,22 +29,7 @@ export class TAAShading extends BaseEffectShading<TAAShading> {
       .declareFragUV()
 
     const vUV = graph.getVary(UvFragVary);
-    // const depth = unPackDepth.make().input("enc", texture("depthResult").fetch(vUV))
-
     const colorOld = texture("TAAHistoryOld").fetch(vUV)
-    // const colorOld = texture("TAAHistoryOld").fetch(
-    //   NDCxyToUV.make().input("ndc",
-    //     getLastPixelNDC.make()
-    //       .input("ndc",
-    //         UVDepthToNDC.make()
-    //           .input("depth", depth)
-    //           .input("uv", graph.getVary(UvFragVary))
-    //       )
-    //       .input("VPMatrixInverse", this.getPropertyUniform("VPMatrixInverse"))
-    //       .input("LastVPMatrix", innerUniform("LastVPMatrix"))
-    //   )
-    // )
-
     graph.setFragmentRoot(
       TAAMix.make()
         .input("oldColor", colorOld.swizzling("xyz"))

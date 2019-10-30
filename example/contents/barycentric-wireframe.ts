@@ -12,7 +12,7 @@ export default async function test(testBridge: TestBridge) {
   //==>
 
   let canvas = testBridge.requestCanvas();
-  const engine = new RenderEngine(canvas);
+  const engine = new RenderEngine({ el: canvas });
   const scene = new Scene();
 
   const geometry = new SphereGeometry(1, 30, 30);

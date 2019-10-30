@@ -1,10 +1,11 @@
-import { BaseEffectShading, MapUniform, MarkNeedRedecorate } from "../../core/shading";
+import { BaseEffectShading, Uniform, MarkNeedRedecorate } from "../../core/shading";
 import { ShaderGraph } from "../../shader-graph/shader-graph";
 import { vec4, constValue } from "../../shader-graph/node-maker";
 import {
   controlExposureShading, OptimizedCineonToneMapping, ReinhardToneMapping,
   ACESFilmicToneMapping, Uncharted2ToneMapping
 } from "../../shader-graph/built-in/tone-mapping";
+import { ShadingComponent } from "../../core/shading-decorator";
 
 export enum ToneMapType {
   Linear = "Linear",
@@ -14,12 +15,13 @@ export enum ToneMapType {
   ACESFilmicToneMapping = "ACESFilmicToneMapping"
 }
 
+@ShadingComponent()
 export class ExposureController extends BaseEffectShading<ExposureController> {
 
-  @MapUniform("toneMappingExposure")
+  @Uniform("toneMappingExposure")
   toneMappingExposure: number = 1 / 1;
 
-  @MapUniform("toneMappingWhitePoint")
+  @Uniform("toneMappingWhitePoint")
   toneMappingWhitePoint: number = 1;
 
   @MarkNeedRedecorate

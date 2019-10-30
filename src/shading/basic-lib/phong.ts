@@ -1,7 +1,8 @@
-import { BaseEffectShading, MapUniform, ShaderUniformProvider } from "../../core/shading";
+import { BaseEffectShading, Uniform, ShaderUniformProvider } from "../../core/shading";
 import { ShaderGraph, NormalFragVary } from "../../shader-graph/shader-graph";
 import { Light, collectLightNodes } from "../../core/light";
 import { ShaderFunction } from "../../shader-graph/shader-function";
+import { ShadingComponent } from "../../core/shading-decorator";
 
 const phongShading = new ShaderFunction({
   source: `
@@ -21,6 +22,7 @@ const phongShading = new ShaderFunction({
   `
 })
 
+@ShadingComponent()
 export class PhongShading<T> extends BaseEffectShading<PhongShading<T>> {
   constructor(lights: Array<Light<T>>) {
     super();
@@ -50,7 +52,7 @@ export class PhongShading<T> extends BaseEffectShading<PhongShading<T>> {
 
   lights: Array<Light<T>>
 
-  @MapUniform("shininess")
+  @Uniform("shininess")
   shininess: number = 15;
 
 }
