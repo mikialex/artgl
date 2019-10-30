@@ -203,7 +203,7 @@ export class RenderEngine implements GLReleasable {
           if (value instanceof Texture || value instanceof CubeTexture) {
             program.setTextureIfExist(value.uniformName, value.getGLTexture(this));
           } else {
-            if (this.UBOEnabled) { // when use ubo, we update ubo buffer
+            if (this.UBOEnabled && provider.shouldProxyedByUBO) { // when use ubo, we update ubo buffer
               if (value.isUploadCacheDirty) {
                 if (typeof value.value === 'number') {
                   provider.uploadCache.blockedBuffer![value.blockedBufferStartIndex] = value.value;

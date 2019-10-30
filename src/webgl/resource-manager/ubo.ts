@@ -35,7 +35,10 @@ export class GLUBOManager implements GLReleasable {
   getUBO(provider: ShaderUniformProvider) {
     const ubo = this.UBOData.get(provider);
     if (ubo === undefined) {
-      return this.createUBO(provider);
+      const newUBO = this.createUBO(provider);
+      this.UBOData.set(provider, newUBO);
+      this.UBOVersionMap.set(provider, provider.uploadCache._version)
+      return newUBO;
     } else {
       if (provider.uploadCache._version !== this.UBOVersionMap.get(provider)) {
         this.deleteUBO(provider, ubo);

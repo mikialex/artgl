@@ -31,6 +31,10 @@ export class TestS extends BaseEffectShading<TestS>{
 
 @ShadingComponent()
 export class ProgressiveDof extends BaseEffectShading<ProgressiveDof> {
+  
+  @Uniform("dof_focus")
+  focusLength = 0;
+
 
   @Uniform("dof_coc")
   coc = new Vector2();
@@ -41,9 +45,6 @@ export class ProgressiveDof extends BaseEffectShading<ProgressiveDof> {
   }
 
   blurRadius = 0.005
-
-  @Uniform("dof_focus")
-  focusLength = 0;
 
   decorate(graph: ShaderGraph) {
     const old = graph.getVertRoot()
