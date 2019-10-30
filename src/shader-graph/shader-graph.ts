@@ -1,18 +1,17 @@
-import { GLProgramConfig, VaryingDescriptor } from "../webgl/program";
 import { genFragShader, genVertexShader } from "./code-gen";
 import {
   ShaderInputNode, ShaderTextureNode, ShaderFunctionNode,
   ShaderAttributeInputNode, ShaderVaryInputNode,
-  ShaderCommonUniformInputNode, ShaderNode,
+  ShaderUniformInputNode, ShaderNode,
 } from "./shader-node";
 import { attribute, constValue, texture } from "./node-maker";
-import { CommonAttribute } from "../webgl/attribute";
 import { Vector4 } from "../math";
 import { eyeDir } from "./built-in/transform";
 import { ChannelType } from "../core/material";
 import { Nullable } from "../type";
-import { Camera } from "../artgl";
-import { GLDataType } from "../core/data-type";
+import { Camera, ShaderUniformProvider } from "../artgl";
+import { GLDataType, valueToGLType, valueToFlatted } from "../core/data-type";
+import { GLProgramConfig, VaryingDescriptor, CommonAttribute, UniformDescriptor, UniformBlockDescriptor } from "../webgl/interface";
 
 
 export const UvFragVary = "v_uv"
@@ -97,7 +96,7 @@ export class ShaderGraph {
     return new ShaderVaryInputNode(key, ret!.type);
   }
 
-  private sharedUniformNodes: Map<string, ShaderCommonUniformInputNode> = new Map();
+  private sharedUniformNodes: Map<string, ShaderUniformInputNode> = new Map();
   getSharedUniform(uniformKey: string) {
     const re = this.sharedUniformNodes.get(uniformKey)
     if (re === undefined) {
@@ -112,7 +111,7 @@ export class ShaderGraph {
   getIfSharedUniform(uniformKey: string) {
     return this.sharedUniformNodes.get(uniformKey);
   }
-  registerSharedUniform(uniformKey: string, node: ShaderCommonUniformInputNode) {
+  registerSharedUniform(uniformKey: string, node: ShaderUniformInputNode) {
     this.sharedUniformNodes.set(uniformKey, node);
   }
 
@@ -144,10 +143,24 @@ export class ShaderGraph {
     return this;
   }
 
-  compile(isWebGL2: boolean): GLProgramConfig {
+  compile(isWebGL2: boolean, useUBO: boolean, providerMap: Map<ShaderUniformProvider, number>): GLProgramConfig {
+    if (!isWebGL2) { useUBO = false; }
+
+    const uniformBlocks: UniformBlockDescriptor[] = [];
+    providerMap.forEach((keyIndex, provider) => {
+      if (!provider.shouldProxyedByUBO || !useUBO) {
+        return;
+      }
+      const des = makeBlockUniformDescriptorFromProvider(provider, keyIndex);
+      if (des !== null) {
+        uniformBlocks.push(des);
+      }
+    })
+
     const { results, needDerivative } = genFragShader(this, isWebGL2);
     return {
-      ...this.collectInputs(),
+      ...this.collectInputs(useUBO),
+      uniformBlocks,
       vertexShaderString: genVertexShader(this, isWebGL2),
       fragmentShaderString: results,
       needDerivative
@@ -175,7 +188,7 @@ export class ShaderGraph {
     return nodeList
   }
 
-  collectInputs() {
+  collectInputs(useUBO: boolean) {
     const nodes = this.nodes;
     const inputNodes = nodes.filter(
       n => n instanceof ShaderInputNode
@@ -190,13 +203,32 @@ export class ShaderGraph {
         }
       });
 
-    const uniforms = (inputNodes as ShaderCommonUniformInputNode[])
-      .filter(node => node instanceof ShaderCommonUniformInputNode)
-      .map((node: ShaderCommonUniformInputNode) => {
-        return {
-          name: node.name,
-          type: node.type,
-          default: node.defaultValue
+    function toUniDes(node: ShaderUniformInputNode): UniformDescriptor {
+      let defaultV;
+      if (node.defaultValue !== null) {
+        if (typeof node.defaultValue === 'number') {
+          defaultV = node.defaultValue
+        } else {
+          defaultV = node.defaultValue.toArray()
+        }
+      }
+      return {
+        name: node.name,
+        type: node.type,
+        default: defaultV,
+      }
+    }
+
+    const uniforms: UniformDescriptor[] = [];
+    (inputNodes as ShaderUniformInputNode[])
+      .filter(node => node instanceof ShaderUniformInputNode)
+      .forEach((node: ShaderUniformInputNode) => {
+        if (!useUBO) {
+          uniforms.push(toUniDes(node));
+        } else {
+          if (!node.wouldBeProxyedByUBO) {
+            uniforms.push(toUniDes(node));
+          }
         }
       });
 
@@ -222,3 +254,24 @@ export class ShaderGraph {
 
 }
 
+function makeBlockUniformDescriptorFromProvider(
+  p: ShaderUniformProvider, providerIndex: number): Nullable<UniformBlockDescriptor> {
+  if (p.uploadCache === undefined) {
+    return null;
+  }
+  const uniforms: UniformDescriptor[] = [];
+  p.uploadCache.uniforms.forEach((u, name) => {
+    uniforms.push({
+      name: u.uniformName,
+      type: valueToGLType(u.value),
+      default: valueToFlatted(u.value),
+    })
+  })
+  if (uniforms.length === 0) {
+    return null;
+  }
+  return {
+    name: "ubo" + providerIndex,
+    uniforms
+  }
+}

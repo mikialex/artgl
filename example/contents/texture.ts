@@ -22,8 +22,8 @@ export default async function test(testBridge: TestBridge) {
   //==>
 
   let canvas = testBridge.requestCanvas();
-  const engine = new RenderEngine(canvas);
-
+  const engine = new RenderEngine({ el: canvas });
+  
   const geometry = new SphereGeometry();
   const material = new Material();
   const shading = new Shading().decoCamera().decorate(new CustomShading());

@@ -1,13 +1,18 @@
 import { Matrix4 } from './matrix4';
+import { DataObject, ArrayFlattenable } from '.';
+import { FloatArray } from '../type';
 
-export class Matrix3 {
+export class Matrix3
+implements
+DataObject<Matrix3>,
+ArrayFlattenable<Matrix3>
+{
 
-  elements = [
+  elements: Float32Array = new Float32Array([
     1, 0, 0,
     0, 1, 0,
     0, 0, 1
-  ]
-
+  ]);
 
   set(
     n11: number, n12: number, n13: number,
@@ -238,7 +243,7 @@ export class Matrix3 {
     return true;
   }
 
-  fromArray(array: number[], offset?: number) {
+  fromArray(array: FloatArray, offset?: number) {
 
     if (offset === undefined) offset = 0;
 
@@ -252,7 +257,7 @@ export class Matrix3 {
 
   }
 
-  toArray(array: number[], offset: number) {
+  toArray(array?: FloatArray, offset?: number) {
 
     if (array === undefined) array = [];
     if (offset === undefined) offset = 0;

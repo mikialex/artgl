@@ -1,10 +1,11 @@
-import { BaseEffectShading, MapUniform, MarkNeedRedecorate } from "../../core/shading";
+import { BaseEffectShading, Uniform, MarkNeedRedecorate } from "../../core/shading";
 import { ShaderGraph } from "../../shader-graph/shader-graph";
 import { constValue, attribute } from "../../shader-graph/node-maker";
-import { CommonAttribute } from "../../webgl/attribute";
 import { ShaderFunction, shader } from "../../shader-graph/shader-function";
 import { Vector3 } from "../../math";
 import { GLDataType } from "../../core/data-type";
+import { CommonAttribute } from "../../webgl/interface";
+import { ShadingComponent } from "../../core/shading-decorator";
 
 const addBarycentricWireFrame = shader(`
 vec4 addBarycentricWireFrame(
@@ -45,12 +46,13 @@ const addBarycentricWireFrameScreenSpace = new ShaderFunction({
 })
 
 
+@ShadingComponent()
 export class BarycentricWireFrame extends BaseEffectShading<BarycentricWireFrame> {
 
-  @MapUniform("barycentricLine_threshold")
+  @Uniform("barycentricLine_threshold")
   barycentricLine_threshold: number = 0.01;
 
-  @MapUniform("screenSpaceRatio")
+  @Uniform("screenSpaceRatio")
   screenSpaceRatio: number = 0.5;
 
   @MarkNeedRedecorate

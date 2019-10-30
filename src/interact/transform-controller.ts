@@ -4,6 +4,12 @@ import { Nullable } from "../type";
 import { Plane } from "../math/entity/plane";
 
 export class TransformController extends Controller  {
+  reloadStates(): void {
+    throw new Error("Method not implemented.");
+  }
+  update(): void {
+    throw new Error("Method not implemented.");
+  }
 
   public registerInteractor(interactor: Interactor) {
     if (this.interactor !== null) {

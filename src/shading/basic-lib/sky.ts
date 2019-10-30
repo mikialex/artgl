@@ -1,8 +1,9 @@
-import { BaseEffectShading, MapUniform } from "../../core/shading";
+import { BaseEffectShading, Uniform } from "../../core/shading";
 import { ShaderGraph, WorldPositionFragVary } from "../../shader-graph/shader-graph";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { Vector3 } from "../../math";
 import { Uncharted2Helper } from "../../shader-graph/built-in/tone-mapping";
+import { ShadingComponent } from "../../core/shading-decorator";
 
 
 const rayleighPhase = new ShaderFunction({
@@ -167,29 +168,30 @@ const BetaM = new ShaderFunction({
   `
 })
 
+@ShadingComponent()
 export class SkyShading extends BaseEffectShading<SkyShading> {
   constructor() {
     super();
   }
 
-  @MapUniform("sunPosition")
+  @Uniform("sunPosition")
   sunPosition = new Vector3(1, 1, 1).normalize() //need normalized
 
-  @MapUniform("rayleigh")
+  @Uniform("rayleigh")
   rayleigh = 2
 
-  @MapUniform("turbidity")
+  @Uniform("turbidity")
   turbidity = 10
 
-  @MapUniform("mieCoefficient")
+  @Uniform("mieCoefficient")
   mieCoefficient = 0.005
 
-  @MapUniform("luminance")
+  @Uniform("luminance")
   luminance = 1
 
   // luminance = 1
 
-  @MapUniform("mieDirectionalG")
+  @Uniform("mieDirectionalG")
   mieDirectionalG = 0.8
 
   decorate(graph: ShaderGraph): void {

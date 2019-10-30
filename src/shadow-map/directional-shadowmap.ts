@@ -4,7 +4,7 @@ import { Matrix4 } from "../math";
 import { BaseEffectShading } from "../core/shading";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { ShaderGraph, WorldPositionFragVary, texture } from "../artgl";
-import { MapUniform } from "../core/shading-util";
+import { Uniform, ShadingComponent } from "../core/shading-decorator";
 import { unPackDepth } from '../shader-graph/built-in/depth-pack';
 
 export abstract class ShadowMap<T> extends BaseEffectShading<T> {
@@ -34,6 +34,7 @@ const addShadow = new ShaderFunction({
   dependFunction: [unPackDepth]
 })
 
+@ShadingComponent()
 export class DirectionalShadowMap extends ShadowMap<DirectionalShadowMap> {
   constructor(light: DirectionalLight) {
     super();
@@ -62,7 +63,7 @@ export class DirectionalShadowMap extends ShadowMap<DirectionalShadowMap> {
     return this.shadowCamera;
   }
 
-  @MapUniform('directionalShadowMapMatrix')
+  @Uniform('directionalShadowMapMatrix')
   shadowMatrix: Matrix4 = new Matrix4();
 
   decorate(graph: ShaderGraph): void {

@@ -1,24 +1,16 @@
 import { SceneNode } from "../scene/scene-node";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { constValue, vec4 } from "../shader-graph/node-maker";
-import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform } from "./shading";
-import { ShaderCommonUniformInputNode, ShaderNode } from "../shader-graph/shader-node";
+import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, ProviderUploadCache } from "./shading";
+import { ShaderUniformInputNode, ShaderNode, ShaderTextureNode } from "../shader-graph/shader-node";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { Observable } from "./observable";
 import { Vector3 } from '../math';
-import { checkCreate } from "./shading-util";
 
 // TODO I cant figure out right multi inheritance impl with strong type, code duplicate 
 
 export abstract class Light<T> extends SceneNode
   implements ShaderUniformProvider, ShaderUniformDecorator {
-  constructor() {
-    super();
-
-    this.uniforms = checkCreate((this as any).uniforms, new Map());
-    this.propertyUniformNameMap = checkCreate((this as any).propertyUniformNameMap, new Map());
-    this.notifyNeedRedecorate = checkCreate((this as any).notifyNeedRedecorate, new Observable());
-  }
 
   decorate(decorated: ShaderGraph): void {
     decorated
@@ -39,14 +31,13 @@ export abstract class Light<T> extends SceneNode
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable()
 
-  hasAnyUniformChanged: boolean = true;
+  shouldProxyedByUBO = true;
+  uploadCache!: ProviderUploadCache;
 
-  uniforms: Map<string, any>;
+  nodeCreated: Map<string, ShaderUniformInputNode> = new Map();
+  textureNodeCreated: Map<string, ShaderTextureNode> = new Map();
 
-  propertyUniformNameMap: Map<string, string>;
-  nodeCreated: Map<string, ShaderCommonUniformInputNode> = new Map();
-
-  getPropertyUniform(name: keyof T): ShaderCommonUniformInputNode {
+  getPropertyUniform(name: keyof T): ShaderUniformInputNode {
     return getPropertyUniform(this, name)
   }
 

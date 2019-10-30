@@ -1,30 +1,15 @@
 import { GLProgram } from "./program";
-import { Nullable } from "../type";
-import { GLExtList } from "./gl-info";
-import { GLDataType, getGLDataTypeStride } from "../core/data-type";
-
-export const enum CommonAttribute {
-  position = 'position',
-  normal = 'normal',
-  color = 'color',
-  uv = 'uv',
-  baryCentric = 'baryCentric'
-}
-
-export interface AttributeDescriptor {
-  name: string,
-  type: GLDataType,
-  asInstance?: boolean, // default false
-  instanceDivisor?: number // default 1
-}
+import { Nullable } from "../../type";
+import { GLExtList } from "../gl-info";
+import { GLDataType, getGLDataTypeStride } from "../../core/data-type";
+import { AttributeDescriptor } from "../interface";
 
 export class GLAttribute {
-  constructor(program: GLProgram, descriptor: AttributeDescriptor) {
+  constructor(program: GLProgram, descriptor: AttributeDescriptor, location: number) {
     this.name = descriptor.name;
     this.gl = program.renderer.gl;
-    this.location = this.gl.getAttribLocation(program.getProgram(), descriptor.name);
     this.type = descriptor.type;
-    this.isActive = this.location !== -1;
+    this.location = location;
 
     const ext = program.renderer.glInfo.getExtension(GLExtList.ANGLE_instanced_arrays);
     if (ext !== undefined) {
@@ -42,18 +27,14 @@ export class GLAttribute {
   
   readonly name: string;
   readonly gl: WebGLRenderingContext;
-  private angleInstanceExt: Nullable<ANGLE_instanced_arrays> = null;
+  private angleInstanceExt: Nullable<ANGLE_instanced_arrays>  = null;
   readonly location: number;
   readonly type: GLDataType;
-  readonly isActive: boolean;
 
   readonly asInstance: boolean = false;
   readonly instanceDivisor: number = 1;
 
   useBuffer(buffer: WebGLBuffer) {
-    if (!this.isActive) {
-      return;
-    }
     const gl = this.gl;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.vertexAttribPointer(this.location, getGLDataTypeStride(this.type), gl.FLOAT, false, 0, 0);

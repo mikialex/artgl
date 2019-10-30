@@ -122,7 +122,7 @@ export class PhongShading<T> extends BaseEffectShading<PhongShading<T>> {
 
   lights: Array<Light<T>>
 
-  @MapUniform("shininess")
+  @Uniform("shininess")
   shininess: number = 15;
 
 }

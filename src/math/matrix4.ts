@@ -1,6 +1,7 @@
 import { Vector3 } from "../math";
 import { Quaternion } from "./quaternion";
 import { DataObject, ArrayFlattenable } from "./index";
+import { FloatArray } from "../type";
 
 const tempX: Vector3 = new Vector3();
 const tempY: Vector3 = new Vector3();
@@ -35,12 +36,12 @@ export class Matrix4
     return true;
   }
 
-  elements: number[] = [
+  elements: Float32Array = new Float32Array([
     1, 0, 0, 0,
     0, 1, 0, 0,
     0, 0, 1, 0,
     0, 0, 0, 1
-  ]
+  ])
 
   set(n11: number, n12: number, n13: number, n14: number,
     n21: number, n22: number, n23: number, n24: number,
@@ -343,7 +344,7 @@ export class Matrix4
     return this;
   }
 
-  toArray(array?: number[], offset?: number) {
+  toArray(array?: FloatArray, offset?: number) {
 
     if (offset === undefined) offset = 0;
     if (array === undefined) array = [];
@@ -374,16 +375,12 @@ export class Matrix4
 
   }
 
-  fromArray(array: number[], offset?: number) {
+  fromArray(array: FloatArray, offset?: number) {
     if (offset === undefined) offset = 0;
     for (var i = 0; i < 16; i++) {
       this.elements[i] = array[i + offset];
     }
     return this;
-  }
-
-  static flatten(v: Matrix4, array: number[]) {
-    return v.toArray(array, 0);
   }
 
 

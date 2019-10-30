@@ -1,5 +1,6 @@
 import { DataObject, VectorDataObject, ArrayFlattenable } from "./index";
 import { Vector3 } from "./vector3";
+import { FloatArray } from "../type";
 
 export class Vector2
   implements
@@ -236,23 +237,19 @@ export class Vector2
     return this;
   }
 
-  fromArray(array: number[], offset?: number) {
+  fromArray(array: FloatArray, offset?: number) {
     if (offset === undefined) offset = 0;
     this.x = array[offset];
     this.y = array[offset + 1];
     return this;
   }
 
-  toArray(array?: number[], offset?: number) {
+  toArray(array?: FloatArray, offset?: number) {
     if (array === undefined) array = [];
     if (offset === undefined) offset = 0;
     array[offset] = this.x;
     array[offset + 1] = this.y;
     return array;
-  }
-
-  static flatten(v: Vector2, array: number[]) {
-    return v.toArray(array, 0);
   }
 
 }

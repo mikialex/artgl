@@ -15,9 +15,9 @@ export default function (app: Application) {
   const dirLight = new DirectionalLight();
   dirLight.color = new Vector3(0.3, 0.6, 0.8);
   dirLight.direction = new Vector3(1, 1, -1).normalize();
-  const dirShadow = new DirectionalShadowMap(dirLight);
-  dirShadow.updateShadowMatrix();
-  app.pipeline.directionalShadowMap = dirShadow;
+  // const dirShadow = new DirectionalShadowMap(dirLight);
+  // dirShadow.updateShadowMatrix();
+  // app.pipeline.directionalShadowMap = dirShadow;
 
   const ambient = new AmbientLight();
   ambient.color = new Vector3(0.3, 0.3, 0.4);
@@ -35,7 +35,7 @@ export default function (app: Application) {
     .decorate(ambient)
     .decorate(exposureController)
     .decorate(wireframe)
-    .decorate(dirShadow, 'dirShadow') 
+    // .decorate(dirShadow, 'dirShadow') 
   
   shading.afterShaderCompiled.add((conf) => {
     console.log(conf)

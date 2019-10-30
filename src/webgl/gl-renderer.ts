@@ -1,15 +1,16 @@
 import { GLInfo, GLExtList } from "./gl-info";
-import { GLProgram } from "./program";
-import { GLProgramManager } from "./program-manager";
-import { GLAttributeBufferDataManager } from "./attribute-buffer-manager";
+import { GLProgram } from "./program/program";
+import { GLProgramManager } from "./resource-manager/program-manager";
+import { GLAttributeBufferDataManager } from "./resource-manager/attribute-buffer-manager";
 import { GLState } from "./states/gl-state";
 import { DrawMode } from "./const";
 import { Nullable, GLReleasable } from "../type";
-import { GLTextureManager } from "./texture-manager";
-import { GLFrameBufferManager } from "./framebuffer-manager";
+import { GLTextureManager } from "./resource-manager/texture-manager";
+import { GLFrameBufferManager } from "./resource-manager/framebuffer-manager";
 import { GLFramebuffer } from "./gl-framebuffer";
 import { GLStat } from "./gl-stat";
-import { GLVAOManager } from "./vao";
+import { GLVAOManager } from "./resource-manager/vao";
+import { GLUBOManager } from "./resource-manager/ubo";
 
 export type WebGLCtx = WebGLRenderingContext | WebGL2RenderingContext
 
@@ -21,6 +22,7 @@ export class GLRenderer implements GLReleasable {
     glOptions = { ...glOptions };
     glOptions.antialias = false;
 
+    this.uboManager = null;
     let ctx: WebGLCtx
     if (forceUseWebGL1) {
       ctx = el.getContext('webgl', glOptions) as WebGLRenderingContext;
@@ -28,10 +30,14 @@ export class GLRenderer implements GLReleasable {
     } else {
       ctx = el.getContext('webgl2', glOptions) as WebGL2RenderingContext;
       this.ctxVersion = 2;
+
       if (ctx === null) {
         console.warn('webgl2 context create failed, try to use webgl1')
         ctx = el.getContext('webgl', glOptions) as WebGLRenderingContext;
         this.ctxVersion = 1;
+      } else {
+        this.gl = ctx;
+        this.uboManager = new GLUBOManager(this);
       }
     }
     if (ctx === null) {
@@ -61,8 +67,11 @@ export class GLRenderer implements GLReleasable {
   readonly glInfo: GLInfo;
   private angleInstanceExt: Nullable<ANGLE_instanced_arrays> = null;
 
-  // enable this will cause great performance issue
-  // only enable this in develope 
+  /**
+   * Check gl error after every drawcall.
+   * Enable this will cause great performance issue,
+   * only enable this in development mode
+   */
   enableRenderErrorCatch: boolean = false;
   enableUniformDiff: boolean = true;
 
@@ -102,6 +111,7 @@ export class GLRenderer implements GLReleasable {
   readonly textureManger: GLTextureManager;
   readonly attributeBufferManager = new GLAttributeBufferDataManager(this);
   readonly vaoManager: GLVAOManager;
+  readonly uboManager: Nullable<GLUBOManager>;
   readonly framebufferManager: GLFrameBufferManager;
 
   useProgram(program: GLProgram) {

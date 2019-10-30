@@ -1,9 +1,10 @@
-import { BaseEffectShading, MapUniform } from "../../core/shading";
+import { BaseEffectShading } from "../../core/shading";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { NormalFragVary, ShaderGraph } from "../../shader-graph/shader-graph";
 import { CubeTexture } from "../../artgl";
 import { sampleEnvMapAndNeedNormalize } from "./cube-env-map";
 import { ShaderTextureNode } from "../../shader-graph/shader-node";
+import { ShadingComponent, Texture } from "../../core/shading-decorator";
 
 const reflect = new ShaderFunction({
   source:
@@ -12,6 +13,7 @@ const reflect = new ShaderFunction({
     }`
 })
 
+@ShadingComponent()
 export class IBLEnvMap extends BaseEffectShading<IBLEnvMap> {
 
   static produceIBLEnvMapColor(graph: ShaderGraph, envMapTexture: ShaderTextureNode) {
@@ -31,7 +33,7 @@ export class IBLEnvMap extends BaseEffectShading<IBLEnvMap> {
       )
   }
 
-  @MapUniform('envMap')
+  @Texture('envMap')
   envMap: CubeTexture = new CubeTexture();
 
 }

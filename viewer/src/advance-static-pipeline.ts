@@ -110,25 +110,28 @@ export class AdvanceStaticRenderPipeline {
   private build(scene: Scene, camera: PerspectiveCamera) {
     this.updateTicks();
 
-    // draw the shadow map
-    const directionalShadowMapPass = pass("directionalShadowMapPass")
-      .use(scene.renderScene)
-      .overrideShading(this.depthShader)
-      .beforeExecute(() => {
-        this.depthShader.params.set(PerspectiveCameraInstance, this.directionalShadowMap.getShadowCamera())
-      }).afterExecute(() => {
-        this.depthShader.params.clear();
-    })
+    // // draw the shadow map
+    // const directionalShadowMapPass = pass("directionalShadowMapPass")
+    //   .use(scene.renderScene)
+    //   .overrideShading(this.depthShader)
+    //   .beforeExecute(() => {
+    //     this.depthShader.params.set(PerspectiveCameraInstance, this.directionalShadowMap.getShadowCamera())
+    //   }).afterExecute(() => {
+    //     this.depthShader.params.clear();
+    // })
     
-    this.directionalShadowMapTarget = this.directionalShadowMapTarget
-      .from(directionalShadowMapPass)
+    // this.directionalShadowMapTarget = this.directionalShadowMapTarget
+    //   .from(directionalShadowMapPass)
     
     const depthPass = pass("depthPass").use(scene.renderScene)
+      .beforeExecute(() => {
+        let a = 1;
+    })
       .overrideShading(this.depthShader)
 
     const scenePass = pass("scenePass")
       .use(scene.render)
-      .depend(this.directionalShadowMapTarget)
+      // .depend(this.directionalShadowMapTarget)
 
     const depthResult = target("depthResult").needDepth().from(depthPass)
     const sceneResult = target("sceneResult").needDepth().from(scenePass)
@@ -139,7 +142,6 @@ export class AdvanceStaticRenderPipeline {
         .overrideShading(this.taaShader)
         .disableColorClear()
         .beforeExecute(() => {
-          this.taaShading.VPMatrixInverse = this.taaShading.VPMatrixInverse.getInverse(VP, true); // TODO maybe add watch
           this.taaShading.sampleCount = this.sampleCount;
         })
         .input("sceneResult", sceneResult)
@@ -157,7 +159,7 @@ export class AdvanceStaticRenderPipeline {
         .disableColorClear()
         .beforeExecute(() => {
           this.tssaoShading.VPMatrix = VP;
-          this.tssaoShading.VPMatrixInverse = this.tssaoShading.VPMatrixInverse.getInverse(VP, true);
+          this.tssaoShading.VPMatrixInverse = this.tssaoShading.VPMatrixInverse.getInverse(VP, true);// TODO maybe add watch
           this.tssaoShading.sampleCount = this.sampleCount;
         })
         .input("depthResult", depthResult)
@@ -191,7 +193,7 @@ export class AdvanceStaticRenderPipeline {
     //       false, 
     //       createTSSAO(),
     //       pass("copy").useQuad().overrideShading(copier)
-    //         .input("copySource", this.directionalShadowMapTarget))
+    //         .input("copySource", sceneResult))
     //   )
     // )
 

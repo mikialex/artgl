@@ -1,8 +1,9 @@
-import { BaseEffectShading, MapUniform } from "../../core/shading";
+import { BaseEffectShading, Uniform } from "../../core/shading";
 import { Matrix4 } from "../../math/matrix4";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { texture, screenQuad } from "../../shader-graph/node-maker";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
+import { ShadingComponent } from "../../core/shading-decorator";
 
 const TAAMix = new ShaderFunction({
   source:
@@ -16,12 +17,10 @@ const TAAMix = new ShaderFunction({
     `
 })
 
+@ShadingComponent()
 export class TAAShading extends BaseEffectShading<TAAShading> {
 
-  @MapUniform("VPMatrixInverse")
-  VPMatrixInverse: Matrix4 = new Matrix4()
-
-  @MapUniform("u_sampleCount")
+  @Uniform("u_sampleCount")
   sampleCount: number = 0;
 
   decorate(graph: ShaderGraph) {

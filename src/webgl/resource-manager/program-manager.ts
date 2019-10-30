@@ -1,7 +1,7 @@
-import { GLRenderer } from "./gl-renderer";
-import { GLProgram } from "./program";
-import { GLReleasable } from '../type';
-import { Shading } from "../core/shading";
+import { GLRenderer } from "../gl-renderer";
+import { GLProgram } from "../program/program";
+import { GLReleasable } from '../../type';
+import { Shading } from "../../core/shading";
 
 export class GLProgramManager implements GLReleasable {
   constructor(renderer: GLRenderer) {
@@ -13,15 +13,15 @@ export class GLProgramManager implements GLReleasable {
   private programs: Map<Shading, GLProgram> = new Map();
   private programsVersion: Map<Shading, number> = new Map();
 
-  getProgram(shading: Shading) {
+  getProgram(shading: Shading, useUBO:boolean) {
     const program = this.programs.get(shading);
     if (program === undefined) {
-      return this.createProgram(shading);
+      return this.createProgram(shading, useUBO);
     }
 
     if (shading._version !== this.programsVersion.get(shading)) {
       this.deleteProgram(shading)
-      return this.createProgram(shading);
+      return this.createProgram(shading, useUBO);
     }
 
     return program
@@ -37,8 +37,8 @@ export class GLProgramManager implements GLReleasable {
     this.programsVersion.delete(shading);
   }
 
-  private createProgram(shading: Shading): GLProgram {
-    const programConfig = shading.getProgramConfig(this.renderer.ctxVersion === 2);
+  private createProgram(shading: Shading, useUBO:boolean): GLProgram {
+    const programConfig = shading.getProgramConfig(this.renderer.ctxVersion === 2, useUBO);
     const program = new GLProgram(this.renderer, programConfig);
     this.programs.set(shading, program);
     this.programsVersion.set(shading, shading._version);

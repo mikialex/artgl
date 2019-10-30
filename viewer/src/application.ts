@@ -14,7 +14,7 @@ export const STATIC_SERVER = "http://localhost:3000/"
 export class Application {
   constructor(canvas: HTMLCanvasElement) {
     this.el = canvas;
-    this.engine = new RenderEngine(canvas);
+    this.engine = new RenderEngine({ el: canvas });
     this.pipeline = new AdvanceStaticRenderPipeline(this.engine);
 
     this.camera = new PerspectiveCamera();
