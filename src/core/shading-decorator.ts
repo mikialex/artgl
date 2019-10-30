@@ -90,7 +90,9 @@ export function Uniform(remapName: string) {
       },
       set(newValue: any) {
         (this as any)[key] = newValue;
-        (this as any).notifyUniformChange(propertyKey, newValue);
+        if ((this as any).notifyUniformChange !== undefined) {
+          (this as any).notifyUniformChange(propertyKey, newValue);
+        }
       }
     }
   };

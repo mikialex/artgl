@@ -139,7 +139,6 @@ export class AdvanceStaticRenderPipeline {
         .overrideShading(this.taaShader)
         .disableColorClear()
         .beforeExecute(() => {
-          this.taaShading.VPMatrixInverse = this.taaShading.VPMatrixInverse.getInverse(VP, true); // TODO maybe add watch
           this.taaShading.sampleCount = this.sampleCount;
         })
         .input("sceneResult", sceneResult)
@@ -157,7 +156,7 @@ export class AdvanceStaticRenderPipeline {
         .disableColorClear()
         .beforeExecute(() => {
           this.tssaoShading.VPMatrix = VP;
-          this.tssaoShading.VPMatrixInverse = this.tssaoShading.VPMatrixInverse.getInverse(VP, true);
+          this.tssaoShading.VPMatrixInverse = this.tssaoShading.VPMatrixInverse.getInverse(VP, true);// TODO maybe add watch
           this.tssaoShading.sampleCount = this.sampleCount;
         })
         .input("depthResult", depthResult)
@@ -185,15 +184,15 @@ export class AdvanceStaticRenderPipeline {
       )
     )
 
-    // this.graph.setScreenRoot(
-    //   screen().from(
-    //     when(
-    //       false, 
-    //       createTSSAO(),
-    //       pass("copy").useQuad().overrideShading(copier)
-    //         .input("copySource", this.directionalShadowMapTarget))
-    //   )
-    // )
+    this.graph.setScreenRoot(
+      screen().from(
+        when(
+          false, 
+          createTSSAO(),
+          pass("copy").useQuad().overrideShading(copier)
+            .input("copySource", sceneResult))
+      )
+    )
 
   }
 }

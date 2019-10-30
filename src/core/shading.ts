@@ -229,7 +229,7 @@ export function getPropertyUniform<T, K extends ShaderUniformDecorator & ShaderU
     return uniformNode;
   }
 
-  const propertyUniformNameMap = Reflect.getMetadata(UNIFORM_META, env)
+  const propertyUniformNameMap = Reflect.getMetadata(UNIFORM_META, env).uniforms
   const uniformName = propertyUniformNameMap.get(name as string);
 
   if (uniformName === undefined) {
@@ -253,7 +253,7 @@ export function getPropertyTexture<T, K extends ShaderUniformDecorator & ShaderU
     if (textureNode !== undefined) {
       return textureNode;
     }
-    const propertyUniformTextureNameMap = Reflect.getMetadata(UNIFORM_TEXTURE_META, env)
+    const propertyUniformTextureNameMap = Reflect.getMetadata(UNIFORM_TEXTURE_META, env).textures
     const textureName = propertyUniformTextureNameMap.get(name as string);
   
     if (textureName === undefined) {

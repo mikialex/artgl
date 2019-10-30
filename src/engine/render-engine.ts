@@ -174,6 +174,9 @@ export class RenderEngine implements GLReleasable {
       const decorator = overrideDecorator === undefined ? defaultDecorator : overrideDecorator;
 
       decorator.foreachProvider(provider => {
+        if (provider.uploadCache === undefined) { // some provider not provide uniform
+          return;
+        }
         const syncedVersion = this.lastUploadedShaderUniformProvider.get(provider)
         if (syncedVersion !== undefined
           && syncedVersion === provider.uploadCache._version // no new change
@@ -198,7 +201,7 @@ export class RenderEngine implements GLReleasable {
 
         provider.uploadCache.uniforms.forEach((value, key) => {
           if (value instanceof Texture || value instanceof CubeTexture) {
-            program.setTextureIfExist(key, value.getGLTexture(this));
+            program.setTextureIfExist(value.uniformName, value.getGLTexture(this));
           } else {
             if (value.isUploadCacheDirty) {
               if (this.UBOEnabled ) { // when use ubo, we update ubo buffer
@@ -213,7 +216,7 @@ export class RenderEngine implements GLReleasable {
                 } else {
                   value.uploadCache = value.value.toArray(value.uploadCache as FloatArray);
                 }
-                program.setUniformIfExist(key, value.uploadCache);
+                program.setUniformIfExist(value.uniformName, value.uploadCache);
               }
               value.isUploadCacheDirty = false;
             }

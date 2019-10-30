@@ -20,9 +20,6 @@ const TAAMix = new ShaderFunction({
 @ShadingComponent()
 export class TAAShading extends BaseEffectShading<TAAShading> {
 
-  @Uniform("VPMatrixInverse")
-  VPMatrixInverse: Matrix4 = new Matrix4()
-
   @Uniform("u_sampleCount")
   sampleCount: number = 0;
 
