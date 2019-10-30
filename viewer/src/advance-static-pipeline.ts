@@ -110,25 +110,28 @@ export class AdvanceStaticRenderPipeline {
   private build(scene: Scene, camera: PerspectiveCamera) {
     this.updateTicks();
 
-    // draw the shadow map
-    const directionalShadowMapPass = pass("directionalShadowMapPass")
-      .use(scene.renderScene)
-      .overrideShading(this.depthShader)
-      .beforeExecute(() => {
-        this.depthShader.params.set(PerspectiveCameraInstance, this.directionalShadowMap.getShadowCamera())
-      }).afterExecute(() => {
-        this.depthShader.params.clear();
-    })
+    // // draw the shadow map
+    // const directionalShadowMapPass = pass("directionalShadowMapPass")
+    //   .use(scene.renderScene)
+    //   .overrideShading(this.depthShader)
+    //   .beforeExecute(() => {
+    //     this.depthShader.params.set(PerspectiveCameraInstance, this.directionalShadowMap.getShadowCamera())
+    //   }).afterExecute(() => {
+    //     this.depthShader.params.clear();
+    // })
     
-    this.directionalShadowMapTarget = this.directionalShadowMapTarget
-      .from(directionalShadowMapPass)
+    // this.directionalShadowMapTarget = this.directionalShadowMapTarget
+    //   .from(directionalShadowMapPass)
     
     const depthPass = pass("depthPass").use(scene.renderScene)
+      .beforeExecute(() => {
+        let a = 1;
+    })
       .overrideShading(this.depthShader)
 
     const scenePass = pass("scenePass")
       .use(scene.render)
-      .depend(this.directionalShadowMapTarget)
+      // .depend(this.directionalShadowMapTarget)
 
     const depthResult = target("depthResult").needDepth().from(depthPass)
     const sceneResult = target("sceneResult").needDepth().from(scenePass)
@@ -184,15 +187,15 @@ export class AdvanceStaticRenderPipeline {
       )
     )
 
-    this.graph.setScreenRoot(
-      screen().from(
-        when(
-          false, 
-          createTSSAO(),
-          pass("copy").useQuad().overrideShading(copier)
-            .input("copySource", sceneResult))
-      )
-    )
+    // this.graph.setScreenRoot(
+    //   screen().from(
+    //     when(
+    //       false, 
+    //       createTSSAO(),
+    //       pass("copy").useQuad().overrideShading(copier)
+    //         .input("copySource", sceneResult))
+    //   )
+    // )
 
   }
 }

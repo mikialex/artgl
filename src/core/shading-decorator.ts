@@ -37,9 +37,9 @@ export function ShadingComponent() {
           uniforms,
           blockedBufferNeedUpdate: true,
           _version: -1
-        }
+        };
 
-        constr.prototype.notifyUniformChange = (changedPropertyKey: string, value: any) => {
+        (this as any).notifyUniformChange = (changedPropertyKey: string, value: any) => {
           const cache = this.uploadCache.uniforms.get(changedPropertyKey)!;
           cache.value = value;
           cache.isUploadCacheDirty = true;
@@ -51,19 +51,6 @@ export function ShadingComponent() {
     }
   }
 }
-
-// export function calculateLayout(info: Map<string, UniformGroup>) {
-//   let LengthAll = 0;
-//   info.forEach(g => {
-//     let size = 0;
-//     if (typeof g.uploadCache === 'number') {
-//       size = 1;
-//     } else {
-//       size = g.uploadCache.length;
-//     }
-//     const realSize = size%
-//   })
-// }
 
 interface UniformProviderCache{
   uniforms: Map<string, string>
