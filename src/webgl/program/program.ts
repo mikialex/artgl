@@ -169,6 +169,12 @@ export class GLProgram {
     }
   }
 
+  queryUBOLayoutIfExist(name: string) {
+    const b = this.uniformBlocks.get(name);
+    if (b === undefined) { return };
+    return b.queryLayout();
+  }
+
 
   setUniformIfExist(name: string, data: uniformUploadType) {
     const uni = this.uniforms.get(name);

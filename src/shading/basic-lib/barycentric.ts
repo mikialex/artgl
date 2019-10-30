@@ -5,7 +5,7 @@ import { ShaderFunction, shader } from "../../shader-graph/shader-function";
 import { Vector3 } from "../../math";
 import { GLDataType } from "../../core/data-type";
 import { CommonAttribute } from "../../webgl/interface";
-import { ShadingComponent } from "../../core/shading-util";
+import { ShadingComponent } from "../../core/shading-decorator";
 
 const addBarycentricWireFrame = shader(`
 vec4 addBarycentricWireFrame(

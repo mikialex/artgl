@@ -5,7 +5,7 @@ import { Uniform } from "../core/shading";
 import { Vector3 } from "../math";
 import { ShaderNode } from '../shader-graph/shader-node';
 import { dir3D } from '../shader-graph/built-in/transform';
-import { ShadingComponent } from "../core/shading-util";
+import { ShadingComponent } from "../core/shading-decorator";
 
 const pointLightShading = new ShaderFunction({
   source:

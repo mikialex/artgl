@@ -2,7 +2,7 @@ import { BaseEffectShading, Uniform, ShaderUniformProvider } from "../../core/sh
 import { ShaderGraph, NormalFragVary } from "../../shader-graph/shader-graph";
 import { Light, collectLightNodes } from "../../core/light";
 import { ShaderFunction } from "../../shader-graph/shader-function";
-import { ShadingComponent } from "../../core/shading-util";
+import { ShadingComponent } from "../../core/shading-decorator";
 
 const phongShading = new ShaderFunction({
   source: `

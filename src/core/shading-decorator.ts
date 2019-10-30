@@ -1,4 +1,4 @@
-import { ShaderUniformProvider } from "./shading";
+import { ShaderUniformProvider, UniformGroup } from "./shading";
 import { valueToFlatted } from "./data-type";
 import "reflect-metadata";
 
@@ -26,7 +26,7 @@ export function ShadingComponent() {
             value, // todo maybe not need this ref, go reflect in useShading
             uploadCache: valueToFlatted(value),
             isUploadCacheDirty: true,
-            blockedBufferStartIndex: 0,
+            blockedBufferStartIndex: 0, // this value will get update later in create ubo
             uniformName: uniformName
           }
           uniforms.set(propertyKey, uniformGroup)
@@ -51,6 +51,19 @@ export function ShadingComponent() {
     }
   }
 }
+
+// export function calculateLayout(info: Map<string, UniformGroup>) {
+//   let LengthAll = 0;
+//   info.forEach(g => {
+//     let size = 0;
+//     if (typeof g.uploadCache === 'number') {
+//       size = 1;
+//     } else {
+//       size = g.uploadCache.length;
+//     }
+//     const realSize = size%
+//   })
+// }
 
 interface UniformProviderCache{
   uniforms: Map<string, string>

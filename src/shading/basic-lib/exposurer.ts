@@ -5,7 +5,7 @@ import {
   controlExposureShading, OptimizedCineonToneMapping, ReinhardToneMapping,
   ACESFilmicToneMapping, Uncharted2ToneMapping
 } from "../../shader-graph/built-in/tone-mapping";
-import { ShadingComponent } from "../../core/shading-util";
+import { ShadingComponent } from "../../core/shading-decorator";
 
 export enum ToneMapType {
   Linear = "Linear",

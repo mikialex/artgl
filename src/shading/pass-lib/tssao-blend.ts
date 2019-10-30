@@ -2,7 +2,7 @@ import { BaseEffectShading, Uniform } from "../../core/shading";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { texture, screenQuad } from "../../shader-graph/node-maker";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
-import { ShadingComponent } from "../../core/shading-util";
+import { ShadingComponent } from "../../core/shading-decorator";
 
 const tssaoBlend = new ShaderFunction({
   source: `

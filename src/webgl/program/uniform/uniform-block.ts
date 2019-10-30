@@ -13,6 +13,7 @@ export class GLUniformBlock{
     this.name = descriptor.name;
     this.blockedUniforms = descriptor.uniforms;
     this.renderer = program.renderer;
+    this.program = program;
     this.UBOManager = this.renderer.uboManager!;
     this.gl = program.renderer.gl as WebGL2RenderingContext;
     this.uniformBlockIndex = uniformBlockIndex;
@@ -22,16 +23,33 @@ export class GLUniformBlock{
 
   readonly name: string;
   private gl: WebGL2RenderingContext;
+  private program: GLProgram;
   private renderer: GLRenderer;
   readonly uniformBlockIndex: number;
   readonly bindPoint: number;
   private UBOManager: GLUBOManager;
-  private blockedUniforms: UniformDescriptor[];
+  readonly blockedUniforms: UniformDescriptor[];
 
   ubo: Nullable<WebGLBuffer> = null;
 
   set(ubo: WebGLBuffer) {
     this.ubo = ubo;
     this.UBOManager.bindProviderTo(ubo, this.bindPoint);
+  }
+
+  queryLayout() {
+    const all: number = this.gl.getActiveUniformBlockParameter(
+      this.program.getProgram(), this.bindPoint,
+      this.gl.UNIFORM_BLOCK_DATA_SIZE)
+    
+    const index = this.gl.getActiveUniformBlockParameter(
+      this.program.getProgram(), this.bindPoint,
+      this.gl.UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES)
+    
+    const offsets = this.gl.getActiveUniformBlockParameter(
+      this.program.getProgram(), index,
+      this.gl.UNIFORM_OFFSET)
+    
+    return { all, offsets };
   }
 }

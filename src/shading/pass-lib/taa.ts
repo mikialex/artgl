@@ -3,7 +3,7 @@ import { Matrix4 } from "../../math/matrix4";
 import { ShaderFunction } from "../../shader-graph/shader-function";
 import { texture, screenQuad } from "../../shader-graph/node-maker";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
-import { ShadingComponent } from "../../core/shading-util";
+import { ShadingComponent } from "../../core/shading-decorator";
 
 const TAAMix = new ShaderFunction({
   source:

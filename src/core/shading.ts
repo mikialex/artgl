@@ -9,9 +9,9 @@ import { ShaderUniformInputNode, ShaderTextureNode } from '../shader-graph/shade
 import { uniformFromValue, textureFromValue } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
 import { GLProgramConfig, uniformUploadType } from "../webgl/interface";
-import { UNIFORM_META, UNIFORM_TEXTURE_META } from "./shading-util";
+import { UNIFORM_META, UNIFORM_TEXTURE_META } from "./shading-decorator";
 import { Texture, CubeTexture } from "../artgl";
-export { Uniform } from "./shading-util";
+export { Uniform } from "./shading-decorator";
 
 
 export interface ShaderUniformDecorator {
@@ -39,7 +39,7 @@ export interface UniformGroup{
 }
 
 export interface ProviderUploadCache {
-  blockedBuffer: Float32Array;
+  blockedBuffer: Nullable<Float32Array>;
   uniforms: Map<propertyName, UniformGroup>;
   blockedBufferNeedUpdate: boolean;
   _version: number;

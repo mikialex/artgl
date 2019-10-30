@@ -182,16 +182,30 @@ export class RenderEngine implements GLReleasable {
           return;
         }
 
+        if (provider.uploadCache.blockedBuffer === null) {
+          const layouts = program.queryUBOLayoutIfExist(uboKeys[providerCount]);
+          if (layouts === undefined) {
+            provider.uploadCache.blockedBuffer = new Float32Array(0); // this mark for checked
+          } else {
+            provider.uploadCache.blockedBuffer = new Float32Array(layouts.all);
+            let i = 0;
+            provider.uploadCache.uniforms.forEach((g) => { // this is inset order, is same like shader
+              g.blockedBufferStartIndex = layouts.offsets[i];
+              i++;
+            })
+          }
+        }
+
         provider.uploadCache.uniforms.forEach((value, key) => {
           if (value instanceof Texture || value instanceof CubeTexture) {
             program.setTextureIfExist(key, value.getGLTexture(this));
           } else {
             if (value.isUploadCacheDirty) {
-              if (this.UBOEnabled) { // when use ubo, we update ubo buffer
+              if (this.UBOEnabled ) { // when use ubo, we update ubo buffer
                 if (typeof value.value === 'number') {
                   provider.uploadCache.blockedBuffer![value.blockedBufferStartIndex] = value.value;
                 } else {
-                  value.value.toArray(provider.uploadCache.blockedBuffer, value.blockedBufferStartIndex);
+                  value.value.toArray(provider.uploadCache.blockedBuffer!, value.blockedBufferStartIndex);
                 }
               } else { // else, we update each flatten uniform array and directly upload
                 if (typeof value.value === 'number') {
@@ -208,7 +222,8 @@ export class RenderEngine implements GLReleasable {
 
         // when use ubo, we final do ubo recreate and upload
         if (this.UBOEnabled && provider.shouldProxyedByUBO &&
-          provider.uploadCache.blockedBuffer.length !== 0) { 
+          provider.uploadCache.uniforms.size !== 0 // no uniform provide by this provider
+        ) { 
           // provider _version has make sure we can get refreshed one
           const ubo = this.renderer.uboManager!.getUBO(provider);
           program.setUBOIfExist(uboKeys[providerCount], ubo);

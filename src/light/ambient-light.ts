@@ -3,7 +3,7 @@ import { Uniform } from "../core/shading";
 import { Vector3 } from "../math";
 import { ShaderGraph, NormalFragVary } from "../shader-graph/shader-graph";
 import { ShaderNode } from '../shader-graph/shader-node';
-import { ShadingComponent } from "../core/shading-util";
+import { ShadingComponent } from "../core/shading-decorator";
 
 @ShadingComponent()
 export class AmbientLight extends Light<AmbientLight> {

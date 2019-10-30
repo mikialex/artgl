@@ -2,7 +2,7 @@ import { SceneNode, ExtendWithSceneNode } from "../scene/scene-node";
 import { Matrix4, Vector3 } from "../math/index";
 import { RenderEngine, Size } from '../engine/render-engine';
 import { ShaderUniformProvider, ShaderUniformDecorator, BaseEffectShading } from "./shading";
-import { Uniform, ShadingComponent } from "./shading-util";
+import { Uniform, ShadingComponent } from "./shading-decorator";
 import { ShaderGraph, WorldPositionFragVary } from "../shader-graph/shader-graph";
 import { VPTransform, MTransform } from "../shader-graph/built-in/transform";
 import { uniformFromValue, attribute, vec4, constValue } from "../shader-graph/node-maker";

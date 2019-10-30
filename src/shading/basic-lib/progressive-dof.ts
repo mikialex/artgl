@@ -2,7 +2,7 @@ import { BaseEffectShading, Uniform } from "../../core/shading";
 import { ShaderGraph } from "../../artgl";
 import { Vector2 } from "../../math/vector2";
 import { ShaderFunction } from "../../shader-graph/shader-function";
-import { ShadingComponent } from "../../core/shading-util";
+import { ShadingComponent } from "../../core/shading-decorator";
 
 const progressiveDof = new ShaderFunction({
   source: `
