@@ -4,6 +4,7 @@ import { Vector2, Vector3, Vector4, ArrayFlattenable } from "../math";
 import { GLDataType } from "../core/data-type";
 import { UniformDescriptor, AttributeDescriptor, GLTextureType } from "../webgl/interface";
 import { Nullable } from "../type";
+import { swizzleType } from "./swizzle-type";
 
 let shaderNodeGUIDCount = 0;
 
@@ -17,7 +18,7 @@ export class ShaderNode extends DAGNode {
 
   guid: number;
 
-  swizzling(swizzleType: string) {
+  swizzling(swizzleType: swizzleType) {
     return new ShaderSwizzleNode(this, swizzleType);
   }
 
@@ -87,7 +88,7 @@ export class ShaderUniformInputNode extends ShaderInputNode {
 
   defaultValue: Nullable<ArrayFlattenable | number> = null;
   wouldBeProxyedByUBO = false;
-  
+
   default(value: ArrayFlattenable | number): ShaderUniformInputNode {
     this.defaultValue = value;
     return this;
@@ -221,7 +222,7 @@ function length2Type(value: string) {
 }
 
 export class ShaderSwizzleNode extends ShaderNode {
-  constructor(node: ShaderNode, swizzleType: string) {
+  constructor(node: ShaderNode, swizzleType: swizzleType) {
     super(node.type);
 
     const swizzledSourceCount = getValueCount(node.type)
