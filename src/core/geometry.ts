@@ -7,6 +7,8 @@ import { Face3 } from "../math/entity/face3";
 import { Line3 } from "../math/entity/line3";
 import { Vector3 } from "../math/vector3";
 import { Nullable } from "../type";
+import { GeometryWebGLDataProvider } from "../engine/interface";
+import { RenderEngine } from "../artgl";
 
 /**
  * geometry define what to draw
@@ -15,7 +17,8 @@ import { Nullable } from "../type";
  * @export
  * @class Geometry
  */
-export abstract class Geometry {
+export abstract class Geometry implements GeometryWebGLDataProvider{
+
   uuid = generateUUID();
 
   _bufferDatum: { [index: string]: BufferData } = {};
@@ -87,6 +90,36 @@ export abstract class Geometry {
   abstract foreachFace(visitor: (face: Face3) => any, range?: RenderRange): any;
   abstract foreachLineSegment(visitor: (face: Line3) => any, range?: RenderRange): any;
   abstract foreachVertex(visitor: (face: Vector3) => any, range?: RenderRange): any;
+
+  getCurrentVersion() {
+    return this._version;
+  }
+  
+  needIndexUint32() {
+    if (this.indexBuffer === null) {
+      return false;
+    }
+    if (this.indexBuffer.data instanceof Uint32Array) {
+      return true
+    } else {
+      throw '';
+    }
+  }
+
+  getIndexAttributeWebGLBuffer(engine: RenderEngine): WebGLBuffer {
+    if (this.indexBuffer === null) {
+      throw "index draw need index buffer"
+    }
+    return engine.createOrUpdateAttributeBuffer(this.indexBuffer, true);
+  }
+
+  getAttributeWebGLBuffer(engine: RenderEngine, attributeName: string): WebGLBuffer {
+    const bufferData = this.getBuffer(attributeName);
+    if (bufferData === undefined) {
+      throw `program needs an attribute named ${attributeName}, but cant find in geometry data`;
+    }
+    return engine.createOrUpdateAttributeBuffer(bufferData, false);
+  }
 
 }
 

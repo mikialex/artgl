@@ -6,6 +6,13 @@ import { Shading } from "../core/shading";
 import { RenderRange } from "../core/render-object";
 import { Vector4Like } from "../math/interface";
 
+export interface GeometryWebGLDataProvider{
+  getCurrentVersion(): number;
+  needIndexUint32(): boolean;
+  getIndexAttributeWebGLBuffer(engine: RenderEngine): WebGLBuffer;
+  getAttributeWebGLBuffer(engine: RenderEngine, attributeName: string): WebGLBuffer;
+}
+
 export interface Renderable {
   render(engine: RenderEngine): void;
 }

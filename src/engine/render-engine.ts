@@ -16,7 +16,7 @@ import { Vector4 } from "../math/vector4";
 import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
 import { Vector4Like } from "../math/interface";
-import { Renderable } from "./interface";
+import { Renderable, GeometryWebGLDataProvider } from "./interface";
 import { Camera } from "../core/camera";
 import { PerspectiveCamera, PerspectiveCameraInstance } from "../camera/perspective-camera";
 import { Matrix4 } from "../math";
@@ -272,24 +272,11 @@ export class RenderEngine implements GLReleasable {
     })
   }
 
-  useGeometry(geometry: Geometry) {
+  useGeometry(geometry: GeometryWebGLDataProvider) {
 
     const program = this.currentProgram;
     if (program === null) {
       throw 'shading not exist'
-    }
-
-    // check index buffer and update program.indexUINT
-    if (program.useIndexDraw) {
-      if (geometry.indexBuffer === null) {
-        throw 'indexBuffer not found for index draw'
-      }
-      const geometryIndexBuffer = geometry.indexBuffer;
-      if (geometryIndexBuffer.data instanceof Uint32Array) {
-        program.indexUINT = true;
-      } else {
-        program.indexUINT = false;
-      }
     }
 
     // vao check
@@ -303,21 +290,12 @@ export class RenderEngine implements GLReleasable {
 
     // common procedure
     program.attributes.forEach(att => {
-      const bufferData = geometry.getBuffer(att.name);
-      if (bufferData === undefined) {
-        throw `program needs an attribute named ${att.name}, but cant find in geometry data`;
-      }
-      const glBuffer = this.createOrUpdateAttributeBuffer(bufferData, false);
-      att.useBuffer(glBuffer);
+      att.useBuffer(geometry.getAttributeWebGLBuffer(this, att.name));
     })
 
     if (program.useIndexDraw) {
-      const geometryIndexBuffer = geometry.indexBuffer;
-      if (geometryIndexBuffer === null) {
-        throw "index draw need index buffer"
-      }
-      const glBuffer = this.createOrUpdateAttributeBuffer(geometryIndexBuffer, true);
-      program.useIndexBuffer(glBuffer);
+      program.indexUINT = geometry.needIndexUint32();
+      program.useIndexBuffer(geometry.getIndexAttributeWebGLBuffer(this));
     }
 
     // create vao
