@@ -14,10 +14,7 @@ const tempVector3 = new Vector3();
  * StandardGeometry is indexed Geometry that has position uv normal channel
  */
 export class StandardGeometry extends Geometry {
-  constructor() {
-    super();
-  }
-
+  
   indexBuffer: BufferData<Uint32Array> = BufferData.u32Index([]);
 
   get position() {

@@ -6,7 +6,6 @@ import {
 import { PointLight } from '../../../src/light/point-light';
 import { RenderConfig } from '@/components/conf/interface';
 import { Application } from '../application';
-import { ArrowGeometry } from '../../../src/geometry/geo-lib/arrow-geometry';
 import { createBarycentricBufferForStandardGeometry } from '../../../src/geometry/geo-util/barycentric'
 import { DirectionalShadowMap } from '../../../src/shadow-map/directional-shadowmap'
 
@@ -19,11 +18,6 @@ export default function (root: SceneNode, app: Application, shading: Shading) {
   createBarycentricBufferForStandardGeometry(cubeGeo);
 
   app.engine.defaultShading = shading;
-
-  const arrowGeo = new ArrowGeometry()
-  createBarycentricBufferForStandardGeometry(arrowGeo);
-  const arrow = new Mesh().g(arrowGeo).s(shading)
-  root.addChild(arrow);
 
   const planeMesh = new Mesh().g(planeGeo).s(shading)
   root.addChild(planeMesh);
