@@ -25,30 +25,109 @@ function isKeyWord(str: string) {
 
 const NORMAL = new StateNode(GLSLStateType.NORMAL)
 const TOKEN = new StateNode(GLSLStateType.TOKEN)
-const OPERATOR = new StateNode(GLSLStateType.OPERATOR, GLSLTokenType.OPERATOR)
-const INTEGER = new StateNode(GLSLStateType.INTEGER, GLSLTokenType.INTEGER)
-const WHITESPACE = new StateNode(GLSLStateType.WHITESPACE, GLSLTokenType.WHITESPACE)
-const PREPROCESSOR = new StateNode(GLSLStateType.PREPROCESSOR, GLSLTokenType.PREPROCESSOR)
-const LINE_COMMENT = new StateNode(GLSLStateType.LINE_COMMENT, GLSLTokenType.LINE_COMMENT)
-const BLOCK_COMMENT = new StateNode(GLSLStateType.BLOCK_COMMENT, GLSLTokenType.BLOCK_COMMENT)
-const KEYWORD = new StateNode(GLSLStateType.KEYWORD, GLSLTokenType.KEYWORD)
-const IDENT = new StateNode(GLSLStateType.IDENT, GLSLTokenType.IDENT)
+const OPERATOR = new StateNode(GLSLStateType.OPERATOR)
+const INTEGER = new StateNode(GLSLStateType.INTEGER)
+const WHITESPACE = new StateNode(GLSLStateType.WHITESPACE)
+const PREPROCESSOR = new StateNode(GLSLStateType.PREPROCESSOR)
+const LINE_COMMENT = new StateNode(GLSLStateType.LINE_COMMENT)
+const BLOCK_COMMENT = new StateNode(GLSLStateType.BLOCK_COMMENT)
 
 NORMAL.defineTransition(tokenizer => {
-  const isNumber = /\d/.test(tokenizer.lastPeekingChar)
-  const isOperator = /[^\w_]/.test(tokenizer.lastPeekingChar)
-  return !isNumber && !isOperator;
-}, TOKEN);
-NORMAL.defineTransition(tokenizer => /[^\w_]/.test(tokenizer.lastPeekingChar), OPERATOR);
-NORMAL.defineTransition(tokenizer => /\d/.test(tokenizer.lastPeekingChar), INTEGER);
-NORMAL.defineTransition(tokenizer => /\s/.test(tokenizer.lastPeekingChar), WHITESPACE);
-NORMAL.defineTransition(tokenizer => tokenizer.lastPeekingChar === '#', PREPROCESSOR);
-NORMAL.defineTransition(tokenizer => tokenizer.allPeeking === '//', LINE_COMMENT);
-NORMAL.defineTransition(tokenizer => tokenizer.allPeeking === '/*', BLOCK_COMMENT);
+  if (tokenizer.allPeeking === '//') { return LINE_COMMENT };
+  if (tokenizer.allPeeking === '/*') { return BLOCK_COMMENT };
+  if (tokenizer.lastPeekingChar === '#') { return PREPROCESSOR };
+  if (/\s/.test(tokenizer.lastPeekingChar)) { return WHITESPACE };
+  const isNumber = /\d/.test(tokenizer.lastPeekingChar);
+  const isOperator = /[^\w_]/.test(tokenizer.lastPeekingChar);
+  if (isNumber) {
+    return INTEGER;
+  } else {
+    return isOperator ? OPERATOR : TOKEN;
+  }
+})
 
-TOKEN.defineTransition(tokenizer =>/[^\d\w_]/.test(tokenizer.lastPeekingChar) && isKeyWord(tokenizer.allPeeking), KEYWORD);
-TOKEN.defineTransition(tokenizer =>/[^\d\w_]/.test(tokenizer.lastPeekingChar), IDENT);
+TOKEN.defineTransition(tokenizer => {
+  if (/[^\d\w_]/.test(tokenizer.lastPeekingChar)) {
+    if (isKeyWord(tokenizer.allPeeking)) {
+      tokenizer.emitToken(GLSLTokenType.KEYWORD)
+      return NORMAL
+    } else {
+      tokenizer.emitToken(GLSLTokenType.IDENT)
+      return NORMAL
+    }
+  }
+  return TOKEN;
+})
 
+PREPROCESSOR.defineTransition(tokenizer => {
+  const c = tokenizer.lastPeekingChar;
+  if ((c === '\r' || c === '\n') && tokenizer.firstPeekingChar !== '\\') {
+    tokenizer.emitToken(GLSLTokenType.PREPROCESSOR)
+    return NORMAL;
+  }
+  return PREPROCESSOR;
+})
+
+LINE_COMMENT.defineTransition(tokenizer => {
+  const c = tokenizer.lastPeekingChar;
+  if ((c === '\r' || c === '\n') && tokenizer.firstPeekingChar !== '\\') {
+    tokenizer.emitToken(GLSLTokenType.LINE_COMMENT)
+    return NORMAL;
+  }
+  return LINE_COMMENT;
+})
+
+BLOCK_COMMENT.defineTransition(tokenizer => {
+  const s = tokenizer.allPeeking;
+  if (s.length >= 4 && s.slice(s.length - 2) === "*/") {
+    tokenizer.emitToken(GLSLTokenType.BLOCK_COMMENT)
+    return NORMAL;
+  }
+  return BLOCK_COMMENT;
+})
+
+WHITESPACE.defineTransition(tokenizer => {
+  if (/[^\s]/g.test(tokenizer.lastPeekingChar)) {
+    tokenizer.emitToken(GLSLTokenType.WHITESPACE)
+    return NORMAL;
+  }
+  return WHITESPACE;
+})
+
+OPERATOR.defineTransition(tokenizer => {
+
+  if (this.currentLastCharactor === '.' && /\d/.test(this.currentCharactor)) {
+    this.switchMode(TokenType.FLOAT)
+    return
+  }
+
+  if (tokenizer.allPeeking === '//') { return LINE_COMMENT };
+  if (tokenizer.allPeeking === '/*') { return BLOCK_COMMENT };
+
+  if (this.currentCharactor === '.' && this.content.length) {
+    while (determineOperator(this.content));
+
+    this.switchMode(TokenType.FLOAT)
+    return
+  }
+
+  if (this.currentCharactor === ';' || this.currentCharactor === ')' || this.currentCharactor === '(') {
+    if (this.content.length) while (this.determineOperator(this.content));
+    this.createToken(this.currentCharactor)
+    this.switchMode(TokenType.NORMAL)
+    this.read();
+    return;
+  }
+
+  var is_composite_operator = this.content.length === 2 && this.currentCharactor !== '='
+  if (/[\w_\d\s]/.test(this.currentCharactor) || is_composite_operator) {
+    while (this.determineOperator(this.content));
+    this.switchMode(TokenType.NORMAL)
+    return
+  }
+
+  return OPERATOR;
+})
 
 export class GLSLTokenizer {
   tokens: [];
@@ -62,6 +141,10 @@ export class GLSLTokenizer {
 
   get lastPeekingChar() {
     return this.input[this.peeking];
+  }
+
+  get firstPeekingChar() {
+    return this.input[this.hasRead];
   }
 
   get allPeeking() {
@@ -81,6 +164,10 @@ export class GLSLTokenizer {
 
   peek() {
     this.peeking++;
+  }
+
+  emitToken(token: GLSLTokenType) {
+
   }
 
   tokenize(input: string): GLSLToken[] {

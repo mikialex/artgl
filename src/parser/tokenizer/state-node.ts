@@ -4,41 +4,23 @@ import { GLSLTokenizer, GLSLStateType } from "./tokenizer";
 
 export type StateTransitionFunction = (
   tokenizer: GLSLTokenizer
-) => boolean;
-
-export interface StateTransition {
-  func: StateTransitionFunction,
-  target: StateNode
-}
+) => StateNode;
 
 export class StateNode{
-  constructor(type: GLSLStateType, emitType?: GLSLTokenType) {
+  constructor(type: GLSLStateType) {
     this.type = type;
-    if (emitType !== undefined) {
-      this.emitType = emitType;
-    }
   }
 
   type: GLSLStateType
-  transitions: StateTransition[] = [];
+  transition: StateTransitionFunction
 
-  emitType: Nullable<GLSLTokenType> = null;
-
-  defineTransition(condition: StateTransitionFunction, nextNode: StateNode) {
-    this.transitions.push({
-      func: condition,
-      target: nextNode
-    })
+  defineTransition(transition: StateTransitionFunction) {
+    this.transition = transition
   }
 
   transit(
     tokenizer: GLSLTokenizer
   ): StateNode {
-    for (let i = 0; i < this.transitions.length; i++) {
-      const tran = this.transitions[i];
-      if (tran.func(tokenizer)) {
-        return tran.target;
-      }
-    }
+    return this.transition(tokenizer)
   }
 }
