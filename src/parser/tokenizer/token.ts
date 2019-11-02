@@ -9,8 +9,6 @@ export interface GLSLToken {
 }
 
 export enum GLSLTokenType {
-  NORMAL = 'normal',      // <-- never emitted
-  TOKEN = 'token',         // <-- never emitted
   BLOCK_COMMENT = 'block comment',
   LINE_COMMENT = 'line comment',
   PREPROCESSOR = 'preprocessor',

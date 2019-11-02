@@ -1,35 +1,40 @@
 import { GLSLTokenType } from "./token";
 import { Nullable } from "../../type";
+import { GLSLTokenizer, GLSLStateType } from "./tokenizer";
 
-export type StateTransitionFunction = (nextChar: string) => boolean;
+export type StateTransitionFunction = (
+  tokenizer: GLSLTokenizer
+) => boolean;
+
 export interface StateTransition {
   func: StateTransitionFunction,
   target: StateNode
 }
 
 export class StateNode{
-  constructor(type: GLSLTokenType) {
+  constructor(type: GLSLStateType) {
     this.type = type;
   }
 
-  type: GLSLTokenType
+  type: GLSLStateType
   transitions: StateTransition[] = [];
   acceptCondition: Nullable<StateTransitionFunction>;
 
-  defineTransitionCondition(condition: StateTransitionFunction, nextNode: StateNode) {
+  defineTransition(condition: StateTransitionFunction, nextNode: StateNode) {
     this.transitions.push({
       func: condition,
       target: nextNode
     })
   }
 
-  transit(nextChar: string): Nullable<StateNode> {
+  transit(
+    tokenizer: GLSLTokenizer
+  ): StateNode {
     for (let i = 0; i < this.transitions.length; i++) {
       const tran = this.transitions[i];
-      if (tran.func(nextChar)) {
+      if (tran.func(tokenizer)) {
         return tran.target;
       }
     }
-    return null;
   }
 }

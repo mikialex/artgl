@@ -1,46 +1,91 @@
 import { StateNode } from "./nfa-state-node";
-import { GLSLTokenType, GLSLToken } from "./token";
+import { GLSLToken } from "./token";
+
+
+export enum GLSLStateType {
+  NORMAL = 'normal',
+  TOKEN = 'token',
+  BLOCK_COMMENT = 'block comment',
+  LINE_COMMENT = 'line comment',
+  PREPROCESSOR = 'preprocessor',
+  OPERATOR = 'operator',
+  INTEGER = 'integer',
+  FLOAT = 'float',
+  IDENT = 'ident',
+  BUILTIN = 'inner func',
+  KEYWORD = 'keyword',
+  WHITESPACE = 'space',
+  EOF = 'eof',
+  HEX = 'hex number',
+}
+
+const NORMAL = new StateNode(GLSLStateType.NORMAL)
+const TOKEN = new StateNode(GLSLStateType.TOKEN)
+const OPERATOR = new StateNode(GLSLStateType.OPERATOR)
+const INTEGER = new StateNode(GLSLStateType.INTEGER)
+const WHITESPACE = new StateNode(GLSLStateType.WHITESPACE)
+const PREPROCESSOR = new StateNode(GLSLStateType.PREPROCESSOR)
+const LINE_COMMENT = new StateNode(GLSLStateType.LINE_COMMENT)
+const BLOCK_COMMENT = new StateNode(GLSLStateType.BLOCK_COMMENT)
+const KEYWORD = new StateNode(GLSLStateType.KEYWORD)
+
+NORMAL.defineTransition(tokenizer => {
+  const isNumber = /\d/.test(tokenizer.lastPeekingChar)
+  const isOperator = /[^\w_]/.test(tokenizer.lastPeekingChar)
+  return !isNumber && !isOperator;
+}, TOKEN);
+NORMAL.defineTransition(tokenizer => /[^\w_]/.test(tokenizer.lastPeekingChar), OPERATOR);
+NORMAL.defineTransition(tokenizer => /\d/.test(tokenizer.lastPeekingChar), INTEGER);
+NORMAL.defineTransition(tokenizer => /\s/.test(tokenizer.lastPeekingChar), WHITESPACE);
+NORMAL.defineTransition(tokenizer => tokenizer.lastPeekingChar === '#', PREPROCESSOR);
+NORMAL.defineTransition(tokenizer => tokenizer.allPeeking === '//', LINE_COMMENT);
+NORMAL.defineTransition(tokenizer => tokenizer.allPeeking === '/*', BLOCK_COMMENT);
+
+// TOKEN.defineTransition(tokenizer => {
+//   if (/[^\d\w_]/.test(this.currentCharactor)) {
+    
+//   }
+// }), KEYWORD);
+
 
 export class GLSLTokenizer {
-  constructor() {
-    const normal = new StateNode(GLSLTokenType.NORMAL);
-    const token = new StateNode(GLSLTokenType.TOKEN);
-    const blockComment = new StateNode(GLSLTokenType.BLOCK_COMMENT);
-    const lineComment = new StateNode(GLSLTokenType.LINE_COMMENT);
-    const preprocessor = new StateNode(GLSLTokenType.PREPROCESSOR);
-    const operator = new StateNode(GLSLTokenType.OPERATOR);
-    const integer = new StateNode(GLSLTokenType.INTEGER);
-    const float = new StateNode(GLSLTokenType.FLOAT);
-    const ident = new StateNode(GLSLTokenType.IDENT);
+  tokens: [];
+  input: string;
+  peeking: number; // peek forward position
+  hasRead: number; // char before read is All tokenized
+
+  currentLine: number;
+  currentCol: number;
+  currentMode: GLSLStateType;
+
+  get lastPeekingChar() {
+    return this.input[this.peeking];
   }
 
-  nodes: Map<GLSLTokenType, StateNode> = new Map();
-  startNode: StateNode
-  currentNode: StateNode
-
-  parsedToken: GLSLToken[] = [];
+  get allPeeking() {
+    return this.input.slice(this.hasRead, this.peeking);
+  }
 
   reset() {
+    this.tokens = [];
+    this.input = "";
+    this.peeking = 0;
+    this.hasRead = 0;
 
+    this.currentLine = 0;
+    this.currentCol = 0;
+    this.currentMode = GLSLStateType.NORMAL;
+  }
+
+  peek() {
+    this.peeking++;
   }
 
   tokenize(input: string): GLSLToken[] {
-    return this.parsedToken;
-  }
+    this.reset();
+    this.input = input;
 
-  read(char: string) {
-    const next = this.currentNode.transit(char);
-    if (next === null) {
-      if (next.acceptCondition !== null && next.acceptCondition(char)) {
-        this.emitToken(this.currentNode);
-        this.currentNode = this.startNode;
-      }
-    } else {
-      this.currentNode = next;
-    }
-  }
 
-  emitToken(node: StateNode) {
-    
+    return this.tokens.slice();
   }
 }
