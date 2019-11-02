@@ -1,5 +1,5 @@
-import { StateNode } from "./nfa-state-node";
-import { GLSLToken } from "./token";
+import { StateNode } from "./state-node";
+import { GLSLToken, GLSLTokenType } from "./token";
 
 
 export enum GLSLStateType {
@@ -19,15 +19,20 @@ export enum GLSLStateType {
   HEX = 'hex number',
 }
 
+function isKeyWord(str: string) {
+  return false;
+}
+
 const NORMAL = new StateNode(GLSLStateType.NORMAL)
 const TOKEN = new StateNode(GLSLStateType.TOKEN)
-const OPERATOR = new StateNode(GLSLStateType.OPERATOR)
-const INTEGER = new StateNode(GLSLStateType.INTEGER)
-const WHITESPACE = new StateNode(GLSLStateType.WHITESPACE)
-const PREPROCESSOR = new StateNode(GLSLStateType.PREPROCESSOR)
-const LINE_COMMENT = new StateNode(GLSLStateType.LINE_COMMENT)
-const BLOCK_COMMENT = new StateNode(GLSLStateType.BLOCK_COMMENT)
-const KEYWORD = new StateNode(GLSLStateType.KEYWORD)
+const OPERATOR = new StateNode(GLSLStateType.OPERATOR, GLSLTokenType.OPERATOR)
+const INTEGER = new StateNode(GLSLStateType.INTEGER, GLSLTokenType.INTEGER)
+const WHITESPACE = new StateNode(GLSLStateType.WHITESPACE, GLSLTokenType.WHITESPACE)
+const PREPROCESSOR = new StateNode(GLSLStateType.PREPROCESSOR, GLSLTokenType.PREPROCESSOR)
+const LINE_COMMENT = new StateNode(GLSLStateType.LINE_COMMENT, GLSLTokenType.LINE_COMMENT)
+const BLOCK_COMMENT = new StateNode(GLSLStateType.BLOCK_COMMENT, GLSLTokenType.BLOCK_COMMENT)
+const KEYWORD = new StateNode(GLSLStateType.KEYWORD, GLSLTokenType.KEYWORD)
+const IDENT = new StateNode(GLSLStateType.IDENT, GLSLTokenType.IDENT)
 
 NORMAL.defineTransition(tokenizer => {
   const isNumber = /\d/.test(tokenizer.lastPeekingChar)
@@ -41,11 +46,8 @@ NORMAL.defineTransition(tokenizer => tokenizer.lastPeekingChar === '#', PREPROCE
 NORMAL.defineTransition(tokenizer => tokenizer.allPeeking === '//', LINE_COMMENT);
 NORMAL.defineTransition(tokenizer => tokenizer.allPeeking === '/*', BLOCK_COMMENT);
 
-// TOKEN.defineTransition(tokenizer => {
-//   if (/[^\d\w_]/.test(this.currentCharactor)) {
-    
-//   }
-// }), KEYWORD);
+TOKEN.defineTransition(tokenizer =>/[^\d\w_]/.test(tokenizer.lastPeekingChar) && isKeyWord(tokenizer.allPeeking), KEYWORD);
+TOKEN.defineTransition(tokenizer =>/[^\d\w_]/.test(tokenizer.lastPeekingChar), IDENT);
 
 
 export class GLSLTokenizer {

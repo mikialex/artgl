@@ -12,13 +12,17 @@ export interface StateTransition {
 }
 
 export class StateNode{
-  constructor(type: GLSLStateType) {
+  constructor(type: GLSLStateType, emitType?: GLSLTokenType) {
     this.type = type;
+    if (emitType !== undefined) {
+      this.emitType = emitType;
+    }
   }
 
   type: GLSLStateType
   transitions: StateTransition[] = [];
-  acceptCondition: Nullable<StateTransitionFunction>;
+
+  emitType: Nullable<GLSLTokenType> = null;
 
   defineTransition(condition: StateTransitionFunction, nextNode: StateNode) {
     this.transitions.push({
