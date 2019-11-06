@@ -16,9 +16,7 @@ async function getStringContentFromFile(file: Blob) {
       const str = reader.result;
       resolve(str as string);
     };
-    reader.onerror = (e) => {
-      reject(e)
-    }
+    reader.onerror = reject;
     reader.readAsText(file);
   });
 }
@@ -46,6 +44,24 @@ export async function loadStringFromFile() {
   return str;
 }
 
+async function getDataUrlFromFile(file: Blob) {
+  const reader = new FileReader();
+  return new Promise<string>(function (resolve, reject) {
+    reader.onload =  () => {
+      const str = reader.result;
+      resolve(str as string);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+export async function loadImageFromFile() {
+  const file = await openFile();
+  const url = await getDataUrlFromFile(file);
+  return loadImageFromURL(url);
+}
+
 export async function loadImageFromURL(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
@@ -53,8 +69,6 @@ export async function loadImageFromURL(url: string): Promise<HTMLImageElement> {
     image.onload = () => {
       resolve(image);
     };
-    image.onerror = (err) => {
-      reject(err);
-    }
+    image.onerror = reject
   })
 }

@@ -9,7 +9,11 @@
       <ChannelEditor 
       v-for="channel in channels" 
       :key="channel.name" 
-      @deleteSelf="deleteChannel(channel.name)"
+      :name ="channel.name"
+      :texture ="channel.value"
+      @deleteSelf="deleteChannel"
+      @uploadImage="updateChannalImage"
+
       />
       <button @click="addChannel">add Channel</button>
     </div>
@@ -20,7 +24,8 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import ChannelEditor from "./channel-editor.vue";
-import { Scene, Material, Vector3 } from "../../../../src/artgl";
+import { Scene, Material, Vector3, Texture } from "../../../../src/artgl";
+import { TextureSource } from "../../../../src/core/texture-source";
 
 @Component({
   components: {
@@ -32,6 +37,10 @@ export default class MaterialPanel extends Vue {
 
   expandDetail = true;
   channelUpdate = 1;
+
+  updateChannalImage(channelName: string, img: HTMLImageElement){
+    this.material.setChannelTexture(channelName, new Texture(TextureSource.fromImageElement(img)));
+  }
 
   get channels() {
     const a = this.channelUpdate;
