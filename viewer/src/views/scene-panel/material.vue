@@ -44,14 +44,15 @@ export default class MaterialPanel extends Vue {
 
   get channels() {
     const a = this.channelUpdate;
-    const results =[];
+    const results: any =[];
     this.material._channels.forEach((value,key) =>{
       results.push({
         name: key, 
         value
       })
     })
-    return Array.from(this.material._channels);
+    console.log(results)
+    return results;
   }
 
   addChannel() {
