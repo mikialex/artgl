@@ -2,8 +2,10 @@ import { TestBridge } from '../src/test-bridge';
 import {
   Vector3, RenderEngine, Scene, Mesh,
   PerspectiveCamera, Vector4, OrbitController, PlaneGeometry, Shading,
-  BaseEffectShading, ShaderGraph, texture, ChannelType, UvFragVary, vec4
+  BaseEffectShading, ShaderGraph, texture, ChannelType, UvFragVary, vec4, constValue, Camera, Line
 } from '../../src/artgl';
+import { GLDataType } from '../../src/core/data-type';
+import { CommonAttribute } from '../../src/webgl/interface';
 
 class DiffuseShading extends BaseEffectShading<DiffuseShading> {
   decorate(graph: ShaderGraph): void {
@@ -17,12 +19,10 @@ class DiffuseShading extends BaseEffectShading<DiffuseShading> {
 class ShowUV extends BaseEffectShading<ShowUV> {
   decorate(graph: ShaderGraph): void {
     graph
-      .setVertexRoot(
-        vec4()
-      )
-      .setFragmentRoot(
-        texture(ChannelType.diffuse).fetch(graph.getVary(UvFragVary))
-      )
+      .setVertexRoot(vec4(
+        graph.getOrMakeAttribute(CommonAttribute.uv, GLDataType.floatVec2),
+        constValue(0), constValue(1)
+      ))
   }
 }
 
@@ -36,8 +36,12 @@ export default async function test(testBridge: TestBridge) {
 
   const scene = new Scene();
   const geometry = new PlaneGeometry();
-  const mesh = new Mesh().g(geometry);
 
+  const shading = new Shading()
+    .decorate(new ShowUV())
+    .decoCamera()
+
+  const mesh = new Line().g(geometry).s(shading);
 
   scene.root.addChild(mesh);
 

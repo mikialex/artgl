@@ -3,6 +3,7 @@ import testDrawPrimitive from '../contents/draw-primitives'
 import barycentric from '../contents/barycentric-wireframe'
 import texture from '../contents/texture'
 import skybox from '../contents/sky-box'
+import uvView from '../contents/uv-view'
 import { TestBridge } from './test-bridge';
 
 type ConstructorTypeOf<T> = new (...args: any[]) => T;
@@ -50,6 +51,11 @@ export const examples: Example[] = [
     name:  "Skybox",
     title: "CubeMap skybox",
     build: skybox
+  },
+  {
+    name:  "uv-view",
+    title: "UV view",
+    build: uvView
   },
 ];
 

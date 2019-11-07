@@ -19,13 +19,15 @@ export const NormalFragVary = "v_normal"
 export const NDCPositionFragVary = "v_position_ndc"
 export const WorldPositionFragVary = "v_position_world"
 
+export const defaultVertexRoot = constValue(new Vector4());
+
 export class ShaderGraph {
   constructor() {
     this.reset();
   }
 
   fragmentRoot: ShaderNode = constValue(new Vector4());
-  vertexRoot: ShaderNode = constValue(new Vector4());
+  vertexRoot: ShaderNode = defaultVertexRoot;
   varyings: Map<string, ShaderVaryInputNode> = new Map();
   attributes: Map<string, ShaderAttributeInputNode> = new Map();
 

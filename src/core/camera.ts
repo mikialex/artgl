@@ -3,7 +3,7 @@ import { Matrix4, Vector3 } from "../math/index";
 import { RenderEngine, Size } from '../engine/render-engine';
 import { ShaderUniformProvider, ShaderUniformDecorator, BaseEffectShading } from "./shading";
 import { Uniform, ShadingComponent } from "./shading-decorator";
-import { ShaderGraph, WorldPositionFragVary } from "../shader-graph/shader-graph";
+import { ShaderGraph, WorldPositionFragVary, defaultVertexRoot } from "../shader-graph/shader-graph";
 import { VPTransform, MTransform } from "../shader-graph/built-in/transform";
 import { uniformFromValue, vec4, constValue } from "../shader-graph/node-maker";
 import { GLDataType } from "./data-type";
@@ -16,7 +16,13 @@ export function MVP(graph: ShaderGraph) {
 
     const worldPosition = MTransform.make()
       .input('MMatrix', graph.getSharedUniform(Camera.WorldMatrixKey))
-      .input('position', graph.getOrMakeAttribute(CommonAttribute.position, GLDataType.floatVec3))
+
+    if (graph.getVertRoot() === defaultVertexRoot) {
+      worldPosition.input('position', graph.getOrMakeAttribute(CommonAttribute.position, GLDataType.floatVec3))
+    } else {
+      worldPosition.input('position', graph.getVertRoot().swizzling('xyz'))
+    }
+
     return {
       MVP: VPTransform.make()
         .input("VPMatrix", graph.getSharedUniform(Camera.ViewProjectionMatrix))
@@ -159,7 +165,7 @@ export class CameraSelf
   //   }
 
   up = new Vector3(0, 1, 0); // todo change watch
-  
+
   lookAt(targetPosition: Vector3) {
     this.transform.lookAt(targetPosition, this.up);
   }
