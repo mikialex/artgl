@@ -5,6 +5,8 @@
       {{config.name}} 
       </div>
       <div class="inline-editor">
+        <button v-if="config.onClick" @click="ifClick"> exe </button>
+
         <NumberEditor
           v-if="typeof configValue === 'number' && config.valueConfig === undefined"
           v-model="configValue"/>
@@ -45,6 +47,12 @@ export default class ConfigItem extends Vue {
   expandEditor:boolean = false;
 
   @Prop({ required: true }) config: any;
+
+  ifClick(){
+    if(this.config.onClick){
+      this.config.onClick();
+    }
+  }
 
   get configValue(){
     return this.config.value;

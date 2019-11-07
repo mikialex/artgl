@@ -1,11 +1,15 @@
 import { TestBridge } from '../src/test-bridge';
 import {
-  Vector3, RenderEngine, Scene, Mesh,
+  Vector3, RenderEngine, Scene,
   PerspectiveCamera, Vector4, OrbitController, PlaneGeometry, Shading,
-  BaseEffectShading, ShaderGraph, texture, ChannelType, UvFragVary, vec4, constValue, Camera, Line
+  BaseEffectShading, ShaderGraph, texture, ChannelType, UvFragVary, vec4,
+  constValue, Line, SphereGeometry, Mesh, Material, Texture
 } from '../../src/artgl';
 import { GLDataType } from '../../src/core/data-type';
 import { CommonAttribute } from '../../src/webgl/interface';
+import { loadObjFile } from '../../src/loader/obj-loader';
+import { TextureSource } from '../../src/core/texture-source';
+import { loadImageFromFile } from '../../src/util/file-io';
 
 class DiffuseShading extends BaseEffectShading<DiffuseShading> {
   decorate(graph: ShaderGraph): void {
@@ -23,6 +27,7 @@ class ShowUV extends BaseEffectShading<ShowUV> {
         graph.getOrMakeAttribute(CommonAttribute.uv, GLDataType.floatVec2),
         constValue(0), constValue(1)
       ))
+      .setFragmentRoot(constValue(new Vector4(1, 1, 1, 1)))
   }
 }
 
@@ -35,19 +40,25 @@ export default async function test(testBridge: TestBridge) {
   const engine = new RenderEngine({ el: canvas });
 
   const scene = new Scene();
-  const geometry = new PlaneGeometry();
 
-  const shading = new Shading()
+  const uvLineShading = new Shading()
     .decorate(new ShowUV())
     .decoCamera()
+  const line = new Line().g(new SphereGeometry()).s(uvLineShading);
+  scene.root.addChild(line);
 
-  const mesh = new Line().g(geometry).s(shading);
-
-  scene.root.addChild(mesh);
+  const quadGeometry = new PlaneGeometry();
+  const material = new Material().setChannelColor(ChannelType.diffuse, new Vector3(0.5, 0.5, 0.5));
+  const textureShading = new Shading()
+    .decorate(new DiffuseShading())
+    .decoCamera()
+  const quad = new Mesh().g(quadGeometry).s(textureShading).m(material);
+  quad.transform.position.set(0.5,0.5,-0.01)
+  scene.root.addChild(quad);
 
   const camera = new PerspectiveCamera().updateRenderRatio(engine)
-  camera.transform.position.set(0, 0, 15);
-  camera.lookAt(new Vector3(0, 0, 0))
+  camera.transform.position.set(0.5, 0.5, 2);
+  camera.lookAt(new Vector3(0.5, 0.5, 0))
   engine.useCamera(camera);
 
   function draw() {
@@ -75,4 +86,25 @@ export default async function test(testBridge: TestBridge) {
     orbitController.update();
     draw();
   })
+
+  testBridge.testConfig = [
+    {
+      name: 'change geometry',
+      onClick: async () => {
+        const newGeometry = await loadObjFile();
+        // line.geometry!.dispose(); // todo
+        line.g(newGeometry);
+      },
+    },
+    {
+      name: 'change texture',
+      onClick: async () => {
+        const newImg = await loadImageFromFile();
+        // material.getChannelTexture(ChannelType.diffuse)!.dispose() // todo
+        material.setChannelTexture(
+          ChannelType.diffuse, new Texture(TextureSource.fromImageElement(newImg))
+        );
+      },
+    },
+  ]
 }

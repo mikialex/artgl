@@ -85,8 +85,9 @@ function generateTextureFromPureColor(color: Vector3): Texture {
   const G = Math.floor(color.y * 256);
   const B = Math.floor(color.z * 256);
   const A = 256;
-  const data = new Uint8ClampedArray([R, G, B, A]);
+  const data = new Uint8ClampedArray([R, G, B, A, R, G, B, A, R, G, B, A, R, G, B, A]);
   const texture = new Texture(TextureSource.fromPixelDataUint8(data, 2, 2));
+  texture.isDataTexture = true;
   return texture;
 }
 

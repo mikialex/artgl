@@ -54,7 +54,7 @@ export const examples: Example[] = [
   },
   {
     name:  "uv-view",
-    title: "UV view",
+    title: "UV viewer",
     build: uvView
   },
 ];
