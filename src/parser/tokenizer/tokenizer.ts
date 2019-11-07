@@ -130,14 +130,14 @@ OPERATOR.defineTransition(tokenizer => {
 })
 
 export class GLSLTokenizer {
-  tokens: [];
-  input: string;
-  peeking: number; // peek forward position
-  hasRead: number; // char before read is All tokenized
+  tokens: [] = [];
+  input = "";
+  peeking = 0; // peek forward position
+  hasRead = 0; // char before read is All tokenized
 
-  currentLine: number;
-  currentCol: number;
-  currentMode: GLSLStateType;
+  currentLine = 0;
+  currentCol = 0;
+  currentMode = GLSLStateType.NORMAL;
 
   get lastPeekingChar() {
     return this.input[this.peeking];
@@ -166,7 +166,7 @@ export class GLSLTokenizer {
     this.peeking++;
   }
 
-  emitToken(token: GLSLTokenType) {
+  emitToken(token: GLSLTokenType, forwardSize?: number) {
 
   }
 
