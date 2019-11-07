@@ -67,9 +67,7 @@ export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
     const VPMatrix = this.getPropertyUniform('VPMatrix')
     const sampleCount = this.getPropertyUniform("sampleCount");
     const depthTex = texture("depthResult");
-    graph
-      .setVertexRoot(screenQuad())
-      .declareFragUV()
+    graph .setVertexRoot(screenQuad(graph))
 
     const vUV = graph.getVary(UvFragVary);
     const depth = unPackDepth.make().input("enc", depthTex.fetch(vUV))

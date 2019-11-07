@@ -41,8 +41,7 @@ export class TSSAOBlendShading extends BaseEffectShading<TSSAOBlendShading> {
 
   decorate(graph: ShaderGraph) {
     graph
-      .setVertexRoot(screenQuad())
-      .declareFragUV()
+      .setVertexRoot(screenQuad(graph))
       .setFragmentRoot(
         tssaoBlend.make()
           .input("colorMap", texture("basic"))

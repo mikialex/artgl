@@ -55,7 +55,7 @@ export function genVertexShader(graph: ShaderGraph, isWebGl2: boolean): string {
   builder.emptyLine()
 
   graph.varyings.forEach((varyNode, key) => {
-    const varyDependList = varyNode.getTopologicalSortedList() as ShaderNode[];
+    const varyDependList = varyNode.source.getTopologicalSortedList() as ShaderNode[];
     const varyResult = codeGenGraph(varyDependList, key, evaluatedNode, isWebGl2);
     pushListToMap(evaluatedNode, varyResult.varList)
     builder.writeBlock(varyResult.code)

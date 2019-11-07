@@ -5,7 +5,7 @@ import { ShaderUniformProvider, ShaderUniformDecorator, BaseEffectShading } from
 import { Uniform, ShadingComponent } from "./shading-decorator";
 import { ShaderGraph, WorldPositionFragVary } from "../shader-graph/shader-graph";
 import { VPTransform, MTransform } from "../shader-graph/built-in/transform";
-import { uniformFromValue, attribute, vec4, constValue } from "../shader-graph/node-maker";
+import { uniformFromValue, vec4, constValue } from "../shader-graph/node-maker";
 import { GLDataType } from "./data-type";
 import { CommonAttribute } from "../webgl/interface";
 
@@ -16,7 +16,7 @@ export function MVP(graph: ShaderGraph) {
 
     const worldPosition = MTransform.make()
       .input('MMatrix', graph.getSharedUniform(Camera.WorldMatrixKey))
-      .input('position', attribute(CommonAttribute.position, GLDataType.floatVec3))
+      .input('position', graph.getOrMakeAttribute(CommonAttribute.position, GLDataType.floatVec3))
     return {
       MVP: VPTransform.make()
         .input("VPMatrix", graph.getSharedUniform(Camera.ViewProjectionMatrix))
@@ -24,7 +24,7 @@ export function MVP(graph: ShaderGraph) {
       worldPosition: worldPosition.swizzling('xyz')
     }
   } else {
-    const rawPosition = vec4(attribute(CommonAttribute.position, GLDataType.floatVec3), constValue(1))
+    const rawPosition = vec4(graph.getOrMakeAttribute(CommonAttribute.position, GLDataType.floatVec3), constValue(1))
     return {
       MVP: rawPosition,
       worldPosition: rawPosition.swizzling('xyz')

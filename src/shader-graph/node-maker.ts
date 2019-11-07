@@ -2,11 +2,12 @@ import {
   ShaderAttributeInputNode, ShaderUniformInputNode,
   ShaderTextureNode, ShaderNode, ShaderConstType, ShaderConstNode, ShaderCombineNode
 } from "./shader-node";
-import { Vector2, Vector3, Matrix4, Vector4, ArrayFlattenable } from "../math";
+import { ArrayFlattenable } from "../math";
 import { Texture } from "../artgl";
 import { CubeTexture } from "../core/texture-cube";
 import { GLDataType, valueToGLType } from "../core/data-type";
 import { GLTextureType, CommonAttribute } from "../webgl/interface";
+import { ShaderGraph } from "./shader-graph";
 
 export function attribute(name: string, type: GLDataType) {
   return new ShaderAttributeInputNode({ name, type });
@@ -58,9 +59,9 @@ export function constValue(value: ShaderConstType) {
   return new ShaderConstNode(value);
 }
 
-export function screenQuad() {
+export function screenQuad(graph: ShaderGraph) {
   return vec4(
-    attribute(CommonAttribute.position, GLDataType.floatVec3),
+    graph.getOrMakeAttribute(CommonAttribute.position, GLDataType.floatVec3),
     constValue(1)
   )
 }

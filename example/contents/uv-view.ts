@@ -1,20 +1,31 @@
 import { TestBridge } from '../src/test-bridge';
 import {
-  Vector3, RenderEngine, SphereGeometry, Mesh,
-  PerspectiveCamera, Vector4, OrbitController, Material,
-  ChannelType, textureFromUrl, ShaderGraph, texture,
-  BaseEffectShading, UvFragVary, Shading, TextureWrap
+  Vector3, RenderEngine, Scene, Mesh,
+  PerspectiveCamera, Vector4, OrbitController, PlaneGeometry, Shading,
+  BaseEffectShading, ShaderGraph, texture, ChannelType, UvFragVary, vec4
 } from '../../src/artgl';
 
-export class CustomShading extends BaseEffectShading<CustomShading> {
+class DiffuseShading extends BaseEffectShading<DiffuseShading> {
   decorate(graph: ShaderGraph): void {
     graph
       .setFragmentRoot(
         texture(ChannelType.diffuse).fetch(graph.getVary(UvFragVary))
       )
   }
-
 }
+
+class ShowUV extends BaseEffectShading<ShowUV> {
+  decorate(graph: ShaderGraph): void {
+    graph
+      .setVertexRoot(
+        vec4()
+      )
+      .setFragmentRoot(
+        texture(ChannelType.diffuse).fetch(graph.getVary(UvFragVary))
+      )
+  }
+}
+
 
 export default async function test(testBridge: TestBridge) {
 
@@ -22,16 +33,13 @@ export default async function test(testBridge: TestBridge) {
 
   let canvas = testBridge.requestCanvas();
   const engine = new RenderEngine({ el: canvas });
-  
-  const geometry = new SphereGeometry();
-  const material = new Material();
-  const shading = new Shading().decoCamera().decorate(new CustomShading());
 
-  const texture = await textureFromUrl(testBridge.getResourceURL("img/demo.jpg"))
-  
-  material.channel(ChannelType.diffuse, texture)
+  const scene = new Scene();
+  const geometry = new PlaneGeometry();
+  const mesh = new Mesh().g(geometry);
 
-  const mesh = new Mesh().g(geometry).m(material).s(shading)
+
+  scene.root.addChild(mesh);
 
   const camera = new PerspectiveCamera().updateRenderRatio(engine)
   camera.transform.position.set(0, 0, 15);
@@ -41,7 +49,7 @@ export default async function test(testBridge: TestBridge) {
   function draw() {
     engine.setClearColor(new Vector4(0.9, 0.9, 0.9, 1.0))
     engine.clearColor();
-    engine.render(mesh);
+    engine.render(scene);
   }
 
   draw();
@@ -51,7 +59,7 @@ export default async function test(testBridge: TestBridge) {
 
   await testBridge.screenShotCompareElement(canvas, "test");
 
-  const orbitController = new OrbitController(camera);
+  const orbitController = new OrbitController(camera as PerspectiveCamera);
   orbitController.registerInteractor(engine.interactor);
 
   testBridge.resizeObserver.add((size) => {

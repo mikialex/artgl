@@ -96,9 +96,11 @@ export class ShaderUniformInputNode extends ShaderInputNode {
 }
 
 export class ShaderVaryInputNode extends ShaderInputNode {
-  constructor(name: string, type: GLDataType) {
+  constructor(name: string, type: GLDataType, source: ShaderNode) {
     super(name, type);
+    this.source = source;
   }
+  source: ShaderNode;
 }
 
 export class ShaderAttributeInputNode extends ShaderInputNode {

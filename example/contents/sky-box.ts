@@ -1,7 +1,7 @@
 import { TestBridge } from '../src/test-bridge';
 import {
-  Vector3, RenderRange, Vector4, RenderEngine, CullSide,
-  Scene, SphereGeometry, Mesh, PerspectiveCamera, OrbitController, Shading, IBLEnvMap, TorusKnotGeometry
+  Vector3, Vector4, RenderEngine, Scene, Mesh, PerspectiveCamera, OrbitController,
+  Shading, IBLEnvMap, TorusKnotGeometry
 } from '../../src/artgl';
 import { CubeTexture } from '../../src/core/texture-cube';
 import { TextureSource } from '../../src/core/texture-source';

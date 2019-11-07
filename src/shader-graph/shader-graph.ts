@@ -26,7 +26,8 @@ export class ShaderGraph {
 
   fragmentRoot: ShaderNode = constValue(new Vector4());
   vertexRoot: ShaderNode = constValue(new Vector4());
-  varyings: Map<string, ShaderNode> = new Map();
+  varyings: Map<string, ShaderVaryInputNode> = new Map();
+  attributes: Map<string, ShaderAttributeInputNode> = new Map();
 
   setFragmentRoot(root: ShaderNode): ShaderGraph {
     this.fragmentRoot = root;
@@ -54,46 +55,59 @@ export class ShaderGraph {
     return this;
   }
 
-  private declareFragNormal(): ShaderNode {
+  private declareFragNormal() {
     if (this.varyings.has(NormalFragVary)) {
       return this.varyings.get(NormalFragVary)!;
     }
-    const node = attribute(CommonAttribute.normal, GLDataType.floatVec3);
+    const node = this.getOrMakeAttribute(CommonAttribute.normal, GLDataType.floatVec3);
     this.setVary(NormalFragVary, node)
     return node;
   }
 
-  declareFragUV(): ShaderGraph {
+  private declareFragUV() {
     if (this.varyings.has(UvFragVary)) {
-      return this;
+      return this.varyings.get(NormalFragVary)!;
     }
-    return this.setVary(UvFragVary, attribute(CommonAttribute.uv, GLDataType.floatVec2))
+    const node = this.getOrMakeAttribute(CommonAttribute.uv, GLDataType.floatVec2);
+    this.setVary(UvFragVary, node)
+    return node
+  }
+
+  getFragRoot() { return this.fragmentRoot; }
+  getVertRoot() { return this.vertexRoot; }
+
+  getAttribute(key: string) { return this.attributes.get(key) }
+  getOrMakeAttribute(key: string, type: GLDataType) {
+    let att = this.getAttribute(key);
+    if (att === undefined) {
+      this.attributes.set(key, attribute(key, type))
+    }
+    att = this.getAttribute(key)!;
+    if (att.type !== type) {
+      throw 'att type not match'
+    }
+    return att;
   }
 
   setVary(key: string, root: ShaderNode): ShaderGraph {
-    this.varyings.set(key, root);
+    this.varyings.set(key, new ShaderVaryInputNode(key, root.type, root));
     return this;
   }
-
-  getFragRoot(): ShaderNode {
-    return this.fragmentRoot;
-  }
-
-  getVertRoot(): ShaderNode {
-    return this.vertexRoot;
-  }
-
   getVary(key: string): ShaderVaryInputNode {
-    let ret = this.varyings.get(key);
-    if (ret === undefined) {
-      if (key === NormalFragVary) {
-        this.declareFragNormal();
-        ret = this.varyings.get(key);
-      } else {
-        throw `cant get vary <${key}>`
-      }
+    let node = this.varyings.get(key);
+    if (node !== undefined) {
+      return node;
     }
-    return new ShaderVaryInputNode(key, ret!.type);
+
+    if (key === NormalFragVary) {
+      this.declareFragNormal();
+      return this.varyings.get(key)!;
+    } if (key === UvFragVary) {
+      this.declareFragUV();
+      return this.varyings.get(key)!;
+    } else {
+      throw `cant get vary <${key}>`
+    }
   }
 
   private sharedUniformNodes: Map<string, ShaderUniformInputNode> = new Map();
@@ -194,14 +208,15 @@ export class ShaderGraph {
       n => n instanceof ShaderInputNode
     );
 
-    const attributes = (inputNodes as ShaderAttributeInputNode[])
-      .filter(node => node instanceof ShaderAttributeInputNode)
-      .map((node: ShaderAttributeInputNode) => {
+    const graphAttributes: ShaderAttributeInputNode[] = [];
+    this.attributes.forEach(a => { graphAttributes.push(a) });
+
+    const attributes = graphAttributes.map((node: ShaderAttributeInputNode) => {
         return {
           name: node.name,
           type: node.type,
         }
-      });
+      })
 
     function toUniDes(node: ShaderUniformInputNode): UniformDescriptor {
       let defaultV;

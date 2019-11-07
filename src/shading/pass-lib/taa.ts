@@ -25,8 +25,7 @@ export class TAAShading extends BaseEffectShading<TAAShading> {
 
   decorate(graph: ShaderGraph) {
     graph
-      .setVertexRoot(screenQuad())
-      .declareFragUV()
+      .setVertexRoot(screenQuad(graph))
 
     const vUV = graph.getVary(UvFragVary);
     const colorOld = texture("TAAHistoryOld").fetch(vUV)

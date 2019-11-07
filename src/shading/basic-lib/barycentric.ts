@@ -1,6 +1,6 @@
 import { BaseEffectShading, Uniform, MarkNeedRedecorate } from "../../core/shading";
 import { ShaderGraph } from "../../shader-graph/shader-graph";
-import { constValue, attribute } from "../../shader-graph/node-maker";
+import { constValue } from "../../shader-graph/node-maker";
 import { ShaderFunction, shader } from "../../shader-graph/shader-function";
 import { Vector3 } from "../../math";
 import { GLDataType } from "../../core/data-type";
@@ -75,7 +75,7 @@ export class BarycentricWireFrame extends BaseEffectShading<BarycentricWireFrame
   }
 
   decorate(graph: ShaderGraph): void {
-    const barCentric = attribute(CommonAttribute.baryCentric, GLDataType.floatVec3);
+    const barCentric = graph.getOrMakeAttribute(CommonAttribute.baryCentric, GLDataType.floatVec3);
 
     graph
       .setVary("v_barCentric", barCentric)
