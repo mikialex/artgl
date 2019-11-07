@@ -10,6 +10,7 @@ import { CommonAttribute } from '../../src/webgl/interface';
 import { loadObjFile } from '../../src/loader/obj-loader';
 import { TextureSource } from '../../src/core/texture-source';
 import { loadImageFromFile } from '../../src/util/file-io';
+import { makeStandardGeometryWireFrame } from '../../src/geometry/geo-util/wireframe';
 
 class DiffuseShading extends BaseEffectShading<DiffuseShading> {
   decorate(graph: ShaderGraph): void {
@@ -44,7 +45,7 @@ export default async function test(testBridge: TestBridge) {
   const uvLineShading = new Shading()
     .decorate(new ShowUV())
     .decoCamera()
-  const line = new Line().g(new SphereGeometry()).s(uvLineShading);
+  const line = new Line().g(makeStandardGeometryWireFrame(new SphereGeometry())).s(uvLineShading);
   scene.root.addChild(line);
 
   const quadGeometry = new PlaneGeometry();
@@ -92,6 +93,7 @@ export default async function test(testBridge: TestBridge) {
       name: 'change geometry',
       onClick: async () => {
         const newGeometry = await loadObjFile();
+        makeStandardGeometryWireFrame(newGeometry);
         // line.geometry!.dispose(); // todo
         line.g(newGeometry);
       },

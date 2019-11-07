@@ -69,11 +69,11 @@ export class StandardGeometry extends Geometry {
     })
   }
 
-  foreachFace(visitor: (face: Face3) => any, range?: RenderRange) {
+  foreachFace(visitor: (face: Face3, id1:number, id2:number, id3:number) => any, range?: RenderRange) {
     const position = this.getBuffer(CommonAttribute.position);
     const index = this.indexBuffer;
     const start = range === undefined ? 0 : range.start;
-    const end = range === undefined ? index.count : (range.start + range.count);
+    const end = range === undefined ? index.count / 3 : (range.start + range.count) / 3;
     for (let i = start; i < end; i++) {
       const p1Index = index.getIndex(i * 3, 0);
       const p2Index = index.getIndex(i * 3 + 1, 0);
@@ -81,7 +81,7 @@ export class StandardGeometry extends Geometry {
       tempFace3.p1.set(position.getIndex(p1Index, 0), position.getIndex(p1Index, 1), position.getIndex(p1Index, 2));
       tempFace3.p2.set(position.getIndex(p2Index, 0), position.getIndex(p2Index, 1), position.getIndex(p2Index, 2));
       tempFace3.p3.set(position.getIndex(p3Index, 0), position.getIndex(p3Index, 1), position.getIndex(p3Index, 2));
-      visitor(tempFace3);
+      visitor(tempFace3, p1Index, p2Index, p3Index);
     }
   };
 
@@ -92,7 +92,7 @@ export class StandardGeometry extends Geometry {
     const position = this.getBuffer(CommonAttribute.position);
     const index = this.indexBuffer;
     const start = range === undefined ? 0 : range.start;
-    const end = range === undefined ? index.count : (range.start + range.count);
+    const end = range === undefined ? index.count : (range.start + range.count); // todo maybe not good
     for (let i = start; i < end; i++) {
       const p1Index = index.getIndex(i * 3, 0);
       const p2Index = index.getIndex(i * 3 + 1, 0);

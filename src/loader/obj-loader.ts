@@ -6,7 +6,7 @@ import { generateNormalFromPosition } from "../geometry/geo-util/normal";
 import { StandardGeometry } from "../geometry/standard-geometry";
 import { GeometryLoader } from "../core/loader";
 
-export async function loadObjFile(): Promise<Geometry> {
+export async function loadObjFile(): Promise<StandardGeometry> {
   const loader = new OBJLoader();
   const str = await loadStringFromFile();
   return loader.parse(str);
