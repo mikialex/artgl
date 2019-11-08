@@ -96,9 +96,8 @@ WHITESPACE.defineTransition(tokenizer => {
 
 OPERATOR.defineTransition(tokenizer => {
 
-  if (this.currentLastCharactor === '.' && /\d/.test(this.currentCharactor)) {
-    this.switchMode(TokenType.FLOAT)
-    return
+  if (tokenizer.currentLastCharactor === '.' && /\d/.test(tokenizer.currentCharactor)) {
+    return GLSLStateType.FLOAT
   }
 
   if (tokenizer.allPeeking === '//') { return LINE_COMMENT };
@@ -133,7 +132,7 @@ export class GLSLTokenizer {
   tokens: [] = [];
   input = "";
   peeking = 0; // peek forward position
-  hasRead = 0; // char before read is All tokenized
+  hasRead = 0; // char before read has all tokenized
 
   currentLine = 0;
   currentCol = 0;

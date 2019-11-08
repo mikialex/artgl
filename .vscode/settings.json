@@ -13,6 +13,7 @@
     "Interactor",
     "Mixins",
     "Proxyed",
+    "Reduceable",
     "Reinhard",
     "Renderable",
     "colorbuffer",
