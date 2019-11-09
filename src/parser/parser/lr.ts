@@ -1,3 +1,4 @@
+import { Nullable } from "../../type"
 
 enum Token {
   AddOperator,
@@ -80,6 +81,10 @@ class ParseConfiguration {
 
   private _stage: number = 0;
 
+  get originRule() {
+    return this.rule;
+  }
+
   get fromSymbol() {
     return this.rule.selfSymbol;
   }
@@ -97,6 +102,14 @@ class ParseConfiguration {
       return null;
     } else {
       return this.rule.allParseConf[this._stage + 1];
+    }
+  }
+
+  get expectNextSymbol() {
+    if (this.isComplete) {
+      return null;
+    } else {
+      return this.rule.equalsTo[this._stage];
     }
   }
 
@@ -138,14 +151,39 @@ class ParseStateNode {
       this.selfConfigs = c.genClosureParseConfigurationSet()
     }
 
+    this.populateNextStates();
 
   }
 
-  transitions: Map<ParseConfiguration, ParseStateNode> = new Map();
-  selfConfigs: Set<ParseConfiguration> = new Set();
+  next(symbol: ParseSymbol) {
+    return this.transitions.get(symbol);
+  }
+
+  private populateNextStates() {
+    this.selfConfigs.forEach(c => {
+      this.populateNextState(c);
+    })
+  }
+
+  private populateNextState(c: ParseConfiguration) {
+    const next = c.successor;
+    if (next === null) { return }
+    this.transitions.set(c.expectNextSymbol!, new ParseStateNode(next, false))
+  }
+
+  private selfConfigs: Set<ParseConfiguration> = new Set();
+  private transitions: Map<ParseSymbol, ParseStateNode> = new Map();
 
   get isReduceable() {
-    return false;// todo
+    return this.transitions.size === 0 && this.selfConfigs.size === 1;
+  }
+
+  get reduceConfig(): ParseConfiguration {
+    return this.selfConfigs.values().next().value
+  }
+
+  get reduceSymbol() {
+    return this.reduceConfig.fromSymbol
   }
 }
 
@@ -159,7 +197,7 @@ class ParseStateNode {
 // }
 
 
-class LRParser {
+export class LRParser {
   constructor(rootSymbol: NoDeterminant) {
     this.rootSymbol = rootSymbol;
     this.parseStateGraph = new ParseStateNode(this.rootSymbol.rules[0].getFirstParseConf(), true);
@@ -168,16 +206,57 @@ class LRParser {
   input: Token[] = [];
   read: number = 0;
 
+  X: Nullable<ParseSymbol> = null;
   symbolStack: ParseSymbol[] = [];
   stateStack: ParseStateNode[] = [];
 
-  private shift() {
+  private parseAll() {
+    this.stateStack.push(this.parseStateGraph);
+  }
+
+  private parse() {
+    const next = this.shift();
+
+    const stateStackTop = this.stateStack[this.stateStack.length - 1];
+    if (stateStackTop.isReduceable) {
+      const nextState = stateStackTop.next(this.X!);
+      if (nextState === undefined) {
+        throw 'parse failed'
+      }
+      this.stateStack.push(nextState);
+      if (this.X instanceof NoDeterminant) {
+        this.stateStack.push(nextState);
+      } else {
+
+      }
+    } else {
+      if (stateStackTop.reduceSymbol === this.rootSymbol) {
+        if (this.X !== null) {
+          throw 'parse failed'
+        } else {
+          return this.symbolStack[0];
+        }
+      } else {
+        this.reduce(stateStackTop);
+      }
+    }
 
   }
 
-  private reduce() {
-
+  private readInput() {
+    const next = this.input[this.read];
+    this.symbolStack.push(next);
+    this.read++;
+    return next;
   }
+
+  private reduce(stateStackTop: ParseStateNode) {
+    const popLength = stateStackTop.reduceConfig.originRule.equalsTo.length;
+    this.stateStack.splice(this.stateStack.length - popLength, popLength);
+    this.symbolStack.splice(this.stateStack.length - popLength, popLength);
+    this.X = stateStackTop.reduceSymbol;
+  }
+
 
   parseStateGraph: ParseStateNode;
 
