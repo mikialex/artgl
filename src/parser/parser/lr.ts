@@ -42,10 +42,10 @@ function makeParser(p: any): any {
 
 }
 
-type ParseSymbol = NoDeterminant | Token;
+type ParseSymbol = NonTerminal | Token;
 
 
-class NoDeterminant {
+class NonTerminal {
   constructor(name: string) {
     this.name = name;
   }
@@ -56,10 +56,10 @@ class NoDeterminant {
 
 // A –> XYZ
 class ProductionRule {
-  constructor(self: NoDeterminant) {
+  constructor(self: NonTerminal) {
     this.selfSymbol = self;
   }
-  selfSymbol: NoDeterminant
+  selfSymbol: NonTerminal
   equalsTo: ParseSymbol[] = [];
 
   allParseConf: ParseConfiguration[] = [];
@@ -122,7 +122,7 @@ class ParseConfiguration {
     const result: Set<ParseConfiguration> = new Set([this]);
 
     function pushResult(symbol: ParseSymbol) {
-      if (!(symbol instanceof NoDeterminant)) {
+      if (!(symbol instanceof NonTerminal)) {
         return;
       }
       symbol.rules.forEach(r => {
@@ -189,7 +189,7 @@ class ParseStateNode {
 
 
 export class LRParser {
-  constructor(rootSymbol: NoDeterminant) {
+  constructor(rootSymbol: NonTerminal) {
     this.rootSymbol = rootSymbol;
     this.parseStateGraph = new ParseStateNode(this.rootSymbol.rules[0].getFirstParseConf(), true);
   }
@@ -220,7 +220,7 @@ export class LRParser {
       if (nextState === undefined) {
         throw 'parse failed'
       }
-      if (this.X instanceof NoDeterminant) {
+      if (this.X instanceof NonTerminal) {
         this.stateStack.push(nextState);
         this.shift();
       } else {
@@ -260,6 +260,6 @@ export class LRParser {
   parseStateGraph: ParseStateNode;
 
   parseSymbols: Set<ParseSymbol> = new Set();
-  allNoDeterminant: Set<NoDeterminant> = new Set();
-  rootSymbol: NoDeterminant;
+  allNonTerminal: Set<NonTerminal> = new Set();
+  rootSymbol: NonTerminal;
 }
