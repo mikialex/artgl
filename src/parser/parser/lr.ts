@@ -187,15 +187,6 @@ class ParseStateNode {
   }
 }
 
-// class ParseStateGraph{
-//   constructor(
-//     private root: ParseStateNode,
-//   ) {
-
-//   }
-//   nodes: Set<ParseStateNode>
-// }
-
 
 export class LRParser {
   constructor(rootSymbol: NoDeterminant) {
@@ -211,11 +202,17 @@ export class LRParser {
   stateStack: ParseStateNode[] = [];
 
   private parseAll() {
-    this.stateStack.push(this.parseStateGraph);
+    this.stateStack.push(this.parseStateGraph); // put initial state
+    let result;
+
+    while (result) {
+      result = this.parse();
+    }
+
+    return result;
   }
 
   private parse() {
-    const next = this.shift();
 
     const stateStackTop = this.stateStack[this.stateStack.length - 1];
     if (stateStackTop.isReduceable) {
@@ -223,11 +220,12 @@ export class LRParser {
       if (nextState === undefined) {
         throw 'parse failed'
       }
-      this.stateStack.push(nextState);
       if (this.X instanceof NoDeterminant) {
         this.stateStack.push(nextState);
+        this.shift();
       } else {
-
+        this.stateStack.push(nextState);
+        this.symbolStack.push(this.X!);
       }
     } else {
       if (stateStackTop.reduceSymbol === this.rootSymbol) {
@@ -243,10 +241,11 @@ export class LRParser {
 
   }
 
-  private readInput() {
+  private shift() {
     const next = this.input[this.read];
     this.symbolStack.push(next);
     this.read++;
+    this.X = next;
     return next;
   }
 
