@@ -29,15 +29,17 @@ interface ScanMatch {
 }
 
 class Lexer {
-  private tokens = [];
+  private tokens: any[] = [];
   private rules: LexerRule[] = [];
   private remove = 0;
-  private state = 0;
+
+  state = 0;
+
   private index = 0;
   private input: string = "";
   private reject: boolean = false;
 
-  defunct (chr: string) {
+  defunct(chr: string) {
     throw new Error("Unexpected character at index " + (this.index - 1) + ": " + chr);
   }
 
@@ -67,39 +69,37 @@ class Lexer {
 
   private scan() {
     const matches: ScanMatch[] = [];
-    let index = 0;
-
-    var state = this.state;
-    var lastIndex = this.index;
-    var input = this.input;
 
     this.rules.forEach(rule => {
       const start = rule.start;
-      const states = start.length;
 
-      if ((states === 0 || start.indexOf(state) >= 0) || (state % 2 !== 0 && states === 1 && start[0] === 0)) {
-        var pattern = rule.pattern;
-        pattern.lastIndex = lastIndex;
-        var result = pattern.exec(input);
+      if ((start.length === 0 || start.indexOf(this.state) >= 0) || (this.state % 2 !== 0 && start.length === 1 && start[0] === 0)) {
+        const pattern = rule.pattern;
+        pattern.lastIndex = this.index;
+        var result = pattern.exec(this.input);
 
-        if (result && result.index === lastIndex) {
-          let j: number = matches.push({
+        if (result !== null && result.index === this.index) {
+          matches.push({
             result: result,
             action: rule.action,
             length: result[0].length
           });
 
-          if (rule.global) index = j;
+          let j = matches.length;
+          if (rule.global) {
+            return;
+          }
 
-          while (--j > index) {
-            var k = j - 1;
-
+          // sort
+          while (--j > 0) {
+            const k = j - 1;
             if (matches[j].length > matches[k].length) {
-              var temple = matches[j];
+              var temp = matches[j];
               matches[j] = matches[k];
-              matches[k] = temple;
+              matches[k] = temp;
             }
           }
+
         }
       }
     })
@@ -118,30 +118,26 @@ class Lexer {
       var matches = this.scan().splice(this.remove);
       var index = this.index;
 
-      while (matches.length > 0) {
-        if (this.reject) {
-          const match = matches.shift()!;
-          var result = match.result;
-          var length = match.length;
-          this.index += length;
-          this.reject = false;
-          this.remove++;
+      while (matches.length > 0 && this.reject) {
+        const match = matches.shift()!;
+        this.index += length;
+        this.reject = false;
+        this.remove++;
 
-          var token = match.action.apply(this, result);
-          if (this.reject) {
-            this.index = result.index;
-          } else if (token !== undefined) {
-            if (Array.isArray(token)) {
-              this.tokens = token.slice(1);
-              token = token[0];
-            } else {
-              if (length !== 0) {
-                this.remove = 0;
-              }
-              return token;
+        var token = match.action(match.result);
+        if (this.reject) {
+          this.index = match.result.index;
+        } else if (token !== undefined) {
+          if (Array.isArray(token)) {
+            this.tokens = token.slice(1);
+            token = token[0];
+          } else {
+            if (match.length !== 0) {
+              this.remove = 0;
             }
+            return token;
           }
-        } else break;
+        }
       }
 
       var input = this.input;
@@ -149,20 +145,24 @@ class Lexer {
       if (index < input.length) {
         if (this.reject) {
           this.remove = 0;
-          var token = this.defunct(input.charAt(this.index++));
-          if (token !== undefined) {
-            if (Object.prototype.toString.call(token) === "[object Array]") {
-              tokens = token.slice(1);
-              return token[0];
-            } else return token;
-          }
+          // var token = this.defunct(input.charAt(this.index++));
+          // if (token !== undefined) {
+          //   if (Array.isArray(token)) {
+          //     this.tokens = token.slice(1);
+          //     return token[0];
+          //   } else return token;
+          // }
         } else {
-          if (this.index !== index) remove = 0;
+          if (this.index !== index) {
+            this.remove = 0;
+          }
           this.reject = true;
         }
-      } else if (matches.length)
+      } else if (matches.length > 0) {
         this.reject = true;
-      else break;
+      } else {
+        break
+      };
     }
   };
 
