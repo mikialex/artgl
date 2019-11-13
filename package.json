@@ -1,9 +1,8 @@
 {
-  "name": "artgl",
-  "version": "0.0.1-alpha",
-  "description": "Web3D framework",
-  "main": "src/artgl.js",
-  "types": "src/artgl.d.ts",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "package": "npx webpack --config webpack.config.prod.js",
     "buildsrc": "npx tsc --build",
@@ -15,18 +14,17 @@
   "author": "mikialex",
   "license": "MIT",
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.5.0",
     "@types/jest": "^24.0.15",
     "@types/node": "^12.7.12",
     "jest": "^24.8.0",
+    "lerna": "^3.18.3",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.4",
     "typescript": "^3.6",
     "webpack": "^4.37.0",
     "webpack-bundle-analyzer": "^3.3.2",
-    "webpack-cli": "^3.3.6",
-    "@microsoft/api-extractor": "^7.5.0"
+    "webpack-cli": "^3.3.6"
   },
-  "dependencies": {
-    "reflect-metadata": "^0.1.13"
-  }
+  "name": "artgl"
 }

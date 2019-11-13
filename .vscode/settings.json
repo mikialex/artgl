@@ -23,6 +23,7 @@
     "framebuffers",
     "fwidth",
     "highp",
+    "mikialex",
     "phong",
     "pingpong",
     "raycast",
@@ -33,6 +34,7 @@
     "tssao",
     "unintialize",
     "varyings",
+    "webgl",
     "wireframe"
   ]
 }
