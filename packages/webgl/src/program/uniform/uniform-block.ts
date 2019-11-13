@@ -2,7 +2,7 @@ import { GLProgram } from "../program";
 import { UniformBlockDescriptor, UniformDescriptor } from "../../interface";
 import { GLRenderer } from "../../gl-renderer";
 import { GLUBOManager } from "../../resource-manager/ubo";
-import { Nullable } from "../../../type";
+import { Nullable } from "@artgl/shared";
 
 export class GLUniformBlock{
   constructor(

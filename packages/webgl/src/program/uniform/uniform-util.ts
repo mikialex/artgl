@@ -1,5 +1,5 @@
 import { uniformUploadType } from "../../interface";
-import { GLDataType } from "../../../core/data-type";
+import { GLDataType } from "../../data-type";
 
 export type setterType = (gl: WebGLRenderingContext, location: WebGLUniformLocation, data: uniformUploadType) => void
 export type copierType = (newValue: uniformUploadType, target: uniformUploadType) => uniformUploadType;

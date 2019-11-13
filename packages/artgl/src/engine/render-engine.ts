@@ -1,17 +1,13 @@
-import { GLRenderer } from "../webgl/gl-renderer";
+
 import { RenderObject, RenderRange } from "../core/render-object";
-import { GLProgram } from "../webgl/program/program";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
 import { Material } from "../core/material";
-import { GLTextureUniform } from "../webgl/program/uniform/uniform-texture";
-import { Nullable, GLReleasable, FloatArray } from "../type";
+import { Nullable, FloatArray } from "../type";
 import { Observable } from "../core/observable";
-import { GLFramebuffer } from '../webgl/gl-framebuffer';
 import { QuadSource } from './render-source';
 import { CopyShading } from "../shading/pass-lib/copy";
 import { NormalShading } from "../artgl";
-import { VAOCreateCallback } from "../webgl/resource-manager/vao";
 import { Vector4 } from "../math/vector4";
 import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
@@ -22,6 +18,10 @@ import { PerspectiveCamera, PerspectiveCameraInstance } from "../camera/perspect
 import { Matrix4 } from "../math";
 import { Texture } from "../core/texture";
 import { CubeTexture } from "../core/texture-cube";
+import {
+  GLReleasable, GLRenderer, GLProgram, GLFramebuffer,
+  GLTextureUniform, VAOCreateCallback
+} from "@artgl/webgl";
 
 export interface Size {
   width: number;

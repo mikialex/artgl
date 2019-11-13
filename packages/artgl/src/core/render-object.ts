@@ -1,14 +1,14 @@
 import { Geometry } from "./geometry";
 import { SceneNode, ExtendWithSceneNode } from "../scene/scene-node";
 import { Material } from "./material";
-import { DrawMode } from "../webgl/const";
 import { DrawState } from "./draw-state";
 import { Face3 } from "../math/entity/face3";
 import { Line3 } from "../math/entity/line3";
 import { Vector3 } from "../math";
-import { Shading, ShaderUniformDecorator } from "./shading";
+import { Shading } from "./shading";
 import { StandardGeometry } from "../geometry/standard-geometry";
 import { RenderEngine } from "../engine/render-engine";
+import { DrawMode } from "@artgl/webgl";
 
 export class RenderRange {
   static fromStandardGeometry(geometry: StandardGeometry) {

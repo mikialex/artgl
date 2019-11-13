@@ -4,8 +4,8 @@ import {
   findUniformSetter, findUniformDiffer, findUniformCopier,
   setterType, differType, copierType
 } from "./uniform-util";
-import { GLRenderer } from "../../../artgl";
-import { Nullable } from "../../../type";
+import { GLRenderer } from "../../gl-renderer";
+import { Nullable } from "@artgl/shared";
 
 export class GLUniform {
   constructor(

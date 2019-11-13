@@ -1,8 +1,8 @@
 import {
   DepthFunction, BlendingMode, CullSide,
-  BlendEquation, SrcAlphaFactor, OneMinusSrcAlphaFactor
-} from "../webgl/const";
-import { GLRenderer } from "../webgl/gl-renderer";
+  BlendEquation, SrcAlphaFactor, OneMinusSrcAlphaFactor,
+  GLRenderer,
+} from "@artgl/webgl";
 
 
 export class DrawState {

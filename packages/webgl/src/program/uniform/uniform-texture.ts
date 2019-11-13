@@ -1,9 +1,9 @@
 import { GLProgram } from "../program";
-import { Nullable } from "../../../type";
 import { GLTextureSlot } from "../../states/gl-texture-slot";
 import { GLRenderer } from '../../gl-renderer';
 import { GLTextureTypeRaw } from "../../const";
 import { TextureDescriptor, GLTextureType } from "../../interface";
+import { Nullable } from "@artgl/shared";
 
 
 export class GLTextureUniform {

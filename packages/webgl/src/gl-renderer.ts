@@ -4,13 +4,14 @@ import { GLProgramManager } from "./resource-manager/program-manager";
 import { GLAttributeBufferDataManager } from "./resource-manager/attribute-buffer-manager";
 import { GLState } from "./states/gl-state";
 import { DrawMode } from "./const";
-import { Nullable, GLReleasable } from "../type";
 import { GLTextureManager } from "./resource-manager/texture-manager";
 import { GLFrameBufferManager } from "./resource-manager/framebuffer-manager";
 import { GLFramebuffer } from "./gl-framebuffer";
 import { GLStat } from "./gl-stat";
 import { GLVAOManager } from "./resource-manager/vao";
 import { GLUBOManager } from "./resource-manager/ubo";
+import { GLReleasable } from "./interface";
+import { Nullable } from "@artgl/shared";
 
 export type WebGLCtx = WebGLRenderingContext | WebGL2RenderingContext
 

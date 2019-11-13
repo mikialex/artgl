@@ -1,5 +1,6 @@
-import { GLDataType2ShaderString } from "../core/data-type";
+
 import { GLProgramConfig, GLTextureType, UniformBlockDescriptor } from "./interface";
+import { GLDataType2ShaderString } from "./data-type";
 
 export function injectVertexShaderHeaders(
   config: GLProgramConfig,

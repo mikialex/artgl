@@ -1,18 +1,16 @@
 
 import { generateUUID, ArrayFlattenable } from "../math";
 import { Nullable } from "../type";
-import { GLProgram } from "../webgl/program/program";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { Observable, Observer } from "./observable";
 import { RenderEngine } from "../engine/render-engine";
 import { ShaderUniformInputNode, ShaderTextureNode } from '../shader-graph/shader-node';
 import { uniformFromValue, textureFromValue } from '../shader-graph/node-maker';
 import { replaceFirst } from '../util/array';
-import { GLProgramConfig, uniformUploadType } from "../webgl/interface";
 import { UNIFORM_META, UNIFORM_TEXTURE_META } from "./shading-decorator";
 import { Texture, CubeTexture } from "../artgl";
 export { Uniform } from "./shading-decorator";
-import { UBOProvider } from "@artgl/webgl";
+import { UBOProvider, uniformUploadType, GLProgramConfig, GLProgram } from "@artgl/webgl";
 
 
 export interface ShaderUniformDecorator {

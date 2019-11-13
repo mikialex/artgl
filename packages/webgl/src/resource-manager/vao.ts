@@ -1,8 +1,9 @@
 import { GLRenderer } from "../gl-renderer";
 import { GLExtList } from "../gl-info";
-import { GLReleasable, Nullable } from "../../type";
 import { Shading } from "../../core/shading";
 import { GeometryWebGLDataProvider } from "../../engine/interface";
+import { Nullable } from "@artgl/shared";
+import { GLReleasable } from "../interface";
 
 type webglVAO = WebGLVertexArrayObject ;
 interface webglVAOExt {
