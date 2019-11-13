@@ -1,7 +1,11 @@
 import { GLRenderer } from "../gl-renderer";
 import { GLProgram } from "../program/program";
-import { GLReleasable } from '../../type';
-import { Shading } from "../../core/shading";
+import { GLProgramConfig, GLReleasable } from "../interface";
+
+export interface WebGLShadingDescriptor{
+  getVersion(): number
+  getProgramConfig(isWebGL2: boolean, useUBO:boolean): GLProgramConfig
+}
 
 export class GLProgramManager implements GLReleasable {
   constructor(renderer: GLRenderer) {
@@ -10,10 +14,10 @@ export class GLProgramManager implements GLReleasable {
 
   readonly renderer: GLRenderer
   
-  private programs: Map<Shading, GLProgram> = new Map();
-  private programsVersion: Map<Shading, number> = new Map();
+  private programs: Map<WebGLShadingDescriptor, GLProgram> = new Map();
+  private programsVersion: Map<WebGLShadingDescriptor, number> = new Map();
 
-  getProgram(shading: Shading, useUBO:boolean) {
+  getProgram(shading: WebGLShadingDescriptor, useUBO:boolean) {
     const program = this.programs.get(shading);
     if (program === undefined) {
       return this.createProgram(shading, useUBO);
@@ -27,7 +31,7 @@ export class GLProgramManager implements GLReleasable {
     return program
   }
 
-  deleteProgram(shading: Shading) {
+  deleteProgram(shading: WebGLShadingDescriptor) {
     const program = this.programs.get(shading);
     if (program === undefined) {
       return;
@@ -37,7 +41,7 @@ export class GLProgramManager implements GLReleasable {
     this.programsVersion.delete(shading);
   }
 
-  private createProgram(shading: Shading, useUBO:boolean): GLProgram {
+  private createProgram(shading: WebGLShadingDescriptor, useUBO:boolean): GLProgram {
     const programConfig = shading.getProgramConfig(this.renderer.ctxVersion === 2, useUBO);
     const program = new GLProgram(this.renderer, programConfig);
     this.programs.set(shading, program);

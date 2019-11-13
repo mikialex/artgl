@@ -37,7 +37,7 @@ export class GLRenderer implements GLReleasable {
         this.ctxVersion = 1;
       } else {
         this.gl = ctx;
-        this.uboManager = new GLUBOManager(this);
+        this.uboManager = new GLUBOManager(ctx as WebGL2RenderingContext);
       }
     }
     if (ctx === null) {

@@ -1,4 +1,8 @@
-import { GLDataType } from "../core/data-type";
+import { GLRenderer } from "./gl-renderer";
+
+export interface GLReleasable {
+  releaseGL(renderer: GLRenderer): void;
+}
 
 export enum GLTextureType{
   texture2D,

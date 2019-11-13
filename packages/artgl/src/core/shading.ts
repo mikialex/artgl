@@ -12,6 +12,7 @@ import { GLProgramConfig, uniformUploadType } from "../webgl/interface";
 import { UNIFORM_META, UNIFORM_TEXTURE_META } from "./shading-decorator";
 import { Texture, CubeTexture } from "../artgl";
 export { Uniform } from "./shading-decorator";
+import { UBOProvider } from "@artgl/webgl";
 
 
 export interface ShaderUniformDecorator {
@@ -47,7 +48,7 @@ export interface ProviderUploadCache {
 
 type propertyName = string;
 type uniformName = string;
-export interface ShaderUniformProvider {
+export interface ShaderUniformProvider extends UBOProvider{
   shouldProxyedByUBO: boolean;
 
   uploadCache: ProviderUploadCache;

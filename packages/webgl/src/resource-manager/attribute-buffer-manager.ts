@@ -1,5 +1,5 @@
 import { GLRenderer } from "../gl-renderer";
-import { GLReleasable } from '../../type';
+import { GLReleasable } from "../interface";
 
 export class GLAttributeBufferDataManager implements GLReleasable {
   constructor(renderer: GLRenderer) {
