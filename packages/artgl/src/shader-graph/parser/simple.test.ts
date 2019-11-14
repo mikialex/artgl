@@ -1,5 +1,6 @@
 import { splitStrUntilChar, getOneParam, getParamList, getFuncBody } from "./shader-function-meta";
-import { GLDataType } from "../../core/data-type";
+import { GLDataType } from "@artgl/webgl";
+
 
 test('split', () => {
   const [h, e] = splitStrUntilChar("asdfas dfsdf {sdfsdf } ", '{')

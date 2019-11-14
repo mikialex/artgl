@@ -5,7 +5,7 @@ import { PassGraphNode } from "./node/pass-graph-node";
 import { Vector4Like } from "../math/interface";
 import { Vector4 } from "../math";
 import { RenderEngine } from "../engine/render-engine";
-import { GLFramebuffer } from "../webgl/gl-framebuffer";
+import { GLFramebuffer } from "@artgl/webgl";
 
 export type uniformName = string;
 type framebufferName = string;

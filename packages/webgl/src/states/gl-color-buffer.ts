@@ -1,9 +1,8 @@
 import { GLRenderer } from "../gl-renderer";
-import { Vector4 } from "../../math/vector4";
-import { Vector4Like } from "../../math/interface";
+import { Vector4Simple, Vector4Like } from "./math-util";
 
 export class GLColorBuffer{
-  static defaultClearColor = new Vector4(0.8, 0.8, 0.8, 1);
+  static defaultClearColor = new Vector4Simple(0.8, 0.8, 0.8, 1);
   constructor(renderer: GLRenderer) {
     this.gl = renderer.gl;
     this.resetDefaultClearColor();
@@ -40,7 +39,7 @@ export class GLColorBuffer{
   }
 
   // TODO premultiplied alpha
-  currentClearColor: Vector4 = new Vector4();
+  currentClearColor = new Vector4Simple();
   setClearColor(newColor: Vector4Like, _premultipliedAlpha?: boolean) {
     if (!newColor.equals(this.currentClearColor)) {
       this.currentClearColor.copy(newColor);

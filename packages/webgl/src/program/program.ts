@@ -1,6 +1,5 @@
 import { GLRenderer } from "../gl-renderer";
 import { GLShader, ShaderType } from "./shader";
-import { generateUUID } from "../../math/uuid";
 import { injectVertexShaderHeaders, injectFragmentShaderHeaders } from "../shader-util";
 import { GLUniform } from "./uniform/uniform";
 import { GLAttribute } from "./attribute";
@@ -36,8 +35,6 @@ export class GLProgram {
       this.useIndexDraw = config.useIndex;
     }
   }
-
-  id: string = generateUUID();
 
   readonly renderer: GLRenderer;
   private program!: WebGLProgram;

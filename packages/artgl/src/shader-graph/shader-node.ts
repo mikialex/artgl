@@ -1,10 +1,9 @@
 import { DAGNode } from "../core/dag-node";
 import { ShaderFunction } from "./shader-function";
 import { Vector2, Vector3, Vector4, ArrayFlattenable } from "../math";
-import { GLDataType } from "../core/data-type";
-import { UniformDescriptor, AttributeDescriptor, GLTextureType } from "../webgl/interface";
 import { Nullable } from "../type";
 import { swizzleType } from "./swizzle-type";
+import { GLDataType, UniformDescriptor, AttributeDescriptor, GLTextureType } from "@artgl/webgl";
 
 let shaderNodeGUIDCount = 0;
 

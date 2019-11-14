@@ -7,6 +7,13 @@ import { ShaderUniformInputNode, ShaderTextureNode } from "../shader-graph/shade
 
 export abstract class BaseEffectShading<T>
   implements ShaderUniformProvider, ShaderUniformDecorator {
+  
+  getBlockedBuffer(): Float32Array {
+    return this.uploadCache.blockedBuffer!;
+  }
+  getBlockedBufferVersion(): number {
+    return this.uploadCache._version;
+  }
 
   shouldProxyedByUBO = true;
   abstract decorate(graph: ShaderGraph): void;

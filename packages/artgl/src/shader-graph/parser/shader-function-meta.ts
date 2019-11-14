@@ -1,5 +1,5 @@
 import { ShaderFunctionDefine, ShaderFunctionParsedDefine } from "../shader-function";
-import { getDataTypeFromShaderString, GLDataType } from "../../core/data-type";
+import { getDataTypeFromShaderString, GLDataType } from "@artgl/webgl";
 
 export function parseShaderFunctionMetaInfo(input: ShaderFunctionDefine)
   : ShaderFunctionParsedDefine {

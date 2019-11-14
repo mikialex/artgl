@@ -1,5 +1,5 @@
 import { RenderObject } from "../core/render-object";
-import { DrawMode } from "../webgl/const";
+import { DrawMode } from "@artgl/webgl";
 
 export class Points extends RenderObject{
   constructor() {

@@ -5,9 +5,9 @@ import {
 import { ArrayFlattenable } from "../math";
 import { Texture } from "../artgl";
 import { CubeTexture } from "../core/texture-cube";
-import { GLDataType, valueToGLType } from "../core/data-type";
-import { GLTextureType, CommonAttribute } from "../webgl/interface";
 import { ShaderGraph } from "./shader-graph";
+import { GLDataType, GLTextureType, CommonAttribute } from "@artgl/webgl";
+import { valueToGLType } from "../core/data-type";
 
 export function attribute(name: string, type: GLDataType) {
   return new ShaderAttributeInputNode({ name, type });

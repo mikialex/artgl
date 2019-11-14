@@ -6,7 +6,7 @@ import {
   ShaderFunctionNode, ShaderNode, ShaderInputNode, ShaderTextureFetchNode,
   ShaderCombineNode, ShaderConstNode, ShaderSwizzleNode
 } from "./shader-node";
-import { GLDataType2ShaderString } from "../core/data-type";
+import { GLDataType2ShaderString } from "@artgl/webgl";
 
 
 export function genFragShader(graph: ShaderGraph, isWebGl2: boolean)

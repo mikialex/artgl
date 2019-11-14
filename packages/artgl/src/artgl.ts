@@ -1,4 +1,6 @@
 
+export * from "@artgl/webgl"
+
 // artgl engine layer
 export { RenderEngine } from "./engine/render-engine";
 export { Framer } from "./engine/framer";

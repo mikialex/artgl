@@ -1,8 +1,7 @@
-import { RenderEngine } from "../artgl";
+import { RenderEngine, GLFramebuffer } from "../artgl";
 import { FrameBufferPool } from "./framebuffer-pool";
 import { RenderPass } from "./pass";
 import { RenderTargetNode } from "./node/render-target-node";
-import { GLFramebuffer } from '../webgl/gl-framebuffer';
 import { Nullable } from "../type";
 
 /**

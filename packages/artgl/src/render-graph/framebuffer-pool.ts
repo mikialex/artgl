@@ -1,7 +1,7 @@
 import { generateUUID } from "../math";
 import { RenderTargetNode } from "./node/render-target-node";
-import { GLFramebuffer } from '../webgl/gl-framebuffer';
 import { RenderEngine } from '../engine/render-engine';
+import { GLFramebuffer } from "@artgl/webgl";
 
 type formatKey = string;
 type FBOGeneratedName = string;

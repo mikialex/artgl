@@ -1,9 +1,9 @@
 import { GLRenderer } from "../gl-renderer";
-import { Vector4 } from "../../math/vector4";
 import { CullSide } from "../const";
 import { GLColorBuffer } from "./gl-color-buffer";
 import { GLDepthBuffer } from "./gl-depth-buffer";
 import { GLTextureSlot } from "./gl-texture-slot";
+import { Vector4Simple } from "./math-util";
 
 export class GLState {
   constructor(renderer: GLRenderer) {
@@ -19,10 +19,10 @@ export class GLState {
   readonly depthbuffer: GLDepthBuffer;
   readonly textureSlot: GLTextureSlot;
 
-  currentViewport: Vector4 = new Vector4();
-  newViewport: Vector4 = new Vector4();
-  currentScissor: Vector4 = new Vector4();
-  newScissor: Vector4 = new Vector4();
+  currentViewport = new Vector4Simple();
+  newViewport = new Vector4Simple();
+  currentScissor = new Vector4Simple();
+  newScissor = new Vector4Simple();
 
   // specifies the affine transformation of x and y 
   // from normalized device coordinates to window coordinates.

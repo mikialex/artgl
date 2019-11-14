@@ -3,9 +3,8 @@ import { ShaderGraph } from "../../shader-graph/shader-graph";
 import { constValue } from "../../shader-graph/node-maker";
 import { ShaderFunction, shader } from "../../shader-graph/shader-function";
 import { Vector3 } from "../../math";
-import { GLDataType } from "../../core/data-type";
-import { CommonAttribute } from "../../webgl/interface";
 import { ShadingComponent } from "../../core/shading-decorator";
+import { CommonAttribute, GLDataType } from "@artgl/webgl";
 
 const addBarycentricWireFrame = shader(`
 vec4 addBarycentricWireFrame(

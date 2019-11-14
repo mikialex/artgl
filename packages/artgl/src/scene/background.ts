@@ -4,9 +4,9 @@ import { Shading } from "../core/shading";
 import { SkyShading } from "../shading/basic-lib/sky";
 import { SphereGeometry } from "../geometry/geo-lib/sphere-geometry";
 import { Mesh } from "../object/mesh";
-import { CullSide } from "../webgl/const";
 import { CubeTexture } from "../core/texture-cube";
 import { CubeEnvMapShading } from "../shading/basic-lib/cube-env-map";
+import { CullSide } from "@artgl/webgl";
 
 export abstract class Background {
   abstract render(engine: RenderEngine): void;

@@ -3,10 +3,9 @@ import {
   Vector3, RenderEngine, Scene,
   PerspectiveCamera, Vector4, OrbitController, PlaneGeometry, Shading,
   BaseEffectShading, ShaderGraph, texture, ChannelType, UvFragVary, vec4,
-  constValue, Line, SphereGeometry, Mesh, Material, Texture, 
+  constValue, Line, SphereGeometry, Mesh, Material, Texture, GLDataType,
+  CommonAttribute
 } from 'artgl';
-import { GLDataType } from 'artgl/src/core/data-type';
-import { CommonAttribute } from 'artgl/src/webgl/interface';
 import { loadObjFile } from 'artgl/src/loader/obj-loader';
 import { TextureSource } from 'artgl/src/core/texture-source';
 import { loadImageFromFile } from 'artgl/src/util/file-io';

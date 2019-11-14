@@ -1,7 +1,7 @@
 import { ShaderFunctionNode } from "./shader-node";
 import { parseShaderFunctionMetaInfo } from "./parser/shader-function-meta";
 import { CodeBuilder } from "./util/code-builder";
-import { GLDataType, GLDataType2ShaderString } from "../core/data-type";
+import { GLDataType, GLDataType2ShaderString } from "@artgl/webgl";
 
 export interface ShaderFunctionDefine {
   source: string,

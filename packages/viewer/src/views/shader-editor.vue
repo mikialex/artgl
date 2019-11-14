@@ -50,15 +50,13 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { ShaderApplication } from "../shader-application";
 import {
-  injectFragmentShaderHeaders,
-} from "artgl/src/webgl/shader-util";
-import {
   ShaderGraph,
   uniform,
   DAGNode,
   TSSAOShading,
-  Shading
-} from "artgl/src/artgl";
+  Shading,
+  GLDataType
+} from "artgl";
 import DAGNodeView from "../components/graph/dag-node.vue";
 import ShaderFunctionNodeView from "../components/graph/nodes/shader-function-node.vue";
 import GraphView from "../components/graph/graph-viewer.vue";
@@ -71,7 +69,6 @@ import {
   layoutGraph
 } from "../model/graph-view";
 import { Nullable } from "artgl/src/type";
-import { GLDataType } from "artgl/src/core/data-type";
 
 @Component({
   components: {

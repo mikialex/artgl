@@ -28,6 +28,13 @@ export abstract class Light<T> extends SceneNode
   abstract produceLightFragDir(_graph: ShaderGraph): ShaderNode
 
   abstract produceLightIntensity(_graph: ShaderGraph): ShaderNode
+    
+  getBlockedBuffer(): Float32Array {
+    return this.uploadCache.blockedBuffer!;
+  }
+  getBlockedBufferVersion(): number {
+    return this.uploadCache._version;
+  }
 
   notifyNeedRedecorate: Observable<ShaderUniformDecorator> = new Observable()
 

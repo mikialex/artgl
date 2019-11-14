@@ -6,8 +6,7 @@ import { Uniform, ShadingComponent } from "./shading-decorator";
 import { ShaderGraph, WorldPositionFragVary, defaultVertexRoot } from "../shader-graph/shader-graph";
 import { VPTransform, MTransform } from "../shader-graph/built-in/transform";
 import { uniformFromValue, vec4, constValue } from "../shader-graph/node-maker";
-import { GLDataType } from "./data-type";
-import { CommonAttribute } from "../webgl/interface";
+import { CommonAttribute, GLDataType } from "@artgl/webgl";
 
 export function MVP(graph: ShaderGraph) {
   if (graph.getIfSharedUniform(Camera.WorldMatrixKey) !== undefined &&

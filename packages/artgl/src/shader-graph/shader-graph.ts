@@ -10,8 +10,11 @@ import { eyeDir } from "./built-in/transform";
 import { ChannelType } from "../core/material";
 import { Nullable } from "../type";
 import { Camera, ShaderUniformProvider } from "../artgl";
-import { GLDataType, valueToGLType, valueToFlatted } from "../core/data-type";
-import { GLProgramConfig, VaryingDescriptor, CommonAttribute, UniformDescriptor, UniformBlockDescriptor } from "../webgl/interface";
+import { valueToGLType, valueToFlatted } from "../core/data-type";
+import {
+  GLDataType, CommonAttribute, GLProgramConfig, UniformBlockDescriptor,
+  UniformDescriptor, VaryingDescriptor
+} from "@artgl/webgl";
 
 
 export const UvFragVary = "v_uv"
