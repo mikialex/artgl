@@ -7,11 +7,13 @@
     "Cineon",
     "Envrionment",
     "Flattenable",
+    "GLSL",
     "GLUBO",
     "GLVAO",
     "Interactor",
     "Mixins",
     "Proxyed",
+    "Reduceable",
     "Reinhard",
     "Renderable",
     "colorbuffer",
@@ -21,6 +23,7 @@
     "framebuffers",
     "fwidth",
     "highp",
+    "mikialex",
     "phong",
     "pingpong",
     "raycast",
@@ -31,6 +34,7 @@
     "tssao",
     "unintialize",
     "varyings",
+    "webgl",
     "wireframe"
   ]
 }

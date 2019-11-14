@@ -1,0 +1,9 @@
+{
+  "name": "@artgl/shared",
+  "version": "0.0.1",
+  "description": "shared utils for artgl",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "author": "mikialex",
+  "license": "MIT"
+}

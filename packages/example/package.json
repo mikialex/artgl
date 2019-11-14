@@ -1,0 +1,17 @@
+{
+  "name": "artgl-test-suit",
+  "version": "0.0.1-alpha",
+  "description": "automated test and doc system for artgl",
+  "scripts": {
+    "build": "node ./scripts/index.js"
+  },
+  "author": "mikialex",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^1.18.1",
+    "static-server": "^2.2.1",
+    "ts-loader": "^6.0.4",
+    "webpack": "^4.38.0",
+    "artgl": "0.0.1-alpha1"
+  }
+}

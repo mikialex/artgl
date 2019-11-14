@@ -1,0 +1,20 @@
+{
+  "name": "artgl",
+  "version": "0.0.1-alpha1",
+  "description": "Web3D framework",
+  "main": "src/artgl.ts",
+  "types": "src/artgl.d.ts",
+  "scripts": {
+    "package": "npx webpack --config webpack.config.prod.js",
+    "buildsrc": "npx tsc --build",
+    "build": "node ./script/build.js",
+    "test": "jest",
+    "test-clear": "jest --clearCache",
+    "api-doc": "npx api-extractor run --local --verbose --typescript-compiler-folder './node_modules/typescript'"
+  },
+  "author": "mikialex",
+  "license": "MIT",
+  "dependencies": {
+    "reflect-metadata": "^0.1.13"
+  }
+}
