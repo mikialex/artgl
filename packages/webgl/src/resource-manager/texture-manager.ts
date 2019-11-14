@@ -2,23 +2,19 @@ import { GLRenderer } from "../gl-renderer";
 import { FramebufferAttachTexture } from "../gl-framebuffer";
 import { GLTextureSlot } from "../states/gl-texture-slot";
 import { GLTextureTypeRaw, TextureFilter, TextureWrap } from "../const";
-import { WebGLTextureProvider, GLReleasable, WebGLCubeTextureProvider } from "../interface"
+import {
+  WebGLTextureProvider, GLReleasable, WebGLCubeTextureProvider,
+  WebGLCommonTextureProvider, TextureBehaviorDescriptor
+} from "../interface"
+import { TextureSource } from "@artgl/shared";
 
-interface TextureDescriptor {
-  minFilter: TextureFilter;
-  magFilter: TextureFilter;
-  wrapS: TextureWrap;
-  wrapT: TextureWrap;
-}
 
-const DefaultTextureDescriptor: TextureDescriptor = {
+const defaultRenderTargetTextureDescriptor = {
   minFilter: TextureFilter.nearest,
   magFilter: TextureFilter.nearest,
   wrapS: TextureWrap.clampToEdge,
   wrapT: TextureWrap.clampToEdge,
 }
-
-const defaultRenderTargetTextureDescriptor = DefaultTextureDescriptor;
 
 
 
@@ -67,7 +63,7 @@ export class GLTextureManager implements GLReleasable {
     const type = gl.UNSIGNED_BYTE;
     const data = null;
     gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat,
-      texture.originalWidth, texture.originalHeight, border,
+      texture.width, texture.height, border,
       format, type, data);
 
     this.textures.set(texture, glTexture);
@@ -77,7 +73,7 @@ export class GLTextureManager implements GLReleasable {
 
   private updateTextureParameters(
     glTexture: WebGLTexture,
-    description: TextureDescriptor,
+    description: TextureBehaviorDescriptor,
     bindType: GLTextureTypeRaw
   )
     : WebGLTexture {
@@ -112,23 +108,17 @@ export class GLTextureManager implements GLReleasable {
 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X,
-      level, internalFormat, format, type,
-      texture.positiveXMap!.source as TexImageSource);
+      level, internalFormat, format, type, texture.getPositiveXMap());
     gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
-      level, internalFormat, format, type,
-      texture.positiveYMap!.source as TexImageSource);
+      level, internalFormat, format, type, texture.getPositiveYMap());
     gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
-      level, internalFormat, format, type,
-      texture.positiveZMap!.source as TexImageSource);
+      level, internalFormat, format, type, texture.getPositiveZMap());
     gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
-      level, internalFormat, format, type,
-      texture.negativeXMap!.source as TexImageSource);
+      level, internalFormat, format, type, texture.getNegativeXMap());
     gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
-      level, internalFormat, format, type,
-      texture.negativeYMap!.source as TexImageSource);
+      level, internalFormat, format, type, texture.getNegativeYMap());
     gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
-      level, internalFormat, format, type,
-      texture.negativeZMap!.source as TexImageSource);
+      level, internalFormat, format, type, texture.getNegativeZMap());
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
     this.textures.set(texture, glTexture);
@@ -136,7 +126,7 @@ export class GLTextureManager implements GLReleasable {
     return glTexture;
   }
 
-  createWebGLTexture(texture: Texture): WebGLTexture {
+  createWebGLTexture(texture: WebGLCommonTextureProvider): WebGLTexture {
     const gl = this.renderer.gl;
     const glTexture = this.createEmptyWebGLTexture();
     this.updateTextureParameters(glTexture, texture, gl.TEXTURE_2D)

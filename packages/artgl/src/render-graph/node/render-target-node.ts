@@ -3,9 +3,8 @@ import { Nullable } from "../../type";
 import { Vector4 } from '../../math/vector4';
 import { PassGraphNode } from "./pass-graph-node";
 import { RenderEngine } from "../../engine/render-engine";
-import { PixelFormat } from "../../core/texture";
 import { Observable } from '../../core/observable';
-import { GLFramebuffer } from "@artgl/webgl";
+import { GLFramebuffer, PixelFormat } from "@artgl/webgl";
 
 
 export enum DimensionType {

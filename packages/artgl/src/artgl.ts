@@ -6,7 +6,7 @@ export { RenderEngine } from "./engine/render-engine";
 export { Framer } from "./engine/framer";
 
 export * from "./core/render-object";
-export * from "./core/texture-source";
+export * from "@artgl/shared/src/texture-source";
 export * from "./core/texture";
 export * from "./core/texture-cube";
 export { Mesh } from "./object/mesh";

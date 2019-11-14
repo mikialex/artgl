@@ -66,13 +66,12 @@ export const MathUtil = {
     return (value & (value - 1)) === 0 && value !== 0;
   },
 
-  nearestPowerOfTwo: function (value: number) {
-    return Math.pow(2, Math.round(Math.log(value) / Math.LN2));
-  },
-
-
   floorPowerOfTwo: function (value: number) {
     return Math.pow(2, Math.floor(Math.log(value) / Math.LN2));
+  },
+
+  nearestPowerOfTwo: function (value: number) {
+    return Math.pow(2, Math.round(Math.log(value) / Math.LN2));
   },
 
   nextPowerOfTwo: function (value: number) {

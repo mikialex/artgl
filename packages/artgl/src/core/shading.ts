@@ -10,7 +10,7 @@ import { replaceFirst } from '../util/array';
 import { UNIFORM_META, UNIFORM_TEXTURE_META } from "./shading-decorator";
 import { Texture, CubeTexture } from "../artgl";
 export { Uniform } from "./shading-decorator";
-import { UBOProvider, uniformUploadType, GLProgramConfig, GLProgram } from "@artgl/webgl";
+import { UBOProvider, uniformUploadType, GLProgramConfig, GLProgram, ShadingProvider } from "@artgl/webgl";
 
 
 export interface ShaderUniformDecorator {
@@ -56,12 +56,15 @@ export interface ShaderUniformProvider extends UBOProvider{
 export type ShadingParams = Map<ShaderUniformDecorator, ShaderUniformDecorator>
 
 
-export class Shading {
+export class Shading implements ShadingProvider{
 
   uuid = generateUUID();
   graph = new ShaderGraph();
 
   _version = 0;
+  getVersion(): number {
+    return this._version;
+  }
 
   private _programConfigCache: Nullable<GLProgramConfig> = null;
   private _needRebuildShader: boolean = true;

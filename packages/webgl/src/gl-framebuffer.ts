@@ -1,15 +1,35 @@
 import { GLRenderer } from "./gl-renderer";
-import { Nullable, GLReleasable } from "../type";
-import { Texture, PixelFormat } from "../core/texture";
-import { TextureSource } from "../core/texture-source";
+import { Nullable, TextureSource } from "@artgl/shared";
+import { PixelFormat, PixelDataType, TextureWrap, TextureFilter } from "./const";
+import { GLReleasable } from "./interface";
 
 
-export class FramebufferAttachTexture extends Texture implements GLReleasable {
-  constructor() {
-    super(TextureSource.forRenderTarget(1,1))
-  }
+export class FramebufferAttachTexture implements GLReleasable {
 
   isDataTexture: true = true;
+
+  width = 0;
+  height = 0;
+
+  private _dataType: PixelDataType = PixelDataType.UNSIGNED_BYTE
+  get dataType() { return this._dataType }
+
+  private _wrapS: TextureWrap = TextureWrap.clampToEdge
+  get wrapS() { return this._wrapS }
+
+  private _wrapT: TextureWrap = TextureWrap.repeat
+  get wrapT() { return this._wrapT }
+
+
+  private _magFilter: TextureFilter = TextureFilter.nearest
+  get magFilter() { return this._magFilter }
+
+  private _minFilter: TextureFilter = TextureFilter.nearest
+  get minFilter() { return this._minFilter }
+
+  getVersion() {
+    return 0;
+  }
 
   releaseGL(renderer: GLRenderer) {
     renderer.textureManger.deleteGLTexture(this);
@@ -92,8 +112,8 @@ export class GLFramebuffer {
     this.renderer.setRenderTarget(this);
 
     const gl = this.gl;
-    texture.rawDataSource.width = this.width;
-    texture.rawDataSource.height = this.height;
+    texture.width = this.width;
+    texture.height = this.height;
     texture.releaseGL(this.renderer);
     const glTexture = this.renderer.textureManger.createTextureForRenderTarget(texture);
     const attachmentPoint = GLAttachmentPoints[attachPoint];

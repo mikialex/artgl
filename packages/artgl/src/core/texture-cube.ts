@@ -1,8 +1,28 @@
-import { TextureSource } from "./texture-source";
-import { PixelDataType, TextureWrap, TextureFilter, RenderEngine } from "../artgl";
+import { TextureSource } from "@artgl/shared/src/texture-source";
+import { PixelDataType, TextureWrap, TextureFilter, RenderEngine, WebGLCubeTextureProvider } from "../artgl";
 import { Nullable } from "../type";
 
-export class CubeTexture {
+export class CubeTexture implements WebGLCubeTextureProvider{
+
+  getPositiveXMap(): TexImageSource {
+    return this.positiveXMap!.source as TexImageSource;
+  }
+  getPositiveYMap(): TexImageSource {
+    return this.positiveYMap!.source as TexImageSource;
+  }
+  getPositiveZMap(): TexImageSource {
+    return this.positiveZMap!.source as TexImageSource;
+  }
+  getNegativeXMap(): TexImageSource {
+    return this.negativeXMap!.source as TexImageSource;
+  }
+  getNegativeYMap(): TexImageSource {
+    return this.negativeYMap!.source as TexImageSource;
+  }
+  getNegativeZMap(): TexImageSource {
+    return this.negativeZMap!.source as TexImageSource;
+  }
+
   positiveXMap: Nullable<TextureSource> = null;
   negativeXMap: Nullable<TextureSource> = null;
 

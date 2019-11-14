@@ -1,5 +1,7 @@
 import { GLRenderer } from "./gl-renderer";
 import { GLDataType } from "./data-type";
+import { TextureSource } from "@artgl/shared";
+import { TextureFilter, TextureWrap } from "..";
 
 export interface UBOProvider {
   getBlockedBuffer(): Float32Array
@@ -11,15 +13,29 @@ export interface ShadingProvider {
   getProgramConfig(isWebGL2: boolean, useUBO:boolean): GLProgramConfig
 }
 
-export interface WebGLTextureProvider {
+export interface TextureBehaviorDescriptor{
+  minFilter: TextureFilter;
+  magFilter: TextureFilter;
+  wrapS: TextureWrap;
+  wrapT: TextureWrap;
+}
+
+export interface WebGLTextureProvider extends TextureBehaviorDescriptor{
   getVersion(): number;
 }
 
 export interface WebGLCommonTextureProvider extends WebGLTextureProvider {
+  getRenderUsedDataSource(isWebGL2: boolean): TextureSource
+  isDataTexture: boolean
 }
 
 export interface WebGLCubeTextureProvider extends WebGLTextureProvider {
-
+  getPositiveXMap(): TexImageSource
+  getPositiveYMap(): TexImageSource
+  getPositiveZMap(): TexImageSource
+  getNegativeXMap(): TexImageSource
+  getNegativeYMap(): TexImageSource
+  getNegativeZMap(): TexImageSource
 }
 
 export interface WebGLAttributeBuffersProvider {

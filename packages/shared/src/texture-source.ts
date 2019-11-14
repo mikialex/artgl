@@ -1,6 +1,12 @@
-import { Nullable } from "../type";
-import { MathUtil } from "../math";
-import { resizeImageFORWebGL } from "../util/texture-util";
+import { Nullable } from "artgl/src/type";
+
+function isPowerOfTwo(value: number) {
+  return (value & (value - 1)) === 0 && value !== 0;
+}
+
+function floorPowerOfTwo(value: number) {
+  return Math.pow(2, Math.floor(Math.log(value) / Math.LN2));
+}
 
 /**
  * Container for texture data storage, not only data self,
@@ -16,7 +22,7 @@ export class TextureSource {
     }
     return TextureSource._utilCanvas
   }
-  
+
   static WEBGL_LARGEST_TEXTURE_SIZE = 4096
 
   static fromImageElement(image: HTMLImageElement) {
@@ -67,12 +73,12 @@ export class TextureSource {
   height: number = 1;
   isPOT: boolean = false;
   updateIsPOT() {
-    this.isPOT = MathUtil.isPowerOfTwo(this.width) && MathUtil.isPowerOfTwo(this.height);
+    this.isPOT = isPowerOfTwo(this.width) && isPowerOfTwo(this.height);
   }
 
   get isSizeDimensionValid() {
     return this.width < TextureSource.WEBGL_LARGEST_TEXTURE_SIZE &&
-    this.height < TextureSource.WEBGL_LARGEST_TEXTURE_SIZE
+      this.height < TextureSource.WEBGL_LARGEST_TEXTURE_SIZE
   }
 
   // two consideration: POT, size too large
@@ -88,5 +94,51 @@ export class TextureSource {
   createPOTTextureSource(needPOT: boolean) {
     return resizeImageFORWebGL(this, needPOT, TextureSource.utilCanvas, 4096)
   }
+
+}
+
+export function resizeImageFORWebGL(
+  source: TextureSource,
+  needsPowerOfTwo: boolean,
+  utilCanvas: HTMLCanvasElement,
+  maxSize: number) {
+
+  if (source.source === null) {
+    return source;
+  }
+
+  let scale = 1;
+
+  // handle case if texture exceeds max size
+  if (source.width > maxSize || source.height > maxSize) {
+    scale = maxSize / Math.max(source.width, source.height);
+  }
+
+  // only perform resize if necessary
+  if (scale < 1 || needsPowerOfTwo) {
+
+    const width = floorPowerOfTwo(scale * source.width);
+    const height = floorPowerOfTwo(scale * source.height);
+
+    utilCanvas.width = width;
+    utilCanvas.height = height;
+
+    var context = utilCanvas.getContext('2d')!;
+    context.drawImage(source.source as any, 0, 0, width, height);
+
+    console.warn(`Texture has been resized from (${source.width}, ${source.height}) to (${width}, ${height}).`);
+
+    const resizedData = context.getImageData(0, 0, width, height);
+
+    const newSource = new TextureSource()
+    newSource.source = resizedData;
+    newSource.width = width;
+    newSource.height = height;
+    newSource.updateIsPOT();
+    return newSource;
+
+  }
+
+  return source;
 
 }

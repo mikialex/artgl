@@ -1,6 +1,6 @@
 import { RenderEngine } from "../engine/render-engine";
 import { GraphicResourceReleasable, Nullable } from "../type";
-import { TextureSource } from "./texture-source";
+import { TextureSource } from "@artgl/shared/src/texture-source";
 import { PixelFormat, TextureWrap, TextureFilter, PixelDataType } from "@artgl/webgl";
 
 export async function textureFromUrl(url: string) {
