@@ -25,7 +25,7 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import ChannelEditor from "./channel-editor.vue";
 import { Scene, Material, Vector3, Texture } from "artgl";
-import { TextureSource } from "artgl/src/core/texture-source";
+import { TextureSource } from "@artgl/shared";
 
 @Component({
   components: {

@@ -4,10 +4,9 @@ import {
   PerspectiveCamera, Vector4, OrbitController, PlaneGeometry, Shading,
   BaseEffectShading, ShaderGraph, texture, ChannelType, UvFragVary, vec4,
   constValue, Line, SphereGeometry, Mesh, Material, Texture, GLDataType,
-  CommonAttribute
+  CommonAttribute, TextureSource
 } from 'artgl';
 import { loadObjFile } from 'artgl/src/loader/obj-loader';
-import { TextureSource } from 'artgl/src/core/texture-source';
 import { loadImageFromFile } from 'artgl/src/util/file-io';
 import { makeStandardGeometryWireFrame } from 'artgl/src/geometry/geo-util/wireframe';
 

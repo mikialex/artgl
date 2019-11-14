@@ -63,8 +63,6 @@ class Lexer<TokenType> {
   }
 
   setInput(input: string) {
-    this.remove = 0;
-    this.state = 0;
     this.index = 0;
     this.tokens = [];
     this.input = input;
@@ -77,7 +75,7 @@ class Lexer<TokenType> {
     this.rules.forEach(rule => {
       const start = rule.start;
 
-      if ((start.length === 0 || start.indexOf(this.state) >= 0) || (this.state % 2 !== 0 && start.length === 1 && start[0] === 0)) {
+      if ((start.length === 0) || (start.length === 1 && start[0] === 0)) {
         const pattern = rule.pattern;
         pattern.lastIndex = this.index;
         var result = pattern.exec(this.input);
@@ -127,7 +125,6 @@ class Lexer<TokenType> {
         if (token !== undefined) {
           if (Array.isArray(token)) {
             this.tokens = token.slice(1);
-            token = token[0];
           } else {
             return token;
           }
