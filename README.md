@@ -17,7 +17,7 @@ Build your post-process pipeline use rendergraph api, we will handle everything 
 
 ### Expressive shading abstraction by shaderGraph API
 
-We also use graph as the shader fragment linker. Its a revolutionary improvement of composability in shader source and shader computation abstraction.  No more confusing #define #include. Make shader effect development productive and provide a sound abstraction in artgl shading model. **You can write shader effect in component style**, and freely compose them, publish them, organize your code better than before.
+We also use graph as the shader fragment linker. Its a revolutionary improvement of composability in shader source and shader computation abstraction.  No more confusing #define #include. Make shader effect development productive and provide a sound abstraction in artgl shading model. **You can write shader effect in component style**, and compose them freely, publish them, organize your code better than before.
 
 ### Alway use advance WebGL API, and auto downgrade
 
@@ -35,13 +35,9 @@ source: [https://github.com/mikialex/artgl](https://github.com/mikialex/artgl)
 
 This repo also contains sub projects: example/ and viewer/
 
-[example readme(cn/zh)](./example/README.md)
+[example readme(cn/zh)](./packages/example/README.md)
 
-[viewer readme](./viewer/README.md)
-
-## demos
-
-[viewer demo](https://mikialex.github.io/artgl/viewer/dist/#/)
+[viewer readme](./packages/viewer/README.md)
 
 ## Posts(cn/zh)
 
@@ -54,8 +50,6 @@ This repo also contains sub projects: example/ and viewer/
 [https://mikialex.github.io/2019/03/12/artgl-about/](https://mikialex.github.io/2019/03/12/artgl-about/)
 
 [https://mikialex.github.io/2019/04/30/wasm-scene/](https://mikialex.github.io/2019/04/30/wasm-scene/)
-
-[https://mikialex.github.io/2019/03/28/wasm-memory-as-data-container/](https://mikialex.github.io/2019/03/28/wasm-memory-as-data-container/)
 
 Some old post maybe not meet the current design, just for reference;
 
