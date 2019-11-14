@@ -49,11 +49,13 @@ export class CubeTexture {
     const glTexture = engine.renderer.textureManger.getGLTexture(this)
     if (glTexture === undefined) {
       this.setNeedUpdate();
+      this.validateAllTextureSource();
       return engine.renderer.textureManger.createWebGLCubeTexture(this)
     }
     if (engine.renderer.textureManger.texturesVersion.get(this) !== this.version) {
       this.releaseGraphics(engine);
       this.setNeedUpdate();
+      this.validateAllTextureSource();
       return engine.renderer.textureManger.createWebGLCubeTexture(this)
     }
     return glTexture;

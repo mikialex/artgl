@@ -5,9 +5,9 @@ import { Nullable } from "../type";
 import { Shading } from "../core/shading";
 import { RenderRange } from "../core/render-object";
 import { Vector4Like } from "../math/interface";
+import { WebGLAttributeBuffersProvider } from "@artgl/webgl";
 
-export interface GeometryWebGLDataProvider{
-  getCurrentVersion(): number;
+export interface GeometryWebGLDataProvider extends WebGLAttributeBuffersProvider{
   needIndexUint32(): boolean;
   getIndexAttributeWebGLBuffer(engine: RenderEngine): WebGLBuffer;
   getAttributeWebGLBuffer(engine: RenderEngine, attributeName: string): WebGLBuffer;

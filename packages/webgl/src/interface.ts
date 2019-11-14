@@ -1,4 +1,30 @@
 import { GLRenderer } from "./gl-renderer";
+import { GLDataType } from "./data-type";
+
+export interface UBOProvider {
+  getBlockedBuffer(): Float32Array
+  getBlockedBufferVersion(): number
+}
+
+export interface ShadingProvider {
+  getVersion(): number
+  getProgramConfig(isWebGL2: boolean, useUBO:boolean): GLProgramConfig
+}
+
+export interface WebGLTextureProvider {
+  getVersion(): number;
+}
+
+export interface WebGLCommonTextureProvider extends WebGLTextureProvider {
+}
+
+export interface WebGLCubeTextureProvider extends WebGLTextureProvider {
+
+}
+
+export interface WebGLAttributeBuffersProvider {
+  getVersion(): number
+}
 
 export interface GLReleasable {
   releaseGL(renderer: GLRenderer): void;

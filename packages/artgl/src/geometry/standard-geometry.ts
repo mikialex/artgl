@@ -4,7 +4,7 @@ import { Face3 } from "../math/entity/face3";
 import { Line3 } from "../math/entity/line3";
 import { Vector3 } from "../math/vector3";
 import { BufferData } from "../core/buffer-data";
-import { CommonAttribute } from "../webgl/interface";
+import { CommonAttribute } from "@artgl/webgl";
 
 const tempFace3 = new Face3();
 const tempLine3 = new Line3();

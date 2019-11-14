@@ -1,10 +1,8 @@
 import { GLRenderer } from "../gl-renderer";
-import { Texture, TextureWrap, TextureFilter } from "../../core/texture";
 import { FramebufferAttachTexture } from "../gl-framebuffer";
 import { GLTextureSlot } from "../states/gl-texture-slot";
-import { TextureSource } from "../../core/texture-source";
-import { CubeTexture } from "../../core/texture-cube";
-import { GLTextureTypeRaw } from "../const";
+import { GLTextureTypeRaw, TextureFilter, TextureWrap } from "../const";
+import { WebGLTextureProvider, GLReleasable, WebGLCubeTextureProvider } from "../interface"
 
 interface TextureDescriptor {
   minFilter: TextureFilter;
@@ -22,7 +20,7 @@ const DefaultTextureDescriptor: TextureDescriptor = {
 
 const defaultRenderTargetTextureDescriptor = DefaultTextureDescriptor;
 
-type StoredTexture = Texture | CubeTexture;
+
 
 /**
  * responsible for webgl texture resource allocation and reallocation
@@ -40,14 +38,14 @@ export class GLTextureManager implements GLReleasable {
   }
   readonly renderer: GLRenderer;
   private slotManager: GLTextureSlot;
-  private textures: Map<StoredTexture, WebGLTexture> = new Map();
-  texturesVersion: Map<StoredTexture, number> = new Map();
+  private textures: Map<WebGLTextureProvider, WebGLTexture> = new Map();
+  texturesVersion: Map<WebGLTextureProvider, number> = new Map();
 
-  getGLTexture(texture: StoredTexture) {
+  getGLTexture(texture: WebGLTextureProvider) {
     return this.textures.get(texture);
   }
 
-  deleteGLTexture(texture: StoredTexture) {
+  deleteGLTexture(texture: WebGLTextureProvider) {
     const glTexture = this.getGLTexture(texture);
     if (glTexture === undefined) {
       return
@@ -101,9 +99,8 @@ export class GLTextureManager implements GLReleasable {
     return glTexture
   }
 
-  createWebGLCubeTexture(texture: CubeTexture): WebGLTexture {
+  createWebGLCubeTexture(texture: WebGLCubeTextureProvider): WebGLTexture {
     const gl = this.renderer.gl;
-    texture.validateAllTextureSource();
 
     const glTexture = this.createEmptyWebGLTexture();
     this.updateTextureParameters(glTexture, texture, gl.TEXTURE_CUBE_MAP)

@@ -1,4 +1,34 @@
 
+// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Pixel_formats
+export enum PixelFormat {
+  Alpha = 0x1906,
+  RGB = 0x1907,
+  RGBA = 0x1908,
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Pixel_types
+export enum PixelDataType {
+  UNSIGNED_BYTE = 0x1401,
+  UNSIGNED_SHORT_5_6_5 = 0x8033,
+  UNSIGNED_SHORT_4_4_4_4 = 0x8034,
+  UNSIGNED_SHORT_5_5_5_1 = 0x8363,
+  FLOAT,
+}
+export const enum TextureWrap {
+  repeat = 0x2901,
+  clampToEdge = 0x812F,
+  mirroredRepeat = 0x8370
+}
+
+export const enum TextureFilter {
+  nearest = 0x2600,
+  linear = 0x2601,
+  nearest_mipmap_nearest = 0x2700,
+  linear_mipmap_nearest = 0x2701,
+  nearest_mipmap_linear = 0x2702,
+  linear_mipmap_linear = 0x2703
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Rendering_primitives
 export const enum DrawMode {
   POINTS = 0x0000,

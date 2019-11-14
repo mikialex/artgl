@@ -1,10 +1,5 @@
-import { GLReleasable } from "../interface";
+import { GLReleasable, UBOProvider } from "../interface";
 import {Nullable} from "@artgl/shared"
-
-export interface UBOProvider {
-  getBlockedBuffer(): Float32Array
-  getBlockedBufferVersion(): number
-}
 
 export class GLUBOManager implements GLReleasable {
   constructor(
@@ -36,10 +31,10 @@ export class GLUBOManager implements GLReleasable {
     if (ubo === undefined) {
       const newUBO = this.createUBO(provider);
       this.UBOData.set(provider, newUBO);
-      this.UBOVersionMap.set(provider, provider.uploadCache._version)
+      this.UBOVersionMap.set(provider, provider.getBlockedBufferVersion())
       return newUBO;
     } else {
-      if (provider.uploadCache._version !== this.UBOVersionMap.get(provider)) {
+      if (provider.getBlockedBufferVersion() !== this.UBOVersionMap.get(provider)) {
         this.deleteUBO(provider, ubo);
         return this.createUBO(provider);
       } else {

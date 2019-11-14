@@ -1,9 +1,7 @@
 import { GLRenderer } from "../gl-renderer";
 import { GLExtList } from "../gl-info";
-import { Shading } from "../../core/shading";
-import { GeometryWebGLDataProvider } from "../../engine/interface";
 import { Nullable } from "@artgl/shared";
-import { GLReleasable } from "../interface";
+import { GLReleasable, WebGLAttributeBuffersProvider, ShadingProvider } from "../interface";
 
 type webglVAO = WebGLVertexArrayObject ;
 interface webglVAOExt {
@@ -23,9 +21,9 @@ export class GLVAOManager implements GLReleasable {
   private vaoExt: Nullable<webglVAOExt>;
   readonly isSupported: boolean;
 
-  private vaoMap: Map<Shading, Map<GeometryWebGLDataProvider, webglVAO>> = new Map();
-  private geometryVersionMap: Map<GeometryWebGLDataProvider, number> = new Map();
-  private shadingVersionMap: Map<Shading, number> = new Map();
+  private vaoMap: Map<ShadingProvider, Map<WebGLAttributeBuffersProvider, webglVAO>> = new Map();
+  private geometryVersionMap: Map<WebGLAttributeBuffersProvider, number> = new Map();
+  private shadingVersionMap: Map<ShadingProvider, number> = new Map();
 
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
@@ -34,7 +32,7 @@ export class GLVAOManager implements GLReleasable {
     this.isSupported = this.vaoExt !== undefined;
   }
 
-  connectGeometry(geometry: GeometryWebGLDataProvider, shading: Shading) {
+  connectGeometry(geometry: WebGLAttributeBuffersProvider, shading: ShadingProvider) {
     let vaoUnbindCallback: VAOCreateCallback;
 
     const webglVAO = this.getVAO(shading, geometry)
@@ -47,10 +45,10 @@ export class GLVAOManager implements GLReleasable {
       const lastGeometryVersion = this.geometryVersionMap.get(geometry);
       const lastShadingVersion = this.shadingVersionMap.get(shading);
 
-      if (lastGeometryVersion !== geometry.getCurrentVersion()) {
+      if (lastGeometryVersion !== geometry.getVersion()) {
         this.deleteAllGeometryCreatedVAO(geometry);
         vaoUnbindCallback = this.createVAO(shading, geometry);
-      } else if (lastShadingVersion !== shading._version) {
+      } else if (lastShadingVersion !== shading.getVersion()) {
         this.deleteAllShadingCreatedVAO(shading);
         vaoUnbindCallback = this.createVAO(shading, geometry);
       } else {
@@ -61,7 +59,7 @@ export class GLVAOManager implements GLReleasable {
     return vaoUnbindCallback;
   }
 
-  private getVAO(shading: Shading, geometry: GeometryWebGLDataProvider) {
+  private getVAO(shading: ShadingProvider, geometry: WebGLAttributeBuffersProvider) {
     const map = this.vaoMap.get(shading);
     if (map === undefined) {
       return undefined
@@ -69,7 +67,7 @@ export class GLVAOManager implements GLReleasable {
     return map.get(geometry);
   }
 
-  private createVAO(shading: Shading, geometry: GeometryWebGLDataProvider): VAOCreateCallback {
+  private createVAO(shading: ShadingProvider, geometry: WebGLAttributeBuffersProvider): VAOCreateCallback {
     let vao: Nullable<webglVAO>
     if (this.renderer.ctxVersion === 2) {
       const gl = (this.gl as WebGL2RenderingContext); 
@@ -90,8 +88,8 @@ export class GLVAOManager implements GLReleasable {
     map.set(geometry, vao)
 
     this.vaoMap.set(shading, map);
-    this.geometryVersionMap.set(geometry, geometry.getCurrentVersion());
-    this.shadingVersionMap.set(shading, shading._version);
+    this.geometryVersionMap.set(geometry, geometry.getVersion());
+    this.shadingVersionMap.set(shading, shading.getVersion());
 
     return {
       vao, unbind: () => {
@@ -100,7 +98,7 @@ export class GLVAOManager implements GLReleasable {
     };
   }
 
-  deleteVAOByShadingAndGeometry(shading: Shading, geometry: GeometryWebGLDataProvider) {
+  deleteVAOByShadingAndGeometry(shading: ShadingProvider, geometry: WebGLAttributeBuffersProvider) {
     this.geometryVersionMap.delete(geometry);
     this.shadingVersionMap.delete(shading);
 
@@ -115,7 +113,7 @@ export class GLVAOManager implements GLReleasable {
     }
   }
 
-  deleteAllGeometryCreatedVAO(geometry: GeometryWebGLDataProvider) {
+  deleteAllGeometryCreatedVAO(geometry: WebGLAttributeBuffersProvider) {
     this.geometryVersionMap.delete(geometry);
     this.vaoMap.forEach(map => {
       const vao = map.get(geometry);
@@ -126,7 +124,7 @@ export class GLVAOManager implements GLReleasable {
     })
   }
 
-  deleteAllShadingCreatedVAO(shading: Shading) {
+  deleteAllShadingCreatedVAO(shading: ShadingProvider) {
     this.shadingVersionMap.delete(shading);
     const map = this.vaoMap.get(shading);
     if (map !== undefined) {

@@ -91,7 +91,7 @@ export abstract class Geometry implements GeometryWebGLDataProvider{
   abstract foreachLineSegment(visitor: (face: Line3) => any, range?: RenderRange): any;
   abstract foreachVertex(visitor: (face: Vector3) => any, range?: RenderRange): any;
 
-  getCurrentVersion() {
+  getVersion() {
     return this._version;
   }
   

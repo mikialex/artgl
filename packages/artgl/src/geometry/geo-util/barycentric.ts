@@ -1,7 +1,7 @@
 import { StandardGeometry } from "../standard-geometry";
-import { BufferData } from "../../artgl";
 import { expandStandardGeometryToNoneReusedFaceData } from "./expand";
-import { CommonAttribute } from "../../webgl/interface";
+import { CommonAttribute } from "@artgl/webgl";
+import { BufferData } from "../../core/buffer-data";
 
 // https://segmentfault.com/a/1190000016175828
 export function generateBarycentricBuffer(position: Float32Array, index: Uint32Array) {

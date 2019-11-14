@@ -1,11 +1,6 @@
 import { GLRenderer } from "../gl-renderer";
 import { GLProgram } from "../program/program";
-import { GLProgramConfig, GLReleasable } from "../interface";
-
-export interface WebGLShadingDescriptor{
-  getVersion(): number
-  getProgramConfig(isWebGL2: boolean, useUBO:boolean): GLProgramConfig
-}
+import { GLReleasable, ShadingProvider } from "../interface";
 
 export class GLProgramManager implements GLReleasable {
   constructor(renderer: GLRenderer) {
@@ -14,16 +9,16 @@ export class GLProgramManager implements GLReleasable {
 
   readonly renderer: GLRenderer
   
-  private programs: Map<WebGLShadingDescriptor, GLProgram> = new Map();
-  private programsVersion: Map<WebGLShadingDescriptor, number> = new Map();
+  private programs: Map<ShadingProvider, GLProgram> = new Map();
+  private programsVersion: Map<ShadingProvider, number> = new Map();
 
-  getProgram(shading: WebGLShadingDescriptor, useUBO:boolean) {
+  getProgram(shading: ShadingProvider, useUBO:boolean) {
     const program = this.programs.get(shading);
     if (program === undefined) {
       return this.createProgram(shading, useUBO);
     }
 
-    if (shading._version !== this.programsVersion.get(shading)) {
+    if (shading.getVersion() !== this.programsVersion.get(shading)) {
       this.deleteProgram(shading)
       return this.createProgram(shading, useUBO);
     }
@@ -31,7 +26,7 @@ export class GLProgramManager implements GLReleasable {
     return program
   }
 
-  deleteProgram(shading: WebGLShadingDescriptor) {
+  deleteProgram(shading: ShadingProvider) {
     const program = this.programs.get(shading);
     if (program === undefined) {
       return;
@@ -41,11 +36,11 @@ export class GLProgramManager implements GLReleasable {
     this.programsVersion.delete(shading);
   }
 
-  private createProgram(shading: WebGLShadingDescriptor, useUBO:boolean): GLProgram {
+  private createProgram(shading: ShadingProvider, useUBO:boolean): GLProgram {
     const programConfig = shading.getProgramConfig(this.renderer.ctxVersion === 2, useUBO);
     const program = new GLProgram(this.renderer, programConfig);
     this.programs.set(shading, program);
-    this.programsVersion.set(shading, shading._version);
+    this.programsVersion.set(shading, shading.getVersion());
     return program;
   }
 
