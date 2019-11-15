@@ -1,7 +1,6 @@
 import { generateUUID } from "@artgl/math";
 import { RenderTargetNode } from "./node/render-target-node";
-import { RenderEngine } from '../engine/render-engine';
-import { GLFramebuffer } from "@artgl/webgl";
+import { RenderGraphBackEnd, FBOProvider } from "./interface"
 
 type formatKey = string;
 type FBOGeneratedName = string;
@@ -10,7 +9,7 @@ type FBOGeneratedName = string;
  * Proxy the fbo storage in rendergraph
  */
 export class FrameBufferPool {
-  constructor(engine: RenderEngine) {
+  constructor(engine: RenderGraphBackEnd) {
     this.engine = engine;
 
     // when resize, clear all for convenience, TODO, optimize
@@ -20,11 +19,11 @@ export class FrameBufferPool {
     })
   }
 
-  private engine: RenderEngine;
+  private engine: RenderGraphBackEnd;
 
-  framebuffers: Map<FBOGeneratedName, GLFramebuffer> = new Map();
+  framebuffers: Map<FBOGeneratedName, FBOProvider> = new Map();
 
-  availableBuffers: Map<formatKey, GLFramebuffer[]> = new Map();
+  availableBuffers: Map<formatKey, FBOProvider[]> = new Map();
 
   clearAll() {
     this.framebuffers.forEach(buffer => {
@@ -35,11 +34,11 @@ export class FrameBufferPool {
   }
 
   /**
-   * get a GLFramebuffer from pool, 
+   * get a FBOProvider from pool, 
    * if there is no fbo meet the config, 
    * create a new one, and pool it
    */
-  requestFramebuffer(node: RenderTargetNode): GLFramebuffer {
+  requestFramebuffer(node: RenderTargetNode): FBOProvider {
     const pooled = this.availableBuffers.get(node.formatKey);
     if (pooled !== undefined) {
       const result = pooled.pop()!;
@@ -61,7 +60,7 @@ export class FrameBufferPool {
   /**
    * return a framebuffer that maybe request before, which will be pooling and reused 
    */
-  returnFramebuffer(framebuffer: GLFramebuffer) {
+  returnFramebuffer(framebuffer: FBOProvider) {
     if (!this.framebuffers.has(framebuffer.name)) {
       throw 'cant return a framebuffer not belong to this pool'
     }

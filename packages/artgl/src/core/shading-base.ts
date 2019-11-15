@@ -1,4 +1,4 @@
-import { Observable } from "./observable";
+import { Observable } from "@artgl/shared";
 import {
   ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform,
   ProviderUploadCache, getPropertyTexture

@@ -1,10 +1,8 @@
-import { DAGNode } from "../../core/dag-node";
-import { Nullable } from "@artgl/shared";
+import { DAGNode, Observable, Nullable } from "@artgl/shared"
 import { Vector4 } from "@artgl/math";
 import { PassGraphNode } from "./pass-graph-node";
-import { RenderEngine } from "../../engine/render-engine";
-import { Observable } from '../../core/observable';
-import { GLFramebuffer, PixelFormat } from "@artgl/webgl";
+import { RenderGraphBackEnd } from "../interface";
+import { PixelFormat } from "@artgl/webgl";
 
 
 export enum DimensionType {
@@ -49,7 +47,7 @@ export class RenderTargetNode extends DAGNode {
   formatKey: string = "";
 
   _afterContentReceived = new Observable<RenderTargetNode>();
-  afterContentReceived(callback: (node:RenderTargetNode) => any) {
+  afterContentReceived(callback: (node: RenderTargetNode) => any) {
     this._afterContentReceived.add(callback);
     return this;
   }
@@ -92,13 +90,13 @@ export class RenderTargetNode extends DAGNode {
   }
 
   private updateFormatKey() {
-    this.formatKey = GLFramebuffer.buildFBOFormatKey(
+    this.formatKey = FBOProvider.buildFBOFormatKey(
       this.widthAbs, this.heightAbs, this.enableDepth
     );
   }
 
   // update abs size info from given engine render size
-  updateSize(engine: RenderEngine) {
+  updateSize(engine: RenderGraphBackEnd) {
 
     if (this.dimensionType === DimensionType.bindRenderSize) {
       this.widthAbs = Math.max(5, engine.renderBufferWidth() * this.autoWidthRatio);

@@ -2,6 +2,11 @@
 export * from "@artgl/webgl"
 export * from "@artgl/math";
 export * from "@artgl/shared";
+export * from '@artgl/render-graph';
+
+import { PassGraphNode } from '@artgl/render-graph';
+import { QuadSourceInstance } from "./engine/render-source";
+PassGraphNode.QuadRenderMethods = QuadSourceInstance.render
 
 // artgl engine layer
 export { RenderEngine } from "./engine/render-engine";
@@ -20,16 +25,12 @@ export * from './core/material';
 export * from "./core/shading";
 export { BufferData } from "./core/buffer-data";
 export { Camera } from "./core/camera";
-export * from "./core/observable";
-export { DAGNode } from "./core/dag-node";
+export * from "@artgl/shared/src/observable";
 
 // scene
 export { Scene } from "./scene/scene";
 export { SceneNode } from "./scene/scene-node";
 export { Transformation } from "./scene/transformation";
-
-// render graph
-export * from './render-graph/exports';
 
 // shader graph
 export * from './shader-graph/shader-graph';

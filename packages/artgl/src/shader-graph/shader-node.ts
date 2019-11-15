@@ -1,4 +1,4 @@
-import { DAGNode } from "../core/dag-node";
+import { DAGNode } from "@artgl/shared";
 import { ShaderFunction } from "./shader-function";
 import { Vector2, Vector3, Vector4, ArrayFlattenable }  from "@artgl/math";
 import { Nullable }  from "@artgl/shared";

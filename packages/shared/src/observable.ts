@@ -1,5 +1,5 @@
 
-import { Nullable } from "../..";
+import { Nullable } from "@artgl/shared";
 
 //https://github.com/BabylonJS/Babylon.js/blob/master/src/Misc/observable.ts
 

@@ -1,17 +1,17 @@
-import { DAGNode } from "../../core/dag-node";
+import { DAGNode, Observable } from "@artgl/shared"
 import { RenderPass, uniformName } from "../pass";
 import { Nullable } from "@artgl/shared";
-import { RenderTargetNode } from "../exports";
+import { RenderTargetNode } from "./render-target-node";
 import { Vector4 } from "@artgl/math";
-import { Observable } from "../../core/observable";
-import { Shading } from "../../artgl";
-import { QuadSourceInstance } from "../../engine/render-source";
+import { ShadingHandle } from "artgl";
+import { RenderMethod } from "../interface";
 
 export interface PassInputMapInfo{
   [index:string]: string
 }
 
 export class PassGraphNode extends DAGNode {
+  static QuadRenderMethods: RenderMethod
   constructor(name: string) {
     super();
     this.name = name;
@@ -52,13 +52,16 @@ export class PassGraphNode extends DAGNode {
 
   readonly name: string;
 
-  source: Function[] = [];
-  use(source: Function) {
+  source: RenderMethod[] = [];
+  use(source: RenderMethod) {
     this.source.push(source);
     return this;
   }
   useQuad() {
-    this.source.push(QuadSourceInstance.render)
+    if (!PassGraphNode.QuadRenderMethods) {
+      throw 'PassGraphNode.QuadRenderMethods should be set for this usage'
+    }
+    this.source.push(PassGraphNode.QuadRenderMethods)
     return this;
   }
   clearUse() {
@@ -66,16 +69,11 @@ export class PassGraphNode extends DAGNode {
     return this;
   }
 
-  _overrideShading: Nullable<Shading> = null;
-  overrideShading(shading: Nullable<Shading>) {
+  _overrideShading: Nullable<ShadingHandle> = null;
+  overrideShading(shading: Nullable<ShadingHandle>) {
     this._overrideShading = shading;
     return this;
   }
-  // _overrideShadingParameter: Nullable<ShadingParams> = null;
-  // overrideShadingParameter(param: Nullable<ShadingParams>) {
-  //   this._overrideShadingParameter = param;
-  //   return this;
-  // }
 
   _enableColorWrite: boolean = true;
   enableColorWrite() {

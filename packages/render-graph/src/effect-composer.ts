@@ -1,13 +1,14 @@
-import { RenderEngine, GLFramebuffer, Nullable } from "../artgl";
 import { FrameBufferPool } from "./framebuffer-pool";
 import { RenderPass } from "./pass";
 import { RenderTargetNode } from "./node/render-target-node";
+import { RenderGraphBackEnd, FBOProvider } from "./interface"
+import { Nullable } from "@artgl/shared";
 
 /**
  * Responsible for rendergraph execution and optimization
  */
 export class EffectComposer {
-  constructor(engine: RenderEngine) {
+  constructor(engine: RenderGraphBackEnd) {
     this.engine = engine;
     this.framebufferPool = new FrameBufferPool(this.engine);
 
@@ -18,12 +19,12 @@ export class EffectComposer {
 
   hasAllPassIsValidChecked = false;
 
-  private engine: RenderEngine;
+  private engine: RenderGraphBackEnd;
   private passes: RenderPass[] = [];
   
   private framebufferPool: FrameBufferPool;
 
-  private keptFramebuffer: Map<RenderTargetNode, GLFramebuffer> = new Map();
+  private keptFramebuffer: Map<RenderTargetNode, FBOProvider> = new Map();
   private framebufferDropList: RenderTargetNode[][] = [];
 
   getFramebuffer(node: RenderTargetNode) {
@@ -38,11 +39,11 @@ export class EffectComposer {
     return fbo.getMainAttachedTexture();
   }
 
-  render(engine: RenderEngine, enableGraphDebugging: boolean = false) {
+  render(engine: RenderGraphBackEnd, enableGraphDebugging: boolean = false) {
     this.passes.forEach((pass, index) => {
       const output = pass.outputTarget;
       output.updateSize(engine);
-      let framebuffer: Nullable<GLFramebuffer> = null;
+      let framebuffer: Nullable<FBOProvider> = null;
 
       if (!output.isScreenNode) {
         framebuffer = this.keptFramebuffer.get(output)!

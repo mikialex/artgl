@@ -1,0 +1,9 @@
+{
+  "name": "@artgl/render-graph",
+  "version": "0.0.1",
+  "description": "Render graph for artgl",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "author": "mikialex",
+  "license": "MIT"
+}

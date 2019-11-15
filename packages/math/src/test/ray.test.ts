@@ -1,5 +1,4 @@
-import { Ray } from "../entity/ray";
-import { Vector3 } from "..";
+import { Vector3, Ray } from "../..";
 
 test('ray default value', () => {
   const v = new Ray();

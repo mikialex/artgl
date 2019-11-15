@@ -1,6 +1,5 @@
 import { DAGNode } from "../dag-node";
 
-
 test('single dag traverse', () => {
   const node = new DAGNode();
   let count = 0;

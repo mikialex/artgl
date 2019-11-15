@@ -1,6 +1,6 @@
 import { Nullable } from "../..";
 import { Accumulator } from "../util/accumulator";
-import { Observable } from "../core/observable";
+import { Observable } from "@artgl/shared";
 
 
 /**

@@ -1,6 +1,6 @@
 import { PassGraphNode } from "./node/pass-graph-node";
 import { RenderTargetNode } from "./node/render-target-node";
-import { RenderGraph } from './exports';
+import { RenderGraph } from './render-graph';
 
 export function pass(name: string) {
   return new PassGraphNode(name);

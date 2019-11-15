@@ -3,11 +3,10 @@ import { RenderObject, RenderRange } from "../core/render-object";
 import { Geometry } from "../core/geometry";
 import { BufferData } from "../core/buffer-data";
 import { Material } from "../core/material";
-import { Nullable, FloatArray } from "@artgl/shared";
-import { Observable } from "../core/observable";
+import { Nullable, FloatArray, Observable } from "@artgl/shared";
 import { QuadSource } from './render-source';
 import { CopyShading } from "../shading/pass-lib/copy";
-import { NormalShading } from "../artgl";
+import { NormalShading, RenderGraphBackEnd } from "../artgl";
 import { Shading, ShaderUniformProvider } from "../core/shading";
 import { Interactor } from "../interact/interactor";
 import { Renderable, GeometryWebGLDataProvider } from "./interface";
@@ -39,7 +38,7 @@ const uboKeys = new Array(100).fill("").map((_, index) => {
   return 'ubo' + index;
 })
 
-export class RenderEngine implements GLReleasable {
+export class RenderEngine implements GLReleasable, RenderGraphBackEnd {
   constructor(config: RenderEngineConstructConfig) {
     this.renderer = new GLRenderer(config.el);
     this.interactor = new Interactor(config.el);

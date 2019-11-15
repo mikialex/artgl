@@ -4,7 +4,8 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: [
-    "<rootDir>/packages/artgl/src/"
+    "<rootDir>/packages/artgl/src/",
+    "<rootDir>/packages/math/src/"
   ],
   collectCoverage: true,
   coverageReporters: [
@@ -13,7 +14,7 @@ module.exports = {
   ],
   collectCoverageFrom: [
     "<rootDir>/packages/artgl/src/**/*.ts",
-    "<rootDir>/packages/artgl/src/**/*.d.ts",
+    "<rootDir>/packages/math/src/**/*.ts",
     "!<rootDir>/packages/artgl/src/wasm-scene/**",
   ]
 };

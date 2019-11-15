@@ -3,8 +3,7 @@ import { Nullable } from "@artgl/shared";
 import { RenderTargetNode } from "./node/render-target-node";
 import { PassGraphNode } from "./node/pass-graph-node";
 import { Vector4, Vector4Like } from "@artgl/math";
-import { RenderEngine } from "../engine/render-engine";
-import { GLFramebuffer } from "@artgl/webgl";
+import { RenderGraphBackEnd, FBOProvider } from "./interface"
 
 export type uniformName = string;
 type framebufferName = string;
@@ -31,8 +30,8 @@ export class RenderPass {
   }
 
   renderDebugResult(
-    engine: RenderEngine,
-    framebuffer: GLFramebuffer
+    engine: RenderGraphBackEnd,
+    framebuffer: FBOProvider
   ) {
     const debugOutputViewport = this.outputTarget.debugViewPort;
     engine.renderFrameBuffer(framebuffer, debugOutputViewport)
@@ -45,12 +44,12 @@ export class RenderPass {
   }
 
   execute(
-    engine: RenderEngine,
-    framebuffer: Nullable<GLFramebuffer>,
+    engine: RenderGraphBackEnd,
+    framebuffer: Nullable<FBOProvider>,
     enableDebuggingView: boolean = false,
   ) {
 
-    let outputTarget: GLFramebuffer;
+    let outputTarget: FBOProvider;
 
     // setup viewport and render target
     if (this.isOutputScreen) {
