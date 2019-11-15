@@ -1,6 +1,6 @@
 import { Matrix4 } from './matrix4';
-import { DataObject, ArrayFlattenable } from '.';
-import { FloatArray } from '../type';
+import { DataObject, ArrayFlattenable } from '..';
+import { FloatArray } from "@artgl/shared";
 
 export class Matrix3
 implements

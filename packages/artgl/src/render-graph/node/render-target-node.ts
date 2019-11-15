@@ -1,6 +1,6 @@
 import { DAGNode } from "../../core/dag-node";
-import { Nullable } from "../../type";
-import { Vector4 } from '../../math/vector4';
+import { Nullable } from "@artgl/shared";
+import { Vector4 } from "@artgl/math";
 import { PassGraphNode } from "./pass-graph-node";
 import { RenderEngine } from "../../engine/render-engine";
 import { Observable } from '../../core/observable';

@@ -1,6 +1,5 @@
-import { Vector3, Matrix4 } from "../math/index";
-import { Nullable } from "../type";
-import { Ray } from "../math/entity/ray";
+import { Vector3, Matrix4, Ray } from "@artgl/math"
+import { Nullable } from "@artgl/shared";
 
 export interface RayCastSource{
   foreachRaycasterable(visitor: (obj: RayCasterable)=> boolean): void;

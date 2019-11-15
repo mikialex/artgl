@@ -1,8 +1,6 @@
 import { Controller } from "./controller";
-import { Spherical } from "../math/spherical";
 import { Interactor } from "./interactor";
-import { Vector2 } from "../math/vector2";
-import { Vector3, MathUtil } from "../math/index";
+import { Vector3, MathUtil, Vector2, Spherical  } from "@artgl/math";
 import { Camera } from "../artgl";
 
 

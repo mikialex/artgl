@@ -1,5 +1,4 @@
-import { Matrix4, Euler, Quaternion, Vector3 } from "../math/index";
-import { Vector3Observable } from "../math/observable/vector3-observable";
+import { Matrix4, Euler, Quaternion, Vector3, Vector3Observable } from "@artgl/math";
 
 const tempVector3 = new Vector3();
 const tempMatrix = new Matrix4();

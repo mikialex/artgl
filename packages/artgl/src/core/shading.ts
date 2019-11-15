@@ -1,6 +1,6 @@
 
-import { generateUUID, ArrayFlattenable } from "../math";
-import { Nullable } from "../type";
+import { generateUUID, ArrayFlattenable } from "@artgl/math";
+import { Nullable } from "@artgl/shared";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { Observable, Observer } from "./observable";
 import { RenderEngine } from "../engine/render-engine";

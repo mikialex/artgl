@@ -1,6 +1,7 @@
 import { Observable } from "./observable";
 import {
-  ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, ProviderUploadCache, getPropertyTexture
+  ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform,
+  ProviderUploadCache, getPropertyTexture
 } from "./shading";
 import { ShaderGraph } from "../shader-graph/shader-graph";
 import { ShaderUniformInputNode, ShaderTextureNode } from "../shader-graph/shader-node";

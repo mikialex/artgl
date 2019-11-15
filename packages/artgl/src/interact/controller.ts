@@ -1,6 +1,6 @@
 
 import { Interactor } from "./interactor";
-import { Nullable } from "../type";
+import { Nullable } from "../..";
 
 export abstract class Controller{
 

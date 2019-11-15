@@ -1,5 +1,5 @@
 
-import { Vector3 } from '../../math/index';
+import { Vector3 } from "@artgl/math";
 import { StandardGeometry } from '../standard-geometry';
 import { ShapeWillChange } from '../../core/geometry';
 

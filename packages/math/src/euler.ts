@@ -2,7 +2,7 @@ import { Quaternion } from './quaternion';
 import { Vector3 } from './vector3';
 import { Matrix4 } from './matrix4';
 import { MathUtil } from './util';
-import { DataObject } from './index';
+import { DataObject } from '..';
 
 export enum EulerOrder {
   'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX'

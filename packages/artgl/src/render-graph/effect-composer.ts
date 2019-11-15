@@ -1,8 +1,7 @@
-import { RenderEngine, GLFramebuffer } from "../artgl";
+import { RenderEngine, GLFramebuffer, Nullable } from "../artgl";
 import { FrameBufferPool } from "./framebuffer-pool";
 import { RenderPass } from "./pass";
 import { RenderTargetNode } from "./node/render-target-node";
-import { Nullable } from "../type";
 
 /**
  * Responsible for rendergraph execution and optimization

@@ -1,7 +1,7 @@
 import { BaseEffectShading, Uniform } from "../../core/shading";
 import { ShaderGraph, WorldPositionFragVary } from "../../shader-graph/shader-graph";
 import { ShaderFunction } from "../../shader-graph/shader-function";
-import { Vector3 } from "../../math";
+import { Vector3 } from "@artgl/math";
 import { Uncharted2Helper } from "../../shader-graph/built-in/tone-mapping";
 import { ShadingComponent } from "../../core/shading-decorator";
 

@@ -1,4 +1,4 @@
-import { generateUUID } from "../math";
+import { generateUUID } from "@artgl/math";
 import { RenderTargetNode } from "./node/render-target-node";
 import { RenderEngine } from '../engine/render-engine';
 import { GLFramebuffer } from "@artgl/webgl";

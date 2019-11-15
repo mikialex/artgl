@@ -1,5 +1,5 @@
 import { RenderObject } from "../core/render-object";
-import { Nullable } from "../type";
+import { Nullable } from "../..";
 
 export class RenderList {
 

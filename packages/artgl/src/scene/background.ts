@@ -1,4 +1,4 @@
-import { Vector4 } from "../math";
+import { Vector4 } from "@artgl/math";
 import { RenderEngine } from "../engine/render-engine";
 import { Shading } from "../core/shading";
 import { SkyShading } from "../shading/basic-lib/sky";

@@ -1,4 +1,4 @@
-import { generateUUID } from "../math/uuid";
+import { generateUUID } from "@artgl/math";
 
 type uuid = string;
 

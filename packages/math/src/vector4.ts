@@ -1,8 +1,8 @@
-import { DataObject, ArrayFlattenable, VectorDataObject } from "./index";
+import { DataObject, ArrayFlattenable, VectorDataObject } from "..";
 import { Matrix4 } from "./matrix4";
 import { Quaternion } from "./quaternion";
 import { Vector4Like } from "./interface";
-import { FloatArray } from "../type";
+import { FloatArray } from "@artgl/shared";
 
 export class Vector4
   implements

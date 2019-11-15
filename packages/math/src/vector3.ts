@@ -1,10 +1,9 @@
 import { Quaternion } from './quaternion';
-import { Matrix4 } from '../math';
-import { Spherical } from './spherical';
-import { DataObject, VectorDataObject, ArrayFlattenable } from './index';
+import { Matrix4 } from '..';
+import { DataObject, VectorDataObject, ArrayFlattenable, Spherical } from '..';
 import { Vector3Like } from './interface';
 import { Matrix3 } from './matrix3';
-import { FloatArray } from '../type';
+import { FloatArray } from "@artgl/shared";
 
 export class Vector3
   implements

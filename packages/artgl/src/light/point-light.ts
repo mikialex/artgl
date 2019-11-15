@@ -2,7 +2,7 @@ import { ShaderFunction } from "../shader-graph/shader-function";
 import { Light } from "../core/light";
 import { WorldPositionFragVary, ShaderGraph } from "../shader-graph/shader-graph";
 import { Uniform } from "../core/shading";
-import { Vector3 } from "../math";
+import { Vector3 } from "@artgl/math";
 import { ShaderNode } from '../shader-graph/shader-node';
 import { dir3D } from '../shader-graph/built-in/transform';
 import { ShadingComponent } from "../core/shading-decorator";

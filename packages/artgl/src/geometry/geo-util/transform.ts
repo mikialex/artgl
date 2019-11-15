@@ -1,5 +1,5 @@
 import { StandardGeometry } from "../standard-geometry";
-import { Vector3, Matrix4 } from "../../math";
+import { Vector3, Matrix4 } from "@artgl/math";
 
 const temp = new Vector3();
 export function transformStandardGeometry

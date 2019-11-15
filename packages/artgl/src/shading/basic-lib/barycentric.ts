@@ -2,7 +2,7 @@ import { BaseEffectShading, Uniform, MarkNeedRedecorate } from "../../core/shadi
 import { ShaderGraph } from "../../shader-graph/shader-graph";
 import { constValue } from "../../shader-graph/node-maker";
 import { ShaderFunction, shader } from "../../shader-graph/shader-function";
-import { Vector3 } from "../../math";
+import { Vector3 }  from "@artgl/math";
 import { ShadingComponent } from "../../core/shading-decorator";
 import { CommonAttribute, GLDataType } from "@artgl/webgl";
 

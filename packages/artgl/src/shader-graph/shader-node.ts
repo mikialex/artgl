@@ -1,7 +1,7 @@
 import { DAGNode } from "../core/dag-node";
 import { ShaderFunction } from "./shader-function";
-import { Vector2, Vector3, Vector4, ArrayFlattenable } from "../math";
-import { Nullable } from "../type";
+import { Vector2, Vector3, Vector4, ArrayFlattenable }  from "@artgl/math";
+import { Nullable }  from "@artgl/shared";
 import { swizzleType } from "./swizzle-type";
 import { GLDataType, UniformDescriptor, AttributeDescriptor, GLTextureType } from "@artgl/webgl";
 

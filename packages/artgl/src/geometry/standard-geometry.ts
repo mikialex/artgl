@@ -1,8 +1,6 @@
 import { Geometry } from "../core/geometry";
 import { RenderRange } from "../core/render-object";
-import { Face3 } from "../math/entity/face3";
-import { Line3 } from "../math/entity/line3";
-import { Vector3 } from "../math/vector3";
+import { Vector3, Line3, Face3 } from "@artgl/math";
 import { BufferData } from "../core/buffer-data";
 import { CommonAttribute } from "@artgl/webgl";
 

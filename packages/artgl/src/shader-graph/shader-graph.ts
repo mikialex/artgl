@@ -5,10 +5,10 @@ import {
   ShaderUniformInputNode, ShaderNode,
 } from "./shader-node";
 import { attribute, constValue, texture } from "./node-maker";
-import { Vector4 } from "../math";
+import { Vector4 }  from "@artgl/math";
 import { eyeDir } from "./built-in/transform";
 import { ChannelType } from "../core/material";
-import { Nullable } from "../type";
+import { Nullable }  from "@artgl/shared";
 import { Camera, ShaderUniformProvider } from "../artgl";
 import { valueToGLType, valueToFlatted } from "../core/data-type";
 import {

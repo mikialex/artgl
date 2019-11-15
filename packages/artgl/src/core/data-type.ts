@@ -1,4 +1,4 @@
-import { Vector2, Vector3, Vector4, Matrix4, ArrayFlattenable, Matrix3 } from "../math";
+import { Vector2, Vector3, Vector4, Matrix4, ArrayFlattenable, Matrix3 } from "@artgl/math";
 import { Texture, CubeTexture } from "../artgl";
 import { GLDataType } from "@artgl/webgl";
 

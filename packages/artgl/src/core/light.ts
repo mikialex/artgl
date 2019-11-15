@@ -5,7 +5,7 @@ import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, Prov
 import { ShaderUniformInputNode, ShaderNode, ShaderTextureNode } from "../shader-graph/shader-node";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { Observable } from "./observable";
-import { Vector3 } from '../math';
+import { Vector3 } from "@artgl/math"
 
 // TODO I cant figure out right multi inheritance impl with strong type, code duplicate 
 

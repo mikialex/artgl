@@ -1,7 +1,7 @@
 import { Light } from "../core/light";
 import { ShaderGraph, ShaderNode } from "../artgl";
 import { Uniform } from "../core/shading";
-import { Vector3 } from "../math";
+import { Vector3 } from "@artgl/math";
 import { ShadingComponent } from "../core/shading-decorator";
 
 

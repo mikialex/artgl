@@ -1,10 +1,10 @@
 import { RenderEngine } from "./render-engine";
 import { Geometry } from "../core/geometry";
 import { Material } from "../core/material";
-import { Nullable } from "../type";
+import { Nullable } from "@artgl/shared";
 import { Shading } from "../core/shading";
 import { RenderRange } from "../core/render-object";
-import { Vector4Like } from "../math/interface";
+import { Vector4Like } from "@artgl/math";
 import { WebGLAttributeBuffersProvider } from "@artgl/webgl";
 
 export interface GeometryWebGLDataProvider extends WebGLAttributeBuffersProvider{

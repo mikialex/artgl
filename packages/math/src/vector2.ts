@@ -1,6 +1,6 @@
-import { DataObject, VectorDataObject, ArrayFlattenable } from "./index";
+import { DataObject, VectorDataObject, ArrayFlattenable } from "..";
 import { Vector3 } from "./vector3";
-import { FloatArray } from "../type";
+import { FloatArray } from "@artgl/shared";
 
 export class Vector2
   implements

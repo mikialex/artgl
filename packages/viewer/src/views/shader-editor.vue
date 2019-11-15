@@ -7,10 +7,7 @@
         <button>attribute</button>
       </div>
       <div style="position: absolute; top:0px; width: 100%;height: 100%">
-        <LineHUDCanvas 
-        :nodes="nodes"
-        :nodesLayoutMap ="nodesLayoutMap"
-        :boardInfo="board" />
+        <LineHUDCanvas :nodes="nodes" :nodesLayoutMap="nodesLayoutMap" :boardInfo="board" />
         <GraphView :board="board">
           <DAGNodeView
             v-for="nodeView in viewNodes"
@@ -51,6 +48,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { ShaderApplication } from "../shader-application";
 import {
   ShaderGraph,
+  Nullable,
   uniform,
   DAGNode,
   TSSAOShading,
@@ -60,7 +58,10 @@ import {
 import DAGNodeView from "../components/graph/dag-node.vue";
 import ShaderFunctionNodeView from "../components/graph/nodes/shader-function-node.vue";
 import GraphView from "../components/graph/graph-viewer.vue";
-import { ShaderNode, ShaderFunctionNode } from "artgl/src/shader-graph/shader-node";
+import {
+  ShaderNode,
+  ShaderFunctionNode
+} from "artgl/src/shader-graph/shader-node";
 import LineHUDCanvas from "./line-hud-canvas.vue";
 import {
   GraphBoardInfo,
@@ -68,7 +69,6 @@ import {
   ViewNode,
   layoutGraph
 } from "../model/graph-view";
-import { Nullable } from "artgl/src/type";
 
 @Component({
   components: {
@@ -88,27 +88,29 @@ export default class ShaderEditor extends Vue {
     height: 0,
     transformX: 0,
     transformY: 0,
-    scale: 1,
+    scale: 1
   };
 
   viewNodes: ViewNode[] = [];
 
-  get nodes(){
-    return this.viewNodes.map(vn => vn.node)
+  get nodes() {
+    return this.viewNodes.map(vn => vn.node);
   }
 
-  get nodesLayoutMap(){
+  get nodesLayoutMap() {
     const map = new Map();
-    this.viewNodes.forEach(vn=>{
-      map.set(vn.node, vn.layout)
-    })
+    this.viewNodes.forEach(vn => {
+      map.set(vn.node, vn.layout);
+    });
     return map;
   }
 
-  $shaderApp?: ShaderApplication
+  $shaderApp?: ShaderApplication;
 
   mounted() {
-    const canvas = this.$el.querySelector("#shader-editor-canvas") as HTMLCanvasElement;
+    const canvas = this.$el.querySelector(
+      "#shader-editor-canvas"
+    ) as HTMLCanvasElement;
     Vue.prototype.$shaderApp = new ShaderApplication(canvas);
     this.graph = this.$shaderApp!.shader.graph;
 

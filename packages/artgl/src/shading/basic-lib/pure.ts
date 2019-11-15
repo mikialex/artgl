@@ -1,6 +1,6 @@
 import { BaseEffectShading, Uniform } from "../../core/shading";
 import { ShaderGraph } from "../../shader-graph/shader-graph";
-import { Vector4 } from '../../math';
+import { Vector4 } from "@artgl/math";
 import { ShadingComponent } from "../../core/shading-decorator";
 
 @ShadingComponent()

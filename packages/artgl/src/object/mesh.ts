@@ -1,8 +1,6 @@
 import { RenderObject, PrimitiveVisitor, PrimitiveType } from "../core/render-object";
 import { RayCasterable, Raycaster, RayCastResult } from "../core/raycaster";
-import { Face3 } from "../math/entity/face3";
-import { Matrix4, Vector3 } from "../math";
-import { Sphere } from "../math/entity/sphere";
+import { Matrix4, Vector3, Face3, Sphere } from "@artgl/math";
 import { DrawMode, CullSide } from "@artgl/webgl";
 
 const inverse = new Matrix4();

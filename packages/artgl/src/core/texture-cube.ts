@@ -1,6 +1,8 @@
 import { TextureSource } from "@artgl/shared/src/texture-source";
-import { PixelDataType, TextureWrap, TextureFilter, RenderEngine, WebGLCubeTextureProvider } from "../artgl";
-import { Nullable } from "../type";
+import {
+  PixelDataType, TextureWrap, TextureFilter, RenderEngine,
+  WebGLCubeTextureProvider, Nullable
+} from "../artgl";
 
 export class CubeTexture implements WebGLCubeTextureProvider{
 

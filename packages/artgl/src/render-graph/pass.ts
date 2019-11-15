@@ -1,9 +1,8 @@
 
-import { Nullable } from "../type";
+import { Nullable } from "@artgl/shared";
 import { RenderTargetNode } from "./node/render-target-node";
 import { PassGraphNode } from "./node/pass-graph-node";
-import { Vector4Like } from "../math/interface";
-import { Vector4 } from "../math";
+import { Vector4, Vector4Like } from "@artgl/math";
 import { RenderEngine } from "../engine/render-engine";
 import { GLFramebuffer } from "@artgl/webgl";
 

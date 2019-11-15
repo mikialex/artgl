@@ -1,5 +1,5 @@
-import { Matrix4, generateUUID } from "../math/index";
-import { Nullable } from "../type";
+import { Matrix4, generateUUID } from "@artgl/math";
+import { Nullable } from "@artgl/shared";
 import { Transformation } from "./transformation";
 import { Scene, RenderObject } from "../artgl";
 

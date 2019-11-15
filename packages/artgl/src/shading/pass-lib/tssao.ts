@@ -4,7 +4,7 @@ import { ShaderFunction } from "../../shader-graph/shader-function";
 import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
 import { unitDir } from "../../shader-graph/built-in/transform";
 import { getWorldPosition, NDCxyToUV } from "../../shader-graph/built-in/transform";
-import { Matrix4 } from "../../math/index";
+import { Matrix4 }  from "@artgl/math";
 import { rand2DT, rand } from "../../shader-graph/built-in/rand";
 import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
 import { ShadingComponent } from "../../core/shading-decorator";

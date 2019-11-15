@@ -1,4 +1,4 @@
-import { Vector3, Matrix4 } from "../../math";
+import { Vector3, Matrix4 } from "../..";
 import { Plane } from "./plane";
 
 export class Sphere {

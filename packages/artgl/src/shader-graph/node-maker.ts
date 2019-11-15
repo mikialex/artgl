@@ -2,7 +2,7 @@ import {
   ShaderAttributeInputNode, ShaderUniformInputNode,
   ShaderTextureNode, ShaderNode, ShaderConstType, ShaderConstNode, ShaderCombineNode
 } from "./shader-node";
-import { ArrayFlattenable } from "../math";
+import { ArrayFlattenable } from "@artgl/math";
 import { Texture } from "../artgl";
 import { CubeTexture } from "../core/texture-cube";
 import { ShaderGraph } from "./shader-graph";

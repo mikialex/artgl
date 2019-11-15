@@ -1,5 +1,5 @@
 import { StandardGeometry } from "../standard-geometry";
-import { Vector2, Vector3 } from "../../math";
+import { Vector2, Vector3 } from "@artgl/math";
 
 export class CylinderGeometry extends StandardGeometry {
   constructor() {

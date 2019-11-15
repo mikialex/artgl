@@ -1,5 +1,5 @@
 
-import { Nullable } from "../type";
+import { Nullable } from "../..";
 
 //https://github.com/BabylonJS/Babylon.js/blob/master/src/Misc/observable.ts
 

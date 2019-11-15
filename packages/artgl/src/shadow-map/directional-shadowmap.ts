@@ -1,6 +1,6 @@
 import { DirectionalLight } from "../light/exports";
 import { OrthographicCamera } from "../camera/orthographic-camera";
-import { Matrix4 } from "../math";
+import { Matrix4 } from "@artgl/math";
 import { BaseEffectShading } from "../core/shading";
 import { ShaderFunction } from "../shader-graph/shader-function";
 import { ShaderGraph, WorldPositionFragVary, texture } from "../artgl";

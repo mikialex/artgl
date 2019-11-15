@@ -1,5 +1,5 @@
 import {
-  RenderGraph, TAAShading, screen,
+  RenderGraph, TAAShading, screen, Nullable,
   TSSAOShading, TSSAOBlendShading,
   DepthShading, Scene, RenderEngine, Shading, ProgressiveDof,
   pass, pingpong, target, when, PingPongTarget, PerspectiveCamera, RenderTargetNode,
@@ -8,7 +8,6 @@ import { EffectComposer } from 'artgl/src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
 import { createConf } from './conf';
 import { CopyShading } from 'artgl/src/shading/pass-lib/copy';
-import { Nullable } from 'artgl/src/type';
 import { DirectionalShadowMap } from 'artgl/src/shadow-map/directional-shadowmap';
 
 const copier = new Shading().decorate(new CopyShading())

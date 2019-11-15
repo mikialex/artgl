@@ -1,7 +1,6 @@
-import { Vector3 } from "../math";
 import { Quaternion } from "./quaternion";
-import { DataObject, ArrayFlattenable } from "./index";
-import { FloatArray } from "../type";
+import { DataObject, ArrayFlattenable, Vector3 } from "..";
+import { FloatArray } from "@artgl/shared";
 
 const tempX: Vector3 = new Vector3();
 const tempY: Vector3 = new Vector3();

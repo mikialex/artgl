@@ -1,4 +1,4 @@
-import { Nullable } from "artgl/src/type";
+import { Nullable } from "..";
 
 function isPowerOfTwo(value: number) {
   return (value & (value - 1)) === 0 && value !== 0;

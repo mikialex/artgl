@@ -1,4 +1,4 @@
-import { Vector3, MathUtil } from "../math/index";
+import { MathUtil } from "@artgl/math";
 import { Camera, ProjectionMatrixNeedUpdate } from "../core/camera";
 import { ScreenSpaceRayProvider, Raycaster } from "../core/raycaster";
 import { Size } from "../engine/render-engine";

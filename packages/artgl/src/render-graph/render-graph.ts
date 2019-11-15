@@ -3,7 +3,7 @@ import { RenderTargetNode } from "./node/render-target-node";
 import { QuadSource } from '../engine/render-source';
 import { EffectComposer } from "./effect-composer";
 import { RenderPass } from "./pass";
-import { Nullable } from "../type";
+import { Nullable } from "@artgl/shared";
 
 export type RenderGraphNode = PassGraphNode | RenderTargetNode;
 

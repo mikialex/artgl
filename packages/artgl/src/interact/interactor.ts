@@ -1,5 +1,5 @@
 import { Controller } from "./controller";
-import { Vector2 } from "../math/vector2";
+import { Vector2 } from "@artgl/math";
 
 interface ControllerCallback {
   controller: Controller,

@@ -1,5 +1,5 @@
 import { SceneNode, ExtendWithSceneNode } from "../scene/scene-node";
-import { Matrix4, Vector3 } from "../math/index";
+import { Matrix4, Vector3 } from "@artgl/math";
 import { RenderEngine, Size } from '../engine/render-engine';
 import { ShaderUniformProvider, ShaderUniformDecorator, BaseEffectShading } from "./shading";
 import { Uniform, ShadingComponent } from "./shading-decorator";

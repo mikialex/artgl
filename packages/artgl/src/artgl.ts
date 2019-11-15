@@ -1,5 +1,7 @@
 
 export * from "@artgl/webgl"
+export * from "@artgl/math";
+export * from "@artgl/shared";
 
 // artgl engine layer
 export { RenderEngine } from "./engine/render-engine";
@@ -48,9 +50,6 @@ export { TorusKnotGeometry } from "./geometry/geo-lib/torus-knot-geometry"
 
 // technique lib
 export { NormalShading } from "./shading/basic-lib/normal";
-
-// math
-export * from "./math/index";
 
 // camera
 export { PerspectiveCamera } from "./camera/perspective-camera";

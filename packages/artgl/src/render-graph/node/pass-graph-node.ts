@@ -1,8 +1,8 @@
 import { DAGNode } from "../../core/dag-node";
 import { RenderPass, uniformName } from "../pass";
-import { Nullable } from "../../type";
+import { Nullable } from "@artgl/shared";
 import { RenderTargetNode } from "../exports";
-import { Vector4 } from "../../math";
+import { Vector4 } from "@artgl/math";
 import { Observable } from "../../core/observable";
 import { Shading } from "../../artgl";
 import { QuadSourceInstance } from "../../engine/render-source";

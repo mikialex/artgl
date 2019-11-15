@@ -1,14 +1,8 @@
 import { BufferData } from "./buffer-data";
-import { Box3 } from "../math/entity/box3";
-import { Sphere } from "../math/entity/sphere";
-import { generateUUID } from '../math/uuid';
-import { RenderRange } from "./render-object";
-import { Face3 } from "../math/entity/face3";
-import { Line3 } from "../math/entity/line3";
-import { Vector3 } from "../math/vector3";
-import { Nullable } from "../type";
+import { Box3, Sphere, generateUUID, Face3, Line3, Vector3 } from "@artgl/math";
+import { Nullable } from "@artgl/shared";
 import { GeometryWebGLDataProvider } from "../engine/interface";
-import { RenderEngine } from "../artgl";
+import { RenderEngine, RenderRange } from "../artgl";
 
 /**
  * geometry define what to draw

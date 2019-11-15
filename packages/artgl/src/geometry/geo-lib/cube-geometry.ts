@@ -1,5 +1,5 @@
 import { StandardGeometry } from "../standard-geometry";
-import { Vector3 } from "../../math";
+import { Vector3 } from "@artgl/math";
 import { ShapeWillChange } from "../../core/geometry";
 
 // https://github.com/mrdoob/three.js/blob/dev/src/geometries/BoxGeometry.js

@@ -1,0 +1,9 @@
+{
+  "name": "@artgl/math",
+  "version": "0.0.1",
+  "description": "math lib for artgl",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "author": "mikialex",
+  "license": "MIT"
+}
