@@ -1,8 +1,7 @@
-import { DAGNode } from "@artgl/shared";
-import { ShaderFunction } from "./shader-function";
-import { Vector2, Vector3, Vector4, ArrayFlattenable }  from "@artgl/math";
-import { Nullable }  from "@artgl/shared";
 import { swizzleType } from "./swizzle-type";
+import { ShaderFunction } from "./shader-function";
+import { DAGNode, Nullable } from "@artgl/shared";
+import { Vector2, Vector3, Vector4, ArrayFlattenable }  from "@artgl/math";
 import { GLDataType, UniformDescriptor, AttributeDescriptor, GLTextureType } from "@artgl/webgl";
 
 let shaderNodeGUIDCount = 0;

@@ -5,7 +5,9 @@ module.exports = {
   testEnvironment: 'node',
   roots: [
     "<rootDir>/packages/artgl/src/",
-    "<rootDir>/packages/math/src/"
+    "<rootDir>/packages/math/src/",
+    "<rootDir>/packages/shared/src/",
+    "<rootDir>/packages/shader-graph/src/",
   ],
   collectCoverage: true,
   coverageReporters: [
@@ -15,6 +17,8 @@ module.exports = {
   collectCoverageFrom: [
     "<rootDir>/packages/artgl/src/**/*.ts",
     "<rootDir>/packages/math/src/**/*.ts",
+    "<rootDir>/packages/shared/src/**/*.ts",
+    "<rootDir>/packages/shader-graph/src/**/*.ts",
     "!<rootDir>/packages/artgl/src/wasm-scene/**",
   ]
 };

@@ -8,7 +8,7 @@ export * from '@artgl/shader-graph';
 import { PassGraphNode } from '@artgl/render-graph';
 import { QuadSourceInstance } from "./engine/render-source";
 import { Texture, CubeTexture, ArrayFlattenable, texture, cubeTexture, uniform } from "..";
-import { valueToGLType } from "./core/data-type";
+import { valueToGLType } from "@artgl/shader-graph/src/data-type";
 PassGraphNode.QuadRenderMethods = QuadSourceInstance.render
 
 // artgl engine layer
@@ -70,6 +70,4 @@ export function textureFromValue(textureName:string, value: Texture | CubeTextur
   }
 }
 
-export function uniformFromValue(name: string, value: ArrayFlattenable | number) {
-  return uniform(name, valueToGLType(value)).default(value);
-}
+export type GLTextureData = Texture | CubeTexture;

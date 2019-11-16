@@ -4,6 +4,8 @@ import {
 } from "./shader-node";
 import { ShaderGraph } from "./shader-graph";
 import { GLDataType, GLTextureType, CommonAttribute } from "@artgl/webgl";
+import { ArrayFlattenable } from "@artgl/math";
+import { valueToGLType } from "./data-type";
 
 export function attribute(name: string, type: GLDataType) {
   return new ShaderAttributeInputNode({ name, type });
@@ -19,6 +21,10 @@ export function cubeTexture(name: string) {
 
 export function uniform(name: string, type: GLDataType) {
   return new ShaderUniformInputNode({ name, type });
+}
+
+export function uniformFromValue(name: string, value: ArrayFlattenable | number) {
+  return uniform(name, valueToGLType(value)).default(value);
 }
 
 export function value(value: ShaderConstType) {

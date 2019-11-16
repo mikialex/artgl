@@ -7,18 +7,13 @@ import {
 import { attribute, constValue, texture } from "./node-maker";
 import { Vector4 }  from "@artgl/math";
 import { eyeDir } from "./built-in/transform";
-import { Nullable }  from "@artgl/shared";
 import {
-  GLDataType, CommonAttribute, GLProgramConfig, UniformBlockDescriptor,
-  UniformDescriptor, VaryingDescriptor
+  GLDataType, CommonAttribute, GLProgramConfig, UniformDescriptor, VaryingDescriptor
 } from "@artgl/webgl";
-import { ShaderGraphUniformProvider } from "./interface";
-
-
-export const UvFragVary = "v_uv"
-export const NormalFragVary = "v_normal"
-export const NDCPositionFragVary = "v_position_ndc"
-export const WorldPositionFragVary = "v_position_world"
+import {
+  EyeDirection, FragWorldPosition, ChannelType, WorldPositionFragVary,
+  NormalFragVary, UvFragVary
+} from "./interface";
 
 export const defaultVertexRoot = constValue(new Vector4());
 
@@ -113,71 +108,58 @@ export class ShaderGraph {
     }
   }
 
-  private sharedUniformNodes: Map<string, ShaderUniformInputNode> = new Map();
+  private sharedNodes: Map<string, ShaderNode> = new Map();
   getSharedUniform(uniformKey: string) {
-    const re = this.sharedUniformNodes.get(uniformKey)
+    const re = this.sharedNodes.get(uniformKey)
     if (re === undefined) {
       throw `cant found shared uniform <${uniformKey}>`
     }
     return re;
   }
   tryGetSharedUniform(uniformKey: string, or: ShaderNode) {
-    const re = this.sharedUniformNodes.get(uniformKey)
+    const re = this.sharedNodes.get(uniformKey)
     return re === undefined ? or : re;
   }
   getIfSharedUniform(uniformKey: string) {
-    return this.sharedUniformNodes.get(uniformKey);
+    return this.sharedNodes.get(uniformKey);
   }
-  registerSharedUniform(uniformKey: string, node: ShaderUniformInputNode) {
-    this.sharedUniformNodes.set(uniformKey, node);
+  registerSharedUniform(uniformKey: string, node: ShaderNode) {
+    this.sharedNodes.set(uniformKey, node);
   }
 
-  private cachedInnerSupportEyeDir: Nullable<ShaderNode> = null;
   getEyeDir(): ShaderNode {
-    if (this.cachedInnerSupportEyeDir === null) {
-      this.cachedInnerSupportEyeDir = eyeDir.make()
-        .input("worldPosition", this.getVary(WorldPositionFragVary))
-        .input("cameraWorldPosition", this.getSharedUniform(Camera.WorldPositionKey))
+    let node = this.getIfSharedUniform(EyeDirection)
+    if (node === undefined) {
+      node = eyeDir.make()
+      .input("worldPosition", this.getVary(WorldPositionFragVary))
+        .input("cameraWorldPosition", this.getSharedUniform(FragWorldPosition))
+      this.registerSharedUniform(EyeDirection, node);
     }
-    return this.cachedInnerSupportEyeDir
+    return node;
   }
 
   private cachedReusedChannelNodes: Map<ChannelType, ShaderNode> = new Map();
   getChannel(channelType: ChannelType): ShaderNode {
-    if (!this.cachedReusedChannelNodes.has(channelType)) {
-      this.cachedReusedChannelNodes.set(channelType,
-        texture(channelType))
+    let node = this.getIfSharedUniform(channelType)
+    if (node === undefined) {
+      node = texture(channelType)
+      this.registerSharedUniform(channelType,  node);
     }
-    return this.cachedReusedChannelNodes.get(channelType)!
+    return node;
   }
 
   reset(): ShaderGraph {
     this.varyings.clear();
-    this.sharedUniformNodes = new Map();
     this.cachedReusedChannelNodes.clear();
-    this.cachedInnerSupportEyeDir = null;
+    this.sharedNodes.clear();
     this.setFragmentRoot(constValue(new Vector4()))
     return this;
   }
 
-  compile(isWebGL2: boolean, useUBO: boolean, providerMap: Map<ShaderGraphUniformProvider, number>): GLProgramConfig {
-    if (!isWebGL2) { useUBO = false; }
-
-    const uniformBlocks: UniformBlockDescriptor[] = [];
-    providerMap.forEach((keyIndex, provider) => {
-      if (!provider.shouldProxyedByUBO || !useUBO) {
-        return;
-      }
-      const des = makeBlockUniformDescriptorFromProvider(provider, keyIndex);
-      if (des !== null) {
-        uniformBlocks.push(des);
-      }
-    })
-
+  compile(isWebGL2: boolean, useUBO: boolean): GLProgramConfig {
     const { results, needDerivative } = genFragShader(this, isWebGL2);
     return {
       ...this.collectInputs(useUBO),
-      uniformBlocks,
       vertexShaderString: genVertexShader(this, isWebGL2),
       fragmentShaderString: results,
       needDerivative

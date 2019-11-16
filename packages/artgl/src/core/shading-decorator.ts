@@ -1,5 +1,5 @@
 import { ShaderUniformProvider, UniformGroup } from "./shading";
-import { valueToFlatted } from "./data-type";
+import { valueToFlatted } from "@artgl/shader-graph/src/data-type";
 import "reflect-metadata";
 
 export const UNIFORM_META = 'uniformMetaData';

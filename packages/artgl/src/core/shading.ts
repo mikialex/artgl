@@ -2,15 +2,14 @@
 import { generateUUID, ArrayFlattenable } from "@artgl/math";
 import { Nullable, Observable, Observer } from "@artgl/shared";
 import {
-  ShaderGraph, ShaderUniformInputNode, ShaderTextureNode
-} from "@artgl/shader-graph";
+  ShaderGraph, ShaderUniformInputNode, ShaderTextureNode} from "@artgl/shader-graph";
 import { RenderEngine } from "../engine/render-engine";
 import { replaceFirst } from '@artgl/shared/src/array';
 import { UNIFORM_META, UNIFORM_TEXTURE_META } from "./shading-decorator";
 import { Texture, CubeTexture, uniformFromValue, textureFromValue } from "../artgl";
 export { Uniform } from "./shading-decorator";
-import { UBOProvider, uniformUploadType, GLProgramConfig, GLProgram, ShadingProvider, UniformDescriptor, UniformBlockDescriptor } from "@artgl/webgl";
-import { valueToGLType, valueToFlatted } from "./data-type";
+import { GLProgramConfig, GLProgram, ShadingProvider, UniformDescriptor, UniformBlockDescriptor } from "@artgl/webgl";
+import { valueToGLType, valueToFlatted } from "@artgl/shader-graph/src/data-type";
 import { ShaderUniformDecorator, ShaderUniformProvider } from "./interface";
 
 export type ShadingParams = Map<ShaderUniformDecorator, ShaderUniformDecorator>
@@ -139,7 +138,12 @@ export class Shading implements ShadingProvider{
     }
     if (this._needRebuildShader) {
       const providerIndexMap = this.build();
-      this._programConfigCache = this.graph.compile(isWebGL2, useUBO, providerIndexMap);
+      this._programConfigCache = this.graph.compile(isWebGL2, isWebGL2 && useUBO);
+
+      if (isWebGL2 && useUBO) {
+        injectUBO(providerIndexMap, this._programConfigCache);
+      }
+
       this.afterShaderCompiled.notifyObservers(this._programConfigCache)
       this._needRebuildShader = false;
     }
@@ -238,13 +242,28 @@ function checkValue(value: any): value is ArrayFlattenable | number {
   return value && value.toArray !== undefined && value.fromArray !== undefined;
 }
 
+function injectUBO(providerMap: Map<ShaderUniformProvider, number>, conf: GLProgramConfig) {
+  const uniformBlocks: UniformBlockDescriptor[] = [];
+  providerMap.forEach((keyIndex, provider) => {
+    if (!provider.shouldProxyedByUBO) {
+      return;
+    }
+    const des = makeBlockUniformDescriptorFromProvider(provider, keyIndex);
+    if (des !== null) {
+      uniformBlocks.push(des);
+    }
+  })
+  conf.uniformBlocks = uniformBlocks;
+  return conf;
+}
+
 function makeBlockUniformDescriptorFromProvider(
   p: ShaderUniformProvider, providerIndex: number): Nullable<UniformBlockDescriptor> {
   if (p.uploadCache === undefined) {
     return null;
   }
   const uniforms: UniformDescriptor[] = [];
-  p.uploadCache.uniforms.forEach((u, name) => {
+  p.uploadCache.uniforms.forEach((u) => {
     uniforms.push({
       name: u.uniformName,
       type: valueToGLType(u.value),

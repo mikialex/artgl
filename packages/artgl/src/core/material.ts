@@ -1,15 +1,7 @@
 import { Texture } from "./texture";
 import { Vector3, generateUUID } from "@artgl/math"
-import { TextureSource } from "@artgl/shared/src/texture-source";
-
-export const enum ChannelType {
-  diffuse = 'diffuse',
-  roughness = 'roughness',
-  metallic = 'metallic',
-  ao = 'ao'
-}
-
-type ChannelName = string;
+import { ChannelType } from '@artgl/shader-graph';
+import { TextureSource } from "@artgl/shared";
 
 // class Channel {
 //   texture: Nullable<Texture> = null
@@ -38,9 +30,9 @@ export class Material {
   name: string = "unnamed"
 
   uuid = generateUUID();
-  _channels: Map<ChannelName, Texture> = new Map();
+  _channels: Map<ChannelType, Texture> = new Map();
 
-  channel(channel: ChannelName, value: Vector3 | Texture) {
+  channel(channel: ChannelType, value: Vector3 | Texture) {
     if (value instanceof Vector3) {
       this.setChannelColor(channel, value);
     } else {
@@ -49,7 +41,7 @@ export class Material {
     return this;
   }
 
-  setChannelColor(channel: ChannelName, color: Vector3) {
+  setChannelColor(channel: ChannelType, color: Vector3) {
     let channelTexture = this._channels.get(channel);
     if (channelTexture === undefined) {
       channelTexture = generateTextureFromPureColor(color);
@@ -60,12 +52,12 @@ export class Material {
     return this;
   }
 
-  setChannelTexture(channel: ChannelName, texture: Texture) {
+  setChannelTexture(channel: ChannelType, texture: Texture) {
     this._channels.set(channel, texture);
     return this;
   }
 
-  getChannelTexture(type: ChannelName): Texture {
+  getChannelTexture(type: ChannelType): Texture {
     const texture = this._channels.get(type);
     if (texture === undefined) {
       throw 'cant get channel texture'
@@ -73,8 +65,8 @@ export class Material {
     return texture;
   }
 
-  deleteChannel(channelName: string) {
-    this._channels.delete(channelName);
+  deleteChannel(ChannelType: string) {
+    this._channels.delete(ChannelType);
   }
 
 }
