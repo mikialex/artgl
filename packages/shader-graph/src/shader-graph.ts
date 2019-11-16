@@ -7,14 +7,12 @@ import {
 import { attribute, constValue, texture } from "./node-maker";
 import { Vector4 }  from "@artgl/math";
 import { eyeDir } from "./built-in/transform";
-import { ChannelType } from "../core/material";
 import { Nullable }  from "@artgl/shared";
-import { Camera, ShaderUniformProvider } from "../artgl";
-import { valueToGLType, valueToFlatted } from "../core/data-type";
 import {
   GLDataType, CommonAttribute, GLProgramConfig, UniformBlockDescriptor,
   UniformDescriptor, VaryingDescriptor
 } from "@artgl/webgl";
+import { ShaderGraphUniformProvider } from "./interface";
 
 
 export const UvFragVary = "v_uv"
@@ -162,7 +160,7 @@ export class ShaderGraph {
     return this;
   }
 
-  compile(isWebGL2: boolean, useUBO: boolean, providerMap: Map<ShaderUniformProvider, number>): GLProgramConfig {
+  compile(isWebGL2: boolean, useUBO: boolean, providerMap: Map<ShaderGraphUniformProvider, number>): GLProgramConfig {
     if (!isWebGL2) { useUBO = false; }
 
     const uniformBlocks: UniformBlockDescriptor[] = [];
@@ -272,26 +270,4 @@ export class ShaderGraph {
     return { attributes, uniforms, textures, varyings }
   }
 
-}
-
-function makeBlockUniformDescriptorFromProvider(
-  p: ShaderUniformProvider, providerIndex: number): Nullable<UniformBlockDescriptor> {
-  if (p.uploadCache === undefined) {
-    return null;
-  }
-  const uniforms: UniformDescriptor[] = [];
-  p.uploadCache.uniforms.forEach((u, name) => {
-    uniforms.push({
-      name: u.uniformName,
-      type: valueToGLType(u.value),
-      default: valueToFlatted(u.value),
-    })
-  })
-  if (uniforms.length === 0) {
-    return null;
-  }
-  return {
-    name: "ubo" + providerIndex,
-    uniforms
-  }
 }

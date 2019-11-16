@@ -1,11 +1,11 @@
 import { SceneNode } from "../scene/scene-node";
-import { ShaderGraph } from "../shader-graph/shader-graph";
-import { constValue, vec4 } from "../shader-graph/node-maker";
-import { ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform, ProviderUploadCache } from "./shading";
-import { ShaderUniformInputNode, ShaderNode, ShaderTextureNode } from "../shader-graph/shader-node";
-import { ShaderFunction } from "../shader-graph/shader-function";
 import { Observable } from "@artgl/shared";
 import { Vector3 } from "@artgl/math"
+import { ShaderUniformProvider, ShaderUniformDecorator, ProviderUploadCache } from "./interface";
+import {
+  ShaderGraph, ShaderNode, ShaderUniformInputNode, ShaderTextureNode,
+  getPropertyUniform, ShaderFunction, constValue, vec4
+} from "../..";
 
 // TODO I cant figure out right multi inheritance impl with strong type, code duplicate 
 

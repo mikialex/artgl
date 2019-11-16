@@ -93,6 +93,10 @@ export class RenderEngine implements GLReleasable, RenderGraphBackEnd {
       })
     }
   }
+
+  hookResize(callback: () => void) {
+    this.resizeObservable.add(callback);
+  }
   ////
 
 

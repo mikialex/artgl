@@ -14,9 +14,7 @@ export class FrameBufferPool {
 
     // when resize, clear all for convenience, TODO, optimize
     // maybe we can mark fbo size dynamic, update(resize) dynamic first
-    this.engine.resizeObservable.add(() => {
-      this.clearAll();
-    })
+    this.engine.hookResize(() => {this.clearAll();})
   }
 
   private engine: RenderGraphBackEnd;

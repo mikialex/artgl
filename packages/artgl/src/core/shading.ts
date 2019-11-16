@@ -1,56 +1,17 @@
 
 import { generateUUID, ArrayFlattenable } from "@artgl/math";
 import { Nullable, Observable, Observer } from "@artgl/shared";
-import { ShaderGraph } from "../shader-graph/shader-graph";
+import {
+  ShaderGraph, ShaderUniformInputNode, ShaderTextureNode
+} from "@artgl/shader-graph";
 import { RenderEngine } from "../engine/render-engine";
-import { ShaderUniformInputNode, ShaderTextureNode } from '../shader-graph/shader-node';
-import { uniformFromValue, textureFromValue } from '../shader-graph/node-maker';
-import { replaceFirst } from '../util/array';
+import { replaceFirst } from '@artgl/shared/src/array';
 import { UNIFORM_META, UNIFORM_TEXTURE_META } from "./shading-decorator";
-import { Texture, CubeTexture } from "../artgl";
+import { Texture, CubeTexture, uniformFromValue, textureFromValue } from "../artgl";
 export { Uniform } from "./shading-decorator";
-import { UBOProvider, uniformUploadType, GLProgramConfig, GLProgram, ShadingProvider } from "@artgl/webgl";
-
-
-export interface ShaderUniformDecorator {
-  /**
-  * impl this to decorate your shader source, add uniform input
-  */
-  decorate(graph: ShaderGraph): void;
-
-  /**
-   * one UniformProvider can have others provider depends and inject, visit them all
-   */
-  foreachProvider(visitor: (p: ShaderUniformProvider) => any): void;
-
-  notifyNeedRedecorate: Observable<ShaderUniformDecorator>;
-  nodeCreated: Map<string, ShaderUniformInputNode>;
-  textureNodeCreated: Map<string, ShaderTextureNode>;
-}
-
-export interface UniformGroup{
-  value: ArrayFlattenable | number,
-  uploadCache: uniformUploadType,
-  isUploadCacheDirty: boolean,
-  blockedBufferStartIndex: number,
-  uniformName: uniformName
-}
-
-export interface ProviderUploadCache {
-  blockedBuffer: Nullable<Float32Array>;
-  uniforms: Map<propertyName, UniformGroup>;
-  blockedBufferNeedUpdate: boolean;
-  _version: number;
-}
-
-type propertyName = string;
-type uniformName = string;
-export interface ShaderUniformProvider extends UBOProvider{
-  shouldProxyedByUBO: boolean;
-
-  uploadCache: ProviderUploadCache;
-}
-
+import { UBOProvider, uniformUploadType, GLProgramConfig, GLProgram, ShadingProvider, UniformDescriptor, UniformBlockDescriptor } from "@artgl/webgl";
+import { valueToGLType, valueToFlatted } from "./data-type";
+import { ShaderUniformDecorator, ShaderUniformProvider } from "./interface";
 
 export type ShadingParams = Map<ShaderUniformDecorator, ShaderUniformDecorator>
 
@@ -275,4 +236,26 @@ function checkValue(value: any): value is ArrayFlattenable | number {
     return true;
   }
   return value && value.toArray !== undefined && value.fromArray !== undefined;
+}
+
+function makeBlockUniformDescriptorFromProvider(
+  p: ShaderUniformProvider, providerIndex: number): Nullable<UniformBlockDescriptor> {
+  if (p.uploadCache === undefined) {
+    return null;
+  }
+  const uniforms: UniformDescriptor[] = [];
+  p.uploadCache.uniforms.forEach((u, name) => {
+    uniforms.push({
+      name: u.uniformName,
+      type: valueToGLType(u.value),
+      default: valueToFlatted(u.value),
+    })
+  })
+  if (uniforms.length === 0) {
+    return null;
+  }
+  return {
+    name: "ubo" + providerIndex,
+    uniforms
+  }
 }

@@ -2,12 +2,8 @@ import {
   ShaderAttributeInputNode, ShaderUniformInputNode,
   ShaderTextureNode, ShaderNode, ShaderConstType, ShaderConstNode, ShaderCombineNode
 } from "./shader-node";
-import { ArrayFlattenable } from "@artgl/math";
-import { Texture } from "../artgl";
-import { CubeTexture } from "../core/texture-cube";
 import { ShaderGraph } from "./shader-graph";
 import { GLDataType, GLTextureType, CommonAttribute } from "@artgl/webgl";
-import { valueToGLType } from "../core/data-type";
 
 export function attribute(name: string, type: GLDataType) {
   return new ShaderAttributeInputNode({ name, type });
@@ -23,20 +19,6 @@ export function cubeTexture(name: string) {
 
 export function uniform(name: string, type: GLDataType) {
   return new ShaderUniformInputNode({ name, type });
-}
-
-export function textureFromValue(textureName:string, value: Texture | CubeTexture){
-  if (value instanceof Texture) {
-    return texture(textureName);
-  } else if (value instanceof CubeTexture) {
-    return cubeTexture(textureName);
-  }  else {
-    throw "unsupported uniform value"
-  }
-}
-
-export function uniformFromValue(name: string, value: ArrayFlattenable | number) {
-  return uniform(name, valueToGLType(value)).default(value);
 }
 
 export function value(value: ShaderConstType) {

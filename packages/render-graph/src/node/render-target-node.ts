@@ -10,6 +10,10 @@ export enum DimensionType {
   fixed
 }
 
+export function buildFBOFormatKey(width: number, height: number, needDepth: boolean) {
+  return `${width}-${height}-${needDepth}`
+}
+
 export class RenderTargetNode extends DAGNode {
   constructor(name: string, isScreenNode: boolean) {
     super();
@@ -90,7 +94,7 @@ export class RenderTargetNode extends DAGNode {
   }
 
   private updateFormatKey() {
-    this.formatKey = FBOProvider.buildFBOFormatKey(
+    this.formatKey = buildFBOFormatKey(
       this.widthAbs, this.heightAbs, this.enableDepth
     );
   }

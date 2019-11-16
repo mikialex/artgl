@@ -7,19 +7,20 @@ export interface Vector4Like{
 export interface FBOProvider {
   name: string
   getFormatKey(): string
+  buildFBOFormatKey(width: number, height: number, needDepth: boolean): string;
 }
-
-// export interface RenderSourceForGraph {
-//   render(engine: RenderGraphBackEnd): void;
-// }
-
-// export interface QuadSourceForGraph extends RenderSourceForGraph{}
 
 export type RenderMethod = Function;
 
-export interface ShadingHandle {}
+export interface ShadingHandle {
+  defineFBOInput(framebufferName: string, uniformName: string): void;
+}
 
 export interface RenderGraphBackEnd {
+  renderBufferWidth(): number;
+  renderBufferHeight(): number;
+  hookResize(callback: Function): void;
+
   //// viewport
   setViewport(x: number, y: number, width: number, height: number): void 
   setFullScreenViewPort(): void 

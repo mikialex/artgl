@@ -1,6 +1,6 @@
 import { ShaderGraph } from "./shader-graph";
 import { ShaderFunction } from "./shader-function";
-import { findFirst } from "../util/array";
+import { findFirst } from "@artgl/shared";
 import { CodeBuilder } from "./util/code-builder";
 import {
   ShaderFunctionNode, ShaderNode, ShaderInputNode, ShaderTextureFetchNode,

@@ -3,9 +3,12 @@ export * from "@artgl/webgl"
 export * from "@artgl/math";
 export * from "@artgl/shared";
 export * from '@artgl/render-graph';
+export * from '@artgl/shader-graph';
 
 import { PassGraphNode } from '@artgl/render-graph';
 import { QuadSourceInstance } from "./engine/render-source";
+import { Texture, CubeTexture, ArrayFlattenable, texture, cubeTexture, uniform } from "..";
+import { valueToGLType } from "./core/data-type";
 PassGraphNode.QuadRenderMethods = QuadSourceInstance.render
 
 // artgl engine layer
@@ -32,11 +35,6 @@ export { Scene } from "./scene/scene";
 export { SceneNode } from "./scene/scene-node";
 export { Transformation } from "./scene/transformation";
 
-// shader graph
-export * from './shader-graph/shader-graph';
-export * from './shader-graph/shader-node';
-export * from './shader-graph/node-maker';
-
 // shading lib
 export * from './shading/basic-lib/exports';
 export * from './shading/pass-lib/exports';
@@ -61,3 +59,17 @@ export { OrbitController } from "./interact/orbit-controller";
 
 //loader
 export { OBJLoader } from './loader/obj-loader';
+
+export function textureFromValue(textureName:string, value: Texture | CubeTexture){
+  if (value instanceof Texture) {
+    return texture(textureName);
+  } else if (value instanceof CubeTexture) {
+    return cubeTexture(textureName);
+  }  else {
+    throw "unsupported uniform value"
+  }
+}
+
+export function uniformFromValue(name: string, value: ArrayFlattenable | number) {
+  return uniform(name, valueToGLType(value)).default(value);
+}

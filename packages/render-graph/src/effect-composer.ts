@@ -11,10 +11,7 @@ export class EffectComposer {
   constructor(engine: RenderGraphBackEnd) {
     this.engine = engine;
     this.framebufferPool = new FrameBufferPool(this.engine);
-
-    this.engine.resizeObservable.add(() => {
-      this.keptFramebuffer.clear();
-    })
+    this.engine.hookResize(() => { this.keptFramebuffer.clear(); });
   }
 
   hasAllPassIsValidChecked = false;
@@ -29,14 +26,6 @@ export class EffectComposer {
 
   getFramebuffer(node: RenderTargetNode) {
     return this.keptFramebuffer.get(node)
-  }
-
-  getFramebufferTexture(node: RenderTargetNode) {
-    const fbo = this.keptFramebuffer.get(node)
-    if (fbo === undefined) {
-      return;
-    }
-    return fbo.getMainAttachedTexture();
   }
 
   render(engine: RenderGraphBackEnd, enableGraphDebugging: boolean = false) {

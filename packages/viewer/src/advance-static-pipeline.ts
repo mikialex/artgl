@@ -1,10 +1,9 @@
 import {
   RenderGraph, TAAShading, screen, Nullable,
-  TSSAOShading, TSSAOBlendShading,
+  TSSAOShading, TSSAOBlendShading, EffectComposer,
   DepthShading, Scene, RenderEngine, Shading, ProgressiveDof,
   pass, pingpong, target, when, PingPongTarget, PerspectiveCamera, RenderTargetNode,
 } from "artgl";
-import { EffectComposer } from 'artgl/src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
 import { createConf } from './conf';
 import { CopyShading } from 'artgl/src/shading/pass-lib/copy';
