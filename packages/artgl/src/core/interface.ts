@@ -37,6 +37,6 @@ export interface ProviderUploadCache {
 type propertyName = string;
 type uniformName = string;
 export interface ShaderUniformProvider extends UBOProvider, ShaderGraphUniformProvider{
-
+  shouldProxyedByUBO: boolean;
   uploadCache: ProviderUploadCache;
 }

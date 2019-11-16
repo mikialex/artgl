@@ -1,6 +1,4 @@
-export interface ShaderGraphUniformProvider{
-  shouldProxyedByUBO: boolean;
-}
+export interface ShaderGraphUniformProvider{}
 
 export const UvFragVary = "v_uv"
 export const NormalFragVary = "v_normal"

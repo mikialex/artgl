@@ -16,22 +16,6 @@ export const DivW = new ShaderFunction({
   `
 })
 
-export const MTransform = new ShaderFunction({
-  source: `
-    vec4 MTransform (mat4 MMatrix, vec3 position){
-      return MMatrix * vec4(position, 1.0);
-    }
-  `
-})
-
-export const VPTransform = new ShaderFunction({
-  source: `
-    vec4 VPTransform (mat4 VPMatrix, vec4 position){
-      return VPMatrix * position;
-    }
-  `
-})
-
 export const getWorldPosition = new ShaderFunction({
   description:
     `Transform from the current view projection matrix and its inverse, 

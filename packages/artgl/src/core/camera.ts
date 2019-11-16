@@ -3,11 +3,29 @@ import { Matrix4, Vector3 } from "@artgl/math";
 import { RenderEngine, Size } from '../engine/render-engine';
 import { BaseEffectShading } from "./shading";
 import { Uniform, ShadingComponent } from "./shading-decorator";
-import { ShaderGraph, WorldPositionFragVary, defaultVertexRoot } from "../shader-graph/shader-graph";
-import { VPTransform, MTransform } from "../shader-graph/built-in/transform";
 import { CommonAttribute, GLDataType } from "@artgl/webgl";
 import { ShaderUniformDecorator, ShaderUniformProvider } from "./interface";
-import { constValue, vec4 } from "@artgl/shader-graph";
+import {
+  constValue, vec4, uniformFromValue, ShaderGraph,
+  WorldPositionFragVary, defaultVertexRoot, ShaderFunction
+} from "@artgl/shader-graph";
+
+export const MTransform = new ShaderFunction({
+  source: `
+    vec4 MTransform (mat4 MMatrix, vec3 position){
+      return MMatrix * vec4(position, 1.0);
+    }
+  `
+})
+
+export const VPTransform = new ShaderFunction({
+  source: `
+    vec4 VPTransform (mat4 VPMatrix, vec4 position){
+      return VPMatrix * position;
+    }
+  `
+})
+
 
 export function MVP(graph: ShaderGraph) {
   if (graph.getIfSharedUniform(Camera.WorldMatrixKey) !== undefined &&

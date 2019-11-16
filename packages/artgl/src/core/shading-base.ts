@@ -1,10 +1,10 @@
 import { Observable } from "@artgl/shared";
+import { ShaderUniformProvider, ShaderUniformDecorator, ProviderUploadCache } from "./interface";
 import {
-  ShaderUniformProvider, ShaderUniformDecorator, getPropertyUniform,
-  ProviderUploadCache, getPropertyTexture
-} from "./shading";
-import { ShaderGraph } from "../shader-graph/shader-graph";
-import { ShaderUniformInputNode, ShaderTextureNode } from "../shader-graph/shader-node";
+  ShaderGraph, ShaderUniformInputNode, ShaderTextureNode
+} from "@artgl/shader-graph";
+import { getPropertyUniform, getPropertyTexture } from "./shading";
+
 
 export abstract class BaseEffectShading<T>
   implements ShaderUniformProvider, ShaderUniformDecorator {
