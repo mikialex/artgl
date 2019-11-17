@@ -1,7 +1,9 @@
-import { SceneNode, Interactor } from "../artgl";
+
 import { Controller } from "./controller";
 import { Nullable } from "@artgl/shared";
 import { Plane } from "@artgl/math";
+import { Interactor } from "./interactor";
+import { SceneNode } from "../scene-graph/scene-node";
 
 export class TransformController extends Controller  {
   reloadStates(): void {

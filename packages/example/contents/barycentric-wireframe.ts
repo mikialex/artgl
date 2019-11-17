@@ -3,10 +3,8 @@ import {
   Vector3, RenderEngine, Scene, SphereGeometry, Mesh,
   PerspectiveCamera, Vector4, OrbitController, Shading, PointLight,
   DirectionalLight, AmbientLight, BarycentricWireFrame, PhongShading,
-  ExposureController
+  ExposureController, createBarycentricBufferForStandardGeometry, Size
 } from 'artgl';
-import { createBarycentricBufferForStandardGeometry } from 'artgl/src/geometry/geo-util/barycentric'
-import { Size } from 'artgl/src/engine/render-engine';
 
 export default async function test(testBridge: TestBridge) {
 

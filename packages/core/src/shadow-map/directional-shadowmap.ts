@@ -2,10 +2,9 @@ import { DirectionalLight } from "../light/exports";
 import { OrthographicCamera } from "../camera/orthographic-camera";
 import { Matrix4 } from "@artgl/math";
 import { BaseEffectShading } from "../core/shading";
-import { ShaderFunction } from "../shader-graph/shader-function";
-import { ShaderGraph, WorldPositionFragVary, texture } from "../artgl";
-import { Uniform, ShadingComponent } from "../core/shading-decorator";
-import { unPackDepth } from '../shader-graph/built-in/depth-pack';
+import { ShadingUniform, ShadingComponent } from "../core/shading-decorator";
+import { ShaderFunction, ShaderGraph, WorldPositionFragVary, texture } from "@artgl/shader-graph";
+import { unPackDepth } from "@artgl/shader-graph/src/built-in/depth-pack";
 
 export abstract class ShadowMap<T> extends BaseEffectShading<T> {
 
@@ -63,7 +62,7 @@ export class DirectionalShadowMap extends ShadowMap<DirectionalShadowMap> {
     return this.shadowCamera;
   }
 
-  @Uniform('directionalShadowMapMatrix')
+  @ShadingUniform('directionalShadowMapMatrix')
   shadowMatrix: Matrix4 = new Matrix4();
 
   decorate(graph: ShaderGraph): void {

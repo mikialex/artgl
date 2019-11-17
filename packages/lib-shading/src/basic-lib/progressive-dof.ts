@@ -1,8 +1,8 @@
-import { BaseEffectShading, Uniform } from "../../core/shading";
-import { ShaderGraph } from "../../artgl";
-import { Vector2 } from "@artgl/math";
-import { ShaderFunction } from "../../shader-graph/shader-function";
-import { ShadingComponent } from "../../core/shading-decorator";
+import {
+  BaseEffectShading, ShaderFunction, ShadingComponent,
+  ShaderGraph, Vector2, ShadingUniform
+} from "@artgl/core";
+
 
 const progressiveDof = new ShaderFunction({
   source: `
@@ -32,11 +32,11 @@ export class TestS extends BaseEffectShading<TestS>{
 @ShadingComponent()
 export class ProgressiveDof extends BaseEffectShading<ProgressiveDof> {
   
-  @Uniform("dof_focus")
+  @ShadingUniform("dof_focus")
   focusLength = 0;
 
 
-  @Uniform("dof_coc")
+  @ShadingUniform("dof_coc")
   coc = new Vector2();
 
   updateSample() {

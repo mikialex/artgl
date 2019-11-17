@@ -1,16 +1,19 @@
 
 import { generateUUID, ArrayFlattenable } from "@artgl/math";
-import { Nullable, Observable, Observer } from "@artgl/shared";
+import { Nullable, Observable, Observer, replaceFirst } from "@artgl/shared";
 import {
-  ShaderGraph, ShaderUniformInputNode, ShaderTextureNode} from "@artgl/shader-graph";
+  ShaderGraph, ShaderUniformInputNode,
+  ShaderTextureNode, uniformFromValue
+} from "@artgl/shader-graph";
 import { RenderEngine } from "./render-engine";
-import { replaceFirst } from '@artgl/shared/src/array';
 import { UNIFORM_META, UNIFORM_TEXTURE_META } from "./shading-decorator";
-import { Texture, CubeTexture, uniformFromValue, textureFromValue } from "../artgl";
-export { Uniform } from "./shading-decorator";
-import { GLProgramConfig, GLProgram, ShadingProvider, UniformDescriptor, UniformBlockDescriptor } from "@artgl/webgl";
-import { valueToGLType, valueToFlatted } from "@artgl/shader-graph/src/data-type";
+import {
+  GLProgramConfig, GLProgram, ShadingProvider, UniformDescriptor,
+  UniformBlockDescriptor
+} from "@artgl/webgl";
+import { valueToGLType, valueToFlatted } from "@artgl/shader-graph";
 import { ShaderUniformDecorator, ShaderUniformProvider } from "./interface";
+import { textureFromValue, Texture, CubeTexture } from "../..";
 
 export type ShadingParams = Map<ShaderUniformDecorator, ShaderUniformDecorator>
 

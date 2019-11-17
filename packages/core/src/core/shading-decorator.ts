@@ -55,7 +55,7 @@ interface UniformProviderCache{
   uniforms: Map<string, string>
 }
 
-export function Uniform(remapName: string) {
+export function ShadingUniform(remapName: string) {
   return (target: ShaderUniformProvider, propertyKey: string): any => {
 
     // mark metadata;
@@ -69,7 +69,7 @@ export function Uniform(remapName: string) {
     cached.uniforms.set(propertyKey, remapName);
 
     // patch getter setter
-    const key = Symbol();
+    const key = Symbol(); 
     return {
       get() {
         return (this as any)[key];
@@ -88,7 +88,7 @@ interface UniformTextureProviderCache{
   textures: Map<string, string>
 }
 
-export function Texture(remapName: string) {
+export function ShadingTexture(remapName: string) {
   return (target: ShaderUniformProvider, propertyKey: string): any => {
 
     // mark metadata;

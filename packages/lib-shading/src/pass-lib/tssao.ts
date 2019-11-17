@@ -1,13 +1,11 @@
-import { Uniform, BaseEffectShading } from "../../core/shading";
-import { texture, screenQuad } from "../../shader-graph/node-maker";
-import { ShaderFunction } from "../../shader-graph/shader-function";
-import { unPackDepth } from "../../shader-graph/built-in/depth-pack";
-import { unitDir } from "../../shader-graph/built-in/transform";
-import { getWorldPosition, NDCxyToUV } from "../../shader-graph/built-in/transform";
-import { Matrix4 }  from "@artgl/math";
-import { rand2DT, rand } from "../../shader-graph/built-in/rand";
-import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
-import { ShadingComponent } from "../../core/shading-decorator";
+import {
+  ShadingComponent, ShaderFunction, BaseEffectShading,
+  ShadingUniform, Matrix4, ShaderGraph, texture, screenQuad, UvFragVary
+} from "@artgl/core";
+import { unPackDepth } from "@artgl/shader-graph/src/built-in/depth-pack";
+import { getWorldPosition, unitDir, NDCxyToUV } from "@artgl/shader-graph/src/built-in/transform";
+import { rand2DT, rand } from "@artgl/shader-graph/src/built-in/rand";
+
 
 const newSamplePosition = new ShaderFunction({
   source: `
@@ -50,17 +48,17 @@ const tssaoMix = new ShaderFunction({
 @ShadingComponent()
 export class TSSAOShading extends BaseEffectShading<TSSAOShading> {
   
-  @Uniform("u_sampleCount")
+  @ShadingUniform("u_sampleCount")
   sampleCount: number = 0;
 
-  @Uniform("VPMatrixInverse")
+  @ShadingUniform("VPMatrixInverse")
   VPMatrixInverse: Matrix4 = new Matrix4()
 
-  @Uniform("VPMatrix")
+  @ShadingUniform("VPMatrix")
   VPMatrix: Matrix4 = new Matrix4()
 
 
-  @Uniform("u_aoRadius")
+  @ShadingUniform("u_aoRadius")
   aoRadius: number = 1
 
   decorate(graph: ShaderGraph) {

@@ -2,7 +2,7 @@ import { SceneNode, ExtendWithSceneNode } from "../scene-graph/scene-node";
 import { Matrix4, Vector3 } from "@artgl/math";
 import { RenderEngine } from './render-engine';
 import { BaseEffectShading } from "./shading";
-import { Uniform, ShadingComponent } from "./shading-decorator";
+import { ShadingComponent, ShadingUniform } from "./shading-decorator";
 import { CommonAttribute, GLDataType } from "@artgl/webgl";
 import { ShaderUniformDecorator, ShaderUniformProvider } from "./interface";
 import {
@@ -72,10 +72,10 @@ export class CameraSelf
 
   shouldProxyedByUBO = false; // todo fix
 
-  @Uniform(CameraSelf.WorldMatrixKey)
+  @ShadingUniform(CameraSelf.WorldMatrixKey)
   renderObjectWorldMatrix = new Matrix4();
 
-  @Uniform(CameraSelf.ViewProjectionMatrix)
+  @ShadingUniform(CameraSelf.ViewProjectionMatrix)
   _renderMatrix = new Matrix4();
 
   decorate(graph: ShaderGraph): void {
@@ -169,7 +169,7 @@ export class CameraSelf
     return this._viewProjectionMatrix;
   }
 
-  @Uniform("worldPosition")
+  @ShadingUniform("worldPosition")
   _worldPosition = new Vector3();
 
   // todo

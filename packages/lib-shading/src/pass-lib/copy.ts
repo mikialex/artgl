@@ -1,6 +1,8 @@
-import { BaseEffectShading } from "../../core/shading";
-import { texture, screenQuad } from "../../shader-graph/node-maker";
-import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
+import {
+  ShaderGraph, screenQuad, BaseEffectShading,
+  texture, UvFragVary
+} from "@artgl/core";
+
 
 export class CopyShading extends BaseEffectShading<CopyShading> {
 

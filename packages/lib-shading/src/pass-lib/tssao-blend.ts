@@ -1,8 +1,8 @@
-import { BaseEffectShading, Uniform } from "../../core/shading";
-import { ShaderFunction } from "../../shader-graph/shader-function";
-import { texture, screenQuad } from "../../shader-graph/node-maker";
-import { UvFragVary, ShaderGraph } from '../../shader-graph/shader-graph';
-import { ShadingComponent } from "../../core/shading-decorator";
+import {
+  BaseEffectShading, ShaderFunction, ShadingComponent,
+  ShadingUniform, ShaderGraph, screenQuad, texture, UvFragVary
+} from "@artgl/core";
+
 
 const tssaoBlend = new ShaderFunction({
   source: `
@@ -27,16 +27,16 @@ const tssaoBlend = new ShaderFunction({
 @ShadingComponent()
 export class TSSAOBlendShading extends BaseEffectShading<TSSAOBlendShading> {
 
-  @Uniform("u_sampleCount")
+  @ShadingUniform("u_sampleCount")
   sampleCount: number = 0;
 
-  @Uniform("u_tssaoComposeRate")
+  @ShadingUniform("u_tssaoComposeRate")
   tssaoComposeRate: number = 1;
 
-  @Uniform("u_tssaoShowThreshold")
+  @ShadingUniform("u_tssaoShowThreshold")
   tssaoShowThreshold: number = 200;
 
-  @Uniform("u_tssaoComposeThreshold")
+  @ShadingUniform("u_tssaoComposeThreshold")
   tssaoComposeThreshold: number = 0.5;
 
   decorate(graph: ShaderGraph) {

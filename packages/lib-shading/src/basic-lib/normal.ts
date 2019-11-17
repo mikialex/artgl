@@ -1,6 +1,5 @@
-import { BaseEffectShading } from "../../core/shading";
-import { ShaderFunction } from "../../shader-graph/shader-function";
-import { NormalFragVary, ShaderGraph } from "../../shader-graph/shader-graph";
+import { ShaderFunction, BaseEffectShading, ShaderGraph, NormalFragVary } from "@artgl/core"
+
 
 const normalShading = new ShaderFunction({
   source:

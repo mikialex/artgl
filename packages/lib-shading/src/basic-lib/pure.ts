@@ -1,13 +1,14 @@
-import { BaseEffectShading, Uniform } from "../../core/shading";
-import { ShaderGraph } from "../../shader-graph/shader-graph";
-import { Vector4 } from "@artgl/math";
-import { ShadingComponent } from "../../core/shading-decorator";
+import {
+  ShadingUniform, ShadingComponent, BaseEffectShading,
+  Vector4, ShaderGraph
+} from "@artgl/core";
+
 
 @ShadingComponent()
 export class PureShading extends BaseEffectShading<PureShading> {
 
   
-  @Uniform("baseColor")
+  @ShadingUniform("baseColor")
   color = new Vector4(0.2, 0.4, 0.6, 1.0);
 
   decorate(graph: ShaderGraph) {

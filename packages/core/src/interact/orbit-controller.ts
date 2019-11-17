@@ -1,7 +1,7 @@
 import { Controller } from "./controller";
 import { Interactor } from "./interactor";
 import { Vector3, MathUtil, Vector2, Spherical  } from "@artgl/math";
-import { Camera } from "../artgl";
+import { Camera } from "../core/camera";
 
 
 const tempVec = new Vector3();

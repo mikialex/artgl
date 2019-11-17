@@ -1,4 +1,5 @@
-import { ShaderFunction } from "../../shader-graph/shader-function";
+import { ShaderFunction } from "@artgl/core"
+
 
 
 export const blurX = new ShaderFunction({

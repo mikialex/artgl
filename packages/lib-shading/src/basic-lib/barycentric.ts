@@ -1,3 +1,8 @@
+import {
+  shader, ShaderFunction, ShadingComponent, BaseEffectShading,
+  Uniform, MarkNeedRedecorate, ShaderGraph, constValue, Vector3,
+  CommonAttribute, GLDataType, ShadingUniform
+} from "@artgl/core";
 
 
 const addBarycentricWireFrame = shader(`
@@ -42,10 +47,10 @@ const addBarycentricWireFrameScreenSpace = new ShaderFunction({
 @ShadingComponent()
 export class BarycentricWireFrame extends BaseEffectShading<BarycentricWireFrame> {
 
-  @Uniform("barycentricLine_threshold")
+  @ShadingUniform("barycentricLine_threshold")
   barycentricLine_threshold: number = 0.01;
 
-  @Uniform("screenSpaceRatio")
+  @ShadingUniform("screenSpaceRatio")
   screenSpaceRatio: number = 0.5;
 
   @MarkNeedRedecorate

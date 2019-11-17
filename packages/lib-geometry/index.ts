@@ -8,3 +8,4 @@ export * from './src/standard-geometry'
 export * from './src/none-indexed-geometry'
 
 export * from './src/geo-util/barycentric'
+export * from './src/geo-util/wireframe'

@@ -15,7 +15,7 @@ export class AmbientLight extends Light<AmbientLight> {
     return this.getPropertyUniform('color')
   }
 
-  @Uniform("color")
+  @ShadingUniform("color")
   color: Vector3 = new Vector3(1, 1, 1)
 
 }

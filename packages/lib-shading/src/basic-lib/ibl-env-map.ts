@@ -1,6 +1,6 @@
 import {
   ShaderFunction, BaseEffectShading, ShaderGraph, ShadingComponent,
-  ShaderTextureNode, NormalFragVary, Texture, CubeTexture
+  ShaderTextureNode, NormalFragVary, CubeTexture, ShadingTexture
 } from "@artgl/core";
 import { sampleEnvMapAndNeedNormalize } from "./cube-env-map";
 
@@ -31,7 +31,7 @@ export class IBLEnvMap extends BaseEffectShading<IBLEnvMap> {
       )
   }
 
-  @Texture('envMap')
+  @ShadingTexture('envMap')
   envMap: CubeTexture = new CubeTexture();
 
 }

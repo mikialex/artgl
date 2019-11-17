@@ -1,8 +1,10 @@
-import { BaseEffectShading, Uniform, ShaderUniformProvider } from "../../core/shading";
-import { ShaderGraph, NormalFragVary } from "../../shader-graph/shader-graph";
-import { Light, collectLightNodes } from "../../core/light";
-import { ShaderFunction } from "../../shader-graph/shader-function";
-import { ShadingComponent } from "../../core/shading-decorator";
+import {
+  ShaderFunction, ShadingComponent, BaseEffectShading,
+  ShaderGraph, NormalFragVary, Light, collectLightNodes,
+  ShaderUniformProvider,
+  ShadingUniform
+} from "@artgl/core";
+
 
 const phongShading = new ShaderFunction({
   source: `
@@ -52,7 +54,7 @@ export class PhongShading<T> extends BaseEffectShading<PhongShading<T>> {
 
   lights: Array<Light<T>>
 
-  @Uniform("shininess")
+  @ShadingUniform("shininess")
   shininess: number = 15;
 
 }

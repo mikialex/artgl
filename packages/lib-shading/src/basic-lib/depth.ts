@@ -1,8 +1,5 @@
-import { BaseEffectShading } from "../../core/shading";
-import { shader } from "../../shader-graph/shader-function";
-import { depthPack } from "../../shader-graph/built-in/depth-pack";
-import { ShaderGraph } from "../../shader-graph/shader-graph";
-import { MVP } from "../../core/camera";
+import { ShaderGraph, shader, BaseEffectShading, MVP } from "@artgl/core"
+import { depthPack } from "@artgl/shader-graph/src/built-in/depth-pack"
 
 const depthV = shader(`
 float depthVary(vec4 worldPosition){
