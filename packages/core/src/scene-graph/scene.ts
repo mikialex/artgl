@@ -4,11 +4,13 @@ import { RenderList } from "./render-list";
 import { Geometry } from "../core/render-entity/geometry";
 import { Material } from "../core/render-entity/material";
 import { Shading } from "../core/shading";
-import { SceneNode, RenderObject, RenderEngine } from "../artgl";
-import { PureShading } from "../shading/basic-lib/pure";
 import { RefCountMap } from "../util/ref-count-map";
 import { Background, SolidColorBackground } from "./background";
 import { RayCastSource, RayCasterable } from "../core/raycaster";
+import { SceneNode } from "./scene-node";
+import { NormalShading } from "../built-in-lib/normal";
+import { RenderObject } from "./object/render-object";
+import { RenderEngine } from "../core/render-engine";
 
 /**
  * scene data management
@@ -30,7 +32,7 @@ export class Scene implements RenderSource, RayCastSource {
   _allRenderable: Set<RenderObject> = new Set();
 
   selectionSet: Set<RenderObject> = new Set();
-  selectShading: Shading = new Shading().decorate(new PureShading());
+  selectShading: Shading = new Shading().decorate(new NormalShading());
 
   background: Background = new SolidColorBackground();
 

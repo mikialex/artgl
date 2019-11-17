@@ -5,11 +5,9 @@ import { BufferData } from "./render-entity/buffer-data";
 import { Material } from "./render-entity/material";
 import { Nullable, FloatArray, Observable } from "@artgl/shared";
 import { QuadSource } from './render-source';
-import { CopyShading } from "../shading/pass-lib/copy";
-import { NormalShading, RenderGraphBackEnd } from "../artgl";
 import { Shading } from "./shading";
 import { Interactor } from "../interact/interactor";
-import { Renderable, GeometryWebGLDataProvider } from "../engine/interface";
+import { Renderable, GeometryWebGLDataProvider } from "./interface";
 import { Camera } from "./camera";
 import { PerspectiveCamera, PerspectiveCameraInstance } from "../camera/perspective-camera";
 import { Matrix4, Vector4, Vector4Like } from "@artgl/math";
@@ -19,7 +17,11 @@ import {
   GLReleasable, GLRenderer, GLProgram, GLFramebuffer,
   GLTextureUniform, VAOCreateCallback
 } from "@artgl/webgl";
-import { Size } from "./interface";
+import { Size, ShaderUniformProvider } from "./interface";
+import { ChannelType } from "@artgl/shader-graph";
+import { RenderGraphBackEnd } from "@artgl/render-graph";
+import { CopyShading } from "../built-in-lib/copy";
+import { NormalShading } from "../built-in-lib/normal";
 
 const copyShading = new Shading().decorate(new CopyShading());
 const quad = new QuadSource();
@@ -248,7 +250,7 @@ export class RenderEngine implements GLReleasable, RenderGraphBackEnd {
 
       // acquire texture from material
       if (material !== undefined) {
-        const texture = material.getChannelTexture(tex.name);
+        const texture = material.getChannelTexture(tex.name as ChannelType);
         glTexture = texture.getGLTexture(this);
       }
 

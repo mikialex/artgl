@@ -41,8 +41,8 @@ export class Material {
     return this;
   }
 
-  setChannelColor(channel: ChannelType, color: Vector3) {
-    let channelTexture = this._channels.get(channel);
+  setChannelColor(channel: string, color: Vector3) {
+    let channelTexture = this._channels.get(channel as ChannelType);
     if (channelTexture === undefined) {
       channelTexture = generateTextureFromPureColor(color);
     } else {
@@ -52,8 +52,8 @@ export class Material {
     return this;
   }
 
-  setChannelTexture(channel: ChannelType, texture: Texture) {
-    this._channels.set(channel, texture);
+  setChannelTexture(channel: string, texture: Texture) {
+    this._channels.set(channel as ChannelType, texture);
     return this;
   }
 

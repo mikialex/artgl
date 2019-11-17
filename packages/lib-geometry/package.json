@@ -1,7 +1,7 @@
 {
-  "name": "@artgl/lib-shading",
+  "name": "@artgl/lib-geometry",
   "version": "0.0.1",
-  "description": "shading lib for artgl",
+  "description": "geometry lib for artgl",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "author": "mikialex",

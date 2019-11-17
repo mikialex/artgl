@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { loadStringFromFile } from "artgl/src/util/file-io";
+import { loadStringFromFile } from "artgl";
 import SceneNodeEditor from "./scene-node-editor.vue";
 import {
   OBJLoader,

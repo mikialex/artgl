@@ -1,4 +1,4 @@
-import { StandardGeometry } from '../standard-geometry';
+import { StandardGeometry } from '@artgl/lib-geometry/src/standard-geometry';
 import { ShapeWillChange } from "@artgl/core";
 
 export class PlaneGeometry extends StandardGeometry {

@@ -1,8 +1,8 @@
 
 import { Mesh } from "../scene-graph/object/mesh";
-import { PlaneGeometry } from "../geometry/geo-lib/plane-geometry";
 import { RenderObject } from "../scene-graph/object/render-object";
 import { RenderEngine } from "./render-engine";
+import { PlaneGeometry } from "../built-in-lib/plane-geometry";
 
 /**
  * Every meaningful draw system like scene should produce drawcall as need.

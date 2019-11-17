@@ -5,8 +5,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { NormalShading, DepthShading, TSSAOShading, Shading } from 'artgl/src/artgl';
-import { TestS } from 'artgl/src/shading/basic-lib/progressive-dof';
+import { NormalShading, DepthShading, TSSAOShading, Shading } from 'artgl';
 @Component({
 })
 export default class Debug extends Vue {
@@ -14,7 +13,6 @@ export default class Debug extends Vue {
 
     console.log("debug")
 
-    const test = new TestS();
   }
 }
 </script>

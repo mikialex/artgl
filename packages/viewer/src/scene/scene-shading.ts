@@ -1,9 +1,9 @@
 import {
   PointLight, DirectionalLight, AmbientLight, ExposureController,
   BarycentricWireFrame, PhongShading, Shading, Vector3, ToneMapType
-} from 'artgl/src/artgl';
+} from 'artgl';
 
-import { DirectionalShadowMap } from 'artgl/src/shadow-map/directional-shadowmap';
+// import { DirectionalShadowMap } from 'artgl/src/shadow-map/directional-shadowmap';
 import { Application } from '@/application';
 
 export default function (app: Application) {

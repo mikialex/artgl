@@ -8,6 +8,7 @@ export * from '@artgl/shader-graph';
 
 // artgl engine layer
 export { RenderEngine } from "./src/core/render-engine";
+export * from './src/core/raycaster'
 export { Framer } from "./src/core/framer";
 
 export * from './src/core/interface'
@@ -36,6 +37,7 @@ export * from './src/light/exports';
 export { Scene } from "./src/scene-graph/scene";
 export { SceneNode } from "./src/scene-graph/scene-node";
 export { Transformation } from "./src/scene-graph/transformation";
+export * from "./src/scene-graph/background"
 
 
 //interaction

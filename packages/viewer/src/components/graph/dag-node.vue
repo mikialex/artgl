@@ -25,13 +25,12 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { ShaderGraph, ShaderNode, DAGNode } from "artgl";
+import { ShaderGraph, ShaderNode, DAGNode, findFirst } from "artgl";
 import {
   NodeLayout,
   GraphBoardInfo,
   ViewNode,
 } from "../../model/graph-view";
-import { findFirst } from "artgl/src/util/array";
 
 @Component({
   components: {}

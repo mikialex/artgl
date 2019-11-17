@@ -4,10 +4,9 @@ import {
   PerspectiveCamera, Vector4, OrbitController, PlaneGeometry, Shading,
   BaseEffectShading, ShaderGraph, texture, ChannelType, UvFragVary, vec4,
   constValue, Line, SphereGeometry, Mesh, Material, Texture, GLDataType,
-  CommonAttribute, TextureSource, makeStandardGeometryWireFrame
+  CommonAttribute, TextureSource, makeStandardGeometryWireFrame,
+  loadObjFile, loadImageFromFile
 } from 'artgl';
-import { loadObjFile } from 'artgl/src/loader/obj-loader';
-import { loadImageFromFile } from 'artgl/src/util/file-io';
 
 class DiffuseShading extends BaseEffectShading<DiffuseShading> {
   decorate(graph: ShaderGraph): void {

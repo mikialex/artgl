@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import { loadImageFromFile } from "artgl/src/util/file-io";
+import { loadImageFromFile } from "artgl";
 import { Texture } from "artgl/";
 
 @Component

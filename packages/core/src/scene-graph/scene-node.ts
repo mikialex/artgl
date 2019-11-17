@@ -1,7 +1,8 @@
 import { Matrix4, generateUUID } from "@artgl/math";
 import { Nullable } from "@artgl/shared";
 import { Transformation } from "./transformation";
-import { Scene, RenderObject } from "../artgl";
+import { RenderObject } from "./object/render-object";
+import { Scene } from "./scene";
 
 
 type Constructor<T = {}> = new (...args: any[]) => T;

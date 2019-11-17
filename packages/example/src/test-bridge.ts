@@ -1,6 +1,5 @@
-import { Framer, Observable, Nullable } from "artgl";
+import { Framer, Observable, Nullable, Size } from "artgl";
 import { RenderConfig } from '../../viewer/src/components/conf/interface';
-import { Size } from 'artgl/src/engine/render-engine';
 
 export class TestBridge implements TestBridge {
   async screenShotCompareElement(element: HTMLElement, goldenPath: string) {

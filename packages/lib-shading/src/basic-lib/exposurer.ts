@@ -1,7 +1,6 @@
 import {
   MarkNeedRedecorate, ShadingComponent, BaseEffectShading,
-  ShadingUniform, Uncharted2ToneMapping, ReinhardToneMapping,
-  ShaderGraph, vec4, constValue
+  ShadingUniform, ShaderGraph, vec4, constValue
 } from "@artgl/core";
 import {
   controlExposureShading, OptimizedCineonToneMapping,

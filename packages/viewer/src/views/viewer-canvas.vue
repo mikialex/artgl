@@ -67,7 +67,7 @@ import {
   layoutGraph,
   NodeLayout
 } from "../model/graph-view";
-import { Vector4, DAGNode, RenderTargetNode } from "artgl/src/artgl";
+import { Vector4, DAGNode, RenderTargetNode } from "artgl";
 
 @Component({
   components: {

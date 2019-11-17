@@ -1,5 +1,5 @@
 export { SphereGeometry } from "./src/geo-lib/sphere-geometry";
-export { PlaneGeometry } from "./src/geo-lib/plane-geometry";
+export { PlaneGeometry } from "@artgl/core/src/built-in-lib/plane-geometry";
 export { CubeGeometry } from "./src/geo-lib/cube-geometry";
 export { CylinderGeometry } from "./src/geo-lib/cylinder-geometry";
 export { TorusKnotGeometry } from "./src/geo-lib/torus-knot-geometry"

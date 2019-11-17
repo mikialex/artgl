@@ -61,7 +61,7 @@ import GraphView from "../components/graph/graph-viewer.vue";
 import {
   ShaderNode,
   ShaderFunctionNode
-} from "artgl/src/shader-graph/shader-node";
+} from "artgl";
 import LineHUDCanvas from "./line-hud-canvas.vue";
 import {
   GraphBoardInfo,
