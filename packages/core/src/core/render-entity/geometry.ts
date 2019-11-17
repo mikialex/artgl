@@ -2,7 +2,8 @@ import { BufferData } from "./buffer-data";
 import { Box3, Sphere, generateUUID, Face3, Line3, Vector3 } from "@artgl/math";
 import { Nullable } from "@artgl/shared";
 import { GeometryWebGLDataProvider } from "../interface";
-import { RenderEngine, RenderRange } from "../../artgl";
+import { RenderRange } from "../../scene-graph/object/render-object";
+import { RenderEngine } from "../render-engine";
 
 /**
  * geometry define what to draw

@@ -1,4 +1,4 @@
-import { ShaderFunction } from "../shader-function";
+import { ShaderFunction } from "@artgl/shader-graph";
 
 export const controlExposureShading = new ShaderFunction({
   source:

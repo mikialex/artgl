@@ -3,8 +3,8 @@ import {
   ShadingUniform, ShaderGraph, vec4, constValue
 } from "@artgl/core";
 import {
-  controlExposureShading, OptimizedCineonToneMapping,
-  ACESFilmicToneMapping
+  Uncharted2ToneMapping, ReinhardToneMapping,
+  controlExposureShading, OptimizedCineonToneMapping, ACESFilmicToneMapping
 } from "@artgl/shader-graph/src/built-in/tone-mapping";
 
 export enum ToneMapType {

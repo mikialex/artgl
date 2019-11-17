@@ -45,8 +45,9 @@ export { Interactor } from "./src/interact/interactor";
 export { OrbitController } from "./src/interact/orbit-controller";
 
 //loader
-export { OBJLoader } from './src/loader/obj-loader';
+export * from './src/loader/obj-loader';
 
+export * from './src/util/file-io'
 
 import { PassGraphNode } from '@artgl/render-graph';
 import { QuadSourceInstance } from "./src/core/render-source";

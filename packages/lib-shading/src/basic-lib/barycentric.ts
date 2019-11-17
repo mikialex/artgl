@@ -1,6 +1,6 @@
 import {
   shader, ShaderFunction, ShadingComponent, BaseEffectShading,
-  Uniform, MarkNeedRedecorate, ShaderGraph, constValue, Vector3,
+  MarkNeedRedecorate, ShaderGraph, constValue, Vector3,
   CommonAttribute, GLDataType, ShadingUniform
 } from "@artgl/core";
 

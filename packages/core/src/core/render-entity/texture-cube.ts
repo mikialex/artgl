@@ -1,10 +1,10 @@
-import { TextureSource } from "@artgl/shared/src/texture-source";
-import {
-  PixelDataType, TextureWrap, TextureFilter, RenderEngine,
-  WebGLCubeTextureProvider, Nullable
-} from "../../artgl";
 
-export class CubeTexture implements WebGLCubeTextureProvider{
+import { WebGLCubeTextureProvider, PixelDataType, TextureWrap, TextureFilter } from "@artgl/webgl";
+import { Nullable, TextureSource } from "@artgl/shared";
+import { RenderEngine } from "../render-engine";
+
+
+export class CubeTexture implements WebGLCubeTextureProvider {
 
   getPositiveXMap(): TexImageSource {
     return this.positiveXMap!.source as TexImageSource;

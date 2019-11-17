@@ -1,9 +1,7 @@
 import { Light } from "../core/light";
-import { Uniform } from "../core/shading";
 import { Vector3 } from "@artgl/math";
-import { ShaderGraph, NormalFragVary } from "../shader-graph/shader-graph";
-import { ShaderNode } from '../shader-graph/shader-node';
-import { ShadingComponent } from "../core/shading-decorator";
+import { ShadingComponent, ShadingUniform } from "../core/shading-decorator";
+import { ShaderGraph, ShaderNode, NormalFragVary } from "@artgl/shader-graph";
 
 @ShadingComponent()
 export class AmbientLight extends Light<AmbientLight> {

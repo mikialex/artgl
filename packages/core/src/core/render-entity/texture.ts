@@ -1,6 +1,5 @@
 import { RenderEngine } from "../render-engine";
-import { GraphicResourceReleasable } from "../type";
-import { Nullable } from "../../.."
+import { Nullable, GraphicResourceReleasable } from "../../.."
 import { TextureSource } from "@artgl/shared/src/texture-source";
 import { PixelFormat, TextureWrap, TextureFilter, PixelDataType } from "@artgl/webgl";
 

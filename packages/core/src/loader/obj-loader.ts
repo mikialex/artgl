@@ -1,8 +1,7 @@
 import { Vector3, Vector2 } from "@artgl/math";
 import { loadStringFromFile } from "../util/file-io";
-import { generateNormalFromPosition } from "../geometry/geo-util/normal";
-import { StandardGeometry } from "../geometry/standard-geometry";
 import { GeometryLoader } from "../scene-graph/loader";
+import { StandardGeometry, generateNormalFromPosition } from "@artgl/lib-geometry";
 
 export async function loadObjFile(): Promise<StandardGeometry> {
   const loader = new OBJLoader();
