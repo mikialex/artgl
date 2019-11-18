@@ -1,6 +1,4 @@
-import { Vector3 } from 'artgl/src/math';
-import { Geometry } from 'artgl/src/artgl';
-import { Nullable } from 'artgl/src/type';
+import { Vector3, Geometry, Nullable } from 'artgl';
 
 export class World{
   constructor() {

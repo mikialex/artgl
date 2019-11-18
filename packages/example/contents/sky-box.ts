@@ -1,9 +1,8 @@
 import { TestBridge } from '../src/test-bridge';
 import {
   Vector3, Vector4, RenderEngine, Scene, Mesh, PerspectiveCamera, OrbitController,
-  Shading, IBLEnvMap, TorusKnotGeometry, CubeTexture, TextureSource, 
+  Shading, IBLEnvMap, TorusKnotGeometry, CubeTexture, TextureSource, CubeEnvrionmentMapBackGround
 } from 'artgl';
-import { CubeEnvrionmentMapBackGround } from 'artgl/src/scene/background';
 
 export default async function test(testBridge: TestBridge) {
 

@@ -6,8 +6,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { Framer } from 'artgl/src/artgl';
-import { Observer } from 'artgl/src/core/observable';
+import { Framer, Observer } from 'artgl';
+
 @Component({
 })
 export default class PrefMonitor extends Vue {

@@ -42,9 +42,8 @@ import GeometryViewPanel from "./geometry-view.vue";
 import MaterialViewPanel from "./material-view.vue";
 import ObjectPanel from "../object-panel/object-panel.vue";
 import NodeView from "./scene-node-view.vue";
-import { RenderEngine, Scene, Observer } from "artgl";
+import { RenderEngine, Scene, Observer, Nullable } from "artgl";
 import { Application } from "../../application";
-import { Nullable } from "artgl/src/type";
 
 @Component({
   components: {

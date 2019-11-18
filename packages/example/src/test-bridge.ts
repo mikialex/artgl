@@ -1,14 +1,12 @@
-import { Framer, Observable } from "artgl";
+import { Framer, Observable, Nullable, Size } from "artgl";
 import { RenderConfig } from '../../viewer/src/components/conf/interface';
-import { Size } from 'artgl/src/engine/render-engine';
-import { Nullable } from 'artgl/src/type';
 
 export class TestBridge implements TestBridge {
   async screenShotCompareElement(element: HTMLElement, goldenPath: string) {
     if (window.screenShotCompareElement) {
       await window.screenShotCompareElement(element, goldenPath);
     }
-   }
+  }
 
   private canvas: Nullable<HTMLCanvasElement> = null;
   requestCanvas() {

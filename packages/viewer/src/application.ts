@@ -1,13 +1,11 @@
 import {
-  RenderEngine, Mesh, PerspectiveCamera, OrbitController,
+  RenderEngine, Mesh, PerspectiveCamera, OrbitController, Raycaster, SkyBackground,
   OBJLoader, Scene, Observable, Framer, Material, Geometry, Shading, RenderObject, Vector3,
 } from 'artgl/';
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
 import createSceneShading from './scene/scene-shading';
 import { AdvanceStaticRenderPipeline } from './advance-static-pipeline';
-import { Raycaster } from 'artgl/src/core/raycaster';
-import { SkyBackground } from 'artgl/src/scene/background';
 
 export const STATIC_SERVER = "http://localhost:3000/"
 

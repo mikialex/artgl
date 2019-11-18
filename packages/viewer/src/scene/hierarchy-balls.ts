@@ -1,9 +1,8 @@
 import {
   SphereGeometry, PlaneGeometry, Mesh, SceneNode,
-  Shading, CubeGeometry
+  Shading, CubeGeometry, createBarycentricBufferForStandardGeometry
 } from 'artgl';
 import { Application } from '../application';
-import { createBarycentricBufferForStandardGeometry } from 'artgl/src/geometry/geo-util/barycentric'
 
 export default function (root: SceneNode, app: Application, shading: Shading) {
   const sphereGeo = new SphereGeometry(1, 40, 40);

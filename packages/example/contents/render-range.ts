@@ -16,7 +16,7 @@ export default async function test(testBridge: TestBridge) {
   const mesh = new Mesh();
 
   const geometry = new SphereGeometry();
-  mesh.geometry = geometry;
+  mesh.geometry = geometry; 
 
   const range = RenderRange.fromStandardGeometry(geometry);
   mesh.range = range;

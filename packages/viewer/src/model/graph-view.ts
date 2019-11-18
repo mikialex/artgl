@@ -1,5 +1,4 @@
-import { DAGNode } from 'artgl/src/core/dag-node';
-import { ShaderNode, ShaderFunctionNode } from 'artgl';
+import { ShaderNode, ShaderFunctionNode, DAGNode } from 'artgl';
 
 export interface GraphBoardInfo {
   width: number,

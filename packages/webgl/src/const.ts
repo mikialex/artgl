@@ -133,11 +133,7 @@ export var SrcAlphaSaturateFactor = 210;
 export var MultiplyOperation = 0;
 export var MixOperation = 1;
 export var AddOperation = 2;
-export var NoToneMapping = 0;
-export var LinearToneMapping = 1;
-export var ReinhardToneMapping = 2;
-export var Uncharted2ToneMapping = 3;
-export var CineonToneMapping = 4;
+
 export var UVMapping = 300;
 export var CubeReflectionMapping = 301;
 export var CubeRefractionMapping = 302;

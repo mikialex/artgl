@@ -24,7 +24,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import ChannelEditor from "./channel-editor.vue";
-import { Scene, Material, Vector3, Texture } from "artgl";
+import { Scene, Material, Vector3, Texture, ChannelType } from "artgl";
 import { TextureSource } from "@artgl/shared";
 
 @Component({
@@ -62,7 +62,7 @@ export default class MaterialPanel extends Vue {
 
   deleteChannel(channelName: string){
     console.log(channelName)
-    this.material.deleteChannel(channelName);
+    this.material.deleteChannel(channelName as ChannelType);
   }
 
   deleteSelf(){

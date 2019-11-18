@@ -1,15 +1,12 @@
 import {
-  RenderGraph, TAAShading, screen,
-  TSSAOShading, TSSAOBlendShading,
+  RenderGraph, TAAShading, screen, Nullable, CopyShading,
+  TSSAOShading, TSSAOBlendShading, EffectComposer,
   DepthShading, Scene, RenderEngine, Shading, ProgressiveDof,
   pass, pingpong, target, when, PingPongTarget, PerspectiveCamera, RenderTargetNode,
 } from "artgl";
-import { EffectComposer } from 'artgl/src/render-graph/effect-composer';
 import { RenderConfig } from './components/conf/interface';
 import { createConf } from './conf';
-import { CopyShading } from 'artgl/src/shading/pass-lib/copy';
-import { Nullable } from 'artgl/src/type';
-import { DirectionalShadowMap } from 'artgl/src/shadow-map/directional-shadowmap';
+import { DirectionalShadowMap } from '@artgl/core/src/shadow-map/directional-shadowmap';
 
 const copier = new Shading().decorate(new CopyShading())
 
@@ -17,7 +14,7 @@ export class AdvanceStaticRenderPipeline {
   constructor(engine: RenderEngine) {
     this.engine = engine;
     this.composer = new EffectComposer(engine);
-    this.config = createConf(this.engine, this); 
+    this.config = createConf(this.engine, this);
   }
   engine: RenderEngine;
   config: RenderConfig;
@@ -36,7 +33,7 @@ export class AdvanceStaticRenderPipeline {
   taaHistory: PingPongTarget = pingpong('taa');
 
   _enableTSSAO = true;
-  
+
   get enableTSSAO() { return this._enableTSSAO }
   set enableTSSAO(value) {
     this.resetSample();
@@ -44,7 +41,7 @@ export class AdvanceStaticRenderPipeline {
   }
   tssaoShading = new TSSAOShading();
   tssaoShader: Shading = new Shading().decorate(this.tssaoShading);
-  
+
   tssaoHistory: PingPongTarget = pingpong('tssao');
 
   composeShading = new TSSAOBlendShading()
@@ -98,13 +95,13 @@ export class AdvanceStaticRenderPipeline {
 
   directionalShadowMap!: DirectionalShadowMap
 
-  directionalShadowMapTarget: RenderTargetNode =target("directionalShadowMap").needDepth()
-  .afterContentReceived(node => {
-    const shadowMapTextureFBOKey = this.composer.getFramebuffer(node)!.name
-    if (this.sceneShading !== null) {
-      this.sceneShading.defineFBOInput(shadowMapTextureFBOKey, 'directionalShadowMapTexture')
-    }
-  })
+  directionalShadowMapTarget: RenderTargetNode = target("directionalShadowMap").needDepth()
+    .afterContentReceived(node => {
+      const shadowMapTextureFBOKey = this.composer.getFramebuffer(node)!.name
+      if (this.sceneShading !== null) {
+        this.sceneShading.defineFBOInput(shadowMapTextureFBOKey, 'directionalShadowMapTexture')
+      }
+    })
 
   private build(scene: Scene, camera: PerspectiveCamera) {
     this.updateTicks();
@@ -118,19 +115,19 @@ export class AdvanceStaticRenderPipeline {
     //   }).afterExecute(() => {
     //     this.depthShader.params.clear();
     // })
-    
+
     // this.directionalShadowMapTarget = this.directionalShadowMapTarget
     //   .from(directionalShadowMapPass)
-    
+
     const depthPass = pass("depthPass").use(scene.renderScene)
       .beforeExecute(() => {
         let a = 1;
-    })
+      })
       .overrideShading(this.depthShader)
 
     const scenePass = pass("scenePass")
       .use(scene.render)
-      // .depend(this.directionalShadowMapTarget)
+    // .depend(this.directionalShadowMapTarget)
 
     const depthResult = target("depthResult").needDepth().from(depthPass)
     const sceneResult = target("sceneResult").needDepth().from(scenePass)
