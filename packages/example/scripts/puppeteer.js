@@ -24,7 +24,7 @@ async function injectBasicUtil(page, testOverResolver) {
   })
 
   // expose imageDiff prediction 
-  await page.exposeFunction('screenShotCompareElement', async (goldenPath, refreshGolden) => {
+  await page.exposeFunction('screenShotCompare', async (goldenPath, refreshGolden) => {
     const filePath = imageDistDirPath + frameName + '.png';
     console.log(`write image file to: ${filePath}`);
     try {

@@ -1,10 +1,18 @@
 import { Framer, Observable, Nullable, Size } from "artgl";
 import { RenderConfig } from '../../viewer/src/components/conf/interface';
 
+// This should impl by node puppeteer, and exposed on headless window;
+declare global {
+  interface Window {
+    startRegression(): Promise<void>
+    screenShotCompare(goldenPath: string, refreshGolden: boolean): Promise<void>;
+  }
+}
+
 export class TestBridge implements TestBridge {
   async screenShotCompare(goldenPath: string) {
-    if (window.screenShotCompareElement) {
-      await window.screenShotCompareElement(goldenPath, this.refreshGolden);
+    if (window.screenShotCompare) {
+      await window.screenShotCompare(goldenPath, this.refreshGolden);
     }
   }
 
