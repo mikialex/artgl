@@ -7,16 +7,14 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "example build script debug",
-      "program": "${workspaceFolder}/example/scripts/index.js"
+      "name": "example build markdown debug",
+      "program": "${workspaceFolder}/packages/example/scripts/index.js"
     },
-
     {
-      "type": "chrome",
+      "type": "node",
       "request": "launch",
-      "name": "Launch Chrome against localhost",
-      "url": "http://localhost:9000",
-      "webRoot": "${workspaceFolder}"
+      "name": "example regression debug",
+      "program": "${workspaceFolder}/packages/example/scripts/regression.js"
     }
   ]
 }

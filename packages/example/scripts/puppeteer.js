@@ -9,7 +9,7 @@ async function createPuppeteerBrowser() {
     ],
     ignoreHTTPSErrors: true,
     devtools: true,
-    headless: true,
+    headless: false,
     defaultViewport: {
       width: 800,
       height: 600
@@ -17,14 +17,14 @@ async function createPuppeteerBrowser() {
   });
 }
 
-async function injectBasicUtil(page) {
+async function injectBasicUtil(page, testOverResolver) {
   // expose log function for log in node from browser
   await page.exposeFunction('frameLog', (log) => {
     console.log('frameLog: ' + log);
   })
 
   // expose imageDiff prediction 
-  await page.exposeFunction('expectFrame', async (frameName) => {
+  await page.exposeFunction('screenShotCompareElement', async (goldenPath, refreshGolden) => {
     const filePath = imageDistDirPath + frameName + '.png';
     console.log(`write image file to: ${filePath}`);
     try {
@@ -34,56 +34,31 @@ async function injectBasicUtil(page) {
     }
   })
 
-  const testWaiter = new Promise(async (resolve) => {
-    await page.exposeFunction('finishTest', async (frameName) => {
-      resolve();
-    })
+  await page.exposeFunction('finishTest', async () => {
+    testOverResolver();
   })
-
-  return testWaiter;
 
 }
 
-
-// async function runHeadlessTest(name, url) {
-//   const browser = await createPuppeteerBrowser();
-//   const page = await browser.newPage();
-//   await injectBasicUtil(page);
-
-//   await page.coverage.startJSCoverage({
-//     reportAnonymousScripts: true
-//   });
-
-
-//   await gotoURL(page, global.mockServerURL);
-//   const t = require('fs').readFileSync('/Users/mikialex/Desktop/framewatcher/workspace/html/dist/artglwebpack.js', "utf-8");
-//   await page.evaluate(t);
-//   await testWaiter;
-
-//   const jsCoverage = await page.coverage.stopJSCoverage();
-
-//   // const pti = require('puppeteer-to-istanbul')
-//   // pti.write(jsCoverage)
-
-//   await browser.close();
-//   console.log(`headless test over for ${name}`);
-// }
-
-
-async function runHeadlessTest(staticUrl) {
+async function runHeadlessTest(staticRootUrl, codePath) {
   const browser = await createPuppeteerBrowser();
   const page = await browser.newPage();
-  await injectBasicUtil(page);
+
+  function testOver() {
+    
+  }
+
+  await injectBasicUtil(page, testOver);
 
   await page.coverage.startJSCoverage({
     reportAnonymousScripts: true
   });
 
 
-  await gotoURL(page, global.mockServerURL);
-  const t = require('fs').readFileSync('/Users/mikialex/Desktop/framewatcher/workspace/html/dist/artglwebpack.js', "utf-8");
+  // await gotoURL(page, global.mockServerURL);
+  const t = require('fs').readFileSync(codePath, "utf-8");
   await page.evaluate(t);
-  await testWaiter;
+  // await testWaiter;
 
   const jsCoverage = await page.coverage.stopJSCoverage();
 

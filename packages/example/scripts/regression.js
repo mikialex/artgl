@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
 const child_process = require('child_process')
+const { runHeadlessTest } = require('./puppeteer.js')
 
 async function compileProject(rootPath, distPath) {
   const config = {
@@ -27,7 +28,8 @@ async function compileProject(rootPath, distPath) {
 
   return new Promise((resolve, reject) => {
     webpack(config, (err, stats) => {
-      if (err || stats.hasErrors()) {
+      if (err) {
+      // if (err || stats.hasErrors()) {
         reject(err, stats);
       }
       resolve(stats);
@@ -65,7 +67,7 @@ async function startStaticServer(rootPath, port){
 
 
 async function runAllTest() {
-  const examplesRoot = path.resolve(__dirname, '../contents/exports');
+  const examplesRoot = path.resolve(__dirname, '../src/regression-entry.ts');
   const examplesDistPath = path.resolve(__dirname, '../build/');
   console.log('start build example')
   await compileProject(examplesRoot, examplesDistPath)
@@ -73,7 +75,10 @@ async function runAllTest() {
   const serverChild = await startStaticServer(examplesDistPath, 3000)
   console.log('static server has started')
 
-  await runHeadlessTest('localhost:3000')
+  const codePath = path.resolve(__dirname, '../build/artgl-example.js')
+  await runHeadlessTest('localhost:3000', codePath)
+
+  serverChild.kill();
 }
 
 runAllTest();
