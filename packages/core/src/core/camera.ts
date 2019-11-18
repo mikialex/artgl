@@ -7,7 +7,7 @@ import { CommonAttribute, GLDataType } from "@artgl/webgl";
 import { ShaderUniformDecorator, ShaderUniformProvider } from "./interface";
 import {
   constValue, vec4, uniformFromValue, ShaderGraph,
-  WorldPositionFragVary, defaultVertexRoot, ShaderFunction
+  WorldPositionFragVary, defaultVertexRoot, ShaderFunction, CameraWorldPosition
 } from "@artgl/shader-graph";
 
 export const MTransform = new ShaderFunction({
@@ -67,7 +67,7 @@ export class CameraSelf
   implements ShaderUniformProvider, ShaderUniformDecorator {
 
   static readonly WorldMatrixKey = 'WorldMatrix'
-  static readonly WorldPositionKey = 'CameraWorldPosition'
+  static readonly WorldPositionKey = CameraWorldPosition
   static readonly ViewProjectionMatrix = 'CameraViewProjectionMatrix'
 
   shouldProxyedByUBO = false; // todo fix

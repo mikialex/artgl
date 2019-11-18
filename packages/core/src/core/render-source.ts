@@ -2,7 +2,7 @@
 import { Mesh } from "../scene-graph/object/mesh";
 import { RenderObject } from "../scene-graph/object/render-object";
 import { RenderEngine } from "./render-engine";
-import { PlaneGeometry } from "../built-in-lib/plane-geometry";
+import { QuadGeometry } from "../built-in-lib/quad-geometry";
 
 /**
  * Every meaningful draw system like scene should produce drawcall as need.
@@ -19,7 +19,7 @@ export interface RenderSource {
 
 
 const quadMesh = new Mesh();
-const geometry = new PlaneGeometry(2, 2, 1, 1);
+const geometry = new QuadGeometry();
 quadMesh.geometry = geometry;
 
 export class QuadSource implements RenderSource {

@@ -11,7 +11,7 @@ import {
   GLDataType, CommonAttribute, GLProgramConfig, UniformDescriptor, VaryingDescriptor
 } from "@artgl/webgl";
 import {
-  EyeDirection, FragWorldPosition, ChannelType, WorldPositionFragVary,
+  EyeDirection, CameraWorldPosition, ChannelType, WorldPositionFragVary,
   NormalFragVary, UvFragVary
 } from "./interface";
 
@@ -132,7 +132,7 @@ export class ShaderGraph {
     if (node === undefined) {
       node = eyeDir.make()
       .input("worldPosition", this.getVary(WorldPositionFragVary))
-        .input("cameraWorldPosition", this.getSharedUniform(FragWorldPosition))
+        .input("cameraWorldPosition", this.getSharedUniform(CameraWorldPosition))
       this.registerSharedUniform(EyeDirection, node);
     }
     return node;

@@ -6,7 +6,7 @@ export const NDCPositionFragVary = "v_position_ndc"
 export const WorldPositionFragVary = "v_position_world"
 
 export const EyeDirection = 'inner_eye_dir'
-export const FragWorldPosition = 'inner_frag_world_position'
+export const CameraWorldPosition = 'inner_camera_world_position'
 
 export const enum ChannelType {
   diffuse = 'tex_diffuse',

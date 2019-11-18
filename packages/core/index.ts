@@ -6,11 +6,6 @@ export * from "@artgl/shared";
 export * from '@artgl/render-graph';
 export * from '@artgl/shader-graph';
 
-// artgl engine layer
-export { RenderEngine } from "./src/core/render-engine";
-export * from './src/core/raycaster'
-export { Framer } from "./src/core/framer";
-
 export * from './src/core/interface'
 
 export * from "./src/scene-graph/object/render-object";
@@ -67,3 +62,7 @@ export function textureFromValue(textureName:string, value: GLTextureData){
 }
 
 export type GLTextureData = Texture | CubeTexture;
+
+export { RenderEngine } from "./src/core/render-engine";
+export * from './src/core/raycaster'
+export { Framer } from "./src/core/framer";
