@@ -207,7 +207,7 @@ export class GLRenderer implements GLReleasable {
     this.attributeBufferManager.releaseGL();
     this.programManager.releaseGL();
     this.textureManger.releaseGL();
-    this.framebufferManager.dispose();
+    this.framebufferManager.releaseGL();
     this.vaoManager.releaseGL();
   }
 

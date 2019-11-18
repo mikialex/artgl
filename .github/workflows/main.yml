@@ -1,25 +1,25 @@
-# name: CI
+name: CI
 
-# on:
-#   pull_request:
-#     branches:
-#     - master
+on:
+  pull_request:
+    branches:
+    - master
 
-# jobs:
-#   build:
+jobs:
+  build:
 
-#     runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
     
-#     steps:
+    steps:
 
-#     - uses: actions/checkout@v1
+    - uses: actions/checkout@v1
 
-#     - uses: actions/checkout@master
-#     - uses: actions/setup-node@v1
-#       with:
-#         node-version: '10.x'
-#     - run: npm install yarn -g
-#     - run: yarn
-#     - run: yarn test
-#     - run: yarn build
-#     - run: yarn package
+    - uses: actions/checkout@master
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+    - run: npm install yarn -g
+    - run: yarn
+    - run: yarn test
+    - run: yarn build
+    - run: yarn package

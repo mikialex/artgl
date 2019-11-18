@@ -159,6 +159,11 @@ export class GLTextureManager implements GLReleasable {
   }
 
   releaseGL() {
-    // TODO
+    this.textures.forEach(t => {
+      this.renderer.gl.deleteTexture(t);
+    })
+    this.slotManager.resetSlotIndex();
+    this.textures = new Map();
+    this.texturesVersion = new Map();
   }
 }
