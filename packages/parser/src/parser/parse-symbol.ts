@@ -1,4 +1,5 @@
 import { Nullable } from "@artgl/shared";
+import { unionSet } from "../util";
 
 
 export class ParseSymbol{
@@ -49,6 +50,33 @@ export class NonTerminal extends ParseSymbol {
   }
 }
 
+export function getFirstSetForAnyProduction(equalsTo: ParseSymbol[]) {
+  const ruleSet = new Set<Terminal>();
+  for (let i = 0; i < equalsTo.length; i++) {
+    const symbol = equalsTo[i];
+
+    if (symbol instanceof Terminal) {
+      ruleSet.add(symbol);
+      return ruleSet;
+
+    } else if (symbol instanceof NonTerminal) {
+      const symbolFirstSet = symbol.getFirstSet();
+
+      if (symbolFirstSet.has(Empty)) {
+        symbolFirstSet.delete(Empty);
+        unionSet(ruleSet, symbolFirstSet);
+      } else {
+        unionSet(ruleSet, symbolFirstSet);
+        return ruleSet;
+      }
+
+    }
+
+  }
+
+  ruleSet.add(Empty);
+  return ruleSet;
+}
 
 // A –> XYZ
 export class ProductionRule {
@@ -60,31 +88,7 @@ export class ProductionRule {
   readonly equalsTo: ParseSymbol[] = [];
 
   getOneRuleFirstSet(): Set<Terminal> {
-    const ruleSet = new Set<Terminal>();
-    for (let i = 0; i < this.equalsTo.length; i++) {
-      const symbol = this.equalsTo[i];
-
-      if (symbol instanceof Terminal) {
-        ruleSet.add(symbol);
-        return ruleSet;
-
-      } else if (symbol instanceof NonTerminal) {
-        const symbolFirstSet = symbol.getFirstSet();
-
-        if (symbolFirstSet.has(Empty)) {
-          symbolFirstSet.delete(Empty);
-          unionSet(ruleSet, symbolFirstSet);
-        } else {
-          unionSet(ruleSet, symbolFirstSet);
-          return ruleSet;
-        }
-
-      }
-
-    }
-
-    ruleSet.add(Empty);
-    return ruleSet;
+    return getFirstSetForAnyProduction(this.equalsTo);
   }
 
   getFirstSymbol() {
@@ -96,10 +100,10 @@ export class ProductionRule {
 export class ParseConfiguration {
   constructor(
     private rule: Readonly<ProductionRule>,
-    private _stage: number = 0
+    private _stage: number = 0,
+    private lookAheadSet: Set<Terminal> = new Set()
   ) { }
 
-  private lookAheadSet: Set<Terminal> = new Set();
 
   get originRule() {
     return this.rule;
@@ -121,7 +125,7 @@ export class ParseConfiguration {
     if (this.isComplete) {
       return null;
     } else {
-      return new ParseConfiguration(this.rule, this._stage + 1);
+      return new ParseConfiguration(this.rule, this._stage + 1, this.lookAheadSet);
     }
   }
 

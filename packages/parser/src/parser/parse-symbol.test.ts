@@ -13,4 +13,6 @@ S.addRule([X, X])
 test('first set', () => {
   const first = S.getFirstSet();
   expect(first.size).toBe(2);
+  expect(first.has(a)).toBe(true);
+  expect(first.has(b)).toBe(true);
 });
