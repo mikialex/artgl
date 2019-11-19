@@ -1,11 +1,12 @@
 import { Nullable } from "@artgl/shared"
-import { NonTerminal, Terminal, ParseSymbol } from "./parse-symbol";
+import { NonTerminal, Terminal, ParseSymbol, ParseConfiguration } from "./parse-symbol";
 import { ParseStateNode } from "./state-node";
 
 export class LRParser {
   constructor(rootSymbol: NonTerminal) {
     this.rootSymbol = rootSymbol;
-    this.parseStateGraph = new ParseStateNode(this.rootSymbol.rules[0].getFirstParseConf(), true);
+    const startConfig = new ParseConfiguration(this.rootSymbol.rules[0])
+    this.parseStateGraph = new ParseStateNode(startConfig, true);
   }
 
   input: Terminal[] = [];

@@ -6,7 +6,8 @@ export class ParseStateNode {
     if (isRoot) {
       this.selfConfigs.add(c);
       c.fromSymbol.rules.forEach(r => {
-        r.getFirstParseConf().genClosureParseConfigurationSet().forEach(cf => {
+        const firstConf = new ParseConfiguration(r)
+        firstConf.genClosureParseConfigurationSet().forEach(cf => {
           this.selfConfigs.add(cf);
         })
       })
@@ -29,7 +30,7 @@ export class ParseStateNode {
   }
 
   private populateNextState(c: ParseConfiguration) {
-    const next = c.successor;
+    const next = c.makeSuccessor();
     if (next === null) { return }
     this.transitions.set(c.expectNextSymbol!, new ParseStateNode(next, false))
   }

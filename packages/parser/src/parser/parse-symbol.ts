@@ -8,6 +8,10 @@ export class ParseSymbol{
   name: string
 }
 
+export function makeTerminal(name: string) {
+  return new Terminal(name);
+}
+
 export class Terminal extends ParseSymbol{ }
 
 class EmptyC extends Terminal{ }
@@ -15,9 +19,19 @@ class EOFc extends Terminal{ }
 export const Empty = new EmptyC('empty');
 export const EOF = new EOFc('eof');
 
+export function makeNonTerminal(name: string) {
+  return new NonTerminal(name);
+}
+
 export class NonTerminal extends ParseSymbol {
+
   rules: ProductionRule[] = [];
   firstSetCache: Nullable<Set<Terminal>> = null;
+
+  addRule(ruleDes: ParseSymbol[]) {
+    this.rules.push(new ProductionRule(this, ruleDes));
+    return this;
+  }
 
   getFirstSet(): Set<Terminal> {
     if (this.firstSetCache !== null) {
@@ -38,13 +52,12 @@ export class NonTerminal extends ParseSymbol {
 
 // A –> XYZ
 export class ProductionRule {
-  constructor(self: NonTerminal) {
+  constructor(self: NonTerminal, equalsTo: ParseSymbol[]) {
     this.selfSymbol = self;
+    this.equalsTo = equalsTo;
   }
-  selfSymbol: NonTerminal
-  equalsTo: ParseSymbol[] = [];
-
-  allParseConf: ParseConfiguration[] = [];
+  readonly selfSymbol: NonTerminal
+  readonly equalsTo: ParseSymbol[] = [];
 
   getOneRuleFirstSet(): Set<Terminal> {
     const ruleSet = new Set<Terminal>();
@@ -74,10 +87,6 @@ export class ProductionRule {
     return ruleSet;
   }
 
-  getFirstParseConf() {
-    return this.allParseConf[0];
-  }
-
   getFirstSymbol() {
     return this.equalsTo[0];
   }
@@ -87,9 +96,9 @@ export class ProductionRule {
 export class ParseConfiguration {
   constructor(
     private rule: Readonly<ProductionRule>,
+    private _stage: number = 0
   ) { }
 
-  private _stage: number = 0;
   private lookAheadSet: Set<Terminal> = new Set();
 
   get originRule() {
@@ -108,11 +117,11 @@ export class ParseConfiguration {
     return this._stage === this.rule.equalsTo.length;
   }
 
-  get successor() {
+  makeSuccessor() {
     if (this.isComplete) {
       return null;
     } else {
-      return this.rule.allParseConf[this._stage + 1];
+      return new ParseConfiguration(this.rule, this._stage + 1);
     }
   }
 
@@ -137,7 +146,7 @@ export class ParseConfiguration {
         return;
       }
       symbol.rules.forEach(r => {
-        const startConf = r.getFirstParseConf();
+        const startConf = new ParseConfiguration(r);
         result.add(startConf);
         pushResult(r.getFirstSymbol());
       })
