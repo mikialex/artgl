@@ -4,15 +4,15 @@ export class ParseStateNode {
   constructor(c: ParseConfiguration, isRoot: boolean) {
 
     if (isRoot) {
-      this.selfConfigs.add(c);
+      this.selfConfigs.push(c);
       c.fromSymbol.rules.forEach(r => {
         const firstConf = new ParseConfiguration(r)
-        firstConf.genClosureParseConfigurationSet().forEach(cf => {
-          this.selfConfigs.add(cf);
+        firstConf.genClosureParseConfigurations().forEach(cf => {
+          this.selfConfigs.push(cf);
         })
       })
     } else {
-      this.selfConfigs = c.genClosureParseConfigurationSet()
+      this.selfConfigs = c.genClosureParseConfigurations()
     }
 
     this.populateNextStates();
@@ -35,11 +35,11 @@ export class ParseStateNode {
     this.transitions.set(c.expectNextSymbol!, new ParseStateNode(next, false))
   }
 
-  private selfConfigs: Set<ParseConfiguration> = new Set();
+  private selfConfigs: ParseConfiguration[] = [];
   private transitions: Map<ParseSymbol, ParseStateNode> = new Map();
 
   get isReduceable() {
-    return this.transitions.size === 0 && this.selfConfigs.size === 1;
+    return this.transitions.size === 0 && this.selfConfigs.length === 1;
   }
 
   get reduceConfig(): ParseConfiguration {

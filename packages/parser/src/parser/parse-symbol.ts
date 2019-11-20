@@ -104,6 +104,26 @@ export class ParseConfiguration {
     private lookAheadSet: Set<Terminal> = new Set()
   ) { }
 
+  toString() {
+    let rule = ''
+    this.rule.equalsTo.forEach((sym, index) => {
+      if (this._stage === index) {
+        rule += "• ";
+      }
+      rule += sym.name
+      rule += ' '
+    })
+    let lookAhead = ''
+    let count = 0;
+    this.lookAheadSet.forEach(sym => {
+      count++;
+      lookAhead += sym.name;
+      if (count < this.lookAheadSet.size) {
+        lookAhead += ' / ';
+      }
+    })
+    return `${this.rule.selfSymbol.name} => ${rule}, (${lookAhead})`;
+  }
 
   get originRule() {
     return this.rule;
@@ -137,26 +157,26 @@ export class ParseConfiguration {
     }
   }
 
-  genClosureParseConfigurationSet(): Set<ParseConfiguration> {
-    const nextSymbol = this.rule.equalsTo[this._stage];
-    if (nextSymbol === undefined) {
-      return new Set([this]);
-    }
+  genClosureParseConfigurations(): ParseConfiguration[] {
+    const result: ParseConfiguration[] = [];
+    const checking: ParseConfiguration[] = [];
+    checking.push(this);
 
-    const result: Set<ParseConfiguration> = new Set([this]);
+    while (checking.length > 0) {
+      const checkItem = checking.pop()!;
+      result.push(checkItem);
 
-    function pushResult(symbol: ParseSymbol) {
-      if (!(symbol instanceof NonTerminal)) {
-        return;
+      const nextSymbol = checkItem.rule.equalsTo[this._stage];
+
+      if (nextSymbol instanceof NonTerminal) {
+        nextSymbol.rules.forEach(r => {
+          const startConf = new ParseConfiguration(r);
+          checking.push(startConf);
+        })
       }
-      symbol.rules.forEach(r => {
-        const startConf = new ParseConfiguration(r);
-        result.add(startConf);
-        pushResult(r.getFirstSymbol());
-      })
+
     }
 
-    pushResult(nextSymbol);
     return result;
   }
 }

@@ -19,6 +19,6 @@ test('first set', () => {
 
 test('closure', () => {
   const start = new ParseConfiguration(X.rules[0], 0, new Set([EOF]));
-  const result = start.genClosureParseConfigurationSet();
-  expect(result.size).toBe(4)
+  const result = start.genClosureParseConfigurations();
+  expect(result.length).toBe(4)
 })
