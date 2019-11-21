@@ -1,4 +1,5 @@
-import { ParseConfiguration, ParseSymbol } from "./parse-symbol";
+import { ParseSymbol } from "./parse-symbol";
+import { ParseConfiguration } from './parse-configuration';
 
 export class ParseStateNode {
   constructor(c: ParseConfiguration, isRoot: boolean) {

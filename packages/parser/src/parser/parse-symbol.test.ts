@@ -1,4 +1,5 @@
-import { makeTerminal, makeNonTerminal, ParseConfiguration, EOF } from "./parse-symbol";
+import { makeTerminal, makeNonTerminal, EOF } from "./parse-symbol";
+import { ParseConfiguration } from './parse-configuration';
 
 const a = makeTerminal('a')
 const b = makeTerminal('b')
@@ -18,7 +19,7 @@ test('first set', () => {
 });
 
 test('closure', () => {
-  const start = new ParseConfiguration(X.rules[0], 0, new Set([EOF]));
+  const start = new ParseConfiguration(S.rules[0], 0, new Set([EOF]));
   const result = start.genClosureParseConfigurations();
-  expect(result.length).toBe(4)
+  expect(result.length).toBe(3)
 })
