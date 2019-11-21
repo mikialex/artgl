@@ -73,22 +73,28 @@ export class ParseConfiguration {
     const checking: ParseConfiguration[] = [];
     checking.push(this);
 
+    let preventEndless = 0;
     while (checking.length > 0) {
+      preventEndless++;
+      if (preventEndless > 10000) {
+        throw 'err'
+      }
+
       const checkItem = checking.pop()!;
       result.push(checkItem);
 
-      const nextSymbol = checkItem.rule.equalsTo[this._stage];
-      const restSymbol = checkItem.rule.equalsTo.slice(this._stage + 1);
-
-      const newLookAheadSet = new Set<Terminal>();
-      checkItem.lookAheadSet.forEach(symbol => {
-        const restSymbolWithOldLookAhead = restSymbol.slice();
-        restSymbolWithOldLookAhead.push(symbol);
-        unionSet(newLookAheadSet, getFirstSetForAnyProduction(restSymbolWithOldLookAhead));
-      })
-      
+      const nextSymbol = checkItem.rule.equalsTo[checkItem._stage];
+      const restSymbol = checkItem.rule.equalsTo.slice(checkItem._stage + 1);
 
       if (nextSymbol instanceof NonTerminal) {
+        const newLookAheadSet = new Set<Terminal>();
+        checkItem.lookAheadSet.forEach(symbol => {
+          const restSymbolWithOldLookAhead = restSymbol.slice();
+          restSymbolWithOldLookAhead.push(symbol);
+          unionSet(newLookAheadSet, getFirstSetForAnyProduction(restSymbolWithOldLookAhead));
+        })
+        
+
         nextSymbol.rules.forEach(r => {
           const startConf = new ParseConfiguration(r, 0, new Set<Terminal>(newLookAheadSet));
           checking.push(startConf);

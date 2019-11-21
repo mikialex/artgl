@@ -2,6 +2,14 @@ import { Nullable } from "@artgl/shared";
 import { unionSet } from "../util";
 import { ParseConfiguration } from "./parse-configuration";
 
+export class ASTNode{
+  constructor(symbol: ParseSymbol) {
+    this.symbol = symbol;
+  }
+  symbol: ParseSymbol
+
+  children: ASTNode[] = [];
+}
 
 export class ParseSymbol{
   constructor(name: string) {

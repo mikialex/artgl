@@ -15,7 +15,13 @@ export function constructParseGraph(rootSymbol: NonTerminal) {
   checkingNodes.push(rootNode);
   registerMap(rootNode);
 
+  let preventEndless = 0;
   while (checkingNodes.length > 0) {
+    preventEndless++;
+    if (preventEndless > 10000) {
+      throw 'err'
+    }
+    
     const checkNode = checkingNodes.pop()!;
     resultNodes.push(checkNode);
 
