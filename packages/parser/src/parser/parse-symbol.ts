@@ -1,5 +1,6 @@
 import { Nullable } from "@artgl/shared";
 import { unionSet } from "../util";
+import { ParseConfiguration } from "./parse-configuration";
 
 
 export class ParseSymbol{
@@ -32,6 +33,16 @@ export class NonTerminal extends ParseSymbol {
   addRule(ruleDes: ParseSymbol[]) {
     this.rules.push(new ProductionRule(this, ruleDes));
     return this;
+  }
+
+  // I0 = CLOSURE( { [S->.u1, $], [S->.u2, $] , ... [S->.un, $] } )
+  genStartStateConfigs() {
+    const result: ParseConfiguration[] = []
+    this.rules.forEach(r => {
+      const firstConf = new ParseConfiguration(r, 0, new Set([EOF]))
+      firstConf.genClosureParseConfigurations().forEach(conf => result.push(conf));
+    })
+    return result;
   }
 
   getFirstSet(): Set<Terminal> {

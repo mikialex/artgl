@@ -19,9 +19,14 @@ export class ParseConfiguration {
       rule += sym.name
       rule += ' '
     })
+    const sortArray: Terminal[] = [];
+    this.lookAheadSet.forEach(sym => {
+      sortArray.push(sym);
+    });
+    sortArray.sort((a, b) => a.name.localeCompare(b.name));
     let lookAhead = ''
     let count = 0;
-    this.lookAheadSet.forEach(sym => {
+    sortArray.forEach(sym => {
       count++;
       lookAhead += sym.name;
       if (count < this.lookAheadSet.size) {
