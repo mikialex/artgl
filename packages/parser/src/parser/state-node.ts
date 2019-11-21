@@ -21,7 +21,7 @@ export function constructParseGraph(rootSymbol: NonTerminal) {
     if (preventEndless > 10000) {
       throw 'err'
     }
-    
+
     const checkNode = checkingNodes.pop()!;
     resultNodes.push(checkNode);
 
@@ -38,7 +38,7 @@ export function constructParseGraph(rootSymbol: NonTerminal) {
 
         const newNode = new ParseStateNode();
         newNode.selfConfigs = next.genClosureParseConfigurations();
-        checkingNodes.push(rootNode);
+        checkingNodes.push(newNode);
         registerMap(newNode);
 
         checkNode.transitions.set(c.expectNextSymbol!, newNode)
@@ -71,5 +71,9 @@ export class ParseStateNode {
 
   get reduceSymbol() {
     return this.reduceConfig.fromSymbol
+  }
+
+  log() {
+    this.selfConfigs.forEach(c => console.log(c.toString()));
   }
 }

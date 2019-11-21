@@ -1,5 +1,5 @@
 import { Nullable } from "@artgl/shared"
-import { NonTerminal, Terminal, ParseSymbol } from "./parse-symbol";
+import { NonTerminal, Terminal, ParseSymbol, EOF } from "./parse-symbol";
 import { ParseStateNode, constructParseGraph } from "./state-node";
 
 export class LR1Parser {
@@ -43,24 +43,33 @@ export class LR1Parser {
     return result!;
   }
 
+  private symbolStackToString() {
+    return this.symbolStack.map(s => s.name).join(' ')
+  }
+
   private parseStep() {
+    console.log(this.symbolStackToString());
+    if (!(this.X instanceof NonTerminal)) {
+      this.X = this.input[this.read];
+    }
 
     const stateStackTop = this.stateStack[this.stateStack.length - 1];
-    if (stateStackTop.isReduceable) {
+    if (!stateStackTop.isReduceable) {
       const nextState = stateStackTop.next(this.X!);
       if (nextState === undefined) {
         throw 'parse failed'
       }
-      if (this.X instanceof NonTerminal) {
+      if (this.X instanceof Terminal) {
         this.stateStack.push(nextState);
         this.shift();
       } else {
         this.stateStack.push(nextState);
-        this.symbolStack.push(this.X!);
+        this.symbolStack.push(this.X);
+        this.X = null;
       }
     } else {
       if (stateStackTop.reduceSymbol === this.rootSymbol) {
-        if (this.X !== null) {
+        if (this.X !== EOF) {
           throw 'parse failed'
         } else {
           return this.symbolStack[0];
@@ -83,7 +92,7 @@ export class LR1Parser {
   private reduce(stateStackTop: ParseStateNode) {
     const popLength = stateStackTop.reduceConfig.originRule.equalsTo.length;
     this.stateStack.splice(this.stateStack.length - popLength, popLength);
-    this.symbolStack.splice(this.stateStack.length - popLength, popLength);
+    this.symbolStack.splice(this.symbolStack.length - popLength, popLength);
     this.X = stateStackTop.reduceSymbol;
   }
 
