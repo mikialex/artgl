@@ -9,7 +9,7 @@ As easy as three.js. You can regard this project as a better three.js, maybe wit
 
 ### Extendable architecture
 
-Instead of making a specific renderer for specific usage, or a general renderer that hard to extent features, artgl is a  framework for general usage. You can easily customize it, extent it to meet you requirements.
+Instead of making a specific renderer for specific usage, or a general renderer that hard to extent features, artgl is a framework for general usage. You can easily customize it, extent it to meet you requirements.
 
 ### Declarative render pipeline by renderGraph API
 
@@ -38,6 +38,10 @@ This repo also contains sub projects: example/ and viewer/
 [example readme(cn/zh)](./packages/example/README.md)
 
 [viewer readme](./packages/viewer/README.md)
+
+Artgl is composed by several modules, and still in progress of modularization. Some modules is supposed to be used in other project.
+
+[@artgl/webgl](./packages/webgl/README.md)
 
 ## Posts(cn/zh)
 

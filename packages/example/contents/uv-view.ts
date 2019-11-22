@@ -69,7 +69,7 @@ export default async function test(testBridge: TestBridge) {
 
   //==<
 
-  await testBridge.screenShotCompareElement(canvas, "test");
+  await testBridge.screenShotCompare("test");
 
   const orbitController = new OrbitController(camera as PerspectiveCamera);
   orbitController.registerInteractor(engine.interactor);

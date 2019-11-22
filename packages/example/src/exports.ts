@@ -4,21 +4,8 @@ import barycentric from '../contents/barycentric-wireframe'
 import texture from '../contents/texture'
 import skybox from '../contents/sky-box'
 import uvView from '../contents/uv-view'
-import { TestBridge } from './test-bridge';
 
-type ConstructorTypeOf<T> = new (...args: any[]) => T;
-
-// This should impl by node puppeteer, and exposed on headless window
-// declare function screenShotCompareElement(element: HTMLElement, goldenPath: string);
-declare global {
-  interface Window {
-    artglExamples: Example[],
-    artglTestBridge: ConstructorTypeOf<TestBridge>;
-    screenShotCompareElement(element: HTMLElement, goldenPath: string): Promise<void>;
-  }
-}
-
-interface Example{
+export interface Example{
   name: string,  // show in url
   title: string, // show in title
   description?: string, // des text
@@ -60,5 +47,4 @@ export const examples: Example[] = [
 ];
 
 
-window.artglExamples = examples;
 

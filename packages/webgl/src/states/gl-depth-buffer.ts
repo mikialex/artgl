@@ -8,7 +8,6 @@ export class GLDepthBuffer {
     this.resetDefault();
   }
 
-  // TODO reset or init set
   currentDepthMask = false;
   currentDepthFunc: number;
 
@@ -35,6 +34,7 @@ export class GLDepthBuffer {
   resetDefault() {
     this.enableTest = true;
     this.enableWrite = true;
+    this.currentDepthMask = false;
     this.setFunc(DepthFunction.LessEqualDepth)
   }
 

@@ -3,7 +3,6 @@ export * from "@artgl/webgl"
 export * from "@artgl/math";
 export * from "@artgl/shared";
 
-export * from '@artgl/render-graph';
 export * from '@artgl/shader-graph';
 
 export * from './src/core/interface'

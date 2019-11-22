@@ -1,235 +1,75 @@
-import { Nullable } from "../../type"
+import { Nullable } from "@artgl/shared"
+import { NonTerminal, Terminal, ParseSymbol, EOF } from "./parse-symbol";
+import { ParseStateNode, constructParseGraph } from "./state-node";
 
-enum Token {
-  AddOperator,
-  MinusOperator,
-  Left, Right,
-  Number,
-}
-
-const exp = make()
-const term = make()
-
-term
-  .list(Token.Number)
-  .list(Token.Left, exp, Token.Right)
-
-exp
-  .list(term)
-  .list(exp, Token.AddOperator, exp)
-
-const parser = makeParser([
-  exp, term
-])
-
-parser.parse([Token.Number])
-
-
-
-function list(input: any[]) {
-
-}
-
-function alt(input: any[]) {
-
-}
-
-function make(): any {
-
-}
-
-function makeParser(p: any): any {
-
-}
-
-type ParseSymbol = NonTerminal | Token;
-
-
-class NonTerminal {
-  constructor(name: string) {
-    this.name = name;
-  }
-  name: string
-  rules: ProductionRule[] = [];
-}
-
-
-// A –> XYZ
-class ProductionRule {
-  constructor(self: NonTerminal) {
-    this.selfSymbol = self;
-  }
-  selfSymbol: NonTerminal
-  equalsTo: ParseSymbol[] = [];
-
-  allParseConf: ParseConfiguration[] = [];
-
-  getFirstParseConf() {
-    return this.allParseConf[0];
-  }
-
-  getFirstSymbol() {
-    return this.equalsTo[0];
-  }
-}
-
-// A –> X•YZ
-class ParseConfiguration {
-  constructor(
-    private rule: Readonly<ProductionRule>,
-  ) { }
-
-  private _stage: number = 0;
-
-  get originRule() {
-    return this.rule;
-  }
-
-  get fromSymbol() {
-    return this.rule.selfSymbol;
-  }
-
-  get isStart() {
-    return this._stage === 0;
-  }
-
-  get isComplete() {
-    return this._stage === this.rule.equalsTo.length;
-  }
-
-  get successor() {
-    if (this.isComplete) {
-      return null;
-    } else {
-      return this.rule.allParseConf[this._stage + 1];
-    }
-  }
-
-  get expectNextSymbol() {
-    if (this.isComplete) {
-      return null;
-    } else {
-      return this.rule.equalsTo[this._stage];
-    }
-  }
-
-  genClosureParseConfigurationSet(): Set<ParseConfiguration> {
-    const nextSymbol = this.rule.equalsTo[this._stage];
-    if (nextSymbol === undefined) {
-      return new Set([this]);
-    }
-
-    const result: Set<ParseConfiguration> = new Set([this]);
-
-    function pushResult(symbol: ParseSymbol) {
-      if (!(symbol instanceof NonTerminal)) {
-        return;
-      }
-      symbol.rules.forEach(r => {
-        const startConf = r.getFirstParseConf();
-        result.add(startConf);
-        pushResult(r.getFirstSymbol());
-      })
-    }
-
-    pushResult(nextSymbol);
-    return result;
-  }
-}
-
-class ParseStateNode {
-  constructor(c: ParseConfiguration, isRoot: boolean) {
-
-    if (isRoot) {
-      this.selfConfigs.add(c);
-      c.fromSymbol.rules.forEach(r => {
-        r.getFirstParseConf().genClosureParseConfigurationSet().forEach(cf => {
-          this.selfConfigs.add(cf);
-        })
-      })
-    } else {
-      this.selfConfigs = c.genClosureParseConfigurationSet()
-    }
-
-    this.populateNextStates();
-
-  }
-
-  next(symbol: ParseSymbol) {
-    return this.transitions.get(symbol);
-  }
-
-  private populateNextStates() {
-    this.selfConfigs.forEach(c => {
-      this.populateNextState(c);
-    })
-  }
-
-  private populateNextState(c: ParseConfiguration) {
-    const next = c.successor;
-    if (next === null) { return }
-    this.transitions.set(c.expectNextSymbol!, new ParseStateNode(next, false))
-  }
-
-  private selfConfigs: Set<ParseConfiguration> = new Set();
-  private transitions: Map<ParseSymbol, ParseStateNode> = new Map();
-
-  get isReduceable() {
-    return this.transitions.size === 0 && this.selfConfigs.size === 1;
-  }
-
-  get reduceConfig(): ParseConfiguration {
-    return this.selfConfigs.values().next().value
-  }
-
-  get reduceSymbol() {
-    return this.reduceConfig.fromSymbol
-  }
-}
-
-
-export class LRParser {
+export class LR1Parser {
   constructor(rootSymbol: NonTerminal) {
     this.rootSymbol = rootSymbol;
-    this.parseStateGraph = new ParseStateNode(this.rootSymbol.rules[0].getFirstParseConf(), true);
+    this.parseStateGraph = constructParseGraph(this.rootSymbol);
   }
+  private parseStateGraph: ParseStateNode;
+  private rootSymbol: NonTerminal;
 
-  input: Token[] = [];
-  read: number = 0;
+  private input: Terminal[] = [];
+  private read: number = 0;
 
-  X: Nullable<ParseSymbol> = null;
-  symbolStack: ParseSymbol[] = [];
-  stateStack: ParseStateNode[] = [];
+  private X: Nullable<ParseSymbol> = null;
+  private symbolStack: ParseSymbol[] = [];
+  private stateStack: ParseStateNode[] = [];
+
+  parse(input: Terminal[]): ParseSymbol {
+    this.input = input;
+    this.read = 0;
+    this.X = null;
+    this.stateStack = [];
+    this.stateStack = [];
+    return this.parseAll();
+  }
 
   private parseAll() {
     this.stateStack.push(this.parseStateGraph); // put initial state
-    let result;
+    let result: ParseSymbol | undefined;
 
-    while (result) {
-      result = this.parse();
+    let preventEndless = 0;
+    while (result === undefined) {
+      preventEndless++;
+      if (preventEndless > 10000) {
+        throw 'endless'
+      }
+
+      result = this.parseStep();
     }
 
-    return result;
+    return result!;
   }
 
-  private parse() {
+  private symbolStackToString() {
+    return this.symbolStack.map(s => s.name).join(' ')
+  }
+
+  private parseStep() {
+    console.log(this.symbolStackToString());
+    if (!(this.X instanceof NonTerminal)) {
+      this.X = this.input[this.read];
+    }
 
     const stateStackTop = this.stateStack[this.stateStack.length - 1];
-    if (stateStackTop.isReduceable) {
+    if (!stateStackTop.isReduceable) {
       const nextState = stateStackTop.next(this.X!);
       if (nextState === undefined) {
         throw 'parse failed'
       }
-      if (this.X instanceof NonTerminal) {
+      if (this.X instanceof Terminal) {
         this.stateStack.push(nextState);
         this.shift();
       } else {
         this.stateStack.push(nextState);
-        this.symbolStack.push(this.X!);
+        this.symbolStack.push(this.X);
+        this.X = null;
       }
     } else {
       if (stateStackTop.reduceSymbol === this.rootSymbol) {
-        if (this.X !== null) {
+        if (this.X !== EOF) {
           throw 'parse failed'
         } else {
           return this.symbolStack[0];
@@ -252,14 +92,8 @@ export class LRParser {
   private reduce(stateStackTop: ParseStateNode) {
     const popLength = stateStackTop.reduceConfig.originRule.equalsTo.length;
     this.stateStack.splice(this.stateStack.length - popLength, popLength);
-    this.symbolStack.splice(this.stateStack.length - popLength, popLength);
+    this.symbolStack.splice(this.symbolStack.length - popLength, popLength);
     this.X = stateStackTop.reduceSymbol;
   }
 
-
-  parseStateGraph: ParseStateNode;
-
-  parseSymbols: Set<ParseSymbol> = new Set();
-  allNonTerminal: Set<NonTerminal> = new Set();
-  rootSymbol: NonTerminal;
 }

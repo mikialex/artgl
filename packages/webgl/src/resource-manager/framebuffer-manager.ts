@@ -1,7 +1,8 @@
 import { GLFramebuffer } from "../gl-framebuffer";
 import { GLRenderer } from "../gl-renderer";
+import { GLReleasable } from "../interface";
 
-export class GLFrameBufferManager {
+export class GLFrameBufferManager implements GLReleasable {
   constructor(renderer: GLRenderer) {
     this.renderer = renderer;
     this.gl = renderer.gl;
@@ -44,7 +45,10 @@ export class GLFrameBufferManager {
     return this.renderer.textureManger.getGLTexture(framebuffer.textureAttachedSlot[0]);
   }
 
-  dispose() {
+  releaseGL() {
+    this.framebuffers.forEach(f => {
+      f.dispose()
+    })
     this.framebuffers.clear();
   }
 }

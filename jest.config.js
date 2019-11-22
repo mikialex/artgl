@@ -6,6 +6,7 @@ module.exports = {
   roots: [
     "<rootDir>/packages/artgl/src/",
     "<rootDir>/packages/math/src/",
+    "<rootDir>/packages/parser/src/",
     "<rootDir>/packages/shared/src/",
     "<rootDir>/packages/shader-graph/src/",
   ],
@@ -15,6 +16,7 @@ module.exports = {
     //  "text", 
   ],
   collectCoverageFrom: [
+    "<rootDir>/packages/parser/src/**/*.ts",
     "<rootDir>/packages/artgl/src/**/*.ts",
     "<rootDir>/packages/math/src/**/*.ts",
     "<rootDir>/packages/shared/src/**/*.ts",

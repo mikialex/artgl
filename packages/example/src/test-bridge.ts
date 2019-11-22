@@ -1,14 +1,23 @@
 import { Framer, Observable, Nullable, Size } from "artgl";
 import { RenderConfig } from '../../viewer/src/components/conf/interface';
 
+// This should impl by node puppeteer, and exposed on headless window;
+declare global {
+  interface Window {
+    startRegression(): Promise<void>
+    screenShotCompare(goldenPath: string, refreshGolden: boolean): Promise<void>;
+  }
+}
+
 export class TestBridge implements TestBridge {
-  async screenShotCompareElement(element: HTMLElement, goldenPath: string) {
-    if (window.screenShotCompareElement) {
-      await window.screenShotCompareElement(element, goldenPath);
+  async screenShotCompare(goldenPath: string) {
+    if (window.screenShotCompare) {
+      await window.screenShotCompare(goldenPath, this.refreshGolden);
     }
   }
 
   private canvas: Nullable<HTMLCanvasElement> = null;
+  refreshGolden = false;
   requestCanvas() {
     if (this.canvas === null) {
       throw `test is not prepared`
@@ -38,6 +47,19 @@ export class TestBridge implements TestBridge {
     this.canvas = canvas;
   }
 
+  makeTestCtx() {
+    const preTestCanvas = document.querySelector('#testCanvas')
+    if (preTestCanvas !== null) {
+      document.removeChild(preTestCanvas);
+    }
+    const canvas = new HTMLCanvasElement();
+    canvas.style.width = '100vw'
+    canvas.style.height = '100vh'
+    canvas.id = 'testCanvas'
+    document.appendChild(canvas);
+    this.reset(canvas);
+  }
+
   private onResize = () => {
     if (this.canvas === null) {
       return
@@ -53,4 +75,3 @@ export class TestBridge implements TestBridge {
   }
 }
 
-window.artglTestBridge = TestBridge

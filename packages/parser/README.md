@@ -1,6 +1,10 @@
-# GLSL Tokenizer and Parser
+# GLSL Parser
 
 This part totally unfinished!
+
+mostly reference this: https://pandolia.net/tinyc/ch12_buttom_up_parse_b.html
+
+maybe some useful link for learning
 
 https://pandolia.net/tinyc/ch11_buttom_up_parse_a.html
 

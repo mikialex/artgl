@@ -1,5 +1,6 @@
 import { StandardGeometry } from "../standard-geometry";
 import { Vector2, Vector3 } from "@artgl/math";
+import { ShapeWillChange } from "@artgl/core";
 
 export class CylinderGeometry extends StandardGeometry {
   constructor() {
@@ -7,14 +8,28 @@ export class CylinderGeometry extends StandardGeometry {
     this.shape();
   }
 
-  // todo add deco
+  @ShapeWillChange
   radiusTop = 1
+
+  @ShapeWillChange
   radiusBottom = 1
+
+  @ShapeWillChange
   height = 1
+
+  @ShapeWillChange
   radialSegments = 10;
+
+  @ShapeWillChange
   heightSegments = 1
+
+  @ShapeWillChange
   openEnded = false;
+
+  @ShapeWillChange
   thetaStart = 0;
+
+  @ShapeWillChange
   thetaLength = Math.PI * 2
 
   shape() {
