@@ -2,8 +2,8 @@ use crate::array_scene::*;
 use na::{Matrix4, Vector3};
 
 pub fn update_worldmatrix_by_parent(
-  index: i16,
-  nodes_indexs: &Vec<i16>,
+  index: i32,
+  nodes_indexs: &Vec<i32>,
   local_transform: &Vec<f32>,
   world_transform: &mut Vec<f32>,
 ) {
@@ -27,36 +27,46 @@ pub fn update_worldmatrix_by_parent(
 }
 
 pub fn update_localmatrix(
-  index: i16,
+  index: i32,
   local_position: &Vec<f32>,
   local_rotation: &Vec<f32>,
   local_scale: &Vec<f32>,
   local_transform: &mut Vec<f32>,
- ){
+ ){ 
    let rotationIndex: usize = (index as usize) * ROTATION_ARRAY_STRIDE;
    let scaleIndex: usize = (index as usize) * SCALE_ARRAY_STRIDE;
    let positionIndex: usize = (index as usize) * POSITION_ARRAY_STRIDE;
-   let mut mat = Matrix4::from_euler_angles(
-     local_rotation[rotationIndex],
-     local_rotation[rotationIndex + 1],
-     local_rotation[rotationIndex + 2],
-   );
-   mat.append_nonuniform_scaling_mut(
-      &Vector3::new(
-        local_scale[scaleIndex],
-        local_scale[scaleIndex + 1],
-        local_scale[scaleIndex + 2],
-      )
-   );
-   mat.append_translation_mut(
-      &Vector3::new(
-        local_position[positionIndex],
-        local_position[positionIndex + 1],
-        local_position[positionIndex + 2],
-      )
-   );
-   let p: usize = (index as usize) * TRANSFORM_ARRAY_STRIDE;
-   write_matrix(&mat, local_transform, p);
+
+   let scaleX = local_scale[scaleIndex];
+   let scaleY = local_scale[scaleIndex + 1];
+   let scaleZ = local_scale[scaleIndex + 2];
+
+    // rotation
+    let (sr, cr) = local_rotation[rotationIndex].sin_cos();
+    let (sp, cp) = local_rotation[rotationIndex + 1].sin_cos();
+    let (sy, cy) = local_rotation[rotationIndex + 2].sin_cos();
+
+    let p: usize = (index as usize) * TRANSFORM_ARRAY_STRIDE;
+
+    local_transform[p] = cy * cp * scaleX;
+    local_transform[p + 1] = (cy * sp * sr - sy * cr) * scaleX;
+    local_transform[p + 2] = (cy * sp * cr + sy * sr) * scaleX;
+    local_transform[p + 3] = 0.0;
+
+    local_transform[p + 4] = sy * cp * scaleY;
+    local_transform[p + 5] = (sy * sp * sr + cy * cr) * scaleY;
+    local_transform[p + 6] = (sy * sp * cr - cy * sr) * scaleY;
+    local_transform[p + 7] = 0.0;
+
+    local_transform[p + 8] = -sp * scaleZ;
+    local_transform[p + 9] = cp * sr * scaleZ;
+    local_transform[p + 10] = cp * cr * scaleZ;
+    local_transform[p + 11] = 0.0;
+
+    local_transform[p + 12] = local_position[positionIndex];
+    local_transform[p + 13] = local_position[positionIndex + 1];
+    local_transform[p + 14] = local_position[positionIndex + 2];
+    local_transform[p + 15] = 1.0;
 }
 
 fn read_matrix(array: &Vec<f32>, index: usize) -> Matrix4<f32> {
