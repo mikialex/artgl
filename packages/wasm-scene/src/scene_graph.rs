@@ -184,15 +184,26 @@ impl SceneGraph {
     // self.nodes[index].quaternion.set(x, y, z);
   }
 
-  // pub fn getNode(&self, index: i32) -> SceneNode{
-  //   self.nodes[index as usize]
-  // }
-
-  // #[wasm_bindgen]
-  // pub fn createNode(&mut self) -> i32 {
-  //   let node = SceneNode{
-
-  //   }
-  //   let index:
-  // }
+  #[wasm_bindgen]
+  pub fn batch_drawcalls(&mut self) {
+    let root = self.get_scene_node_mut(0);
+    // self.traverse(root, &update_hirerachy_visitor);
+  }
 }
+
+
+// fn update_hirerachy_visitor(index: i32, scene: &mut SceneGraph) {
+//   // update_localmatrix(
+//   //   index,
+//   //   &scene.local_position_array,
+//   //   &scene.local_rotation_array,
+//   //   &scene.local_scale_array,
+//   //   &mut scene.local_transform_array,
+//   // );
+//   update_worldmatrix_by_parent(
+//     index,
+//     &scene.nodes_indexs,
+//     &scene.local_transform_array,
+//     &mut scene.world_transform_array,
+//   );
+// }
