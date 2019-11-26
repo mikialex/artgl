@@ -1,7 +1,6 @@
+use crate::math::*;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
-use crate::math::*;
-
 
 #[derive(Debug, Clone, Copy)]
 pub struct Quaternion {
@@ -9,11 +8,6 @@ pub struct Quaternion {
   pub y: f32,
   pub z: f32,
   pub w: f32,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct Matrix4 {
-  pub x: f32,
 }
 
 pub struct SceneNode {
@@ -27,8 +21,8 @@ pub struct SceneNode {
   pub matrix_local: Matrix4,
   pub matrix_world: Matrix4,
 
-  pub isRenderable: bool,
-  pub geometryId: Option<usize>,
+  pub is_renderable: bool,
+  pub geometry_id: Option<usize>,
 
   parent: Option<usize>,
   left_brother: Option<usize>,
@@ -37,27 +31,30 @@ pub struct SceneNode {
 }
 
 impl SceneNode {
-  #[inline]
+  pub fn new(index: usize) -> SceneNode {
+    unimplemented!();
+  }
+
+  pub fn get_index(&self) -> usize {
+    self.index
+  }
+
   pub fn parent(&self) -> Option<&SceneNode> {
     self.parent.map(|p| self.scene.get_scene_node(p))
   }
 
-  #[inline]
   pub fn first_child(&self) -> Option<&SceneNode> {
     self.first_child.map(|p| self.scene.get_scene_node(p))
   }
 
-  #[inline]
   pub fn left_brother(&self) -> Option<&SceneNode> {
     self.left_brother.map(|p| self.scene.get_scene_node(p))
   }
 
-  #[inline]
   pub fn right_brother(&self) -> Option<&SceneNode> {
     self.right_brother.map(|p| self.scene.get_scene_node(p))
   }
 
-  #[inline]
   pub fn foreach_child<F>(&self, f: F)
   where
     F: Fn(&SceneNode),
@@ -78,7 +75,7 @@ impl SceneNode {
       visitor(node_to_visit);
 
       // add childs to stack
-      // try fix this compile
+      // try fix this compile TODO
       // node_to_visit.foreach_child(|n|{travers_stack.push(n)});
 
       if let Some(first_child) = node_to_visit.first_child() {
@@ -94,12 +91,23 @@ impl SceneNode {
 #[wasm_bindgen]
 #[derive(Default)]
 pub struct SceneGraph {
-  nodes: Vec<SceneNode>,
+  nodes: Vec<Option<SceneNode>>,
+  tomb_list: Vec<usize>,
 }
 
 impl SceneGraph {
   pub fn get_scene_node(&self, index: usize) -> &SceneNode {
-    &self.nodes[index]
+    if let Some(node) = &self.nodes[index] {
+      return node;
+    }
+    panic!("try get a deleted node")
+  }
+
+  pub fn get_scene_node_mut(&mut self, index: usize) -> &mut SceneNode {
+    if let Some(node) = &mut self.nodes[index] {
+      return node;
+    }
+    panic!("try get a deleted node")
   }
 }
 
@@ -107,13 +115,43 @@ impl SceneGraph {
 impl SceneGraph {
   #[wasm_bindgen]
   pub fn new() -> SceneGraph {
-    SceneGraph { nodes: Vec::new() }
+    SceneGraph {
+      nodes: Vec::new(),
+      tomb_list: Vec::new(),
+    }
   }
 
-  // #[wasm_bindgen]
-  // pub fn setNodePosition(&mut self, index: usize, x: f32, y: f32, z: f32) {
-  //   self.nodes[index].position.set(x, y, z);
-  // }
+  #[wasm_bindgen]
+  pub fn create_new_node(&mut self) -> usize {
+    let free_index;
+    if let Some(i) = self.tomb_list.pop() {
+      free_index = i;
+    } else {
+      free_index = self.nodes.len();
+    }
+
+    let new_node = SceneNode::new(free_index);
+    self.nodes[free_index] = Some(new_node);
+    free_index
+  }
+
+  #[wasm_bindgen]
+  pub fn free_node(&mut self, index: usize) {}
+
+  #[wasm_bindgen]
+  pub fn set_node_position(&mut self, index: usize, x: f32, y: f32, z: f32) {
+    self.get_scene_node_mut(index).position.set(x, y, z);
+  }
+
+  #[wasm_bindgen]
+  pub fn set_node_scale(&mut self, index: usize, x: f32, y: f32, z: f32) {
+    self.get_scene_node_mut(index).scale.set(x, y, z);
+  }
+
+  #[wasm_bindgen]
+  pub fn set_node_quaternion(&mut self, index: usize, x: f32, y: f32, z: f32, w: f32) {
+    // self.nodes[index].quaternion.set(x, y, z);
+  }
 
   // pub fn getNode(&self, index: i32) -> SceneNode{
   //   self.nodes[index as usize]
