@@ -20,66 +20,6 @@ pub struct ArraySceneAllocationProtocal {
 }
 
 #[wasm_bindgen]
-#[derive(Debug, Clone, Copy)]
-pub struct Vec3{
-  pub x: f32,
-  pub y: f32,
-  pub z: f32
-}
-
-#[wasm_bindgen]
-#[derive(Debug, Clone, Copy)]
-pub struct Quaternion{
-  pub x: f32,
-  pub y: f32,
-  pub z: f32,
-  pub w: f32,
-}
-
-#[wasm_bindgen]
-pub struct SceneNode {
-  pub position: Vec3,
-  pub scale: Vec3,
-
-  parent: Option<i32>,
-  left_brother: Option<i32>,
-  right_brother: Option<i32>,
-  first_child: Option<i32>,
-
-}
-
-#[wasm_bindgen]
-pub struct SceneGraph {
-  nodes: Vec<SceneNode>
-
-}
-
-#[wasm_bindgen]
-impl SceneGraph {
-
-  #[wasm_bindgen]
-  pub fn new() -> SceneGraph{
-    SceneGraph{
-      nodes: Vec::new()
-    }
-  }
-  
-  #[wasm_bindgen]
-  pub fn getNode(&self, index: i32) -> SceneNode{
-    self.nodes[index as usize]
-  }
-
-  // #[wasm_bindgen]
-  // pub fn createNode(&mut self) -> i32 {
-  //   let node = SceneNode{
-
-  //   }
-  //   let index: 
-  // }
-}
-
-
-#[wasm_bindgen]
 pub struct ArrayScene {
   local_transform_array: Vec<f32>,
   local_position_array: Vec<f32>,

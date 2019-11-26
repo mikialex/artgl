@@ -1,4 +1,5 @@
 mod array_scene;
+mod scene_graph;
 mod scene;
 mod math;
 mod utils;
