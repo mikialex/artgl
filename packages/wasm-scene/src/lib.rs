@@ -1,7 +1,8 @@
 mod array_scene;
-mod scene_graph;
-mod scene;
 mod math;
+mod math_util;
+mod scene;
+mod scene_graph;
 mod utils;
 
 use wasm_bindgen::prelude::*;

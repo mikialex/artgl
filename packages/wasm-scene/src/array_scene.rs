@@ -1,7 +1,6 @@
-use std::rc::Rc;
-use crate::math::*;
+use crate::math_util::*;
+use crate::utils::set_panic_hook;
 use wasm_bindgen::prelude::*;
-use crate::utils::{set_panic_hook};
 
 #[wasm_bindgen]
 pub struct ArraySceneAllocationProtocal {
@@ -127,7 +126,8 @@ impl ArrayScene {
 
       // add childs to stack
       let first_child = self.nodes_indexs[(node_to_visit as usize) * NODE_INDEX_STRIDE + 3];
-      if first_child != -1 { // has children
+      if first_child != -1 {
+        // has children
         travers_stack.push(first_child);
         let mut current_child = first_child;
         loop {
