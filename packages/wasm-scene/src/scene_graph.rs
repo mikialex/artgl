@@ -19,7 +19,6 @@ impl Quaternion {
 pub struct RenderDescriptor {}
 
 pub struct SceneNode {
-  scene: Rc<SceneGraph>,
   index: usize,
 
   pub position: Vec3,
@@ -38,9 +37,8 @@ pub struct SceneNode {
 }
 
 impl SceneNode {
-  pub fn new(scene: Rc<SceneGraph>, index: usize) -> SceneNode {
+  pub fn new(index: usize) -> SceneNode {
     SceneNode {
-      scene: scene.clone(),
       index,
       position: Vec3::zero(),
       scale: Vec3::new(1., 1., 1.),
@@ -54,58 +52,11 @@ impl SceneNode {
       first_child: None,
     }
   }
-
+  
   pub fn get_index(&self) -> usize {
     self.index
   }
 
-  pub fn parent(&self) -> Option<&SceneNode> {
-    self.parent.map(|p| self.scene.get_scene_node(p))
-  }
-
-  pub fn first_child(&self) -> Option<&SceneNode> {
-    self.first_child.map(|p| self.scene.get_scene_node(p))
-  }
-
-  pub fn left_brother(&self) -> Option<&SceneNode> {
-    self.left_brother.map(|p| self.scene.get_scene_node(p))
-  }
-
-  pub fn right_brother(&self) -> Option<&SceneNode> {
-    self.right_brother.map(|p| self.scene.get_scene_node(p))
-  }
-
-  pub fn foreach_child<F>(&self, f: F)
-  where
-    F: Fn(&SceneNode),
-  {
-    if let Some(first_child) = self.first_child() {
-      f(first_child);
-      while let Some(next_child) = first_child.right_brother() {
-        f(next_child);
-      }
-    }
-  }
-
-  pub fn traverse(&self, visitor: &dyn Fn(&SceneNode) -> ()) {
-    let mut travers_stack: Vec<&SceneNode> = Vec::new();
-    travers_stack.push(self);
-
-    while let Some(node_to_visit) = travers_stack.pop() {
-      visitor(node_to_visit);
-
-      // add childs to stack
-      // try fix this compile TODO
-      // node_to_visit.foreach_child(|n|{travers_stack.push(n)});
-
-      if let Some(first_child) = node_to_visit.first_child() {
-        travers_stack.push(first_child);
-        while let Some(next_child) = first_child.right_brother() {
-          travers_stack.push(next_child);
-        }
-      }
-    }
-  }
 }
 
 #[wasm_bindgen]
@@ -129,6 +80,59 @@ impl SceneGraph {
     }
     panic!("try get a deleted node")
   }
+
+  pub fn parent(&self, node: &SceneNode) -> Option<&SceneNode> {
+    node.parent.map(|p| self.get_scene_node(p))
+  }
+
+  pub fn first_child(&self, node: &SceneNode) -> Option<&SceneNode> {
+    node.first_child.map(|p| self.get_scene_node(p))
+  }
+
+  pub fn left_brother(&self, node: &SceneNode) -> Option<&SceneNode> {
+    node.left_brother.map(|p| self.get_scene_node(p))
+  }
+
+  pub fn right_brother(&self, node: &SceneNode) -> Option<&SceneNode> {
+    node.right_brother.map(|p| self.get_scene_node(p))
+  }
+
+  pub fn foreach_child<F>(&self, node: &SceneNode, f: F)
+  where
+    F: Fn(&SceneNode),
+  {
+    if let Some(first_child) = self.first_child(node) {
+      f(first_child);
+      let mut child_next = first_child;
+      while let Some(next_child) = self.right_brother(child_next) {
+        f(next_child);
+        child_next = next_child
+      }
+    }
+  }
+
+  pub fn traverse(&self, node: &SceneNode, visitor: &dyn Fn(&SceneNode) -> ()) {
+    let mut travers_stack: Vec<&SceneNode> = Vec::new();
+    travers_stack.push(node);
+
+    while let Some(node_to_visit) = travers_stack.pop() {
+      visitor(node_to_visit);
+
+      // add childs to stack
+      // try fix this compile TODO
+      // node_to_visit.foreach_child(|n|{travers_stack.push(n)});
+
+      if let Some(first_child) = self.first_child(node_to_visit) {
+        travers_stack.push(first_child);
+        let mut child_next = first_child;
+        while let Some(next_child) = self.right_brother(child_next) {
+          travers_stack.push(next_child);
+          child_next = next_child
+        }
+      }
+
+    }
+  }
 }
 
 #[wasm_bindgen]
@@ -150,13 +154,20 @@ impl SceneGraph {
       free_index = self.nodes.len();
     }
 
-    let new_node = SceneNode::new(&self, free_index);
+    let new_node = SceneNode::new(free_index);
     self.nodes[free_index] = Some(new_node);
     free_index
   }
 
   #[wasm_bindgen]
-  pub fn free_node(&mut self, index: usize) {}
+  pub fn free_node(&mut self, index: usize) {
+    if let Some(_) = &self.nodes[index] {
+      self.nodes[index] = None;
+      self.tomb_list.push(index);
+    }else{
+      panic!("node has been deleted before")
+    }
+  }
 
   #[wasm_bindgen]
   pub fn set_node_position(&mut self, index: usize, x: f32, y: f32, z: f32) {
