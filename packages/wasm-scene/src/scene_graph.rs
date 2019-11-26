@@ -10,6 +10,14 @@ pub struct Quaternion {
   pub w: f32,
 }
 
+impl Quaternion {
+  pub fn new() -> Quaternion {
+    unimplemented!()
+  }
+}
+
+pub struct RenderDescriptor {}
+
 pub struct SceneNode {
   scene: Rc<SceneGraph>,
   index: usize,
@@ -21,8 +29,7 @@ pub struct SceneNode {
   pub matrix_local: Matrix4,
   pub matrix_world: Matrix4,
 
-  pub is_renderable: bool,
-  pub geometry_id: Option<usize>,
+  pub render_data: Option<RenderDescriptor>,
 
   parent: Option<usize>,
   left_brother: Option<usize>,
@@ -31,8 +38,21 @@ pub struct SceneNode {
 }
 
 impl SceneNode {
-  pub fn new(index: usize) -> SceneNode {
-    unimplemented!();
+  pub fn new(scene: Rc<SceneGraph>, index: usize) -> SceneNode {
+    SceneNode {
+      scene: scene.clone(),
+      index,
+      position: Vec3::zero(),
+      scale: Vec3::new(1., 1., 1.),
+      rotation: Quaternion::new(),
+      matrix_local: Matrix4::new(),
+      matrix_world: Matrix4::new(),
+      render_data: None,
+      parent: None,
+      left_brother: None,
+      right_brother: None,
+      first_child: None,
+    }
   }
 
   pub fn get_index(&self) -> usize {
@@ -130,7 +150,7 @@ impl SceneGraph {
       free_index = self.nodes.len();
     }
 
-    let new_node = SceneNode::new(free_index);
+    let new_node = SceneNode::new(&self, free_index);
     self.nodes[free_index] = Some(new_node);
     free_index
   }
