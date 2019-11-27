@@ -1,14 +1,54 @@
+use std::rc::Rc;
 use crate::{log_usize, log};
-use core::cell::RefMut;
-use core::cell::Ref;
 use core::cell::RefCell;
 use crate::math::*;
 use wasm_bindgen::prelude::*;
 
+pub struct Box3{
+  min: Vec3<f32>, 
+  max: Vec3<f32>,
+}
+
+impl Box3{
+  pub fn new()-> Self{
+    unimplemented!()
+  }
+}
+
+pub struct Sphere{
+  center: Vec3<f32>,
+  radius: f32,
+}
+
+impl Sphere{
+  pub fn new()-> Self{
+    unimplemented!()
+  }
+}
+
+pub struct Geoemtry {
+  bounding_box: Box3,
+  bounding_sphere: Sphere,
+  id: Option<String>,
+}
+
+pub struct Program {
+  id: Option<String>,
+  
+}
+
 pub struct RenderDescriptor {
-  // boundingBox
-// boundingSphere
-// shaderId: usize
+  program: Rc<Program>,
+  geometry: Rc<Geoemtry>,
+}
+
+impl RenderDescriptor{
+  pub fn new()-> Self{
+    boundingBox: Box3::new(),
+    boundingSphere: Sphere::new(),
+    shaderId: None, 
+    geometryId: None,
+  }
 }
 
 pub struct SceneNode {
@@ -66,7 +106,9 @@ impl SceneGraph {
     panic!("try get a deleted node")
   }
 
-  pub fn traverse(&self, node: &RefCell<SceneNode>, visitor: &dyn Fn(&RefCell<SceneNode>, &SceneGraph) -> ()) {
+  pub fn traverse<T>
+  (&self, node: &RefCell<SceneNode>, visitor: T)
+  where T: Fn(&RefCell<SceneNode>, &SceneGraph) -> () {
     let mut travers_stack: Vec<&RefCell<SceneNode>> = Vec::new();
     travers_stack.push(node);
 
@@ -74,9 +116,6 @@ impl SceneGraph {
       visitor(node_to_visit, self);
 
       // add childs to stack
-      // try fix this compile TODO
-      // node_to_visit.foreach_child(|n|{travers_stack.push(n)});
-
       if let Some(first_child_index) = node_to_visit.borrow().first_child {
         let first_child = self.get_scene_node(first_child_index);
         travers_stack.push(first_child);
@@ -213,15 +252,23 @@ impl SceneGraph {
   #[wasm_bindgen]
   pub fn batch_drawcalls(&self) {
     let root = self.get_scene_node(0);
-    self.traverse(root, &update_hirerachy_visitor);
+
+    self.traverse(root, 
+      |node: &RefCell<SceneNode>, scene: &SceneGraph|{
+
+      let mut self_node = node.borrow_mut();
+      if let Some(parent_index) = self_node.parent {
+        let parent_node = scene.get_scene_node(parent_index).borrow_mut();
+        self_node.matrix_world = self_node.matrix_world * parent_node.matrix_world;
+      }
+
+    })
+
   }
 }
 
-fn update_hirerachy_visitor(node: &RefCell<SceneNode>, scene: &SceneGraph) {
-  // let parent = scene.parent(node);
-  let mut self_node = node.borrow_mut();
-  if let Some(parent_index) = self_node.parent {
-    let parent_node = scene.get_scene_node(parent_index).borrow_mut();
-    self_node.matrix_world = self_node.matrix_world * parent_node.matrix_world;
-  }
-}
+// #[wasm_bindgen(inline_js = "export function doNothing(a, b) { return a + b }")]
+// extern "C" {
+//     fn doNothing(a: usize, b: usize);
+
+// }
