@@ -1,32 +1,21 @@
 use crate::math::*;
-use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 
-#[derive(Debug, Clone, Copy)]
-pub struct Quaternion {
-  pub x: f32,
-  pub y: f32,
-  pub z: f32,
-  pub w: f32,
+pub struct RenderDescriptor {
+  // boundingBox
+// boundingSphere
+// shaderId: usize
 }
-
-impl Quaternion {
-  pub fn new() -> Quaternion {
-    unimplemented!()
-  }
-}
-
-pub struct RenderDescriptor {}
 
 pub struct SceneNode {
   index: usize,
 
-  pub position: Vec3,
-  pub scale: Vec3,
-  pub rotation: Quaternion,
+  pub position: Vec3<f32>,
+  pub scale: Vec3<f32>,
+  pub rotation: Quat<f32>,
 
-  pub matrix_local: Matrix4,
-  pub matrix_world: Matrix4,
+  pub matrix_local: Mat4<f32>,
+  pub matrix_world: Mat4<f32>,
 
   pub render_data: Option<RenderDescriptor>,
 
@@ -41,10 +30,10 @@ impl SceneNode {
     SceneNode {
       index,
       position: Vec3::zero(),
-      scale: Vec3::new(1., 1., 1.),
-      rotation: Quaternion::new(),
-      matrix_local: Matrix4::new(),
-      matrix_world: Matrix4::new(),
+      scale: Vec3::one(),
+      rotation: Quat::one(),
+      matrix_local: Mat4::one(),
+      matrix_world: Mat4::one(),
       render_data: None,
       parent: None,
       left_brother: None,
@@ -52,11 +41,10 @@ impl SceneNode {
       first_child: None,
     }
   }
-  
+
   pub fn get_index(&self) -> usize {
     self.index
   }
-
 }
 
 #[wasm_bindgen]
@@ -111,12 +99,12 @@ impl SceneGraph {
     }
   }
 
-  pub fn traverse(&self, node: &SceneNode, visitor: &dyn Fn(&SceneNode) -> ()) {
+  pub fn traverse(&self, node: &SceneNode, visitor: &dyn Fn(&SceneNode, &SceneGraph) -> ()) {
     let mut travers_stack: Vec<&SceneNode> = Vec::new();
     travers_stack.push(node);
 
     while let Some(node_to_visit) = travers_stack.pop() {
-      visitor(node_to_visit);
+      visitor(node_to_visit, self);
 
       // add childs to stack
       // try fix this compile TODO
@@ -130,7 +118,6 @@ impl SceneGraph {
           child_next = next_child
         }
       }
-
     }
   }
 }
@@ -164,7 +151,7 @@ impl SceneGraph {
     if let Some(_) = &self.nodes[index] {
       self.nodes[index] = None;
       self.tomb_list.push(index);
-    }else{
+    } else {
       panic!("node has been deleted before")
     }
   }
@@ -184,26 +171,15 @@ impl SceneGraph {
     // self.nodes[index].quaternion.set(x, y, z);
   }
 
+  pub fn set_node_parent(&mut self, index: usize, x: f32, y: f32, z: f32, w: f32) {}
+
   #[wasm_bindgen]
-  pub fn batch_drawcalls(&mut self) {
-    let root = self.get_scene_node_mut(0);
-    // self.traverse(root, &update_hirerachy_visitor);
+  pub fn batch_drawcalls(&self) {
+    let root = self.get_scene_node(0);
+    self.traverse(root, &update_hirerachy_visitor);
   }
 }
 
-
-// fn update_hirerachy_visitor(index: i32, scene: &mut SceneGraph) {
-//   // update_localmatrix(
-//   //   index,
-//   //   &scene.local_position_array,
-//   //   &scene.local_rotation_array,
-//   //   &scene.local_scale_array,
-//   //   &mut scene.local_transform_array,
-//   // );
-//   update_worldmatrix_by_parent(
-//     index,
-//     &scene.nodes_indexs,
-//     &scene.local_transform_array,
-//     &mut scene.world_transform_array,
-//   );
-// }
+fn update_hirerachy_visitor(node: &SceneNode, scene: &SceneGraph) {
+  let parent = scene.parent(node);
+}
