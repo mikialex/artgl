@@ -65,43 +65,6 @@ impl SceneGraph {
     panic!("try get a deleted node")
   }
 
-  // pub fn get_scene_node_mut(&mut self, index: usize) -> RefMut<SceneNode> {
-  //   if let Some(node) = &mut self.nodes[index] {
-  //     return node.borrow_mut();
-  //   }
-  //   panic!("try get a deleted node")
-  // }
-
-  // pub fn parent(&self, node: &SceneNode) -> Option<Ref<SceneNode>> {
-  //   node.parent.map(|p| self.get_scene_node(p))
-  // }
-
-  // pub fn first_child(&self, node: &SceneNode) -> Option<Ref<SceneNode>> {
-  //   node.first_child.map(|p| self.get_scene_node(p))
-  // }
-
-  // pub fn left_brother(&self, node: &SceneNode) -> Option<RefSceneNode> {
-  //   node.left_brother.map(|p| self.get_scene_node(p))
-  // }
-
-  // pub fn right_brother(&self, node: &SceneNode) -> Option<&SceneNode> {
-  //   node.right_brother.map(|p| self.get_scene_node(p))
-  // }
-
-  // pub fn foreach_child<F>(&self, node: &SceneNode, f: F)
-  // where
-  //   F: Fn(&SceneNode),
-  // {
-  //   if let Some(first_child) = self.first_child(node) {
-  //     f(first_child);
-  //     let mut child_next = first_child;
-  //     while let Some(next_child) = self.right_brother(child_next) {
-  //       f(next_child);
-  //       child_next = next_child
-  //     }
-  //   }
-  // }
-
   pub fn traverse(&self, node: &RefCell<SceneNode>, visitor: &dyn Fn(&RefCell<SceneNode>, &SceneGraph) -> ()) {
     let mut travers_stack: Vec<&RefCell<SceneNode>> = Vec::new();
     travers_stack.push(node);
@@ -191,6 +154,53 @@ impl SceneGraph {
       child.parent = Some(index);
     }
 
+  }
+
+  #[wasm_bindgen]
+  pub fn remove(self, index: usize) {
+    let mut self_node = self.get_scene_node(index).borrow_mut();
+    if let Some(parent_index) = self_node.parent {
+
+      self_node.parent = None;
+      let mut parent = self.get_scene_node(parent_index).borrow_mut();
+
+      // updating parent first index
+      if let Some(first_child_index) = parent.first_child {
+        if first_child_index == index {
+
+          if let Some(right_brother_index) = self_node.right_brother {
+            let right_brother = self.get_scene_node(right_brother_index).borrow_mut();
+            parent.first_child = Some(right_brother.get_index());
+          }else{
+            parent.first_child = None;
+          }
+
+        }
+      }
+
+      if let Some(right_brother_index) = self_node.right_brother {
+        let mut right_brother = self.get_scene_node(right_brother_index).borrow_mut();
+        if let Some(left_brother_index) = self_node.left_brother {
+          let left_brother = self.get_scene_node(left_brother_index).borrow_mut();
+          right_brother.left_brother = Some(left_brother.get_index());
+        }else{
+          right_brother.left_brother = None;
+        }
+      }
+
+      if let Some(left_brother_index) = self_node.left_brother {
+        let mut left_brother = self.get_scene_node(left_brother_index).borrow_mut();
+        if let Some(right_brother_index) = self_node.right_brother {
+          let right_brother = self.get_scene_node(right_brother_index).borrow_mut();
+          left_brother.right_brother = Some(right_brother.get_index());
+        }else{
+          left_brother.right_brother = None;
+        }
+      }
+
+    }else{
+      unreachable!()
+    }
   }
 
   #[wasm_bindgen]
