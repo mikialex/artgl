@@ -104,7 +104,6 @@ impl SceneGraph {
 
   #[wasm_bindgen]
   pub fn create_new_node(&mut self) -> usize {
-    // log("new");
     let free_index;
     if let Some(i) = self.tomb_list.pop() {
       free_index = i;
@@ -112,7 +111,6 @@ impl SceneGraph {
       free_index = self.nodes.len();
     }
 
-    // log_usize(free_index);
     let new_node = SceneNode::new(free_index);
     if free_index >= self.nodes.len() {
       self.nodes.push(Some(RefCell::new(new_node)));
@@ -149,8 +147,6 @@ impl SceneGraph {
 
   #[wasm_bindgen]
   pub fn add(&self, index: usize, add_index: usize) {
-    // log("add");
-    // log_usize(add_index);
     let mut parent = self.get_scene_node(index).borrow_mut();
     let mut child = self.get_scene_node(add_index).borrow_mut();
 
@@ -160,9 +156,9 @@ impl SceneGraph {
 
       old_first_child.left_brother = Some(add_index);
       child.right_brother = Some(first_child_index);
-      child.parent = Some(index);
     }
 
+    child.parent = Some(index);
     parent.first_child = Some(add_index);
 
   }
