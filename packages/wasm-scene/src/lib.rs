@@ -26,6 +26,9 @@ extern "C" {
 
   #[wasm_bindgen(js_namespace = console, js_name = log)]
   pub fn log_i16(s: i16);
+
+  #[wasm_bindgen(js_namespace = console, js_name = log)]
+  pub fn log_usize(s: usize);
 }
 
 #[wasm_bindgen]

@@ -3,8 +3,27 @@ import * as wasm from "../pkg/wasm_scene";
 import {memory} from '../pkg/wasm_scene_bg'
 import { CompactScene } from "../client/wasm-scene";
 import { CompactSceneNode } from "../client/wasm-scene-node";
+import { WasmSceneGraph, WasmSceneNode } from "../client-v2/wasm-scene-graph";
 
-function buildScene(scene: CompactScene, childrenCount: number, depth: number) {
+function buildWasmSceneGraph(scene: WasmSceneGraph, childrenCount: number, depth: number) {
+  let count = 0;
+  function addChildren(node: WasmSceneNode, d: number) {
+    if (d > 0) {
+      for (let i = 0; i < childrenCount; i++) {
+        const child = scene.createNewNode();
+        // child.positionX = Math.random();
+        // child.rotationX = Math.random();
+        // child.scaleZ = Math.random();
+        count++;
+        node.add(child);
+        addChildren(child, d - 1);
+      }
+    }
+  }
+  addChildren(scene.root, depth)
+}
+
+function buildWasmScene(scene: CompactScene, childrenCount: number, depth: number) {
   let count = 0;
   function addChildren(node: CompactSceneNode, d: number) {
     if (d > 0) {
@@ -47,19 +66,25 @@ function buildTHREEScene(scene: THREE.Scene, childrenCount: number, depth: numbe
 console.log(wasm)
 console.log(memory)
 
-const scene = new CompactScene();
-console.log(scene)
-
-buildScene(scene, 6, 6);
 
 function output(result: number[]) {
   let sum = 0;
   result.forEach(re => {
     sum += re;
   })
-  console.log(result)
+  // console.log(result)
   console.log("avg:" + sum / result.length);
 }
+
+
+
+/// benching wasm1
+console.log('===========')
+
+const scene = new CompactScene();
+console.log(scene)
+
+buildWasmScene(scene, 6, 6);
 
 console.log("wasm");
 let wasmresult = []
@@ -72,6 +97,32 @@ for (let i = 0; i < 50; i++) {
 wasmresult = wasmresult.slice(3);
 output(wasmresult)
 
+
+
+
+
+/// benching wasm2
+console.log('===========')
+const wasmSceneGraph = new WasmSceneGraph();
+buildWasmSceneGraph(wasmSceneGraph, 6, 6);
+console.log("wasm graph");
+let wasmresult2 = []
+for (let i = 0; i < 50; i++) {
+  let t = performance.now();
+  wasmSceneGraph.batchDrawcall();
+  t = performance.now() - t;
+  wasmresult2.push(t);
+}
+wasmresult2 = wasmresult2.slice(3);
+output(wasmresult2)
+
+
+
+
+
+
+/// benching three
+console.log('===========')
 const scenethree = new THREE.Scene();
 scenethree.matrixAutoUpdate = false;
 buildTHREEScene(scenethree, 6, 6);

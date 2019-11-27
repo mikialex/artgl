@@ -3,6 +3,7 @@ import { SceneGraph } from "../pkg/wasm_scene";
 export class WasmSceneGraph{
     constructor() {
         this.wasmScene = SceneGraph.new();
+        this.root = new WasmSceneNode(this, 0);
     }
     free() {
         this.wasmScene.free();
@@ -11,15 +12,23 @@ export class WasmSceneGraph{
     private wasmScene: SceneGraph;
     getWasm() { return this.wasmScene;}
 
-    createNewNode(): number {
-        return this.wasmScene.create_new_node();
+    createNewNode(): WasmSceneNode {
+        const index = this.wasmScene.create_new_node();
+        const node = new WasmSceneNode(this, index);
+        return node;
     }
+
+    batchDrawcall() {
+        this.wasmScene.batch_drawcalls();
+    }
+
+    readonly root: WasmSceneNode
 }
 
 export class WasmSceneNode{
-    constructor(scene: WasmSceneGraph) {
+    constructor(scene: WasmSceneGraph, index: number) {
         this.scene = scene;
-        this.index = this.scene.createNewNode()
+        this.index = index;
     }
     
     readonly index: number;
