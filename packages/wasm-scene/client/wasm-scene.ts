@@ -13,7 +13,7 @@ export const BSphereArrayStride = 4;
 export const nodeIndexStride = 4;
 
 export class CompactScene {
-  static defaultCompactSceneCapacity = 1000;
+  static defaultCompactSceneCapacity = 100000;
   constructor() {
     this.wasmScene = ArrayScene.new();
     this.checkIfNeedAndReAllocate(this.capacity);
@@ -47,7 +47,7 @@ export class CompactScene {
   emptyListArray: Uint16Array;
   emptyCount: number;
 
-  nodesIndexs: Int16Array;
+  nodesIndexs: Int32Array;
   nodes: CompactSceneNode[] = [];
 
   capacity: number = CompactScene.defaultCompactSceneCapacity;
@@ -107,7 +107,7 @@ export class CompactScene {
         newCapacity * BSphereArrayStride);
 
     this.nodesIndexs =
-      new Int16Array(wasmMemoryBuffer,
+      new Int32Array(wasmMemoryBuffer,
         alloctionInfo.nodes_indexs_start,
         newCapacity * nodeIndexStride);
 
@@ -119,6 +119,7 @@ export class CompactScene {
       this.nodeCount++;
       return ret;
     } else {
+      throw "ddd"
       if (this.emptyCount > 0) {
 
       } else {

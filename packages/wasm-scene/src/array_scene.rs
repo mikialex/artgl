@@ -1,6 +1,6 @@
-use crate::math::*;
+use crate::math_util::*;
+use crate::utils::set_panic_hook;
 use wasm_bindgen::prelude::*;
-use crate::utils::{set_panic_hook};
 
 #[wasm_bindgen]
 pub struct ArraySceneAllocationProtocal {
@@ -15,7 +15,7 @@ pub struct ArraySceneAllocationProtocal {
   pub local_bsphere_array_start: *const f32,
   pub world_bsphere_array_start: *const f32,
 
-  pub nodes_indexs_start: *const i16,
+  pub nodes_indexs_start: *const i32,
 }
 
 #[wasm_bindgen]
@@ -36,7 +36,7 @@ pub struct ArrayScene {
   empty_count: u16,
 
   // [parent, left brother, right brother, first child]
-  nodes_indexs: Vec<i16>,
+  nodes_indexs: Vec<i32>,
 }
 
 pub const DEFAULT_NODE_CAPACITY: usize = 100;
@@ -90,7 +90,7 @@ impl ArrayScene {
     self.empty_array = vec![0; capacity];
     self.empty_list_array = vec![0; capacity];
 
-    self.nodes_indexs = vec![0; capacity];
+    self.nodes_indexs = vec![0; capacity * NODE_INDEX_STRIDE];
 
     ArraySceneAllocationProtocal {
       local_transform_array_start: self.local_transform_array.as_ptr(),
@@ -108,20 +108,26 @@ impl ArrayScene {
     }
   }
 
+  // #[wasm_bindgen]
+  // pub fn update_projection(&mut self, matrix: [f32]) {
+
+  // }
+
   #[wasm_bindgen]
   pub fn batch_renderlist(&mut self) {
     self.update_hirerachy();
   }
 
-  fn traverse_from(&mut self, index: i16, visitor: &Fn(i16, &mut ArrayScene) -> ()) {
-    let mut travers_stack: Vec<i16> = Vec::with_capacity(100);
+  fn traverse_from(&mut self, index: i32, visitor: &Fn(i32, &mut ArrayScene) -> ()) {
+    let mut travers_stack: Vec<i32> = Vec::with_capacity(100);
     travers_stack.push(index);
     while let Some(node_to_visit) = travers_stack.pop() {
       visitor(node_to_visit, self);
 
       // add childs to stack
       let first_child = self.nodes_indexs[(node_to_visit as usize) * NODE_INDEX_STRIDE + 3];
-      if first_child != -1 { // has children
+      if first_child != -1 {
+        // has children
         travers_stack.push(first_child);
         let mut current_child = first_child;
         loop {
@@ -144,15 +150,14 @@ impl ArrayScene {
 
 use crate::log_i16;
 
-fn update_hirerachy_visitor(index: i16, scene: &mut ArrayScene) {
-  log_i16(index);
-  update_localmatrix(
-    index,
-    &scene.local_position_array,
-    &scene.local_rotation_array,
-    &scene.local_scale_array,
-    &mut scene.local_transform_array,
-  );
+fn update_hirerachy_visitor(index: i32, scene: &mut ArrayScene) {
+  // update_localmatrix(
+  //   index,
+  //   &scene.local_position_array,
+  //   &scene.local_rotation_array,
+  //   &scene.local_scale_array,
+  //   &mut scene.local_transform_array,
+  // );
   update_worldmatrix_by_parent(
     index,
     &scene.nodes_indexs,
