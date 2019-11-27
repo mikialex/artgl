@@ -1,3 +1,6 @@
+use core::cell::RefMut;
+use core::cell::Ref;
+use core::cell::RefCell;
 use crate::math::*;
 use wasm_bindgen::prelude::*;
 
@@ -50,57 +53,57 @@ impl SceneNode {
 #[wasm_bindgen]
 #[derive(Default)]
 pub struct SceneGraph {
-  nodes: Vec<Option<SceneNode>>,
+  nodes: Vec<Option<RefCell<SceneNode>>>,
   tomb_list: Vec<usize>,
 }
 
 impl SceneGraph {
-  pub fn get_scene_node(&self, index: usize) -> &SceneNode {
+  pub fn get_scene_node(&self, index: usize) -> &RefCell<SceneNode> {
     if let Some(node) = &self.nodes[index] {
-      return node;
+      return &node;
     }
     panic!("try get a deleted node")
   }
 
-  pub fn get_scene_node_mut(&mut self, index: usize) -> &mut SceneNode {
-    if let Some(node) = &mut self.nodes[index] {
-      return node;
-    }
-    panic!("try get a deleted node")
-  }
+  // pub fn get_scene_node_mut(&mut self, index: usize) -> RefMut<SceneNode> {
+  //   if let Some(node) = &mut self.nodes[index] {
+  //     return node.borrow_mut();
+  //   }
+  //   panic!("try get a deleted node")
+  // }
 
-  pub fn parent(&self, node: &SceneNode) -> Option<&SceneNode> {
-    node.parent.map(|p| self.get_scene_node(p))
-  }
+  // pub fn parent(&self, node: &SceneNode) -> Option<Ref<SceneNode>> {
+  //   node.parent.map(|p| self.get_scene_node(p))
+  // }
 
-  pub fn first_child(&self, node: &SceneNode) -> Option<&SceneNode> {
-    node.first_child.map(|p| self.get_scene_node(p))
-  }
+  // pub fn first_child(&self, node: &SceneNode) -> Option<Ref<SceneNode>> {
+  //   node.first_child.map(|p| self.get_scene_node(p))
+  // }
 
-  pub fn left_brother(&self, node: &SceneNode) -> Option<&SceneNode> {
-    node.left_brother.map(|p| self.get_scene_node(p))
-  }
+  // pub fn left_brother(&self, node: &SceneNode) -> Option<RefSceneNode> {
+  //   node.left_brother.map(|p| self.get_scene_node(p))
+  // }
 
-  pub fn right_brother(&self, node: &SceneNode) -> Option<&SceneNode> {
-    node.right_brother.map(|p| self.get_scene_node(p))
-  }
+  // pub fn right_brother(&self, node: &SceneNode) -> Option<&SceneNode> {
+  //   node.right_brother.map(|p| self.get_scene_node(p))
+  // }
 
-  pub fn foreach_child<F>(&self, node: &SceneNode, f: F)
-  where
-    F: Fn(&SceneNode),
-  {
-    if let Some(first_child) = self.first_child(node) {
-      f(first_child);
-      let mut child_next = first_child;
-      while let Some(next_child) = self.right_brother(child_next) {
-        f(next_child);
-        child_next = next_child
-      }
-    }
-  }
+  // pub fn foreach_child<F>(&self, node: &SceneNode, f: F)
+  // where
+  //   F: Fn(&SceneNode),
+  // {
+  //   if let Some(first_child) = self.first_child(node) {
+  //     f(first_child);
+  //     let mut child_next = first_child;
+  //     while let Some(next_child) = self.right_brother(child_next) {
+  //       f(next_child);
+  //       child_next = next_child
+  //     }
+  //   }
+  // }
 
-  pub fn traverse(&self, node: &SceneNode, visitor: &dyn Fn(&SceneNode, &SceneGraph) -> ()) {
-    let mut travers_stack: Vec<&SceneNode> = Vec::new();
+  pub fn traverse(&self, node: &RefCell<SceneNode>, visitor: &dyn Fn(&RefCell<SceneNode>, &SceneGraph) -> ()) {
+    let mut travers_stack: Vec<&RefCell<SceneNode>> = Vec::new();
     travers_stack.push(node);
 
     while let Some(node_to_visit) = travers_stack.pop() {
@@ -110,10 +113,12 @@ impl SceneGraph {
       // try fix this compile TODO
       // node_to_visit.foreach_child(|n|{travers_stack.push(n)});
 
-      if let Some(first_child) = self.first_child(node_to_visit) {
+      if let Some(first_child_index) = node_to_visit.borrow().first_child {
+        let first_child = self.get_scene_node(first_child_index);
         travers_stack.push(first_child);
         let mut child_next = first_child;
-        while let Some(next_child) = self.right_brother(child_next) {
+        while let Some(next_child_index) = child_next.borrow().right_brother {
+          let next_child = self.get_scene_node(first_child_index);
           travers_stack.push(next_child);
           child_next = next_child
         }
@@ -142,7 +147,7 @@ impl SceneGraph {
     }
 
     let new_node = SceneNode::new(free_index);
-    self.nodes[free_index] = Some(new_node);
+    self.nodes[free_index] = Some(RefCell::new(new_node));
     free_index
   }
 
@@ -158,12 +163,12 @@ impl SceneGraph {
 
   #[wasm_bindgen]
   pub fn set_node_position(&mut self, index: usize, x: f32, y: f32, z: f32) {
-    self.get_scene_node_mut(index).position.set(x, y, z);
+    self.get_scene_node(index).borrow_mut().position.set(x, y, z);
   }
 
   #[wasm_bindgen]
   pub fn set_node_scale(&mut self, index: usize, x: f32, y: f32, z: f32) {
-    self.get_scene_node_mut(index).scale.set(x, y, z);
+    self.get_scene_node(index).borrow_mut().scale.set(x, y, z);
   }
 
   #[wasm_bindgen]
@@ -171,7 +176,22 @@ impl SceneGraph {
     // self.nodes[index].quaternion.set(x, y, z);
   }
 
-  pub fn set_node_parent(&mut self, index: usize, x: f32, y: f32, z: f32, w: f32) {}
+  #[wasm_bindgen]
+  pub fn add(self, index: usize, add_index: usize) {
+    let mut parent = self.get_scene_node(index).borrow_mut();
+    let mut child = self.get_scene_node(add_index).borrow_mut();
+
+    parent.first_child = Some(add_index);
+
+    if let Some(first_child_index) = parent.first_child {
+      let mut old_first_child = self.get_scene_node(first_child_index).borrow_mut();
+
+      old_first_child.left_brother = Some(add_index);
+      child.right_brother = Some(first_child_index);
+      child.parent = Some(index);
+    }
+
+  }
 
   #[wasm_bindgen]
   pub fn batch_drawcalls(&self) {
@@ -180,6 +200,6 @@ impl SceneGraph {
   }
 }
 
-fn update_hirerachy_visitor(node: &SceneNode, scene: &SceneGraph) {
-  let parent = scene.parent(node);
+fn update_hirerachy_visitor(node: &RefCell<SceneNode>, scene: &SceneGraph) {
+  // let parent = scene.parent(node);
 }
