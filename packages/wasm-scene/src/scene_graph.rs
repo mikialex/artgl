@@ -5,8 +5,8 @@ use crate::math::*;
 use wasm_bindgen::prelude::*;
 
 pub struct Box3{
-  min: Vec3<f32>, 
-  max: Vec3<f32>,
+  pub min: Vec3<f32>, 
+  pub max: Vec3<f32>,
 }
 
 impl Box3{
@@ -16,8 +16,8 @@ impl Box3{
 }
 
 pub struct Sphere{
-  center: Vec3<f32>,
-  radius: f32,
+  pub center: Vec3<f32>,
+  pub radius: f32,
 }
 
 impl Sphere{
@@ -26,28 +26,28 @@ impl Sphere{
   }
 }
 
-pub struct Geoemtry {
-  bounding_box: Box3,
-  bounding_sphere: Sphere,
-  id: Option<String>,
+pub struct Geometry {
+  pub bounding_box: Box3,
+  pub bounding_sphere: Sphere,
+  pub id: Option<String>,
 }
 
 pub struct Program {
-  id: Option<String>,
+  pub id: Option<String>,
   
 }
 
 pub struct RenderDescriptor {
-  program: Rc<Program>,
-  geometry: Rc<Geoemtry>,
+  pub program: Rc<Program>,
+  pub geometry: Rc<Geometry>,
 }
 
 impl RenderDescriptor{
-  pub fn new()-> Self{
-    boundingBox: Box3::new(),
-    boundingSphere: Sphere::new(),
-    shaderId: None, 
-    geometryId: None,
+  pub fn new(program: Rc<Program>, geometry: Rc<Geometry>)-> Self{
+    RenderDescriptor{
+      program,
+      geometry
+    }
   }
 }
 
