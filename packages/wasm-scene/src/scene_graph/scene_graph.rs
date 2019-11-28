@@ -1,36 +1,9 @@
+use crate::scene_graph::geometry::Geometry;
 use std::rc::Rc;
 use crate::{log_usize, log};
 use core::cell::RefCell;
 use crate::math::*;
 use wasm_bindgen::prelude::*;
-
-pub struct Box3{
-  pub min: Vec3<f32>, 
-  pub max: Vec3<f32>,
-}
-
-impl Box3{
-  pub fn new()-> Self{
-    unimplemented!()
-  }
-}
-
-pub struct Sphere{
-  pub center: Vec3<f32>,
-  pub radius: f32,
-}
-
-impl Sphere{
-  pub fn new()-> Self{
-    unimplemented!()
-  }
-}
-
-pub struct Geometry {
-  pub bounding_box: Box3,
-  pub bounding_sphere: Sphere,
-  pub id: usize,
-}
 
 pub struct Shading {
   pub id: usize,
@@ -41,14 +14,14 @@ pub struct BufferData{
   pub id: usize
 }
 
-pub struct RenderDescriptor {
+pub struct RenderData {
   pub shading: Rc<Shading>,
   pub geometry: Rc<Geometry>,
 }
 
-impl RenderDescriptor{
+impl RenderData{
   pub fn new(shading: Rc<Shading>, geometry: Rc<Geometry>)-> Self{
-    RenderDescriptor{
+    RenderData{
       shading,
       geometry
     }
@@ -65,7 +38,7 @@ pub struct SceneNode {
   pub matrix_local: Mat4<f32>,
   pub matrix_world: Mat4<f32>,
 
-  pub render_data: Option<RenderDescriptor>,
+  pub render_data: Option<RenderData>,
 
   pub(crate) parent: Option<usize>,
   pub(crate) left_brother: Option<usize>,

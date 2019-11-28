@@ -1,4 +1,4 @@
-use crate::scene_graph::scene_graph::{SceneGraph, SceneNode};
+use crate::scene_graph::scene_graph::{SceneGraph, SceneNode, RenderData};
 use wasm_bindgen::prelude::*;
 use core::cell::RefCell;
 
@@ -96,6 +96,20 @@ impl SceneGraph {
     }else{
       unreachable!()
     }
+  }
+
+  fn make_render_data(&self, geometry_id: usize, shading_id: usize) -> RenderData {
+    let geometry = self.geometries[geometry_id].clone();
+    let shading = self.shadings[shading_id].clone();
+    RenderData{
+      geometry,
+      shading
+    }
+  }
+
+  #[wasm_bindgen]
+  pub fn set_render_discriptor(&mut self, node_index: usize, geometry_id: usize, shading_id: usize){
+    self.get_scene_node(node_index).borrow_mut().render_data = Some(self.make_render_data(geometry_id, shading_id));
   }
 
   #[wasm_bindgen]

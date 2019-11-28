@@ -18,11 +18,32 @@ export class WasmSceneGraph{
         return node;
     }
 
+    createShading(): Shading{
+        return new Shading()
+    }
+
+    createGeometry(): Geometry{
+
+    }
+
     batchDrawcall() {
         this.wasmScene.batch_drawcalls();
     }
 
     readonly root: WasmSceneNode
+}
+
+export class WASMIndexedObject{
+    constructor(index: number) {
+        this.index = index;
+    }
+    readonly index: number;
+}
+
+export class Geometry extends WASMIndexedObject{
+}
+
+export class Shading  extends WASMIndexedObject{
 }
 
 export class WasmSceneNode{
@@ -35,6 +56,8 @@ export class WasmSceneNode{
     readonly scene: WasmSceneGraph
     private parent: WasmSceneNode | null = null;
     private children: WasmSceneNode[] = [];
+
+    private shading: Shading
 
     add(node: WasmSceneNode) {
         if (node.parent !== null) {
