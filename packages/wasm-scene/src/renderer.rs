@@ -4,7 +4,7 @@ use wasm_bindgen::JsCast;
 use web_sys::{WebGlProgram, WebGlRenderingContext, WebGlShader, HtmlCanvasElement};
 
 #[wasm_bindgen]
-struct WebGLRenderer {
+pub struct WebGLRenderer {
     gl: WebGlRenderingContext
 }
 
