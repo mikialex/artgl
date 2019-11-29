@@ -2,18 +2,18 @@ use crate::scene_graph::scene_graph::SceneGraph;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use web_sys::{WebGlProgram, WebGlRenderingContext, WebGlShader, HtmlCanvasElement};
+use web_sys::{WebGlProgram, WebGlBuffer, WebGlRenderingContext, WebGlShader, HtmlCanvasElement};
 
 #[wasm_bindgen]
 pub struct WebGLRenderer {
     gl: Rc<WebGlRenderingContext>,
     programs: Vec<Program>,
+    buffers: Vec<WebGlBuffer>
 }
 
 #[wasm_bindgen]
 impl WebGLRenderer {
 
-    #[wasm_bindgen]
     pub fn new(canvas: HtmlCanvasElement) -> Result<WebGLRenderer, JsValue>{
             
         let context = canvas
@@ -24,10 +24,37 @@ impl WebGLRenderer {
         Ok(WebGLRenderer{
             gl: Rc::new(context),
             programs: Vec::new(),
+            buffers: Vec::new(),
         })
     }
 
-    #[wasm_bindgen]
+    pub fn make_demo_buffer(&mut self) -> Result<(), JsValue>{
+        let vertices: [f32; 9] = [-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0];
+
+        let buffer = self.gl.create_buffer().ok_or("failed to create buffer")?;
+        self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
+    
+        // Note that `Float32Array::view` is somewhat dangerous (hence the
+        // `unsafe`!). This is creating a raw view into our module's
+        // `WebAssembly.Memory` buffer, but if we allocate more pages for ourself
+        // (aka do a memory allocation in Rust) it'll cause the buffer to change,
+        // causing the `Float32Array` to be invalid.
+        //
+        // As a result, after `Float32Array::view` we have to be very careful not to
+        // do any memory allocations before it's dropped.
+        unsafe {
+            let vert_array = js_sys::Float32Array::view(&vertices);
+    
+            self.gl.buffer_data_with_array_buffer_view(
+                WebGlRenderingContext::ARRAY_BUFFER,
+                &vert_array,
+                WebGlRenderingContext::STATIC_DRAW,
+            );
+        }
+        self.buffers.push(buffer);
+        Ok(())
+    }
+
     pub fn make_demo_program(&mut self) -> Result<(), JsValue>{
         let program = Program::new(self.gl.clone(), 
             r#"
@@ -49,7 +76,20 @@ impl WebGLRenderer {
 
     #[wasm_bindgen]
     pub fn render(&self, scene: &SceneGraph){
-        
+        self.gl.clear_color(0.0, 0.0, 0.0, 1.0);
+        self.gl.clear(WebGlRenderingContext::COLOR_BUFFER_BIT);
+
+        let buffer = &self.buffers[0];
+        self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(buffer));
+        self.gl.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
+        self.gl.enable_vertex_attrib_array(0);
+
+        self.gl.use_program(Some(&self.programs[0].program));
+        self.gl.draw_arrays(
+            WebGlRenderingContext::TRIANGLES,
+            0,
+            (9 / 3) as i32,
+        );
     }
 
 }

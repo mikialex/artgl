@@ -101,3 +101,4 @@ output(threeresult)
 
 const renderer = new Renderer(document.querySelector('#wasm')! as HTMLCanvasElement);
 console.log(renderer)
+renderer.render(wasmSceneGraph)
