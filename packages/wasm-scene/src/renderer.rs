@@ -1,3 +1,4 @@
+use crate::scene_graph::scene_graph::SceneGraph;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
@@ -5,7 +6,8 @@ use web_sys::{WebGlProgram, WebGlRenderingContext, WebGlShader, HtmlCanvasElemen
 
 #[wasm_bindgen]
 pub struct WebGLRenderer {
-    gl: WebGlRenderingContext
+    gl: Rc<WebGlRenderingContext>,
+    programs: Vec<Program>,
 }
 
 #[wasm_bindgen]
@@ -20,36 +22,61 @@ impl WebGLRenderer {
         .dyn_into::<WebGlRenderingContext>()?;
 
         Ok(WebGLRenderer{
-            gl: context
+            gl: Rc::new(context),
+            programs: Vec::new(),
         })
+    }
+
+    #[wasm_bindgen]
+    pub fn make_demo_program(&mut self) -> Result<(), JsValue>{
+        let program = Program::new(self.gl.clone(), 
+            r#"
+            attribute vec4 position;
+            void main() {
+                gl_Position = position;
+            }
+            "#
+            ,
+            r#"
+            void main() {
+                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            }
+             "#
+        )?;
+        self.programs.push(program);
+        Ok(())
+    }
+
+    #[wasm_bindgen]
+    pub fn render(&self, scene: &SceneGraph){
+        
     }
 
 }
 
 struct Program{
-    renderer: Rc<WebGLRenderer>,
+    context: Rc<WebGlRenderingContext>,
     program: WebGlProgram,
 }
 
 impl Program {
-    pub fn new(renderer: Rc<WebGLRenderer>, vertex_shader_str: &str, frag_shader_str: &str) -> Result<Program, String>{
-        let vertex_shader = compile_shader(&renderer, WebGlRenderingContext::VERTEX_SHADER, vertex_shader_str)?;
-        let frag_shader = compile_shader(&renderer, WebGlRenderingContext::VERTEX_SHADER, frag_shader_str)?;
-        let program = link_program(&renderer, &vertex_shader, &frag_shader)?;
+    pub fn new(context: Rc<WebGlRenderingContext>, vertex_shader_str: &str, frag_shader_str: &str) -> Result<Program, String>{
+        let vertex_shader = compile_shader(&context, WebGlRenderingContext::VERTEX_SHADER, vertex_shader_str)?;
+        let frag_shader = compile_shader(&context, WebGlRenderingContext::FRAGMENT_SHADER, frag_shader_str)?;
+        let program = link_program(&context, &vertex_shader, &frag_shader)?;
 
         Ok(Program{
-            renderer,
+            context,
             program
         })
     }
 }
 
 fn compile_shader(
-    renderer: &WebGLRenderer,
+    context: &WebGlRenderingContext,
     shader_type: u32,
     source: &str,
 ) -> Result<WebGlShader, String> {
-    let context = &renderer.gl;
     let shader = context
         .create_shader(shader_type)
         .ok_or_else(|| String::from("Unable to create shader object"))?;
@@ -70,11 +97,10 @@ fn compile_shader(
 }
 
 fn link_program(
-    renderer: &WebGLRenderer,
+    context: &WebGlRenderingContext,
     vert_shader: &WebGlShader,
     frag_shader: &WebGlShader,
 ) -> Result<WebGlProgram, String> {
-    let context = &renderer.gl;
     let program = context
         .create_program()
         .ok_or_else(|| String::from("Unable to create shader object"))?;
