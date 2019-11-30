@@ -16,13 +16,14 @@ import {
 } from "./interface";
 
 export const defaultVertexRoot = constValue(new Vector4());
+export const defaultFragRoot = constValue(new Vector4(0.5, 0.5, 0.5, 1));
 
 export class ShaderGraph {
   constructor() {
     this.reset();
   }
 
-  fragmentRoot: ShaderNode = constValue(new Vector4());
+  fragmentRoot: ShaderNode = defaultFragRoot;
   vertexRoot: ShaderNode = defaultVertexRoot;
   varyings: Map<string, ShaderVaryInputNode> = new Map();
   attributes: Map<string, ShaderAttributeInputNode> = new Map();
@@ -149,6 +150,9 @@ export class ShaderGraph {
   }
 
   reset(): ShaderGraph {
+    this.vertexRoot = defaultVertexRoot;
+    this.fragmentRoot = defaultFragRoot;
+    this.attributes.clear();
     this.varyings.clear();
     this.cachedReusedChannelNodes.clear();
     this.sharedNodes.clear();
@@ -176,7 +180,7 @@ export class ShaderGraph {
       nodes.add(node as ShaderNode);
     })
     this.varyings.forEach(vary => {
-      vary.traverseDFS(node => {
+      vary.source.traverseDFS(node => {
         nodes.add(node as ShaderNode);
       })
     })
