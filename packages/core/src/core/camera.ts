@@ -27,7 +27,7 @@ export const VPTransform = new ShaderFunction({
 })
 
 
-export function MVP(graph: ShaderGraph) {
+export function MVP(graph: ShaderGraph, useOldRootXYZasPosition: boolean = false) {
   if (graph.getIfSharedUniform(Camera.WorldMatrixKey) !== undefined &&
     graph.getIfSharedUniform(Camera.ViewProjectionMatrix) !== undefined
   ) {
@@ -35,10 +35,10 @@ export function MVP(graph: ShaderGraph) {
     const worldPosition = MTransform.make()
       .input('MMatrix', graph.getSharedUniform(Camera.WorldMatrixKey))
 
-    if (graph.getVertRoot() === defaultVertexRoot) {
-      worldPosition.input('position', graph.getOrMakeAttribute(CommonAttribute.position, GLDataType.floatVec3))
-    } else {
+    if (useOldRootXYZasPosition) {
       worldPosition.input('position', graph.getVertRoot().swizzling('xyz'))
+    } else {
+      worldPosition.input('position', graph.getOrMakeAttribute(CommonAttribute.position, GLDataType.floatVec3))
     }
 
     return {
