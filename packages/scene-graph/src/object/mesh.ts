@@ -1,4 +1,4 @@
-import { RenderObject, PrimitiveVisitor, PrimitiveType } from "./render-object";
+import { RenderObject, PrimitiveVisitor, PrimitiveType } from "@artgl/core/src/core/render-object";
 import { RayCasterable, Raycaster, RayCastResult } from "../../core/raycaster";
 import { Matrix4, Vector3, Face3, Sphere } from "@artgl/math";
 import { DrawMode, CullSide } from "@artgl/webgl";

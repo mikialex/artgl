@@ -1,4 +1,3 @@
-import { SceneNode, ExtendWithSceneNode } from "../scene-graph/scene-node";
 import { Matrix4, Vector3 } from "@artgl/math";
 import { RenderEngine } from './render-engine';
 import { BaseEffectShading } from "./shading";
@@ -62,8 +61,8 @@ export function MVP(graph: ShaderGraph, useOldRootXYZasPosition: boolean = false
  * Implementor should impl how matrix is calculate and how to react to render size change
  */
 @ShadingComponent()
-export class CameraSelf
-  extends BaseEffectShading<CameraSelf>
+export class Camera
+  extends BaseEffectShading<Camera>
   implements ShaderUniformProvider, ShaderUniformDecorator {
 
   static readonly WorldMatrixKey = 'WorldMatrix'
@@ -72,16 +71,16 @@ export class CameraSelf
 
   shouldProxyedByUBO = false; // todo fix
 
-  @ShadingUniform(CameraSelf.WorldMatrixKey)
+  @ShadingUniform(Camera.WorldMatrixKey)
   renderObjectWorldMatrix = new Matrix4();
 
-  @ShadingUniform(CameraSelf.ViewProjectionMatrix)
+  @ShadingUniform(Camera.ViewProjectionMatrix)
   _renderMatrix = new Matrix4();
 
   decorate(graph: ShaderGraph): void {
-    graph.registerSharedUniform(CameraSelf.WorldPositionKey, this.getPropertyUniform('_worldPosition'))
-    graph.registerSharedUniform(CameraSelf.ViewProjectionMatrix, this.getPropertyUniform('_renderMatrix'))
-    graph.registerSharedUniform(CameraSelf.WorldMatrixKey, uniformFromValue(CameraSelf.WorldMatrixKey, this.worldMatrix))
+    graph.registerSharedUniform(Camera.WorldPositionKey, this.getPropertyUniform('_worldPosition'))
+    graph.registerSharedUniform(Camera.ViewProjectionMatrix, this.getPropertyUniform('_renderMatrix'))
+    graph.registerSharedUniform(Camera.WorldMatrixKey, uniformFromValue(Camera.WorldMatrixKey, this.worldMatrix))
     const { MVP: MVPResult, worldPosition } = MVP(graph)
     graph.setVertexRoot(MVPResult);
     graph.setVary(WorldPositionFragVary, worldPosition)
@@ -182,17 +181,8 @@ export class CameraSelf
   //     return this._worldPosition;
   //   }
 
-  up = new Vector3(0, 1, 0); // todo change watch
-
-  lookAt(targetPosition: Vector3) {
-    this.transform.lookAt(targetPosition, this.up);
-  }
-
 }
 
-export interface CameraSelf extends SceneNode { }
-export interface Camera extends SceneNode, CameraSelf { }
-export const Camera = ExtendWithSceneNode(CameraSelf)
 
 // https://dev.to/angular/decorators-do-not-work-as-you-might-expect-3gmj
 export function ProjectionMatrixNeedUpdate<T>(_target: Camera, _propertyKey: any): any {

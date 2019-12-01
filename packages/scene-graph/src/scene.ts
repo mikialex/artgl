@@ -1,16 +1,11 @@
-
-import { RenderSource } from "../core/render-source";
-import { RenderList } from "./render-list";
-import { Geometry } from "../core/render-entity/geometry";
-import { Material } from "../core/render-entity/material";
-import { Shading } from "../core/shading";
-import { RefCountMap } from "../util/ref-count-map";
-import { Background, SolidColorBackground } from "./background";
-import { RayCastSource, RayCasterable } from "../core/raycaster";
+import { 
+  RayCastSource, Geometry, Material, Shading, RenderObject,
+  NormalShading, RayCasterable, RenderEngine, RenderSource
+} from "@artgl/core";
 import { SceneNode } from "./scene-node";
-import { NormalShading } from "../built-in-lib/normal";
-import { RenderObject } from "./object/render-object";
-import { RenderEngine } from "../core/render-engine";
+import { RenderList } from "./render-list";
+import { Background, SolidColorBackground } from "./background";
+import { RefCountMap } from "./ref-count-map";
 
 /**
  * scene data management

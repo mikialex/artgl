@@ -1,16 +1,16 @@
 
-import { RenderObject, RenderRange } from "../scene-graph/object/render-object";
+import { RenderObject, RenderRange } from "./render-object";
 import { Geometry } from "./render-entity/geometry";
 import { BufferData } from "./render-entity/buffer-data";
 import { Material } from "./render-entity/material";
 import { Nullable, FloatArray, Observable } from "@artgl/shared";
-import { QuadSource } from './render-source';
+import { QuadSource, RenderSource } from './render-source';
 import { Shading } from "./shading";
-import { Interactor } from "../interact/interactor";
+import { Interactor } from "../../../scene-graph/src/interact/interactor";
 import { Renderable, GeometryWebGLDataProvider } from "./interface";
 import { Camera } from "./camera";
 import { PerspectiveCamera, PerspectiveCameraInstance } from "../camera/perspective-camera";
-import { Matrix4, Vector4, Vector4Like } from "@artgl/math";
+import { Matrix4, Vector4, Vector4Like, Matrix3 } from "@artgl/math";
 import { Texture } from "./render-entity/texture";
 import { CubeTexture } from "./render-entity/texture-cube";
 import {
@@ -99,8 +99,12 @@ export class RenderEngine implements GLReleasable, RenderGraphBackEnd {
 
 
   //// render APIs
-  render(source: Renderable) {
+  render(source: RenderSource) {
     source.render(this);
+  }
+
+  renderObject(source: Renderable, transform: Matrix4) {
+    source.render(this, transform);
   }
 
   renderFrameBuffer(framebuffer: GLFramebuffer, debugViewPort: Vector4) {

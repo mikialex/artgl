@@ -3,7 +3,7 @@ import {
   Vector3, RenderEngine, Scene, SphereGeometry, Mesh,
   PerspectiveCamera, Vector4, OrbitController, Shading, PointLight,
   DirectionalLight, AmbientLight, BarycentricWireFrame, PhongShading,
-  ExposureController, createBarycentricBufferForStandardGeometry, Size
+  ExposureController, createBarycentricBufferForStandardGeometry, Size, SceneNode
 } from 'artgl';
 
 export default async function test(testBridge: TestBridge) {
@@ -44,17 +44,17 @@ export default async function test(testBridge: TestBridge) {
 
   const mesh = new Mesh().g(geometry).s(shading);
 
-  scene.root.addChild(mesh);
 
   const camera = new PerspectiveCamera().updateRenderRatio(engine)
+  const node = new SceneNode();
   camera.transform.position.set(2, 2, 2);
-  camera.lookAt(new Vector3(0, 0, 0));
+  camera.transform.lookAt(new Vector3(0, 0, 0));
   engine.useCamera(camera);
 
   function draw() {
     engine.setClearColor(new Vector4(0.9, 0.9, 0.9, 1.0))
     engine.clearColor();
-    engine.render(scene);
+    engine.renderObject(mesh);
   }
 
   draw();

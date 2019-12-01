@@ -1,5 +1,5 @@
-import { RenderObject } from "./object/render-object";
-import { Nullable } from "../..";
+import { RenderObject } from "@artgl/core/src/core/render-object";
+import { Nullable } from "@artgl/shared";
 
 export class RenderList {
 

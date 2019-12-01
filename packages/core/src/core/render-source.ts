@@ -1,6 +1,5 @@
 
-import { Mesh } from "../scene-graph/object/mesh";
-import { RenderObject } from "../scene-graph/object/render-object";
+import { RenderObject } from "./render-object";
 import { RenderEngine } from "./render-engine";
 import { QuadGeometry } from "../built-in-lib/quad-geometry";
 
@@ -18,7 +17,7 @@ export interface RenderSource {
 }
 
 
-const quadMesh = new Mesh();
+const quadMesh = new RenderObject();
 const geometry = new QuadGeometry();
 quadMesh.geometry = geometry;
 

@@ -1,7 +1,7 @@
 import { Matrix4, generateUUID } from "@artgl/math";
 import { Nullable } from "@artgl/shared";
 import { Transformation } from "./transformation";
-import { RenderObject } from "./object/render-object";
+import { RenderObject } from "@artgl/core/src/core/render-object";
 import { Scene } from "./scene";
 
 

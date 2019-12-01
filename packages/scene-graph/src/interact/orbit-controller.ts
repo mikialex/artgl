@@ -1,16 +1,15 @@
 import { Controller } from "./controller";
 import { Interactor } from "./interactor";
 import { Vector3, MathUtil, Vector2, Spherical  } from "@artgl/math";
-import { Camera } from "../core/camera";
+import { SceneNode } from "../scene-node";
 
 
 const tempVec = new Vector3();
 
 export class OrbitController extends Controller {
 
-  constructor(public camera: Camera) {
+  constructor(private target: SceneNode) {
     super();
-    this.camera = camera;
     this.reloadStates();
   }
 
@@ -74,10 +73,11 @@ export class OrbitController extends Controller {
 
   
   reloadStates(): void {
-    tempVec.copy(this.camera.transform.position).sub(this.spherical.center);
+    tempVec.copy(this.target.transform.position).sub(this.spherical.center);
     this.spherical.setFromVector(tempVec);
   }
 
+  up = new Vector3(0, 1, 0); // todo change watch
 
   public update() {
 
@@ -103,8 +103,8 @@ export class OrbitController extends Controller {
       this.spherical.center.add(this.panOffset);
 
       tempVec.setFromSpherical(this.spherical).add(this.spherical.center);
-      this.camera.transform.position.copy(tempVec);
-      this.camera.lookAt(this.spherical.center);
+      this.target.transform.position.copy(tempVec);
+      this.target.transform.lookAt(this.spherical.center, this.up);
     }
     this.needUpdate = false;
 

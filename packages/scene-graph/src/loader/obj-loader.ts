@@ -1,5 +1,5 @@
 import { Vector3, Vector2 } from "@artgl/math";
-import { loadStringFromFile } from "../util/file-io";
+import { loadStringFromFile } from "@artgl/core/src/util/file-io";
 import { GeometryLoader } from "../scene-graph/loader";
 import { StandardGeometry, generateNormalFromPosition } from "@artgl/lib-geometry";
 

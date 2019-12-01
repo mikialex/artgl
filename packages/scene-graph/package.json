@@ -1,0 +1,9 @@
+{
+  "name": "@artgl/scene-graph",
+  "version": "0.0.1",
+  "description": "Scene graph for artgl",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "author": "mikialex",
+  "license": "MIT"
+}

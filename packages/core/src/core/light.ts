@@ -1,4 +1,3 @@
-import { SceneNode } from "../scene-graph/scene-node";
 import { Observable } from "@artgl/shared";
 import { Vector3 } from "@artgl/math"
 import { ShaderUniformProvider, ShaderUniformDecorator, ProviderUploadCache } from "./interface";
@@ -9,8 +8,7 @@ import {
 
 // TODO I cant figure out right multi inheritance impl with strong type, code duplicate 
 
-export abstract class Light<T> extends SceneNode
-  implements ShaderUniformProvider, ShaderUniformDecorator {
+export abstract class Light<T> implements ShaderUniformProvider, ShaderUniformDecorator {
 
   decorate(decorated: ShaderGraph): void {
     decorated

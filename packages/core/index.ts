@@ -7,12 +7,10 @@ export * from '@artgl/shader-graph';
 
 export * from './src/core/interface'
 
-export * from "./src/scene-graph/object/render-object";
+export * from "./src/core/render-object";
+export * from "./src/core/render-source";
 export * from "./src/core/render-entity/texture";
 export * from "./src/core/render-entity/texture-cube";
-export { Mesh } from "./src/scene-graph/object/mesh";
-export { Line } from "./src/scene-graph/object/line";
-export { Points } from "./src/scene-graph/object/points";
 
 export * from "./src/core/render-entity/geometry";
 export * from './src/core/render-entity/material';
@@ -27,27 +25,15 @@ export { PerspectiveCamera } from "./src/camera/perspective-camera";
 export * from './src/core/light'
 export * from './src/light/exports';
 
-// scene
-export { Scene } from "./src/scene-graph/scene";
-export { SceneNode } from "./src/scene-graph/scene-node";
-export { Transformation } from "./src/scene-graph/transformation";
-export * from "./src/scene-graph/background"
-
-
-//interaction
-export { Interactor } from "./src/interact/interactor";
-export { OrbitController } from "./src/interact/orbit-controller";
-
-//loader
-export * from './src/loader/obj-loader';
-
 export * from './src/util/file-io'
+
 
 import { PassGraphNode } from '@artgl/render-graph';
 import { QuadSourceInstance } from "./src/core/render-source";
 import { Texture } from "./src/core/render-entity/texture";
 import { CubeTexture } from "./src/core/render-entity/texture-cube";
 import { texture, cubeTexture } from "@artgl/shader-graph";
+export { NormalShading } from "./src/built-in-lib/normal";
 PassGraphNode.QuadRenderMethods = QuadSourceInstance.render
 
 export function textureFromValue(textureName:string, value: GLTextureData){
