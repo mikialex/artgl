@@ -17,6 +17,16 @@ pub struct Quat<T>
 	pub w:T,
 }
 
+impl<T> Quat<T> {
+	pub fn set(&mut self, x: T, y: T, z: T, w: T) -> &Self {
+		self.x = x;
+		self.y = y;
+		self.z = z;
+		self.w = w;
+		self
+	}
+}
+
 impl<T> Neg for Quat<T> where T:Neg<Output=T>
 {
 	type Output = Self;

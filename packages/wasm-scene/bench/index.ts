@@ -1,9 +1,7 @@
 import * as wasm from "../pkg/wasm_scene";
-
 import {memory} from '../pkg/wasm_scene_bg'
-import { CompactScene } from "../client/wasm-scene";
-import { CompactSceneNode } from "../client/wasm-scene-node";
-import { WasmSceneGraph, WasmSceneNode } from "../client-v2/wasm-scene-graph";
+import { WasmSceneGraph, WasmSceneNode } from "../client/wasm-scene-graph";
+import { Renderer } from "../client/renderer";
 
 function buildWasmSceneGraph(scene: WasmSceneGraph, childrenCount: number, depth: number) {
   let count = 0;
@@ -21,25 +19,6 @@ function buildWasmSceneGraph(scene: WasmSceneGraph, childrenCount: number, depth
     }
   }
   addChildren(scene.root, depth)
-}
-
-function buildWasmScene(scene: CompactScene, childrenCount: number, depth: number) {
-  let count = 0;
-  function addChildren(node: CompactSceneNode, d: number) {
-    if (d > 0) {
-      for (let i = 0; i < childrenCount; i++) {
-        const child = scene.createSceneNode();
-        // child.positionX = Math.random();
-        // child.rotationX = Math.random();
-        // child.scaleZ = Math.random();
-        count++;
-        node.add(child);
-        addChildren(child, d - 1);
-      }
-    }
-  }
-  addChildren(scene.rootNode, depth);
-  console.log(`${count} has add to scene`)
 }
 
 import * as THREE from './node_modules/three/src/Three' // i have no idea
@@ -77,30 +56,6 @@ function output(result: number[]) {
 }
 
 
-
-/// benching wasm1
-console.log('===========')
-
-const scene = new CompactScene();
-console.log(scene)
-
-buildWasmScene(scene, 6, 6);
-
-console.log("wasm");
-let wasmresult = []
-for (let i = 0; i < 50; i++) {
-  let t = performance.now();
-  scene.batchDrawcall();
-  t = performance.now() - t;
-  wasmresult.push(t);
-}
-wasmresult = wasmresult.slice(3);
-output(wasmresult)
-
-
-
-
-
 /// benching wasm2
 console.log('===========')
 const wasmSceneGraph = new WasmSceneGraph();
@@ -121,7 +76,7 @@ output(wasmresult2)
 
 
 
-/// benching three
+/// benching threejs
 console.log('===========')
 const scenethree = new THREE.Scene();
 scenethree.matrixAutoUpdate = false;
@@ -139,17 +94,11 @@ threeresult = threeresult.slice(3);
 output(threeresult)
 
 
-// wasm.greet("hello from js to wasm");
 
-// const dataLength = 1000000;
-// const batcher = wasm.Batcher.new();
-// console.log(batcher)
-// const ptr = batcher.allocate(dataLength);
-// const dataview = new Float32Array(memory.buffer, ptr, dataLength);
 
-// for (let i = 0; i < dataLength; i++) {
-//     dataview[i] = i;
-// }
 
-// batcher.batch(5);
+/// test renderer
 
+const renderer = new Renderer(document.querySelector('#wasm')! as HTMLCanvasElement);
+console.log(renderer)
+renderer.render(wasmSceneGraph)

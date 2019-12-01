@@ -18,6 +18,20 @@ export class WasmSceneGraph{
         return node;
     }
 
+    // createShading(): Shading{
+    //     const index = this.wasmScene.create_shading();
+    //     return new Shading()
+    // }
+
+    // createBuffer(): {
+
+    // }
+
+    // createGeometry(): Geometry{
+    //     const index = this.wasmScene.create_shading();
+    //     return new Shading()
+    // }
+
     batchDrawcall() {
         this.wasmScene.batch_drawcalls();
     }
@@ -25,16 +39,44 @@ export class WasmSceneGraph{
     readonly root: WasmSceneNode
 }
 
-export class WasmSceneNode{
+export class WASMIndexedObject{
     constructor(scene: WasmSceneGraph, index: number) {
-        this.scene = scene;
         this.index = index;
+        this.scene = scene;
     }
+    readonly index: number;
+    readonly scene: WasmSceneGraph
+}
+
+export class Geometry extends WASMIndexedObject{
+}
+
+export class Shading  extends WASMIndexedObject{
+}
+
+export class RenderObject{
+    shading: Shading
+    geometry: Geometry
+}
+
+export class WasmSceneNode extends WASMIndexedObject{
     
     readonly index: number;
     readonly scene: WasmSceneGraph
     private parent: WasmSceneNode | null = null;
     private children: WasmSceneNode[] = [];
+
+    private renderData: RenderObject = null;
+    get renderObject() {
+        return this.renderData;
+    }
+
+    set renderObject(obj: RenderObject) {
+        this.renderData = obj;
+        this.scene.getWasm().set_render_discriptor(
+            this.index, obj.geometry.index, obj.shading.index
+        )
+    }
 
     add(node: WasmSceneNode) {
         if (node.parent !== null) {

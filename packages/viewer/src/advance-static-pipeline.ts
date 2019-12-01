@@ -189,7 +189,7 @@ export class AdvanceStaticRenderPipeline {
     //       false, 
     //       createTSSAO(),
     //       pass("copy").useQuad().overrideShading(copier)
-    //         .input("copySource", sceneResult))
+    //         .input("copySource", depthResult))
     //   )
     // )
 
