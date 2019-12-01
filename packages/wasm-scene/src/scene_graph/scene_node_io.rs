@@ -5,35 +5,17 @@ use core::cell::RefCell;
 #[wasm_bindgen]
 impl SceneGraph {
 
-  #[wasm_bindgen]
   pub fn create_new_node(&mut self) -> usize {
-    let free_index;
-    if let Some(i) = self.tomb_list.pop() {
-      free_index = i;
-    } else {
-      free_index = self.nodes.len();
-    }
-
-    let new_node = SceneNode::new(free_index);
-    if free_index >= self.nodes.len() {
-      self.nodes.push(Some(RefCell::new(new_node)));
-    }else{
-      self.nodes[free_index] = Some(RefCell::new(new_node));
-    }
+    let free_index = self.nodes.get_free_index();
+    let new_node = RefCell::new(SceneNode::new(free_index));
+    self.nodes.set_item(new_node, free_index);
     free_index
   }
 
-  #[wasm_bindgen]
   pub fn free_node(&mut self, index: usize) {
-    if let Some(_) = &self.nodes[index] {
-      self.nodes[index] = None;
-      self.tomb_list.push(index);
-    } else {
-      panic!("node has been deleted before")
-    }
+    self.nodes.delete_item(index)
   }
 
-  #[wasm_bindgen]
   pub fn add(&self, index: usize, add_index: usize) {
     let mut parent = self.get_scene_node(index).borrow_mut();
     let mut child = self.get_scene_node(add_index).borrow_mut();
@@ -51,7 +33,6 @@ impl SceneGraph {
 
   }
 
-  #[wasm_bindgen]
   pub fn remove(&self, index: usize) {
     let mut self_node = self.get_scene_node(index).borrow_mut();
     if let Some(parent_index) = self_node.parent {
@@ -99,30 +80,26 @@ impl SceneGraph {
   }
 
   fn make_render_data(&self, geometry_id: usize, shading_id: usize) -> RenderData {
-    let geometry = self.geometries[geometry_id].clone();
-    let shading = self.shadings[shading_id].clone();
+    let geometry = self.geometries.get(geometry_id).clone();
+    let shading = self.shadings.get(shading_id).clone();
     RenderData{
       geometry,
       shading
     }
   }
 
-  #[wasm_bindgen]
   pub fn set_render_discriptor(&mut self, node_index: usize, geometry_id: usize, shading_id: usize){
     self.get_scene_node(node_index).borrow_mut().render_data = Some(self.make_render_data(geometry_id, shading_id));
   }
 
-  #[wasm_bindgen]
   pub fn set_node_position(&mut self, index: usize, x: f32, y: f32, z: f32) {
     self.get_scene_node(index).borrow_mut().position.set(x, y, z);
   }
 
-  #[wasm_bindgen]
   pub fn set_node_scale(&mut self, index: usize, x: f32, y: f32, z: f32) {
     self.get_scene_node(index).borrow_mut().scale.set(x, y, z);
   }
 
-  #[wasm_bindgen]
   pub fn set_node_quaternion(&mut self, index: usize, x: f32, y: f32, z: f32, w: f32) {
     self.get_scene_node(index).borrow_mut().rotation.set(x, y, z, w);
   }

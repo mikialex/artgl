@@ -1,3 +1,4 @@
+use crate::utils::ArrayContainer;
 use crate::scene_graph::geometry::Geometry;
 use std::rc::Rc;
 use crate::{log_usize, log};
@@ -69,22 +70,16 @@ impl SceneNode {
 }
 
 #[wasm_bindgen]
-#[derive(Default)]
 pub struct SceneGraph {
-  pub(crate) nodes: Vec<Option<RefCell<SceneNode>>>,
-  pub(crate) tomb_list: Vec<usize>,
-
-  pub(crate) buffers: Vec<Rc<BufferData>>,
-  pub(crate) geometries: Vec<Rc<Geometry>>,
-  pub(crate) shadings: Vec<Rc<Shading>>,
+  pub(crate) nodes: ArrayContainer<RefCell<SceneNode>>,
+  pub(crate) buffers: ArrayContainer<Rc<BufferData>>,
+  pub(crate) geometries: ArrayContainer<Rc<Geometry>>,
+  pub(crate) shadings: ArrayContainer<Rc<Shading>>,
 }
 
 impl SceneGraph {
   pub fn get_scene_node(&self, index: usize) -> &RefCell<SceneNode> {
-    if let Some(node) = &self.nodes[index] {
-      return &node;
-    }
-    panic!("try get a deleted node")
+    self.nodes.get(index)
   }
 
   pub fn traverse<T>
@@ -113,19 +108,17 @@ impl SceneGraph {
 
 #[wasm_bindgen]
 impl SceneGraph {
-  #[wasm_bindgen]
   pub fn new() -> SceneGraph {
-    let root = SceneNode::new(0);
-    SceneGraph {
-      nodes: vec![Some(RefCell::new(root))],
-      tomb_list: Vec::new(),
-      buffers:  Vec::new(),
-      geometries:  Vec::new(),
-      shadings:  Vec::new(),
-    }
+    let mut graph = SceneGraph {
+      nodes: ArrayContainer::new(),
+      buffers:  ArrayContainer::new(),
+      geometries:  ArrayContainer::new(),
+      shadings:  ArrayContainer::new(),
+    };
+    graph.create_new_node(); // as root
+    graph
   }
 
-  #[wasm_bindgen]
   pub fn batch_drawcalls(&self) {
     let root = self.get_scene_node(0);
 

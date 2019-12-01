@@ -7,7 +7,7 @@ import { CommonAttribute, GLDataType } from "@artgl/webgl";
 import { ShaderUniformDecorator, ShaderUniformProvider } from "./interface";
 import {
   constValue, vec4, uniformFromValue, ShaderGraph,
-  WorldPositionFragVary, defaultVertexRoot, ShaderFunction, CameraWorldPosition
+  WorldPositionFragVary, ShaderFunction, CameraWorldPosition
 } from "@artgl/shader-graph";
 
 export const MTransform = new ShaderFunction({
