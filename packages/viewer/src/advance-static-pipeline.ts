@@ -183,15 +183,15 @@ export class AdvanceStaticRenderPipeline {
       )
     )
 
-    // this.graph.setScreenRoot(
-    //   screen().from(
-    //     when(
-    //       false, 
-    //       createTSSAO(),
-    //       pass("copy").useQuad().overrideShading(copier)
-    //         .input("copySource", sceneResult))
-    //   )
-    // )
+    this.graph.setScreenRoot(
+      screen().from(
+        when(
+          false, 
+          createTSSAO(),
+          pass("copy").useQuad().overrideShading(copier)
+            .input("copySource", depthResult))
+      )
+    )
 
   }
 }

@@ -158,7 +158,7 @@ export class RenderEngine implements GLReleasable, RenderGraphBackEnd {
     this.renderer.useProgram(program);
 
     const shadingParams = shading.params;
-    let providerCount = 0;
+    let providerCount = -1;
     shading._decorators.forEach(defaultDecorator => {
 
       let overrideDecorator
@@ -173,6 +173,7 @@ export class RenderEngine implements GLReleasable, RenderGraphBackEnd {
       const decorator = overrideDecorator === undefined ? defaultDecorator : overrideDecorator;
 
       decorator.foreachProvider(provider => {
+        providerCount++;
         if (provider.uploadCache === undefined) { // some provider not provide uniform
           return;
         }
@@ -235,7 +236,6 @@ export class RenderEngine implements GLReleasable, RenderGraphBackEnd {
           program.setUBOIfExist(uboKeys[providerCount], ubo);
         }
         this.lastUploadedShaderUniformProvider.set(provider, provider.uploadCache._version)
-        providerCount++;
       })
     })
 
