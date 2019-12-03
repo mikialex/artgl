@@ -2,6 +2,8 @@
 import { RenderObject } from "./render-object";
 import { RenderEngine } from "./render-engine";
 import { QuadGeometry } from "../built-in-lib/quad-geometry";
+import { RenderItem } from "./render-list";
+import { Matrix4 } from "@artgl/math";
 
 /**
  * Every meaningful draw system like scene should produce drawcall as need.
@@ -11,7 +13,7 @@ import { QuadGeometry } from "../built-in-lib/quad-geometry";
  */
 export interface RenderSource {
 
-  visitAllRenderObject(visitor: (item: RenderObject) => any): void;
+  visitAllRenderObject(visitor: (item: RenderItem) => any): void;
 
   render(engine: RenderEngine): void;
 }
@@ -19,15 +21,20 @@ export interface RenderSource {
 
 const quadMesh = new RenderObject();
 const geometry = new QuadGeometry();
+const i = new Matrix4();
 quadMesh.geometry = geometry;
+const item = {
+  object: quadMesh, 
+  worldMatrix: i
+}
 
 export class QuadSource implements RenderSource {
-  visitAllRenderObject(visitor: (item: RenderObject) => any) {
-    visitor(quadMesh);
+  visitAllRenderObject(visitor: (item: RenderItem) => any) {
+    visitor(item);
   }
 
   render(engine: RenderEngine) {
-    engine.render(quadMesh);
+    engine.renderObject(quadMesh);
   }
 
 }

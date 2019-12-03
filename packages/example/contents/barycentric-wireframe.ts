@@ -1,6 +1,6 @@
 import { TestBridge } from '../src/test-bridge';
 import {
-  Vector3, RenderEngine, Scene, SphereGeometry, Mesh,
+  Vector3, RenderEngine, SphereGeometry, Mesh,
   PerspectiveCamera, Vector4, OrbitController, Shading, PointLight,
   DirectionalLight, AmbientLight, BarycentricWireFrame, PhongShading,
   ExposureController, createBarycentricBufferForStandardGeometry, Size, SceneNode
@@ -12,7 +12,6 @@ export default async function test(testBridge: TestBridge) {
 
   let canvas = testBridge.requestCanvas();
   const engine = new RenderEngine({ el: canvas });
-  const scene = new Scene();
 
   const geometry = new SphereGeometry(1, 30, 30);
   createBarycentricBufferForStandardGeometry(geometry);
@@ -47,6 +46,7 @@ export default async function test(testBridge: TestBridge) {
 
   const camera = new PerspectiveCamera().updateRenderRatio(engine)
   const node = new SceneNode();
+  camera.transform = node.transform;
   camera.transform.position.set(2, 2, 2);
   camera.transform.lookAt(new Vector3(0, 0, 0));
   engine.useCamera(camera);
@@ -64,7 +64,7 @@ export default async function test(testBridge: TestBridge) {
 
   await testBridge.screenShotCompare("test");
 
-  const orbitController = new OrbitController(camera as PerspectiveCamera);
+  const orbitController = new OrbitController(node);
   orbitController.registerInteractor(engine.interactor);
 
   testBridge.resizeObserver.add((size: Size) => {

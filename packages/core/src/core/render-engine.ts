@@ -103,8 +103,8 @@ export class RenderEngine implements GLReleasable, RenderGraphBackEnd {
     source.render(this);
   }
 
-  renderObject(source: Renderable, transform: Matrix4) {
-    source.render(this, transform);
+  renderObject(source: Renderable, transform?: Matrix4) {
+    source.render(this, transform === undefined ? RenderObject.defaultTransform : transform);
   }
 
   renderFrameBuffer(framebuffer: GLFramebuffer, debugViewPort: Vector4) {

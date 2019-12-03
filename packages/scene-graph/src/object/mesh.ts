@@ -1,5 +1,7 @@
-import { RenderObject, PrimitiveVisitor, PrimitiveType } from "@artgl/core/src/core/render-object";
-import { RayCasterable, Raycaster, RayCastResult } from "../../core/raycaster";
+import {
+  RenderObject, PrimitiveVisitor, PrimitiveType,
+  RayCasterable, Raycaster, RayCastResult
+} from "@artgl/core";
 import { Matrix4, Vector3, Face3, Sphere } from "@artgl/math";
 import { DrawMode, CullSide } from "@artgl/webgl";
 
@@ -22,18 +24,18 @@ export class Mesh extends RenderObject
     }
   }
 
-  raycast(raycaster: Raycaster, results: RayCastResult[]): RayCastResult[] {
+  raycast(raycaster: Raycaster, results: RayCastResult[], worldMatrix: Matrix4): RayCastResult[] {
     if (this.geometry === undefined) {
       return results;
     }
 
-    inverse.getInverse(this.worldMatrix, false)
+    inverse.getInverse(worldMatrix, false)
     const localRay = raycaster.getLocalRay(inverse);
     const hitPosition = new Vector3();
 
     // filter by world sphere
     sphere.copy(this.geometry.boundingSphere);
-    sphere.applyMatrix4(this.worldMatrix);
+    sphere.applyMatrix4(worldMatrix);
     if (!raycaster.worldRay.ifIntersectSphere(sphere)) {
       return results;
     }
@@ -49,7 +51,8 @@ export class Mesh extends RenderObject
       if (result !== null) {
         results.push({
           object: this,
-          hitLocalPosition: hitPosition.clone()
+          hitLocalPosition: hitPosition.clone(),
+          worldMatrix
         })
       }
 

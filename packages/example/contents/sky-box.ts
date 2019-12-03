@@ -1,7 +1,7 @@
 import { TestBridge } from '../src/test-bridge';
 import {
   Vector3, Vector4, RenderEngine, Scene, Mesh, PerspectiveCamera, OrbitController,
-  Shading, IBLEnvMap, TorusKnotGeometry, CubeTexture, TextureSource, CubeEnvrionmentMapBackGround
+  Shading, IBLEnvMap, TorusKnotGeometry, CubeTexture, TextureSource, CubeEnvrionmentMapBackGround, SceneNode
 } from 'artgl';
 
 export default async function test(testBridge: TestBridge) {
@@ -23,8 +23,10 @@ export default async function test(testBridge: TestBridge) {
   cubeEnv.texture = skyCubeMap;
 
   const camera = new PerspectiveCamera().updateRenderRatio(engine)
+  const cameraNode = new SceneNode();
+  camera.transform = cameraNode.transform;
   camera.transform.position.set(0, 0, 5);
-  camera.lookAt(new Vector3(0, 0, 0))
+  camera.transform.lookAt(new Vector3(0, 0, 0))
   engine.useCamera(camera);
 
   const scene = new Scene();
@@ -38,7 +40,7 @@ export default async function test(testBridge: TestBridge) {
     .decorate(ibl)
 
   const mesh = new Mesh().g(geometry).s(shading);
-  scene.root.addChild(mesh);
+  scene.root.addChild(new SceneNode().with(mesh));
   scene.background = cubeEnv;
 
   function draw() {
@@ -53,7 +55,7 @@ export default async function test(testBridge: TestBridge) {
 
   await testBridge.screenShotCompare("test");
 
-  const orbitController = new OrbitController(camera as PerspectiveCamera);
+  const orbitController = new OrbitController(cameraNode);
   orbitController.registerInteractor(engine.interactor);
 
   testBridge.resizeObserver.add((size) => {

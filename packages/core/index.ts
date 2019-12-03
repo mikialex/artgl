@@ -18,6 +18,7 @@ export * from "./src/core/render-entity/buffer-data";
 
 export * from "./src/core/shading-decorator";
 export * from "./src/core/shading";
+export * from "./src/core/transformation"
 
 export * from "./src/core/camera";
 export { PerspectiveCamera } from "./src/camera/perspective-camera";

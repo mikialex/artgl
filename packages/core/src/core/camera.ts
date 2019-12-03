@@ -8,6 +8,7 @@ import {
   constValue, vec4, uniformFromValue, ShaderGraph,
   WorldPositionFragVary, ShaderFunction, CameraWorldPosition
 } from "@artgl/shader-graph";
+import { Transformation } from "./transformation";
 
 export const MTransform = new ShaderFunction({
   source: `
@@ -65,6 +66,8 @@ export class Camera
   extends BaseEffectShading<Camera>
   implements ShaderUniformProvider, ShaderUniformDecorator {
 
+  transform = new Transformation();
+
   static readonly WorldMatrixKey = 'WorldMatrix'
   static readonly WorldPositionKey = CameraWorldPosition
   static readonly ViewProjectionMatrix = 'CameraViewProjectionMatrix'
@@ -80,7 +83,7 @@ export class Camera
   decorate(graph: ShaderGraph): void {
     graph.registerSharedUniform(Camera.WorldPositionKey, this.getPropertyUniform('_worldPosition'))
     graph.registerSharedUniform(Camera.ViewProjectionMatrix, this.getPropertyUniform('_renderMatrix'))
-    graph.registerSharedUniform(Camera.WorldMatrixKey, uniformFromValue(Camera.WorldMatrixKey, this.worldMatrix))
+    graph.registerSharedUniform(Camera.WorldMatrixKey, uniformFromValue(Camera.WorldMatrixKey, this.transform.matrix))
     const { MVP: MVPResult, worldPosition } = MVP(graph)
     graph.setVertexRoot(MVPResult);
     graph.setVary(WorldPositionFragVary, worldPosition)

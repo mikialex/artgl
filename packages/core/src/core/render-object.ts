@@ -47,6 +47,7 @@ export type PrimitiveVisitor = (prim: RenderablePrimitive) => any
  * engine will read these information and organize things properly
  */
 export class RenderObject {
+  static defaultTransform = new Matrix4()
 
   material?: Material;
   geometry?: Geometry;

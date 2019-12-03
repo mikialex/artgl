@@ -3,7 +3,7 @@ import {
   Vector3, RenderEngine, SphereGeometry, Mesh,
   PerspectiveCamera, Vector4, OrbitController, Material,
   ChannelType, textureFromUrl, ShaderGraph, texture,
-  BaseEffectShading, UvFragVary, Shading
+  BaseEffectShading, UvFragVary, Shading, SceneNode
 } from 'artgl';
 
 export class CustomShading extends BaseEffectShading<CustomShading> {
@@ -31,17 +31,19 @@ export default async function test(testBridge: TestBridge) {
   
   material.channel(ChannelType.diffuse, texture)
 
-  const mesh = new Mesh().g(geometry).m(material).s(shading)
+  const ball = new Mesh().g(geometry).m(material).s(shading)
 
   const camera = new PerspectiveCamera().updateRenderRatio(engine)
+  const cameraNode = new SceneNode();
+  camera.transform = cameraNode.transform;
   camera.transform.position.set(0, 0, 15);
-  camera.lookAt(new Vector3(0, 0, 0))
+  camera.transform.lookAt(new Vector3(0, 0, 0))
   engine.useCamera(camera);
 
   function draw() {
     engine.setClearColor(new Vector4(0.9, 0.9, 0.9, 1.0))
     engine.clearColor();
-    engine.render(mesh);
+    engine.renderObject(ball);
   }
 
   draw();
@@ -51,7 +53,7 @@ export default async function test(testBridge: TestBridge) {
 
   await testBridge.screenShotCompare("test");
 
-  const orbitController = new OrbitController(camera);
+  const orbitController = new OrbitController(cameraNode);
   orbitController.registerInteractor(engine.interactor);
 
   testBridge.resizeObserver.add((size) => {
