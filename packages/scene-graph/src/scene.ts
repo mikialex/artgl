@@ -53,7 +53,7 @@ export class Scene implements RenderSource, RayCastSource {
   foreachRaycasterable(visitor: (obj: RayCasterable, matrix: Matrix4) => boolean): void {
     this.updateObjectList();
     this.renderList.forEach(item => {
-      if ((item as unknown as RayCasterable).raycasterable === true) {
+      if ((item.object as unknown as RayCasterable).raycasterable === true) {
         visitor(item.object as unknown as RayCasterable, item.worldMatrix);
       }
     })
