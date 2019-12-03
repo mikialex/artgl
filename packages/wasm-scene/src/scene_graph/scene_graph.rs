@@ -1,5 +1,5 @@
 use crate::utils::ArrayContainer;
-use crate::scene_graph::geometry::Geometry;
+use crate::scene_graph::geometry::*;
 use std::rc::Rc;
 use crate::{log_usize, log};
 use core::cell::RefCell;
@@ -18,13 +18,19 @@ pub struct BufferData{
 pub struct RenderData {
   pub shading: Rc<Shading>,
   pub geometry: Rc<Geometry>,
+  pub world_bounding_box: Box3,
+  pub world_bounding_sphere: Sphere,
 }
 
 impl RenderData{
   pub fn new(shading: Rc<Shading>, geometry: Rc<Geometry>)-> Self{
+    let world_bounding_box = geometry.bounding_box;
+    let world_bounding_sphere = geometry.bounding_sphere;
     RenderData{
       shading,
-      geometry
+      geometry,
+      world_bounding_box,
+      world_bounding_sphere,
     }
   }
 }

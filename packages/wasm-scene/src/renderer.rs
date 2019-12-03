@@ -4,7 +4,8 @@ use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{WebGlProgram, WebGlBuffer, WebGlRenderingContext, WebGlShader, HtmlCanvasElement};
-
+use crate::math::*;
+use std::mem;
 
 #[wasm_bindgen]
 pub struct WebGLRenderer {
@@ -32,6 +33,11 @@ impl WebGLRenderer {
 
     pub fn make_demo_buffer(&mut self) -> Result<(), JsValue>{
         let vertices: [f32; 9] = [-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0];
+        // let vertices: [Vec3<f32>; 3] = [
+        //     Vec3::new(-0.7, -0.7, 0.0),
+        //     Vec3::new(0.7, -0.7, 0.0),
+        //     Vec3::new(0.0, 0.7, 0.0)
+        // ];
 
         let buffer = self.gl.create_buffer().ok_or("failed to create buffer")?;
         self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
@@ -45,6 +51,10 @@ impl WebGLRenderer {
         // As a result, after `Float32Array::view` we have to be very careful not to
         // do any memory allocations before it's dropped.
         unsafe {
+            // let n_bytes = vertices.len() * std::mem::size_of::<Vec3<f32>>();
+            // let data: &[f32] = std::slice::from_raw_parts(vertices.as_ptr(), n_bytes);
+
+            // let data: &[f32] = mem::transmute(&vertices);
             let vert_array = js_sys::Float32Array::view(&vertices);
     
             self.gl.buffer_data_with_array_buffer_view(

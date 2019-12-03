@@ -82,10 +82,7 @@ impl SceneGraph {
   fn make_render_data(&self, geometry_id: usize, shading_id: usize) -> RenderData {
     let geometry = self.geometries.get(geometry_id).clone();
     let shading = self.shadings.get(shading_id).clone();
-    RenderData{
-      geometry,
-      shading
-    }
+    RenderData::new(shading, geometry)
   }
 
   pub fn set_render_discriptor(&mut self, node_index: usize, geometry_id: usize, shading_id: usize){
