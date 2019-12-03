@@ -3,7 +3,7 @@ import { Controller } from "./controller";
 import { Nullable } from "@artgl/shared";
 import { Plane } from "@artgl/math";
 import { Interactor } from "./interactor";
-import { SceneNode } from "../scene-graph/scene-node";
+import { SceneNode } from "../scene-node";
 
 export class TransformController extends Controller  {
   reloadStates(): void {

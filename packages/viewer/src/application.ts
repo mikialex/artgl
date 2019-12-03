@@ -1,6 +1,6 @@
 import {
   RenderEngine, Mesh, PerspectiveCamera, OrbitController, Raycaster, SkyBackground,
-  OBJLoader, Scene, Observable, Framer, Material, Geometry, Shading, RenderObject, Vector3,
+  OBJLoader, Scene, Observable, Framer, Material, Geometry, Shading, RenderObject, Vector3, SceneNode,
 } from 'artgl/';
 
 import hierarchyBallBuilder from './scene/hierarchy-balls';
@@ -16,11 +16,12 @@ export class Application {
     this.pipeline = new AdvanceStaticRenderPipeline(this.engine);
 
     this.camera = new PerspectiveCamera();
+    this.camera.transform = this.cameraNode.transform;
     this.camera.transform.position.set(5, 5, 5);
-    this.camera.lookAt(new Vector3(0, 0, 0));
+    this.camera.transform.lookAt(new Vector3(0, 0, 0));
     this.camera.updateRenderRatio(this.engine);
 
-    this.orbitController = new OrbitController(this.camera);
+    this.orbitController = new OrbitController(this.cameraNode);
     this.orbitController.registerInteractor(this.engine.interactor);
     this.createScene(this.scene);
 
@@ -32,6 +33,7 @@ export class Application {
   }
 
   camera: PerspectiveCamera;
+  cameraNode: SceneNode = new SceneNode();
   pipeline: AdvanceStaticRenderPipeline;
   engine: RenderEngine;
   framer: Framer = new Framer();
@@ -128,9 +130,8 @@ export class Application {
     const response = await fetch(STATIC_SERVER + 'obj/chair.obj');
     const result = await response.text();
     const geo = objLoader.parse(result);
-    const mesh = new Mesh();
-    mesh.geometry = geo;
-    this.scene.root.addChild(mesh);
+    const mesh = new Mesh().g(geo);
+    this.scene.root.addChild(new SceneNode().with(mesh));
   }
 
 }

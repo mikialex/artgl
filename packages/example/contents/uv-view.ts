@@ -5,7 +5,7 @@ import {
   BaseEffectShading, ShaderGraph, texture, ChannelType, UvFragVary, vec4,
   constValue, Line, SphereGeometry, Mesh, Material, Texture, GLDataType,
   CommonAttribute, TextureSource, makeStandardGeometryWireFrame,
-  loadObjFile, loadImageFromFile
+  loadObjFile, loadImageFromFile, SceneNode
 } from 'artgl';
 
 class DiffuseShading extends BaseEffectShading<DiffuseShading> {
@@ -41,7 +41,7 @@ export default async function test(testBridge: TestBridge) {
   const uvLineShading = new Shading()
     .decorate(new ShowUV())
     .decoCamera()
-  const line = new Line().g(makeStandardGeometryWireFrame(new SphereGeometry())).s(uvLineShading);
+  const line = new SceneNode().with(new Line().g(makeStandardGeometryWireFrame(new SphereGeometry())).s(uvLineShading));
   scene.root.addChild(line);
 
   const quadGeometry = new PlaneGeometry();
@@ -49,13 +49,15 @@ export default async function test(testBridge: TestBridge) {
   const textureShading = new Shading()
     .decorate(new DiffuseShading())
     .decoCamera()
-  const quad = new Mesh().g(quadGeometry).s(textureShading).m(material);
+  const quad =  new SceneNode().with(new Mesh().g(quadGeometry).s(textureShading).m(material));
   quad.transform.position.set(0.5,0.5,-0.01)
   scene.root.addChild(quad);
 
   const camera = new PerspectiveCamera().updateRenderRatio(engine)
+  const cameraNode = new SceneNode();
+  camera.transform = cameraNode.transform;
   camera.transform.position.set(0.5, 0.5, 2);
-  camera.lookAt(new Vector3(0.5, 0.5, 0))
+  camera.transform.lookAt(new Vector3(0.5, 0.5, 0))
   engine.useCamera(camera);
 
   function draw() {
@@ -71,7 +73,7 @@ export default async function test(testBridge: TestBridge) {
 
   await testBridge.screenShotCompare("test");
 
-  const orbitController = new OrbitController(camera as PerspectiveCamera);
+  const orbitController = new OrbitController(cameraNode);
   orbitController.registerInteractor(engine.interactor);
 
   testBridge.resizeObserver.add((size) => {
@@ -91,7 +93,7 @@ export default async function test(testBridge: TestBridge) {
         const newGeometry = await loadObjFile();
         makeStandardGeometryWireFrame(newGeometry);
         // line.geometry!.dispose(); // todo
-        line.g(newGeometry);
+        line.renderEntities[0].g(newGeometry);
       },
     },
     {

@@ -1,6 +1,5 @@
 import { Vector3, Vector2 } from "@artgl/math";
-import { loadStringFromFile } from "../util/file-io";
-import { GeometryLoader } from "../scene-graph/loader";
+import { loadStringFromFile } from "@artgl/core/src/util/file-io";
 import { StandardGeometry, generateNormalFromPosition } from "@artgl/lib-geometry";
 
 export async function loadObjFile(): Promise<StandardGeometry> {
@@ -9,7 +8,7 @@ export async function loadObjFile(): Promise<StandardGeometry> {
   return loader.parse(str);
 }
 
-export class OBJLoader extends GeometryLoader{
+export class OBJLoader {
   private vertexPattern = /v( +[\d|\.|\+|\-|e|E]+)( +[\d|\.|\+|\-|e|E]+)( +[\d|\.|\+|\-|e|E]+)/;
   // vn float float float
 

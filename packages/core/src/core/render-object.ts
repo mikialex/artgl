@@ -1,12 +1,8 @@
-import { Geometry } from "../../core/render-entity/geometry";
-import { SceneNode, ExtendWithSceneNode } from "../scene-node";
-import { Material } from "../../core/render-entity/material";
-import { DrawState } from "../../core/render-entity/draw-state";
-import { Vector3, Face3, Line3 } from "@artgl/math"
-import { Shading } from "../../core/shading";
-import { RenderEngine } from "../../core/render-engine";
+import { Vector3, Face3, Line3, Matrix4 } from "@artgl/math"
 import { DrawMode } from "@artgl/webgl";
 import { StandardGeometry } from "@artgl/lib-geometry";
+import { Material, Geometry, Shading, RenderEngine } from "../..";
+import { DrawState } from "./render-entity/draw-state";
 
 export class RenderRange {
   static fromStandardGeometry(geometry: StandardGeometry) {
@@ -50,7 +46,8 @@ export type PrimitiveVisitor = (prim: RenderablePrimitive) => any
  * and many other draw config such as blending depth behavior defined in state object
  * engine will read these information and organize things properly
  */
-export class RenderObjectSelf {
+export class RenderObject {
+  static defaultTransform = new Matrix4()
 
   material?: Material;
   geometry?: Geometry;
@@ -80,7 +77,7 @@ export class RenderObjectSelf {
     return this;
   }
 
-  render(engine: RenderEngine) {
+  render(engine: RenderEngine, worldMatrix: Matrix4) {
     
     if (this.geometry === undefined) {
       return;
@@ -89,7 +86,7 @@ export class RenderObjectSelf {
     const shading = engine.getRealUseShading(this);
 
     // prepare technique
-    engine.renderObjectWorldMatrix = this.worldMatrix;
+    engine.renderObjectWorldMatrix = worldMatrix;
     engine.useShading(shading);
 
     // prepare material
@@ -108,7 +105,3 @@ export class RenderObjectSelf {
     engine.useShading(null);
   }
 }
-
-export interface RenderObjectSelf extends SceneNode { }
-export interface RenderObject extends SceneNode, RenderObjectSelf { }
-export const RenderObject = ExtendWithSceneNode(RenderObjectSelf)

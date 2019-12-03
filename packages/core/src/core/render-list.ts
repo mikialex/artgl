@@ -1,12 +1,16 @@
-import { RenderObject } from "./object/render-object";
-import { Nullable } from "../..";
+import { Matrix4, RenderObject } from "artgl";
+
+export interface RenderItem {
+  object: RenderObject,
+  worldMatrix: Matrix4,
+}
 
 export class RenderList {
 
-  private list: Nullable<RenderObject>[] = [];
+  private list: RenderItem[] = [];
   private realLength: number = 0;
 
-  public addRenderItem(object: RenderObject) {
+  public addRenderItem(object: RenderItem) {
     if (this.realLength < this.list.length) {
       this.list[this.realLength] = object;
     } else {
@@ -15,9 +19,9 @@ export class RenderList {
     this.realLength++;
   }
 
-  forEach(visitor: (object: RenderObject) => any) {
+  forEach(visitor: (object: RenderItem) => any) {
     for (let i = 0; i < this.realLength; i++) {
-      visitor(this.list[i] as RenderObject);
+      visitor(this.list[i]);
     }
   }
 

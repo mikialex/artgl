@@ -1,4 +1,4 @@
-import { Geometry } from "../core/render-entity/geometry";
+import { Geometry } from "@artgl/core";
 
 /**
  * Base class for resource loader 

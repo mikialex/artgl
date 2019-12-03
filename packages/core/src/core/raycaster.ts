@@ -2,7 +2,7 @@ import { Vector3, Matrix4, Ray } from "@artgl/math"
 import { Nullable } from "@artgl/shared";
 
 export interface RayCastSource{
-  foreachRaycasterable(visitor: (obj: RayCasterable)=> boolean): void;
+  foreachRaycasterable(visitor: (obj: RayCasterable, matrix: Matrix4)=> boolean): void;
 }
 
 export interface RayCasterable {
@@ -12,22 +12,20 @@ export interface RayCasterable {
    */
   raycasterable: true
 
-  worldMatrix: Matrix4;
-
   /**
    * check if this obj has any hit, should early return.
    */
-  raycastIfHit(raycaster: Raycaster): boolean
+  raycastIfHit(raycaster: Raycaster, worldMatrix: Matrix4): boolean
 
   /**
    * get all raycast point on this obj, push the results in results array
    */
-  raycast(raycaster: Raycaster, results: RayCastResult[]): RayCastResult[];
+  raycast(raycaster: Raycaster, results: RayCastResult[], worldMatrix: Matrix4): RayCastResult[]
 
   /**
    * get first raycast point on this obj, return null if not hit
    */
-  raycastFirst(raycaster: Raycaster): Nullable<RayCastResult>
+  raycastFirst(raycaster: Raycaster, worldMatrix: Matrix4): Nullable<RayCastResult>
 }
 
 
@@ -40,6 +38,8 @@ export interface RayCastResult {
    * hit object
    */
   object: RayCasterable
+
+  worldMatrix: Matrix4
 
   /**
   * The hit position in object's local space.
@@ -73,13 +73,13 @@ export class Raycaster {
 
   pick(source: RayCastSource, preFilter?: (obj: RayCasterable) => boolean) {
     const results: RayCastResult[] = [];
-    source.foreachRaycasterable((obj) => {
+    source.foreachRaycasterable((obj, matrix) => {
 
       if (preFilter !== undefined && !preFilter(obj)) {
         return true;
       }
 
-      (obj as unknown as RayCasterable).raycast(this, results);
+      (obj as unknown as RayCasterable).raycast(this, results, matrix);
       
       return true;
     })
@@ -89,7 +89,7 @@ export class Raycaster {
   pickFirst(source: RayCastSource, preFilter?: (obj: RayCasterable) => boolean) {
     // TODO use pre exist 
     return this.pick(source, preFilter).map(re => {
-      const hitWorldPosition = re.hitLocalPosition.applyMatrix4(re.object.worldMatrix);
+      const hitWorldPosition = re.hitLocalPosition.applyMatrix4(re.worldMatrix);
       return {
         cameraDistance: this.worldRay.origin.distanceTo(hitWorldPosition),
         hitWorldPosition,

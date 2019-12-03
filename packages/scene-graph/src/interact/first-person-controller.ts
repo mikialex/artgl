@@ -1,8 +1,8 @@
 import { Controller } from "./controller";
 import { Interactor } from "./interactor";
-import { SceneNode } from "../scene-graph/scene-node";
+import { SceneNode } from "../scene-node";
 import { Vector3, MathUtil } from "@artgl/math";
-import { Spherical } from "../../../math/src/spherical";
+import { Spherical } from "@artgl/math/src/spherical";
 
 const targetPosition = new Vector3();
 
