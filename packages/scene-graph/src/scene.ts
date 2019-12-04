@@ -1,16 +1,11 @@
-
-import { RenderSource } from "../core/render-source";
-import { RenderList } from "./render-list";
-import { Geometry } from "../core/render-entity/geometry";
-import { Material } from "../core/render-entity/material";
-import { Shading } from "../core/shading";
-import { RefCountMap } from "../util/ref-count-map";
-import { Background, SolidColorBackground } from "./background";
-import { RayCastSource, RayCasterable } from "../core/raycaster";
+import { 
+  RayCastSource, Geometry, Material, Shading, RenderObject,
+  NormalShading, RayCasterable, RenderEngine, RenderSource, Matrix4
+} from "@artgl/core";
 import { SceneNode } from "./scene-node";
-import { NormalShading } from "../built-in-lib/normal";
-import { RenderObject } from "./object/render-object";
-import { RenderEngine } from "../core/render-engine";
+import { RenderList, RenderItem } from "@artgl/core/src/core/render-list";
+import { Background, SolidColorBackground } from "./background";
+import { RefCountMap } from "./ref-count-map";
 
 /**
  * scene data management
@@ -48,18 +43,18 @@ export class Scene implements RenderSource, RayCastSource {
     }
   }
 
-  visitAllRenderObject(visitor: (item: RenderObject) => any) {
+  visitAllRenderObject(visitor: (item: RenderItem) => any) {
     this.updateObjectList();
     this.renderList.forEach(item => {
       visitor(item);
     })
   }
 
-  foreachRaycasterable(visitor: (obj: RayCasterable) => boolean): void {
+  foreachRaycasterable(visitor: (obj: RayCasterable, matrix: Matrix4) => boolean): void {
     this.updateObjectList();
     this.renderList.forEach(item => {
-      if ((item as unknown as RayCasterable).raycasterable === true) {
-        visitor(item as unknown as RayCasterable);
+      if ((item.object as unknown as RayCasterable).raycasterable === true) {
+        visitor(item.object as unknown as RayCasterable, item.worldMatrix);
       }
     })
   }
@@ -71,7 +66,7 @@ export class Scene implements RenderSource, RayCastSource {
 
   renderScene = (engine: RenderEngine) => {
     this.visitAllRenderObject((item) => {
-      engine.render(item);
+      engine.renderObject(item.object, item.worldMatrix);
     })
   }
 
@@ -119,9 +114,10 @@ export class Scene implements RenderSource, RayCastSource {
         return false;
       }
 
-      if (node instanceof RenderObject) {
-        this.renderList.addRenderItem(node as RenderObject); //todo
-      }
+      node.renderEntities.forEach(object => {
+        this.renderList.addRenderItem({object, worldMatrix: node.worldMatrix})
+      })
+
     });
 
   }

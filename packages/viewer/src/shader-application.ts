@@ -1,7 +1,7 @@
 
 import {
   RenderEngine, Mesh, OrbitController, Shading,
-  ShaderGraph, PerspectiveCamera, Scene, NormalShading, SphereGeometry
+  ShaderGraph, PerspectiveCamera, Scene, NormalShading, SphereGeometry, SceneNode
 } from 'artgl';
 
 export class ShaderApplication {
@@ -9,10 +9,12 @@ export class ShaderApplication {
     this.canvas = canvas;
     this.engine = new RenderEngine({ el: canvas });
 
-    this.camera.transform.position.set(20, 10, 10)
+    this.cameraNode.transform.position.set(20, 10, 10)
     this.camera.updateRenderRatio(this.engine);
+    this.camera.transform = this.cameraNode.transform;
 
-    this.orbitController = new OrbitController(this.camera);
+
+    this.orbitController = new OrbitController(this.cameraNode);
     this.orbitController.registerInteractor(this.engine.interactor);
     this.shader = new Shading().decorate(new NormalShading());
     // this.loadScene();
@@ -27,6 +29,7 @@ export class ShaderApplication {
   graph: ShaderGraph = new ShaderGraph();
   scene: Scene = new Scene();
   camera: PerspectiveCamera = new PerspectiveCamera();
+  cameraNode: SceneNode = new SceneNode();
 
   shader: Shading;
   mesh: Mesh = new Mesh();
@@ -50,7 +53,7 @@ export class ShaderApplication {
     mesh.geometry = testGeo;
     mesh.shading = this.shader;
     this.mesh = mesh;
-    this.scene.root.addChild(mesh);
+    this.scene.root.addChild(new SceneNode().with(mesh));
   }
 
   canvasRun: boolean = false;

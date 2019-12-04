@@ -11,6 +11,7 @@ const tempMatrix = new Matrix4();
  * @class Transformation
  */
 export class Transformation{
+  static defaultUp = new Vector3(0, 1, 0);
   constructor() {
     this._position.onChange = () => {
       this.matrixIsDirty = true;
@@ -126,8 +127,8 @@ export class Transformation{
     return this._quaternion;
   }
 
-  lookAt(targetPosition: Vector3, up: Vector3) {
-    tempMatrix.lookAt(this.position, targetPosition, up);
+  lookAt(targetPosition: Vector3, up?: Vector3) {
+    tempMatrix.lookAt(this.position, targetPosition, up === undefined ? Transformation.defaultUp : up);
     this.quaternion.setFromRotationMatrix(tempMatrix);
   }
 

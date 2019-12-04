@@ -1,4 +1,4 @@
-import { RenderObject } from "./render-object";
+import { RenderObject } from "@artgl/core";
 import { DrawMode } from "@artgl/webgl";
 
 export class Line extends RenderObject{

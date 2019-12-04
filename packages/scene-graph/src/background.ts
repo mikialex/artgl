@@ -1,11 +1,10 @@
 import { Vector4 } from "@artgl/math";
-import { RenderEngine } from "../core/render-engine";
-import { Shading } from "../core/shading";
+import { RenderEngine, Shading, CubeTexture } from "@artgl/core";
 import { Mesh } from "./object/mesh";
-import { CubeTexture } from "../core/render-entity/texture-cube";
 import { CullSide } from "@artgl/webgl";
 import { SphereGeometry } from "@artgl/lib-geometry";
 import { CubeEnvMapShading, SkyShading } from "@artgl/lib-shading";
+import { SceneNode } from "./scene-node";
 
 export abstract class Background {
   abstract render(engine: RenderEngine): void;
@@ -27,16 +26,17 @@ const domeSphere = new SphereGeometry()
 export class SkyBackground extends Background {
   skyShading = new Shading().decoCamera().decorate(new SkyShading())
   private domeMesh = new Mesh().g(domeSphere).s(this.skyShading)
+  private node = new SceneNode();
 
   constructor() {
     super();
-    this.domeMesh.transform.scale.setAll(100);
-    this.domeMesh.updateWorldMatrix();
+    this.node.transform.scale.setAll(100);
+    this.node.updateWorldMatrix();
     this.domeMesh.state.cullSide = CullSide.CullFaceNone
   }
 
   render(engine: RenderEngine) {
-    engine.render(this.domeMesh);
+    engine.renderObject(this.domeMesh, this.node.worldMatrix);
   }
 }
 
@@ -45,6 +45,7 @@ export class CubeEnvrionmentMapBackGround extends Background {
   envMapDeco = new CubeEnvMapShading();
   shading: Shading;
   private domeMesh = new Mesh().g(domeSphere).s(this.shading)
+  private node = new SceneNode();
 
   private _texture: CubeTexture
 
@@ -60,8 +61,8 @@ export class CubeEnvrionmentMapBackGround extends Background {
   constructor(texture: CubeTexture) {
     super();
     this.shading = new Shading().decoCamera().decorate(this.envMapDeco)
-    this.domeMesh.transform.scale.setAll(100);
-    this.domeMesh.updateWorldMatrix();
+    this.node.transform.scale.setAll(100);
+    this.node.updateWorldMatrix();
     this.domeMesh.state.cullSide = CullSide.CullFaceNone
     this.domeMesh.g(domeSphere).s(this.shading)
 
@@ -70,7 +71,7 @@ export class CubeEnvrionmentMapBackGround extends Background {
   }
 
   render(engine: RenderEngine) {
-    engine.render(this.domeMesh);
+    engine.renderObject(this.domeMesh, this.node.worldMatrix);
   }
 }
 
