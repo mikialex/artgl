@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 use crate::math::vec3::Vec3;
+use crate::math::vec::Math;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Box3{
@@ -23,7 +24,6 @@ impl Box3{
   }
 
   pub fn expandByPoint(&mut self, point: Vec3<f32>) {
-    use crate::math::vec::Math;
 		self.min.min(point);
 		self.max.max(point);
 	}
@@ -52,12 +52,24 @@ impl Sphere{
     }
   }
 
+  pub fn makeFromPositionBufferWithBox(position:&[f32], box3: &Box3) -> Self {
+    let center = (box3.max + box3.min) / 2.;
+    let mut max_distance2 = 0.;
+    for index in 0..position.len()/3 {
+      let i = index*3;
+      let p = Vec3::new(position[i], position[i+1], position[i+2]);
+      let d = (p - center).length2();
+      max_distance2 = max_distance2.max(d);
+    };
+    Sphere::new(center, max_distance2.sqrt())
+  }
+
 }
 
 pub struct BufferData<T> {
-  id: usize,
-  data: Vec<T>,
-  stride: usize,
+  pub id: usize,
+  pub data: Vec<T>,
+  pub stride: usize,
 }
 
 impl<T> BufferData<T> {
@@ -88,7 +100,7 @@ impl Geometry {
     if position.stride != 3 {
       Err(String::from("postion buffer is not stride of 3"))
     }else{
-      let geo = Geometry{
+      let mut geo = Geometry{
         bounding_box: Box3::new(Vec3::new(1.,1.,1.), Vec3::new(1.,1.,1.)),
         bounding_sphere: Sphere::new(Vec3::new(1.,1.,1.), 1.),
         id: index, 
@@ -96,12 +108,14 @@ impl Geometry {
         index: None,
         attributes: HashMap::new()
       };
+      geo.update_bounding();
       Ok(geo)
     }
   }
 
   pub fn update_bounding(&mut self){
-    
+    self.bounding_box = Box3::makeFromPositionBuffer(&self.position.data);
+    self.bounding_sphere = Sphere::makeFromPositionBufferWithBox(&self.position.data, &self.bounding_box);
   }
 
 
