@@ -75,7 +75,7 @@ export default class BooleanEditor extends Vue {
     const geo = objLoader.parse(objStr);
     const mesh = new Mesh();
     mesh.geometry = geo;
-    this.node!.addChild(mesh);
+    this.node!.addChild(new SceneNode().with(mesh));
     this.showMenu = false;
   }
 

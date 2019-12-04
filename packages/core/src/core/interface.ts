@@ -3,6 +3,7 @@ import {
   ArrayFlattenable, uniformUploadType, Nullable, UBOProvider, ShaderGraphUniformProvider,
   RenderEngine, WebGLAttributeBuffersProvider, Geometry, Material, Shading, RenderRange, Vector4Like
 } from "../..";
+import { Matrix4 } from "artgl";
 
 export interface GeometryWebGLDataProvider extends WebGLAttributeBuffersProvider{
   needIndexUint32(): boolean;
@@ -11,7 +12,7 @@ export interface GeometryWebGLDataProvider extends WebGLAttributeBuffersProvider
 }
 
 export interface Renderable {
-  render(engine: RenderEngine): void;
+  render(engine: RenderEngine, transform: Matrix4): void;
 }
 
 export interface IRenderEngine {

@@ -1,7 +1,7 @@
 import { TestBridge } from '../src/test-bridge';
 import {
   Vector3, RenderRange, Vector4, RenderEngine, CullSide,
-  Scene, SphereGeometry, Mesh, PerspectiveCamera, OrbitController
+  Scene, SphereGeometry, Mesh, PerspectiveCamera, OrbitController, SceneNode
 } from 'artgl';
 
 export default async function test(testBridge: TestBridge) {
@@ -12,21 +12,22 @@ export default async function test(testBridge: TestBridge) {
   const engine = new RenderEngine({ el: canvas });
 
   const scene = new Scene();
-
-  const mesh = new Mesh();
-
   const geometry = new SphereGeometry();
-  mesh.geometry = geometry; 
+
+  const mesh = new Mesh().g(geometry);
+  const node = new SceneNode().with(mesh);
 
   const range = RenderRange.fromStandardGeometry(geometry);
   mesh.range = range;
   mesh.state.cullSide = CullSide.CullFaceNone;
 
-  scene.root.addChild(mesh);
+  scene.root.addChild(node);
 
   const camera = new PerspectiveCamera().updateRenderRatio(engine)
+  const cameraNode = new SceneNode();
+  camera.transform = cameraNode.transform;
   camera.transform.position.set(0, 0, 5);
-  camera.lookAt(new Vector3(0, 0, 0))
+  camera.transform.lookAt(new Vector3(0, 0, 0))
   engine.useCamera(camera);
 
   function draw() {
@@ -41,7 +42,7 @@ export default async function test(testBridge: TestBridge) {
 
   await testBridge.screenShotCompare("test");
 
-  const orbitController = new OrbitController(camera as PerspectiveCamera);
+  const orbitController = new OrbitController(cameraNode);
   orbitController.registerInteractor(engine.interactor);
 
   testBridge.resizeObserver.add((size) => {

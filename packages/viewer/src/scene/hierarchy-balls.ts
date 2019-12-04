@@ -1,6 +1,6 @@
 import {
   SphereGeometry, PlaneGeometry, Mesh, SceneNode,
-  Shading, CubeGeometry, createBarycentricBufferForStandardGeometry
+  Shading, CubeGeometry, createBarycentricBufferForStandardGeometry, Scene
 } from 'artgl';
 import { Application } from '../application';
 
@@ -14,21 +14,22 @@ export default function (root: SceneNode, app: Application, shading: Shading) {
 
   app.engine.defaultShading = shading;
 
-  const planeMesh = new Mesh().g(planeGeo).s(shading)
+  const planeMesh = new SceneNode().with(new Mesh().g(planeGeo).s(shading))
   root.addChild(planeMesh);
 
-  const ground = new Mesh().g(planeGeo).s(shading)
+  const ground = new SceneNode().with(new Mesh().g(planeGeo).s(shading))
   ground.transform.position.y = -2;
   ground.transform.rotation.x = - Math.PI / 4;
   ground.transform.rotation.y = - Math.PI / 4;
   root.addChild(ground);
 
-  const boxMesh = new Mesh().g(cubeGeo).s(shading)
+  const boxMesh = new SceneNode().with(new Mesh().g(cubeGeo).s(shading));
   boxMesh.transform.position.y = -2;
   root.addChild(boxMesh);
 
   const arraySize = 5;
   const grid = 1;
+  const ball = new Mesh().g(sphereGeo).s(shading);
   for (let i = 0; i < arraySize; i++) {
     const node = new SceneNode();
     node.transform.position.x = i * grid;
@@ -39,7 +40,7 @@ export default function (root: SceneNode, app: Application, shading: Shading) {
       node.addChild(node2);
       for (let k = 0; k < arraySize; k++) {
 
-        const testMesh = new Mesh().g(sphereGeo).s(shading)
+        const testMesh = new SceneNode().with(ball);
         testMesh.transform.position.z = k * grid;
         testMesh.transform.scale.setAll(0.3);
         // testMesh.transform.scale.set(0.3 + i * 0.1, 0.3 + j * 0.1, 0.3 + k * 0.1);

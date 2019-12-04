@@ -1,6 +1,6 @@
 
 import { Interactor } from "./interactor";
-import { Nullable } from "../..";
+import { Nullable } from "@artgl/core";
 
 export abstract class Controller{
 
