@@ -1,3 +1,4 @@
+use crate::scene_graph::render_object::RenderObject;
 use crate::utils::ArrayContainer;
 use crate::scene_graph::geometry::*;
 use std::rc::Rc;
@@ -11,26 +12,6 @@ pub struct Shading {
   
 }
 
-pub struct RenderData {
-  pub shading: Rc<Shading>,
-  pub geometry: Rc<Geometry>,
-  pub world_bounding_box: Box3,
-  pub world_bounding_sphere: Sphere,
-}
-
-impl RenderData{
-  pub fn new(shading: Rc<Shading>, geometry: Rc<Geometry>)-> Self{
-    let world_bounding_box = geometry.bounding_box;
-    let world_bounding_sphere = geometry.bounding_sphere;
-    RenderData{
-      shading,
-      geometry,
-      world_bounding_box,
-      world_bounding_sphere,
-    }
-  }
-}
-
 pub struct SceneNode {
   index: usize,
 
@@ -41,7 +22,7 @@ pub struct SceneNode {
   pub matrix_local: Mat4<f32>,
   pub matrix_world: Mat4<f32>,
 
-  pub render_data: Option<RenderData>,
+  pub render_data: Option<Rc<RenderObject>>,
 
   pub(crate) parent: Option<usize>,
   pub(crate) left_brother: Option<usize>,
@@ -77,6 +58,7 @@ pub struct SceneGraph {
   pub(crate) buffers: ArrayContainer<Rc<BufferData<f32>>>,
   pub(crate) geometries: ArrayContainer<Rc<Geometry>>,
   pub(crate) shadings: ArrayContainer<Rc<Shading>>,
+  pub(crate) render_objects: ArrayContainer<Rc<RenderObject>>,
 }
 
 impl SceneGraph {
@@ -116,6 +98,7 @@ impl SceneGraph {
       buffers:  ArrayContainer::new(),
       geometries:  ArrayContainer::new(),
       shadings:  ArrayContainer::new(),
+      render_objects: ArrayContainer::new(),
     };
     graph.create_new_node(); // as root
     graph

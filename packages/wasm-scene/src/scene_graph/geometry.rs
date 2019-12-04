@@ -23,16 +23,16 @@ impl Box3{
     )
   }
 
-  pub fn expandByPoint(&mut self, point: Vec3<f32>) {
+  pub fn expand_by_point(&mut self, point: Vec3<f32>) {
 		self.min.min(point);
 		self.max.max(point);
 	}
 
-  pub fn makeFromPositionBuffer(position:&[f32]) -> Self {
+  pub fn make_from_position_buffer(position:&[f32]) -> Self {
     let mut b = Box3::empty();
     for index in 0..position.len()/3 {
       let i = index*3;
-      b.expandByPoint(Vec3::new(position[i], position[i+1], position[i+2]));
+      b.expand_by_point(Vec3::new(position[i], position[i+1], position[i+2]));
     };
     b
   }
@@ -52,7 +52,7 @@ impl Sphere{
     }
   }
 
-  pub fn makeFromPositionBufferWithBox(position:&[f32], box3: &Box3) -> Self {
+  pub fn make_from_position_buffer_with_box(position:&[f32], box3: &Box3) -> Self {
     let center = (box3.max + box3.min) / 2.;
     let mut max_distance2 = 0.;
     for index in 0..position.len()/3 {
@@ -114,8 +114,8 @@ impl Geometry {
   }
 
   pub fn update_bounding(&mut self){
-    self.bounding_box = Box3::makeFromPositionBuffer(&self.position.data);
-    self.bounding_sphere = Sphere::makeFromPositionBufferWithBox(&self.position.data, &self.bounding_box);
+    self.bounding_box = Box3::make_from_position_buffer(&self.position.data);
+    self.bounding_sphere = Sphere::make_from_position_buffer_with_box(&self.position.data, &self.bounding_box);
   }
 
 
