@@ -69,20 +69,20 @@ impl SceneGraph {
   pub fn traverse<T>
   (&self, node: &RefCell<SceneNode>, visitor: T)
   where T: Fn(&RefCell<SceneNode>, &SceneGraph) -> () {
-    let mut travers_stack: Vec<&RefCell<SceneNode>> = Vec::new();
-    travers_stack.push(node);
+    let mut traverse_stack: Vec<&RefCell<SceneNode>> = Vec::new();
+    traverse_stack.push(node);
 
-    while let Some(node_to_visit) = travers_stack.pop() {
+    while let Some(node_to_visit) = traverse_stack.pop() {
       visitor(node_to_visit, self);
 
-      // add childs to stack
+      // add children to stack
       if let Some(first_child_index) = node_to_visit.borrow().first_child {
         let first_child = self.get_scene_node(first_child_index);
-        travers_stack.push(first_child);
+        traverse_stack.push(first_child);
         let mut child_next = first_child;
         while let Some(next_child_index) = child_next.borrow().right_brother {
           let next_child = self.get_scene_node(next_child_index);
-          travers_stack.push(next_child);
+          traverse_stack.push(next_child);
           child_next = next_child
         }
       }
