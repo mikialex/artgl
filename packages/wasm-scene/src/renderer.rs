@@ -31,6 +31,25 @@ impl WebGLRenderer {
         })
     }
 
+    pub fn make_buffer(&mut self, vertices: &[f32]) -> Result<(), JsValue>{
+
+        let buffer = self.gl.create_buffer().ok_or("failed to create buffer")?;
+        self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
+    
+        unsafe {
+            let vert_array = js_sys::Float32Array::view(&vertices);
+    
+            self.gl.buffer_data_with_array_buffer_view(
+                WebGlRenderingContext::ARRAY_BUFFER,
+                &vert_array,
+                WebGlRenderingContext::STATIC_DRAW,
+            );
+        }
+        self.buffers.push(buffer);
+        Ok(())
+    }
+
+
     pub fn make_demo_buffer(&mut self) -> Result<(), JsValue>{
         let vertices: [f32; 9] = [-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0];
         // let vertices: [Vec3<f32>; 3] = [

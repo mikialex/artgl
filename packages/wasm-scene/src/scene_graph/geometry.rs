@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::rc::Rc;
 use crate::math::vec3::Vec3;
 
@@ -13,6 +14,27 @@ impl Box3{
       min,
       max,
     }
+  }
+  pub fn empty() -> Self{
+    Box3::new(
+      Vec3::new(std::f32::INFINITY, std::f32::INFINITY, std::f32::INFINITY),
+      Vec3::new(std::f32::NEG_INFINITY, std::f32::NEG_INFINITY, std::f32::NEG_INFINITY),
+    )
+  }
+
+  pub fn expandByPoint(&mut self, point: Vec3<f32>) {
+    use crate::math::vec::Math;
+		self.min.min(point);
+		self.max.max(point);
+	}
+
+  pub fn makeFromPositionBuffer(position:&[f32]) -> Self {
+    let mut b = Box3::empty();
+    for index in 0..position.len()/3 {
+      let i = index*3;
+      b.expandByPoint(Vec3::new(position[i], position[i+1], position[i+2]));
+    };
+    b
   }
 }
 
@@ -30,9 +52,6 @@ impl Sphere{
     }
   }
 
-  // pub fn makeFromPositionBuffer() -> Self {
-
-  // }
 }
 
 pub struct BufferData<T> {
@@ -60,16 +79,24 @@ pub struct Geometry {
   pub position: Rc<BufferData<f32>>, 
   pub index: Option<Rc<BufferData<usize>>>,
 
+  pub attributes: HashMap<String, Rc<BufferData<f32>>>
+
 }
 
 impl Geometry {
-  pub fn new(index: usize, position: Rc<BufferData<f32>>) -> Geometry{
-    Geometry{
-      bounding_box: Box3::new(Vec3::new(1.,1.,1.), Vec3::new(1.,1.,1.)),
-      bounding_sphere: Sphere::new(Vec3::new(1.,1.,1.), 1.),
-      id: index, 
-      position,
-      index: None,
+  pub fn new(index: usize, position: Rc<BufferData<f32>>) -> Result<Geometry, String>{
+    if position.stride != 3 {
+      Err(String::from("postion buffer is not stride of 3"))
+    }else{
+      let geo = Geometry{
+        bounding_box: Box3::new(Vec3::new(1.,1.,1.), Vec3::new(1.,1.,1.)),
+        bounding_sphere: Sphere::new(Vec3::new(1.,1.,1.), 1.),
+        id: index, 
+        position,
+        index: None,
+        attributes: HashMap::new()
+      };
+      Ok(geo)
     }
   }
 

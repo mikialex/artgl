@@ -18,6 +18,16 @@ export class WasmSceneGraph{
         return node;
     }
 
+    createNewBuffer(data: Float32Array, stride: number): BufferData {
+        const index = this.wasmScene.create_new_buffer_data(data, stride);
+        const buffer = new BufferData(this, index);
+        return buffer;
+    }
+
+    createNewGeometry(positionBuffer: BufferData, ) {
+        
+    }
+
     // createShading(): Shading{
     //     const index = this.wasmScene.create_shading();
     //     return new Shading()
@@ -49,6 +59,9 @@ export class WASMIndexedObject{
 }
 
 export class Geometry extends WASMIndexedObject{
+}
+
+export class BufferData extends WASMIndexedObject{
 }
 
 export class Shading  extends WASMIndexedObject{

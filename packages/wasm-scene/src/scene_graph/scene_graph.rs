@@ -11,10 +11,6 @@ pub struct Shading {
   
 }
 
-pub struct BufferData{
-  pub id: usize
-}
-
 pub struct RenderData {
   pub shading: Rc<Shading>,
   pub geometry: Rc<Geometry>,
@@ -78,7 +74,7 @@ impl SceneNode {
 #[wasm_bindgen]
 pub struct SceneGraph {
   pub(crate) nodes: ArrayContainer<RefCell<SceneNode>>,
-  pub(crate) buffers: ArrayContainer<Rc<BufferData>>,
+  pub(crate) buffers: ArrayContainer<Rc<BufferData<f32>>>,
   pub(crate) geometries: ArrayContainer<Rc<Geometry>>,
   pub(crate) shadings: ArrayContainer<Rc<Shading>>,
 }

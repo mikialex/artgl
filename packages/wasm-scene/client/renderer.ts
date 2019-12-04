@@ -6,6 +6,7 @@ export class Renderer{
         this.wasmRenderer = WebGLRenderer.new(canvas);
         // this.wasmRenderer.make_demo_program();
         this.wasmRenderer.make_demo_buffer();
+        this.wasmRenderer.make_buffer(new Float32Array([-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0]));
         this.wasmRenderer.make_program(
             `            
             attribute vec4 position;
