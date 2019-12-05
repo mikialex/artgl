@@ -4,6 +4,7 @@ import barycentric from '../contents/barycentric-wireframe'
 import texture from '../contents/texture'
 import skybox from '../contents/sky-box'
 import uvView from '../contents/uv-view'
+import perf from '../contents/performance'
 
 export interface Example{
   name: string,  // show in url
@@ -43,6 +44,11 @@ export const examples: Example[] = [
     name:  "uv-view",
     title: "UV viewer",
     build: uvView
+  },
+  {
+    name:  "performance",
+    title: "test",
+    build: perf
   },
 ];
 

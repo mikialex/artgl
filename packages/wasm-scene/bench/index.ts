@@ -22,6 +22,7 @@ function buildWasmSceneGraph(scene: WasmSceneGraph, childrenCount: number, depth
 }
 
 import * as THREE from './node_modules/three/src/Three' // i have no idea
+import { intoThree } from "./scene";
 function buildTHREEScene(scene: THREE.Scene, childrenCount: number, depth: number) {
   let count = 0;
   function addChildren(node: THREE.Object3D, d: number) {
@@ -102,3 +103,5 @@ output(threeresult)
 const renderer = new Renderer(document.querySelector('#wasm')! as HTMLCanvasElement);
 console.log(renderer)
 renderer.render(wasmSceneGraph)
+
+intoThree()
