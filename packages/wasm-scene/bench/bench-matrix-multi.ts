@@ -60,7 +60,7 @@ export function benchMatrix() {
       let wasmresult2 = []
       for (let i = 0; i < 50; i++) {
         let t = performance.now();
-        wasmSceneGraph.batchDrawcall();
+        wasmSceneGraph.perf_matrix();
         t = performance.now() - t;
         wasmresult2.push(t);
       }

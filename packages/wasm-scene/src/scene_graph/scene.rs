@@ -15,6 +15,8 @@ pub struct SceneGraph {
   pub(crate) geometries: ArrayContainer<Rc<Geometry>>,
   pub(crate) shadings: ArrayContainer<Rc<Shading>>,
   pub(crate) render_objects: ArrayContainer<Rc<RenderObject>>,
+
+  render_list: RenderList
 }
 
 impl SceneGraph {
@@ -49,6 +51,20 @@ impl SceneGraph {
       }
     }
   }
+
+  pub fn batch_drawcalls(&self) -> &RenderList{
+    let root = self.get_scene_node(0);
+
+    self.traverse(root, |node: &RefCell<SceneNode>, scene: &SceneGraph| {
+      let mut self_node = node.borrow_mut();
+      if let Some(parent_index) = self_node.parent {
+        let parent_node = scene.get_scene_node(parent_index).borrow_mut();
+        self_node.matrix_world = self_node.matrix_world * parent_node.matrix_world;
+      }
+    });
+
+    &self.render_list
+  }
 }
 
 #[wasm_bindgen]
@@ -62,14 +78,14 @@ impl SceneGraph {
       geometries: ArrayContainer::new(),
       shadings: ArrayContainer::new(),
       render_objects: ArrayContainer::new(),
+      render_list: RenderList::new()
     };
     graph.create_new_node(); // as root
     graph
   }
 
-  pub fn batch_drawcalls(&self) {
+  pub fn update_all_world_matrix(&mut self){
     let root = self.get_scene_node(0);
-
     self.traverse(root, |node: &RefCell<SceneNode>, scene: &SceneGraph| {
       let mut self_node = node.borrow_mut();
       if let Some(parent_index) = self_node.parent {
@@ -78,6 +94,7 @@ impl SceneGraph {
       }
     })
   }
+
 }
 
 // #[wasm_bindgen(inline_js = "export function doNothing(a, b) { return a + b }")]

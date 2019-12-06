@@ -5,6 +5,7 @@ pub mod geometry;
 pub mod frustum;
 pub mod shading;
 pub mod camera;
+pub mod render_list;
 
 
 pub mod bindgen_entity;
@@ -17,3 +18,4 @@ pub use geometry::*;
 pub use frustum::*;
 pub use shading::*;
 pub use camera::*;
+pub use render_list::*;

@@ -1,23 +1,22 @@
-use crate::utils::ArrayContainer;
 use crate::scene_graph::*;
+use crate::math::*;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{WebGlProgram, WebGlBuffer, WebGlRenderingContext, WebGlShader, HtmlCanvasElement};
-use crate::math::*;
-use std::mem;
 use std::collections::HashMap;
 
 #[wasm_bindgen]
 pub struct WebGLRenderer {
     gl: Rc<WebGlRenderingContext>,
-    programs: ArrayContainer<Program>,
-    buffers: Vec<WebGlBuffer>
+
+    programs: HashMap<Rc<Shading>, Program>,
+    buffers: HashMap<Rc<BufferData<f32>>, WebGlBuffer>,
 }
+
 
 #[wasm_bindgen]
 impl WebGLRenderer {
-
     pub fn new(canvas: HtmlCanvasElement) -> Result<WebGLRenderer, JsValue>{
             
         let context = canvas
@@ -27,41 +26,68 @@ impl WebGLRenderer {
 
         Ok(WebGLRenderer{
             gl: Rc::new(context),
-            programs: ArrayContainer::new(),
-            buffers: Vec::new(),
+            programs: HashMap::new(),
+            buffers: HashMap::new(),
         })
     }
+
+    pub fn render(&mut self, scene: &SceneGraph){
+        self.gl.clear_color(0.0, 0.0, 0.0, 1.0);
+        self.gl.clear(WebGlRenderingContext::COLOR_BUFFER_BIT);
+
+        let list = scene.batch_drawcalls();
+
+        list.foreach(|(object_id, scene_id)|{
+            let object = scene.render_objects.get(*object_id);
+            let scene_node = scene.nodes.get(*scene_id);
+
+            self.use_shading(object.shading.clone());
+            self.use_geometry(object.geometry.clone());
+            self.draw(object.geometry.clone());
+        })
+        // let buffer = &self.buffers[0];
+        // self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(buffer));
+        // self.gl.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
+        // self.gl.enable_vertex_attrib_array(0);
+
+        // self.gl.use_program(Some(&self.programs.get(0).program));
+        // self.gl.draw_arrays(
+        //     WebGlRenderingContext::TRIANGLES,
+        //     0,
+        //     (9 / 3) as i32,
+        // );
+    }
+
+}
+
+impl WebGLRenderer {
+    pub fn draw(&mut self, geometry: Rc<Geometry>){
+
+    }
+
+    pub fn use_transform(&mut self, mat: Mat4<f32>){
+
+    }
+
+
+    pub fn use_shading(&mut self, shading: Rc<Shading>) {
+
+    }
+
+    // pub fn get_program(&mut self, shading: Rc<Shading>) -> &Program{
+
+    // }
+
+    pub fn use_geometry(&mut self, geometry: Rc<Geometry>) {
+
+    }
+
 
     // pub fn make_index_buffer() -> Result<(), JsValue>{
 
     // }
 
-    pub fn make_buffer(&mut self, vertices: &[f32]) -> Result<(), JsValue>{
-
-        let buffer = self.gl.create_buffer().ok_or("failed to create buffer")?;
-        self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
-    
-        unsafe {
-            let vert_array = js_sys::Float32Array::view(&vertices);
-    
-            self.gl.buffer_data_with_array_buffer_view(
-                WebGlRenderingContext::ARRAY_BUFFER,
-                &vert_array,
-                WebGlRenderingContext::STATIC_DRAW,
-            );
-        }
-        self.buffers.push(buffer);
-        Ok(())
-    }
-
-
-    pub fn make_demo_buffer(&mut self) -> Result<(), JsValue>{
-        let vertices: [f32; 9] = [-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0];
-        // let vertices: [Vec3<f32>; 3] = [
-        //     Vec3::new(-0.7, -0.7, 0.0),
-        //     Vec3::new(0.7, -0.7, 0.0),
-        //     Vec3::new(0.0, 0.7, 0.0)
-        // ];
+    pub fn make_buffer(&mut self, data: Rc<BufferData<f32>>) -> Result<(), String>{
 
         let buffer = self.gl.create_buffer().ok_or("failed to create buffer")?;
         self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
@@ -75,11 +101,7 @@ impl WebGLRenderer {
         // As a result, after `Float32Array::view` we have to be very careful not to
         // do any memory allocations before it's dropped.
         unsafe {
-            // let n_bytes = vertices.len() * std::mem::size_of::<Vec3<f32>>();
-            // let data: &[f32] = std::slice::from_raw_parts(vertices.as_ptr(), n_bytes);
-
-            // let data: &[f32] = mem::transmute(&vertices);
-            let vert_array = js_sys::Float32Array::view(&vertices);
+            let vert_array = js_sys::Float32Array::view(&data.data);
     
             self.gl.buffer_data_with_array_buffer_view(
                 WebGlRenderingContext::ARRAY_BUFFER,
@@ -87,52 +109,30 @@ impl WebGLRenderer {
                 WebGlRenderingContext::STATIC_DRAW,
             );
         }
-        self.buffers.push(buffer);
+        self.buffers.insert(data, buffer);
         Ok(())
     }
 
-
-    pub fn make_program(&mut self, vertex_str: &str, frag_str: &str) -> Result<usize, JsValue>{
-        let index = self.programs.get_free_index();
-        let program = Program::new(index, self.gl.clone(), vertex_str, frag_str)?;
-        self.programs.set_item(program, index);
-        Ok(index)
-    }
-
-    #[wasm_bindgen]
-    pub fn render(&self, scene: &SceneGraph){
-        self.gl.clear_color(0.0, 0.0, 0.0, 1.0);
-        self.gl.clear(WebGlRenderingContext::COLOR_BUFFER_BIT);
-
-        let buffer = &self.buffers[0];
-        self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(buffer));
-        self.gl.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
-        self.gl.enable_vertex_attrib_array(0);
-
-        self.gl.use_program(Some(&self.programs.get(0).program));
-        self.gl.draw_arrays(
-            WebGlRenderingContext::TRIANGLES,
-            0,
-            (9 / 3) as i32,
-        );
+    pub fn make_program(&mut self, shading: Rc<Shading>) -> Result<(), String>{
+        let program = Program::new(self.gl.clone(), &shading.vertex_str, &shading.frag_str)?;
+        self.programs.insert(shading, program);
+        Ok(())
     }
 
 }
 
 struct Program{
-    index: usize,
     context: Rc<WebGlRenderingContext>,
     program: WebGlProgram,
 }
 
 impl Program {
-    pub fn new(index:usize, context: Rc<WebGlRenderingContext>, vertex_shader_str: &str, frag_shader_str: &str) -> Result<Program, String>{
+    pub fn new(context: Rc<WebGlRenderingContext>, vertex_shader_str: &str, frag_shader_str: &str) -> Result<Program, String>{
         let vertex_shader = compile_shader(&context, WebGlRenderingContext::VERTEX_SHADER, vertex_shader_str)?;
         let frag_shader = compile_shader(&context, WebGlRenderingContext::FRAGMENT_SHADER, frag_shader_str)?;
         let program = link_program(&context, &vertex_shader, &frag_shader)?;
 
         Ok(Program{
-            index,
             context,
             program
         })

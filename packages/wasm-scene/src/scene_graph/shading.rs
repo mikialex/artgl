@@ -1,7 +1,10 @@
+use std::hash::Hasher;
+use std::hash::Hash;
+
 pub struct Shading{
     index: usize,
-    vertex_str: String,
-    frag_str: String,
+    pub vertex_str: String,
+    pub frag_str: String,
 }
 
 impl Shading {
@@ -11,3 +14,19 @@ impl Shading {
         }
     }
 }
+
+impl Hash for Shading {
+    fn hash<H>(&self, state: &mut H)
+    where
+        H: Hasher,
+    {
+      self.index.hash(state);
+    }
+  }
+  
+  impl PartialEq for Shading {
+    fn eq(&self, other: &Self) -> bool {
+        self.index == other.index
+    }
+  }
+  impl Eq for Shading {}

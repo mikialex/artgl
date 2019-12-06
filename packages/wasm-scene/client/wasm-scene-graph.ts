@@ -47,8 +47,8 @@ export class WasmSceneGraph{
     }
 
 
-    batchDrawcall() {
-        this.wasmScene.batch_drawcalls();
+    perf_matrix() {
+        this.wasmScene.update_all_world_matrix();
     }
 
     readonly root: WasmSceneNode
