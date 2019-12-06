@@ -1,12 +1,14 @@
 import * as THREE from './node_modules/three/src/Three'
 import { Renderer } from '../client/renderer';
 import { WasmSceneGraph } from '../client/wasm-scene-graph';
+import { Quaternion, Euler, Object3D } from './node_modules/three/src/Three';
 
 export function intoThree() {
 
     const canvas = document.querySelector('#three')! as HTMLCanvasElement
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    camera.position.z = 50;
 
     var renderer = new THREE.WebGLRenderer({
         canvas
@@ -14,8 +16,9 @@ export function intoThree() {
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 
     const geom = new THREE.BoxBufferGeometry();
+    const mat = new THREE.MeshBasicMaterial();
 
-    const arraySize = 20;
+    const arraySize = 5;
     console.log(arraySize * arraySize * arraySize);
     const grid = 1;
     for (let i = 0; i < arraySize; i++) {
@@ -28,8 +31,7 @@ export function intoThree() {
             node.add(node2);
             for (let k = 0; k < arraySize; k++) {
 
-                const testMesh = new THREE.Mesh();
-                testMesh.geometry = geom;
+                const testMesh = new THREE.Mesh(geom, mat);
                 testMesh.position.z = k * grid;
                 testMesh.scale.set(0.3, 0.3, 0.3);
                 testMesh.frustumCulled = false;
@@ -37,8 +39,6 @@ export function intoThree() {
             }
         }
     }
-
-    camera.position.z = 50;
 
     var animate = function () {
         requestAnimationFrame(animate);
@@ -54,10 +54,10 @@ export function intoThree() {
 }
 
 export function intoWasmScene() {
-    const renderer = new Renderer(document.querySelector('#wasm')! as HTMLCanvasElement);
+    const canvas = document.querySelector('#wasm')! as HTMLCanvasElement
+    const renderer = new Renderer(canvas);
     console.log(renderer)
     const scene = new WasmSceneGraph();
-    renderer.render(scene)
 
     const shading = scene.createShading(
         `            
@@ -72,12 +72,12 @@ export function intoWasmScene() {
             }
         `
     );
-    const data = new Float32Array([-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0];
+    const data = new Float32Array([-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0]);
     const positionbuffer = scene.createNewBuffer(data, 3);
     const geometry = scene.createNewGeometry(positionbuffer)
     const renderable = scene.createRenderObject(shading, geometry)
 
-    const arraySize = 20;
+    const arraySize = 5;
     console.log(arraySize * arraySize * arraySize);
     const grid = 1;
     for (let i = 0; i < arraySize; i++) {
@@ -96,4 +96,22 @@ export function intoWasmScene() {
             }
         }
     }
+
+    const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    camera.position.z = 50;
+    camera.updateMatrix();
+    scene.useProjection(new Float32Array(camera.projectionMatrix.elements));
+
+    const o3d = new Object3D();
+
+    var animate = function () {
+        requestAnimationFrame(animate);
+
+        o3d.rotation.y += 0.01;
+        scene.root.setRotation(o3d.quaternion.x, o3d.quaternion.y, o3d.quaternion.z, o3d.quaternion.w);
+
+        renderer.render(scene);
+    };
+
+    animate();
 }

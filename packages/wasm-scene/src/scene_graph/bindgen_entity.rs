@@ -5,6 +5,10 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 impl SceneGraph {
 
+  pub fn update_camera_projection(&mut self, mat: &[f32]) {
+    self.camera.update_projection(mat);
+  }
+
   pub fn create_new_shading(&mut self, vertex_str: String, frag_str: String) -> usize {
     let free_index = self.shadings.get_free_index();
     let shading = Rc::new(Shading::new(free_index, vertex_str, frag_str));

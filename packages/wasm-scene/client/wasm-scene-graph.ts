@@ -9,6 +9,10 @@ export class WasmSceneGraph{
         this.wasmScene.free();
     }
 
+    useProjection(data: Float32Array) {
+        this.wasmScene.update_camera_projection(data);
+    }
+
     private wasmScene: SceneGraph;
     getWasm() { return this.wasmScene;}
 
@@ -89,6 +93,10 @@ export class WasmSceneNode extends WASMIndexedObject{
         this.scene.getWasm().set_node_position(this.index, x, y, z);
     }
 
+    setRotation(x: number, y: number, z: number, w: number) {
+        this.scene.getWasm().set_node_quaternion(this.index, x, y, z, w);
+    }
+
     private renderData: RenderObject = null;
     get renderObject() {
         return this.renderData;
@@ -97,7 +105,7 @@ export class WasmSceneNode extends WASMIndexedObject{
     set renderObject(obj: RenderObject) {
         this.renderData = obj;
         this.scene.getWasm().set_render_descriptor(
-            this.index, obj.index
+            obj.index, this.index
         )
     }
 

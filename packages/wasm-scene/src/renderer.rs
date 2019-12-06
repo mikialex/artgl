@@ -6,6 +6,7 @@ use wasm_bindgen::JsCast;
 use web_sys::{WebGlProgram, WebGlBuffer, WebGlRenderingContext, WebGlShader, HtmlCanvasElement};
 use crate::math::*;
 use std::mem;
+use std::collections::HashMap;
 
 #[wasm_bindgen]
 pub struct WebGLRenderer {
@@ -30,6 +31,10 @@ impl WebGLRenderer {
             buffers: Vec::new(),
         })
     }
+
+    // pub fn make_index_buffer() -> Result<(), JsValue>{
+
+    // }
 
     pub fn make_buffer(&mut self, vertices: &[f32]) -> Result<(), JsValue>{
 

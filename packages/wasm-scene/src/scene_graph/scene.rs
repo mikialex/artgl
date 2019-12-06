@@ -1,3 +1,4 @@
+use crate::utils::set_panic_hook;
 use crate::math::*;
 use crate::scene_graph::*;
 use crate::utils::ArrayContainer;
@@ -17,6 +18,10 @@ pub struct SceneGraph {
 }
 
 impl SceneGraph {
+  pub fn set_camera(&mut self, camera: Camera){
+    self.camera = camera;
+  }
+
   pub fn get_scene_node(&self, index: usize) -> &RefCell<SceneNode> {
     self.nodes.get(index)
   }
@@ -49,6 +54,7 @@ impl SceneGraph {
 #[wasm_bindgen]
 impl SceneGraph {
   pub fn new() -> SceneGraph {
+    set_panic_hook();
     let mut graph = SceneGraph {
       camera: Camera::new(),
       nodes: ArrayContainer::new(),
