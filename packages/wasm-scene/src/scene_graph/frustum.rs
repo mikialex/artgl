@@ -1,6 +1,5 @@
-use crate::math::mat4::Mat4;
-use crate::scene_graph::geometry::Sphere;
-use crate::math::vec3::Vec3;
+use crate::scene_graph::*;
+use crate::math::*;
 
 pub struct Plane{
     pub normal: Vec3<f32>,

@@ -1,5 +1,5 @@
 use crate::utils::ArrayContainer;
-use crate::scene_graph::scene_graph::SceneGraph;
+use crate::scene_graph::*;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;

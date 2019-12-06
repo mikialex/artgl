@@ -1,59 +1,14 @@
-use crate::scene_graph::render_object::RenderObject;
-use crate::utils::ArrayContainer;
-use crate::scene_graph::geometry::*;
-use std::rc::Rc;
-use crate::{log_usize, log};
-use core::cell::RefCell;
 use crate::math::*;
+use crate::scene_graph::*;
+use crate::utils::ArrayContainer;
+use crate::{log, log_usize};
+use core::cell::RefCell;
+use std::rc::Rc;
 use wasm_bindgen::prelude::*;
-
-pub struct Shading {
-  pub id: usize,
-  
-}
-
-pub struct SceneNode {
-  index: usize,
-
-  pub position: Vec3<f32>,
-  pub scale: Vec3<f32>,
-  pub rotation: Quat<f32>,
-
-  pub matrix_local: Mat4<f32>,
-  pub matrix_world: Mat4<f32>,
-
-  pub render_data: Option<Rc<RenderObject>>,
-
-  pub(crate) parent: Option<usize>,
-  pub(crate) left_brother: Option<usize>,
-  pub(crate) right_brother: Option<usize>,
-  pub(crate) first_child: Option<usize>,
-}
-
-impl SceneNode {
-  pub fn new(index: usize) -> SceneNode {
-    SceneNode {
-      index,
-      position: Vec3::zero(),
-      scale: Vec3::one(),
-      rotation: Quat::one(),
-      matrix_local: Mat4::one(),
-      matrix_world: Mat4::one(),
-      render_data: None,
-      parent: None,
-      left_brother: None,
-      right_brother: None,
-      first_child: None,
-    }
-  }
-
-  pub fn get_index(&self) -> usize {
-    self.index
-  }
-}
 
 #[wasm_bindgen]
 pub struct SceneGraph {
+  pub(crate) camera: Camera,
   pub(crate) nodes: ArrayContainer<RefCell<SceneNode>>,
   pub(crate) buffers: ArrayContainer<Rc<BufferData<f32>>>,
   pub(crate) geometries: ArrayContainer<Rc<Geometry>>,
@@ -66,9 +21,10 @@ impl SceneGraph {
     self.nodes.get(index)
   }
 
-  pub fn traverse<T>
-  (&self, node: &RefCell<SceneNode>, visitor: T)
-  where T: Fn(&RefCell<SceneNode>, &SceneGraph) -> () {
+  pub fn traverse<T>(&self, node: &RefCell<SceneNode>, visitor: T)
+  where
+    T: Fn(&RefCell<SceneNode>, &SceneGraph) -> (),
+  {
     let mut traverse_stack: Vec<&RefCell<SceneNode>> = Vec::new();
     traverse_stack.push(node);
 
@@ -94,10 +50,11 @@ impl SceneGraph {
 impl SceneGraph {
   pub fn new() -> SceneGraph {
     let mut graph = SceneGraph {
+      camera: Camera::new(),
       nodes: ArrayContainer::new(),
-      buffers:  ArrayContainer::new(),
-      geometries:  ArrayContainer::new(),
-      shadings:  ArrayContainer::new(),
+      buffers: ArrayContainer::new(),
+      geometries: ArrayContainer::new(),
+      shadings: ArrayContainer::new(),
       render_objects: ArrayContainer::new(),
     };
     graph.create_new_node(); // as root
@@ -107,17 +64,13 @@ impl SceneGraph {
   pub fn batch_drawcalls(&self) {
     let root = self.get_scene_node(0);
 
-    self.traverse(root, 
-      |node: &RefCell<SceneNode>, scene: &SceneGraph|{
-
+    self.traverse(root, |node: &RefCell<SceneNode>, scene: &SceneGraph| {
       let mut self_node = node.borrow_mut();
       if let Some(parent_index) = self_node.parent {
         let parent_node = scene.get_scene_node(parent_index).borrow_mut();
         self_node.matrix_world = self_node.matrix_world * parent_node.matrix_world;
       }
-
     })
-
   }
 }
 

@@ -30,10 +30,10 @@ export class WasmSceneGraph{
         return geometry;
     }
 
-    createShading(){
-        // const index = this.wasmScene.create_shading();
-        // const shading = Shading(this, index);
-        // return shading;
+    createShading(vertexStr: string, fragStr: string){
+        const index = this.wasmScene.create_new_shading(vertexStr, fragStr);
+        const shading = new Shading(this, index);
+        return shading;
     }
 
     createRenderObject(s: Shading, g: Geometry) {
@@ -84,6 +84,10 @@ export class WasmSceneNode extends WASMIndexedObject{
     readonly scene: WasmSceneGraph
     private parent: WasmSceneNode | null = null;
     private children: WasmSceneNode[] = [];
+
+    setPosition(x: number, y: number, z: number) {
+        this.scene.getWasm().set_node_position(this.index, x, y, z);
+    }
 
     private renderData: RenderObject = null;
     get renderObject() {

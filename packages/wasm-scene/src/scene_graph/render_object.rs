@@ -1,6 +1,5 @@
 use std::rc::Rc;
-use crate::scene_graph::scene_graph::*;
-use crate::scene_graph::geometry::*;
+use crate::scene_graph::*;
 
 pub struct RenderObject {
   pub index: usize,
