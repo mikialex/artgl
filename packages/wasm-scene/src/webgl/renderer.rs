@@ -76,9 +76,24 @@ impl WebGLRenderer {
   }
 
   pub fn use_geometry(&mut self, geometry: Rc<Geometry>) {
-
-    // self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(buffer));
-    // self.gl.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
-    // self.gl.enable_vertex_attrib_array(0);
+    if let Some(program) = &self.active_program {
+      for (name, _) in  program.attributes.iter() {
+        let buffer_data = geometry.attributes.get(name).unwrap();
+        {
+        let buffer = self.get_buffer(buffer_data.clone()).unwrap();
+        self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(buffer));
+        }
+        self.gl.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
+        self.gl.enable_vertex_attrib_array(0);
+        
+      }
+      // program.attributes.iter().for_each(|(name, _)|{
+      //   let buffer_data = geometry.attributes.get(name).unwrap();
+      //   let buffer = self.get_buffer(buffer_data.clone()).unwrap();
+      //   self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(buffer));
+      //   self.gl.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
+      //   self.gl.enable_vertex_attrib_array(0);
+      // });
+    }
   }
 }

@@ -33,8 +33,8 @@ impl WebGLRenderer {
 pub struct Program {
   context: Rc<WebGlRenderingContext>,
   program: WebGlProgram,
-  uniforms: HashMap<String, WebGlUniformLocation>,
-  attributes: HashMap<String, i32>,
+  pub uniforms: HashMap<String, WebGlUniformLocation>,
+  pub attributes: HashMap<String, i32>,
 }
 
 impl Program {
