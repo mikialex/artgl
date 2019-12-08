@@ -4,16 +4,45 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 impl SceneGraph {
-
   pub fn update_camera_projection(&mut self, mat: &[f32]) {
     self.camera.update_projection(mat);
   }
 
-  pub fn create_new_shading(&mut self, vertex_str: String, frag_str: String) -> usize {
-    let free_index = self.shadings.get_free_index();
-    let shading = Rc::new(Shading::new(free_index, vertex_str, frag_str));
-    self.shadings.set_item(shading, free_index);
-    free_index
+  // pub fn create_new_shading(&mut self, vertex_str: String, frag_str: String) -> usize {
+  //   let free_index = self.shadings.get_free_index();
+  //   let shading = Rc::new(Shading::new(free_index, vertex_str, frag_str));
+  //   self.shadings.set_item(shading, free_index);
+  //   free_index
+  // }
+
+  pub fn create_new_shading(&mut self, shadingKey: String) -> usize {
+    if shadingKey == "test" {
+      let free_index = self.shadings.get_free_index();
+      let shading = Rc::new(Shading::new(
+        free_index,
+        String::from(
+          r#"           
+            attribute vec4 position;
+            void main() {
+                gl_Position = position;
+            }
+            "#,
+        ),
+        String::from(
+          r#"
+            void main() {
+                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            }
+        "#,
+        ),
+        vec![String::from("position")],
+        vec![],
+      ));
+      self.shadings.set_item(shading, free_index);
+      free_index
+    } else {
+      panic!("not supported shading")
+    }
   }
 
   pub fn create_new_buffer_data(&mut self, data: Vec<f32>, stride: usize) -> usize {

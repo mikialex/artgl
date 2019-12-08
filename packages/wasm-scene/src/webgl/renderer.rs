@@ -46,8 +46,8 @@ impl WebGLRenderer {
       let scene_node = scene.nodes.get(*scene_id).borrow();
 
       self.use_transform(scene_node.matrix_world);
-      let program = self.use_shading(object.shading.clone());
-      self.use_geometry(object.geometry.clone(), program);
+      self.use_shading(object.shading.clone());
+      self.use_geometry(object.geometry.clone());
       self.draw(object.geometry.clone());
     })
     // let buffer = &self.buffers[0];
@@ -71,11 +71,11 @@ impl WebGLRenderer {
 
   pub fn use_transform(&mut self, mat: Mat4<f32>) {}
 
-  pub fn use_shading(&mut self, shading: Rc<Shading>) -> &Program {
+  pub fn use_shading(&mut self, shading: Rc<Shading>){
     unimplemented!()
   }
 
-  pub fn use_geometry(&mut self, geometry: Rc<Geometry>, program: &Program) {
+  pub fn use_geometry(&mut self, geometry: Rc<Geometry>) {
 
     // self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(buffer));
     // self.gl.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);

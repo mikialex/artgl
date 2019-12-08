@@ -59,19 +59,20 @@ export function intoWasmScene() {
     console.log(renderer)
     const scene = new WasmSceneGraph();
 
-    const shading = scene.createShading(
-        `            
-            attribute vec4 position;
-            void main() {
-                gl_Position = position;
-            }
-            `,
-        `
-            void main() {
-                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-            }
-        `
-    );
+    // const shading = scene.createShading(
+    //     `            
+    //         attribute vec4 position;
+    //         void main() {
+    //             gl_Position = position;
+    //         }
+    //         `,
+    //     `
+    //         void main() {
+    //             gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    //         }
+    //     `
+    // );
+    const shading = scene.createShading('test');
     const data = new Float32Array([-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0]);
     const positionbuffer = scene.createNewBuffer(data, 3);
     const geometry = scene.createNewGeometry(positionbuffer)

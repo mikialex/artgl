@@ -14,6 +14,8 @@ impl WebGLRenderer {
           self.gl.clone(),
           &shading.vertex_str,
           &shading.frag_str,
+          &shading.uniforms, 
+          &shading.attributes,
         )?))
         .clone(),
     )
@@ -32,7 +34,7 @@ pub struct Program {
   context: Rc<WebGlRenderingContext>,
   program: WebGlProgram,
   uniforms: HashMap<String, WebGlUniformLocation>,
-  attribute: HashMap<String, i32>,
+  attributes: HashMap<String, i32>,
 }
 
 impl Program {
@@ -40,6 +42,8 @@ impl Program {
     context: Rc<WebGlRenderingContext>,
     vertex_shader_str: &str,
     frag_shader_str: &str,
+    attributes_vec: &Vec<String>, 
+    uniforms_vec: &Vec<String>
   ) -> Result<Program, String> {
     let vertex_shader = compile_shader(
       &context,
@@ -53,12 +57,24 @@ impl Program {
     )?;
     let program = link_program(&context, &vertex_shader, &frag_shader)?;
 
-    let activeUniform = context.get_program_parameter(&program, WebGlRenderingContext::ACTIVE_UNIFORMS);
+    // let activeUniform = context.get_program_parameter(&program, WebGlRenderingContext::ACTIVE_UNIFORMS);
 
-    let uniform_location = context.get_uniform_location(&program, "test");
-    let attribute_location = context.get_attrib_location(&program, "test");
+    let mut uniforms: HashMap<String, WebGlUniformLocation> = HashMap::new();
+    uniforms_vec.iter().for_each(|name| {
+      uniforms.insert(name.clone(), context.get_uniform_location(&program, name).unwrap());
+    });
 
-    Ok(Program { context, program })
+    let mut attributes = HashMap::new();
+    attributes_vec.iter().for_each(|name| {
+      attributes.insert(name.clone(), context.get_attrib_location(&program, name));
+    });
+
+    Ok(Program { 
+      context, 
+      program,
+      uniforms,
+      attributes
+      })
   }
 }
 

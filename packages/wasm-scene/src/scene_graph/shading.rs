@@ -5,12 +5,18 @@ pub struct Shading{
     index: usize,
     pub vertex_str: String,
     pub frag_str: String,
+    pub attributes: Vec<String>,
+    pub uniforms: Vec<String>,
 }
 
 impl Shading {
-    pub fn new(index:usize, vertex_str: String, frag_str: String) -> Shading {
+    pub fn new(index:usize, vertex_str: String, frag_str: String, 
+        attributes: Vec<String>, uniforms: Vec<String>,
+    ) -> Shading {
         Shading{
-            index, vertex_str, frag_str
+            index, vertex_str, frag_str,
+            attributes,
+            uniforms,
         }
     }
 }

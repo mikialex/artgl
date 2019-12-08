@@ -34,8 +34,8 @@ export class WasmSceneGraph{
         return geometry;
     }
 
-    createShading(vertexStr: string, fragStr: string){
-        const index = this.wasmScene.create_new_shading(vertexStr, fragStr);
+    createShading(keyName: string){
+        const index = this.wasmScene.create_new_shading(keyName);
         const shading = new Shading(this, index);
         return shading;
     }
