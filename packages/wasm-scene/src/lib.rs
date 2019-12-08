@@ -1,7 +1,7 @@
 
 mod math;
 mod scene_graph;
-mod renderer;
+mod webgl;
 mod utils;
 
 use wasm_bindgen::prelude::*;

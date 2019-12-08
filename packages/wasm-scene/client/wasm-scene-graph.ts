@@ -9,6 +9,10 @@ export class WasmSceneGraph{
         this.wasmScene.free();
     }
 
+    useProjection(data: Float32Array) {
+        this.wasmScene.update_camera_projection(data);
+    }
+
     private wasmScene: SceneGraph;
     getWasm() { return this.wasmScene;}
 
@@ -18,22 +22,33 @@ export class WasmSceneGraph{
         return node;
     }
 
-    // createShading(): Shading{
-    //     const index = this.wasmScene.create_shading();
-    //     return new Shading()
-    // }
+    createNewBuffer(data: Float32Array, stride: number) {
+        const index = this.wasmScene.create_new_buffer_data(data, stride);
+        const buffer = new BufferData(this, index);
+        return buffer;
+    }
 
-    // createBuffer(): {
+    createNewGeometry(positionBuffer: BufferData) {
+        const index = this.wasmScene.create_geometry(positionBuffer.index);
+        const geometry = new Geometry(this, index);
+        return geometry;
+    }
 
-    // }
+    createShading(vertexStr: string, fragStr: string){
+        const index = this.wasmScene.create_new_shading(vertexStr, fragStr);
+        const shading = new Shading(this, index);
+        return shading;
+    }
 
-    // createGeometry(): Geometry{
-    //     const index = this.wasmScene.create_shading();
-    //     return new Shading()
-    // }
+    createRenderObject(s: Shading, g: Geometry) {
+        const index = this.wasmScene.create_render_data(g.index, s.index);
+        const obj = new RenderObject(this, index, g, s);
+        return obj;
+    }
 
-    batchDrawcall() {
-        this.wasmScene.batch_drawcalls();
+
+    perf_matrix() {
+        this.wasmScene.update_all_world_matrix();
     }
 
     readonly root: WasmSceneNode
@@ -51,10 +66,18 @@ export class WASMIndexedObject{
 export class Geometry extends WASMIndexedObject{
 }
 
+export class BufferData extends WASMIndexedObject{
+}
+
 export class Shading  extends WASMIndexedObject{
 }
 
-export class RenderObject{
+export class RenderObject extends WASMIndexedObject{
+    constructor(scene: WasmSceneGraph, index: number, g: Geometry, s: Shading) {
+        super(scene, index)
+        this.geometry = g
+        this.shading = s
+    }
     shading: Shading
     geometry: Geometry
 }
@@ -66,6 +89,14 @@ export class WasmSceneNode extends WASMIndexedObject{
     private parent: WasmSceneNode | null = null;
     private children: WasmSceneNode[] = [];
 
+    setPosition(x: number, y: number, z: number) {
+        this.scene.getWasm().set_node_position(this.index, x, y, z);
+    }
+
+    setRotation(x: number, y: number, z: number, w: number) {
+        this.scene.getWasm().set_node_quaternion(this.index, x, y, z, w);
+    }
+
     private renderData: RenderObject = null;
     get renderObject() {
         return this.renderData;
@@ -73,8 +104,8 @@ export class WasmSceneNode extends WASMIndexedObject{
 
     set renderObject(obj: RenderObject) {
         this.renderData = obj;
-        this.scene.getWasm().set_render_discriptor(
-            this.index, obj.geometry.index, obj.shading.index
+        this.scene.getWasm().set_render_descriptor(
+            obj.index, this.index
         )
     }
 
