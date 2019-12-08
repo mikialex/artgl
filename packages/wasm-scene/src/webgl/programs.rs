@@ -38,6 +38,10 @@ pub struct Program {
 }
 
 impl Program {
+  pub fn get_program(&self) -> &WebGlProgram {
+    &self.program
+  }
+
   pub fn new(
     context: Rc<WebGlRenderingContext>,
     vertex_shader_str: &str,

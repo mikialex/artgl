@@ -1,13 +1,30 @@
 use crate::scene_graph::*;
-use crate::webgl::*;
+use std::collections::HashMap;
 use std::rc::Rc;
 use web_sys::*;
 
-impl WebGLRenderer {
+pub struct BufferManager {
+  gl: Rc<WebGlRenderingContext>,
+  buffers: HashMap<Rc<BufferData<f32>>, WebGlBuffer>,
+  index_buffers: HashMap<Rc<BufferData<u16>>, WebGlBuffer>,
+}
+
+impl BufferManager {
+
+  pub fn new(gl: Rc<WebGlRenderingContext>) -> BufferManager{
+    BufferManager{
+      gl,
+      buffers: HashMap::new(),
+      index_buffers: HashMap::new(),
+    }
+  }
+
   pub fn get_index_buffer(&mut self, data: Rc<BufferData<u16>>) -> Result<&WebGlBuffer, String> {
     Ok(self.index_buffers.entry(data.clone()).or_insert({
       let buffer = self.gl.create_buffer().ok_or("failed to create buffer")?;
-      self.gl.bind_buffer(WebGlRenderingContext::ELEMENT_ARRAY_BUFFER, Some(&buffer));
+      self
+        .gl
+        .bind_buffer(WebGlRenderingContext::ELEMENT_ARRAY_BUFFER, Some(&buffer));
       unsafe {
         let vert_array = js_sys::Uint16Array::view(&data.data);
 
@@ -24,7 +41,9 @@ impl WebGLRenderer {
   pub fn get_buffer(&mut self, data: Rc<BufferData<f32>>) -> Result<&WebGlBuffer, String> {
     Ok(self.buffers.entry(data.clone()).or_insert({
       let buffer = self.gl.create_buffer().ok_or("failed to create buffer")?;
-      self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
+      self
+        .gl
+        .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
 
       // Note that `Float32Array::view` is somewhat dangerous (hence the
       // `unsafe`!). This is creating a raw view into our module's

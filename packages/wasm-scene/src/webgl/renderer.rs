@@ -1,6 +1,7 @@
 use crate::math::*;
 use crate::scene_graph::*;
 use crate::webgl::programs::*;
+use crate::webgl::buffer_attribute::*;
 use std::collections::HashMap;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
@@ -14,8 +15,7 @@ pub struct WebGLRenderer {
   pub(crate) active_program: Option<Rc<Program>>,
 
   pub(crate) programs: HashMap<Rc<Shading>, Rc<Program>>,
-  pub(crate) buffers: HashMap<Rc<BufferData<f32>>, WebGlBuffer>,
-  pub(crate) index_buffers: HashMap<Rc<BufferData<u16>>, WebGlBuffer>,
+  pub(crate) buffer_manager: BufferManager,
 }
 
 #[wasm_bindgen]
@@ -26,12 +26,13 @@ impl WebGLRenderer {
       .unwrap()
       .dyn_into::<WebGlRenderingContext>()?;
 
+    let gl = Rc::new(context);
+    let glc= gl.clone();
     Ok(WebGLRenderer {
-      gl: Rc::new(context),
+      gl,
       active_program: None,
       programs: HashMap::new(),
-      buffers: HashMap::new(),
-      index_buffers: HashMap::new(),
+      buffer_manager: BufferManager::new(glc),
     })
   }
 
@@ -45,8 +46,8 @@ impl WebGLRenderer {
       let object = scene.render_objects.get(*object_id);
       let scene_node = scene.nodes.get(*scene_id).borrow();
 
-      self.use_transform(scene_node.matrix_world);
       self.use_shading(object.shading.clone());
+      self.use_transform(scene_node.matrix_world);
       self.use_geometry(object.geometry.clone());
       self.draw(object.geometry.clone());
     })
@@ -66,34 +67,32 @@ impl WebGLRenderer {
 
 impl WebGLRenderer {
   pub fn draw(&mut self, geometry: Rc<Geometry>) {
-    self.gl.draw_arrays(WebGlRenderingContext::TRIANGLES, 0, (9 / 3) as i32);
+    let length = geometry.attributes.get("position").unwrap().data.len() / 3;
+    self.gl.draw_arrays(WebGlRenderingContext::TRIANGLES, 0, length as i32);
   }
 
   pub fn use_transform(&mut self, mat: Mat4<f32>) {}
 
   pub fn use_shading(&mut self, shading: Rc<Shading>){
-    unimplemented!()
+    let program = self.get_program(shading).unwrap();
+    if let Some(current_program) = &self.active_program {
+      if current_program as *const Rc<Program> != &program as *const Rc<Program>  { // maybe is ok?
+        let p = program.clone();
+        self.active_program = Some(program);
+        self.gl.use_program(Some(p.get_program()));
+      }
+    }
   }
 
   pub fn use_geometry(&mut self, geometry: Rc<Geometry>) {
     if let Some(program) = &self.active_program {
       for (name, _) in  program.attributes.iter() {
         let buffer_data = geometry.attributes.get(name).unwrap();
-        {
-        let buffer = self.get_buffer(buffer_data.clone()).unwrap();
+        let buffer = self.buffer_manager.get_buffer(buffer_data.clone()).unwrap();
         self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(buffer));
-        }
         self.gl.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
         self.gl.enable_vertex_attrib_array(0);
-        
       }
-      // program.attributes.iter().for_each(|(name, _)|{
-      //   let buffer_data = geometry.attributes.get(name).unwrap();
-      //   let buffer = self.get_buffer(buffer_data.clone()).unwrap();
-      //   self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(buffer));
-      //   self.gl.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
-      //   self.gl.enable_vertex_attrib_array(0);
-      // });
     }
   }
 }

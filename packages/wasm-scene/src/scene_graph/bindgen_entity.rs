@@ -15,8 +15,8 @@ impl SceneGraph {
   //   free_index
   // }
 
-  pub fn create_new_shading(&mut self, shadingKey: String) -> usize {
-    if shadingKey == "test" {
+  pub fn create_new_shading(&mut self, shading_key: String) -> usize {
+    if shading_key == "test" {
       let free_index = self.shadings.get_free_index();
       let shading = Rc::new(Shading::new(
         free_index,
