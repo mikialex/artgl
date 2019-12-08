@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use crate::scene_graph::*;
 use crate::webgl::*;
 use std::rc::Rc;
@@ -19,9 +20,19 @@ impl WebGLRenderer {
   }
 }
 
+// pub struct Attribute {
+//   location: i32,
+// }
+
+// pub struct Uniform {
+//   location: WebGlUniformLocation,
+// }
+
 pub struct Program {
   context: Rc<WebGlRenderingContext>,
   program: WebGlProgram,
+  uniforms: HashMap<String, WebGlUniformLocation>,
+  attribute: HashMap<String, i32>,
 }
 
 impl Program {
@@ -41,6 +52,11 @@ impl Program {
       frag_shader_str,
     )?;
     let program = link_program(&context, &vertex_shader, &frag_shader)?;
+
+    let activeUniform = context.get_program_parameter(&program, WebGlRenderingContext::ACTIVE_UNIFORMS);
+
+    let uniform_location = context.get_uniform_location(&program, "test");
+    let attribute_location = context.get_attrib_location(&program, "test");
 
     Ok(Program { context, program })
   }
