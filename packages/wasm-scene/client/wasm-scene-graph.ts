@@ -97,7 +97,7 @@ export class WasmSceneNode extends WASMIndexedObject{
     readonly index: number;
     readonly scene: WasmSceneGraph
     private parent: WasmSceneNode | null = null;
-    private children: WasmSceneNode[] = [];
+    children: WasmSceneNode[] = [];
 
     setPosition(x: number, y: number, z: number) {
         this.scene.getWasm().set_node_position(this.index, x, y, z);

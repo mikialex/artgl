@@ -66,7 +66,7 @@ impl SceneGraph {
         self_node.matrix_local =
           compose(&self_node.position, &self_node.rotation, &self_node.scale);
         
-        self_node.matrix_world = parent_node.matrix_world * self_node.matrix_local;
+        self_node.matrix_world = self_node.matrix_local * parent_node.matrix_world;
 
         if let Some(render_object) = &self_node.render_data {
           render_list.add_renderable(render_object, &self_node);

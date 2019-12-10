@@ -1,3 +1,4 @@
+use crate::log_usize;
 use crate::scene_graph::*;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -20,8 +21,8 @@ impl BufferManager {
   }
 
   pub fn get_index_buffer(&mut self, data: Rc<BufferData<u16>>) -> Result<&WebGlBuffer, String> {
-    Ok(self.index_buffers.entry(data.clone()).or_insert({
-      let buffer = self.gl.create_buffer().ok_or("failed to create buffer")?;
+    Ok(self.index_buffers.entry(data.clone()).or_insert_with(||{
+      let buffer = self.gl.create_buffer().ok_or("failed to create buffer").unwrap();
       self
         .gl
         .bind_buffer(WebGlRenderingContext::ELEMENT_ARRAY_BUFFER, Some(&buffer));
@@ -39,8 +40,9 @@ impl BufferManager {
   }
 
   pub fn get_buffer(&mut self, data: Rc<BufferData<f32>>) -> Result<&WebGlBuffer, String> {
-    Ok(self.buffers.entry(data.clone()).or_insert({
-      let buffer = self.gl.create_buffer().ok_or("failed to create buffer")?;
+    let size = self.buffers.len();
+    Ok(self.buffers.entry(data.clone()).or_insert_with(||{
+      let buffer = self.gl.create_buffer().ok_or("failed to create buffer").unwrap();
       self
         .gl
         .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
@@ -53,6 +55,7 @@ impl BufferManager {
       //
       // As a result, after `Float32Array::view` we have to be very careful not to
       // do any memory allocations before it's dropped.
+        log_usize(size);
       unsafe {
         let vert_array = js_sys::Float32Array::view(&data.data);
 
