@@ -6,17 +6,18 @@ use web_sys::*;
 
 impl WebGLRenderer {
   pub fn get_program(&mut self, shading: Rc<Shading>) -> Result<Rc<Program>, String> {
+    let gl = self.gl.clone();
     Ok(
       self
         .programs
         .entry(shading.clone())
-        .or_insert(Rc::new(Program::new(
-          self.gl.clone(),
+        .or_insert_with(||{Rc::new(Program::new(
+          gl.clone(),
           &shading.vertex_str,
           &shading.frag_str,
           &shading.attributes, 
           &shading.uniforms,
-        )?))
+        ).unwrap())})
         .clone(),
     )
   }

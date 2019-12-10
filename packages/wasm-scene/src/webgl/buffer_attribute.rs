@@ -21,15 +21,14 @@ impl BufferManager {
   }
 
   pub fn get_index_buffer(&mut self, data: Rc<BufferData<u16>>) -> Result<&WebGlBuffer, String> {
+    let gl = self.gl.clone();
     Ok(self.index_buffers.entry(data.clone()).or_insert_with(||{
-      let buffer = self.gl.create_buffer().ok_or("failed to create buffer").unwrap();
-      self
-        .gl
-        .bind_buffer(WebGlRenderingContext::ELEMENT_ARRAY_BUFFER, Some(&buffer));
+      let buffer = gl.create_buffer().ok_or("failed to create buffer").unwrap();
+      gl.bind_buffer(WebGlRenderingContext::ELEMENT_ARRAY_BUFFER, Some(&buffer));
       unsafe {
         let vert_array = js_sys::Uint16Array::view(&data.data);
 
-        self.gl.buffer_data_with_array_buffer_view(
+        gl.buffer_data_with_array_buffer_view(
           WebGlRenderingContext::ELEMENT_ARRAY_BUFFER,
           &vert_array,
           WebGlRenderingContext::STATIC_DRAW,
@@ -40,12 +39,10 @@ impl BufferManager {
   }
 
   pub fn get_buffer(&mut self, data: Rc<BufferData<f32>>) -> Result<&WebGlBuffer, String> {
-    let size = self.buffers.len();
+    let gl = self.gl.clone();
     Ok(self.buffers.entry(data.clone()).or_insert_with(||{
-      let buffer = self.gl.create_buffer().ok_or("failed to create buffer").unwrap();
-      self
-        .gl
-        .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
+      let buffer = gl.create_buffer().ok_or("failed to create buffer").unwrap();
+      gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&buffer));
 
       // Note that `Float32Array::view` is somewhat dangerous (hence the
       // `unsafe`!). This is creating a raw view into our module's
@@ -55,11 +52,10 @@ impl BufferManager {
       //
       // As a result, after `Float32Array::view` we have to be very careful not to
       // do any memory allocations before it's dropped.
-        log_usize(size);
       unsafe {
         let vert_array = js_sys::Float32Array::view(&data.data);
 
-        self.gl.buffer_data_with_array_buffer_view(
+        gl.buffer_data_with_array_buffer_view(
           WebGlRenderingContext::ARRAY_BUFFER,
           &vert_array,
           WebGlRenderingContext::STATIC_DRAW,

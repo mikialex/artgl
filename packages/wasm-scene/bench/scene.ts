@@ -8,17 +8,18 @@ export function intoThree() {
     const canvas = document.querySelector('#three')! as HTMLCanvasElement
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-    camera.position.z = 5;
+    camera.position.z = 50;
 
     var renderer = new THREE.WebGLRenderer({
-        canvas
+        canvas,
+        antialias: true
     });
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 
     const geom = new THREE.BoxBufferGeometry();
     const mat = new THREE.MeshBasicMaterial();
 
-    const arraySize = 2;
+    const arraySize = 20;
     console.log(arraySize * arraySize * arraySize);
     const grid = 2;
     for (let i = 0; i < arraySize; i++) {
@@ -39,18 +40,15 @@ export function intoThree() {
         }
     }
 
-    scene.add(new THREE.Mesh(geom, mat));
-
     var animate = function () {
-        // requestAnimationFrame(animate);
+        requestAnimationFrame(animate);
 
-        scene.rotation.x += 0.01;
         scene.rotation.y += 0.01;
 
         renderer.render(scene, camera);
     };
 
-    animate();
+    // animate();
 
 }
 
@@ -102,7 +100,7 @@ export function intoWasmScene() {
     const geometry = scene.createNewGeometry(null, positionbuffer)
     const renderable = scene.createRenderObject(shading, geometry)
 
-    const arraySize = 2;
+    const arraySize = 20;
     console.log(arraySize * arraySize * arraySize);
     const grid = 2;
     for (let i = 0; i < arraySize; i++) {
@@ -123,24 +121,23 @@ export function intoWasmScene() {
     }
 
     const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-    camera.position.z = 5;
+    camera.position.z = 50;
     camera.updateMatrix();
     camera.updateMatrixWorld(true);
 
     const o3d = new Object3D();
 
     var animate = function () {
-        // requestAnimationFrame(animate);
+        requestAnimationFrame(animate);
 
         scene.useProjection(
             new Float32Array(camera.projectionMatrix.elements),
             new Float32Array(camera.matrixWorldInverse.elements)
         );
 
-        // o3d.rotation.y += 0.01;
-        // o3d.position.x += 0.01;
+        o3d.rotation.y += 0.01;
         // scene.root.setPosition(o3d.position.x, o3d.position.y, o3d.position.z);
-        // scene.root.setRotation(o3d.quaternion.x, o3d.quaternion.y, o3d.quaternion.z, o3d.quaternion.w);
+        scene.root.setRotation(o3d.quaternion.x, o3d.quaternion.y, o3d.quaternion.z, o3d.quaternion.w);
 
         renderer.render(scene);
     };

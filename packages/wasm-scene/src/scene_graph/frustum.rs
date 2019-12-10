@@ -36,7 +36,7 @@ pub struct Frustum {
 }
 
 impl Frustum{
-    pub fn intersects_shpere(&self, sphere: &Sphere) -> bool {
+    pub fn intersects_sphere(&self, sphere: &Sphere) -> bool {
         let neg_radius = - sphere.radius;
         
         for p in &self.planes {

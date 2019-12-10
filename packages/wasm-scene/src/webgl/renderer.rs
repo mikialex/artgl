@@ -33,6 +33,9 @@ impl WebGLRenderer {
       .unwrap()
       .dyn_into::<WebGlRenderingContext>()?;
 
+      
+    context.enable(WebGlRenderingContext::DEPTH_TEST);
+    context.clear_color(0.0, 0.0, 0.0, 1.0);
     context.get_extension("OES_element_index_uint")?;
 
     let gl = Rc::new(context);
@@ -49,8 +52,8 @@ impl WebGLRenderer {
   }
 
   pub fn render(&mut self, scene: &SceneGraph) {
-    self.gl.clear_color(0.0, 0.0, 0.0, 1.0);
     self.gl.clear(WebGlRenderingContext::COLOR_BUFFER_BIT);
+    self.gl.clear(WebGlRenderingContext::DEPTH_BUFFER_BIT);
 
     let list = scene.batch_drawcalls().borrow();
 

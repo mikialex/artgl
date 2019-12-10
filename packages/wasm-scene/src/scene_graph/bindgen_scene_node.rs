@@ -1,3 +1,4 @@
+use crate::log_usize;
 use crate::scene_graph::*;
 use core::cell::RefCell;
 use wasm_bindgen::prelude::*;

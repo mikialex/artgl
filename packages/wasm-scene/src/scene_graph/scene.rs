@@ -66,11 +66,15 @@ impl SceneGraph {
         self_node.matrix_local =
           compose(&self_node.position, &self_node.rotation, &self_node.scale);
         
-        self_node.matrix_world = self_node.matrix_local * parent_node.matrix_world;
+        self_node.matrix_world = parent_node.matrix_world * self_node.matrix_local;
 
         if let Some(render_object) = &self_node.render_data {
           render_list.add_renderable(render_object, &self_node);
         }
+      } else {
+        self_node.matrix_local =
+          compose(&self_node.position, &self_node.rotation, &self_node.scale);
+        self_node.matrix_world =  self_node.matrix_local;
       }
     });
 
@@ -99,28 +103,6 @@ fn compose(position: &Vec3<f32>, quaternion: &Quat<f32>, scale: &Vec3<f32>) -> M
   let sx = scale.x;
   let sy = scale.y;
   let sz = scale.z;
-
-  // Mat4::new(
-  //   1.,
-  //   0.,
-  //   0.,
-  //   0.,
-
-  //   0.,
-  //   1.,
-  //   0.,
-  //   0.,
-
-  //   0.,
-  //   0.,
-  //   1.,
-  //   0.,
-
-  //   position.x,
-  //   position.y,
-  //   position.z,
-  //   1.,
-  // )
 
   Mat4::new(
     (1. - (yy + zz)) * sx,
