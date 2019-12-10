@@ -64,8 +64,10 @@ impl WebGLRenderer {
       let object = scene.render_objects.get(*object_id);
       let scene_node = scene.nodes.get(*scene_id).borrow();
 
+     let trans = scene.camera.projection_matrix * scene.camera.inverse_world_matrix * scene_node.matrix_world;
+
       self.model_transform = scene_node.matrix_world.to_array();
-      self.use_shading(object.shading.clone());
+      self.use_shading(object.shading.clone(), &trans.to_array());
       self.use_geometry(object.geometry.clone());
       self.draw(object.geometry.clone());
     })
@@ -83,7 +85,7 @@ impl WebGLRenderer {
     }
   }
 
-  pub fn use_shading(&mut self, shading: Rc<Shading>){
+  pub fn use_shading(&mut self, shading: Rc<Shading>, mat: &[f32]){
     let program = self.get_program(shading).unwrap();
     if let Some(current_program) = &self.active_program {
       if current_program.program != program.program {
@@ -97,14 +99,20 @@ impl WebGLRenderer {
         self.gl.use_program(Some(p.get_program()));
     }
 
-    let model_matrix_location = program.uniforms.get("model_matrix").unwrap();
-    self.gl.uniform_matrix4fv_with_f32_array(Some(model_matrix_location), false, &self.model_transform);
+    let location = program.uniforms.get("transform").unwrap();
+    self.gl.uniform_matrix4fv_with_f32_array(Some(location), false, mat);
 
-    let camera_inverse_location = program.uniforms.get("camera_inverse").unwrap();
-    self.gl.uniform_matrix4fv_with_f32_array(Some(camera_inverse_location), false, &self.camera_inverse);
 
-    let projection_matrix_location = program.uniforms.get("projection_matrix").unwrap();
-    self.gl.uniform_matrix4fv_with_f32_array(Some(projection_matrix_location), false, &self.camera_projection);
+    // let model_matrix_location = program.uniforms.get("model_matrix").unwrap();
+    // self.gl.uniform_matrix4fv_with_f32_array(Some(model_matrix_location), false, &self.model_transform);
+
+    // let camera_inverse_location = program.uniforms.get("camera_inverse").unwrap();
+    // self.gl.uniform_matrix4fv_with_f32_array(Some(camera_inverse_location), false, &self.camera_inverse);
+
+    // let projection_matrix_location = program.uniforms.get("projection_matrix").unwrap();
+    // self.gl.uniform_matrix4fv_with_f32_array(Some(projection_matrix_location), false, &self.camera_projection);
+
+
     // for (name, location) in program.uniforms.iter() {
     //   // if name == "model_matrix" {
 

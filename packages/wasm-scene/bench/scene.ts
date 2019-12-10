@@ -48,7 +48,7 @@ export function intoThree() {
         renderer.render(scene, camera);
     };
 
-    // animate();
+    animate();
 
 }
 
@@ -142,5 +142,5 @@ export function intoWasmScene() {
         renderer.render(scene);
     };
 
-    animate();
+    // animate();
 }
