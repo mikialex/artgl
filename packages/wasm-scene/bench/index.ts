@@ -5,5 +5,5 @@ import { benchMatrix } from "./bench-matrix-multi";
 // benchMatrix();
 
 /// test renderer
-// intoThree()
+intoThree()
 intoWasmScene();

@@ -1,7 +1,7 @@
 import * as THREE from './node_modules/three/src/Three'
 import { Renderer } from '../client/renderer';
 import { WasmSceneGraph } from '../client/wasm-scene-graph';
-import { Quaternion, Euler, Object3D } from './node_modules/three/src/Three';
+import { Object3D } from './node_modules/three/src/Three';
 
 export function intoThree() {
 
@@ -41,7 +41,7 @@ export function intoThree() {
     }
 
     var animate = function () {
-        requestAnimationFrame(animate);
+        // requestAnimationFrame(animate);
 
         scene.rotation.x += 0.01;
         scene.rotation.y += 0.01;
@@ -55,6 +55,8 @@ export function intoThree() {
 
 export function intoWasmScene() {
     const canvas = document.querySelector('#wasm')! as HTMLCanvasElement
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
     const renderer = new Renderer(canvas);
     console.log(renderer)
     const scene = new WasmSceneGraph();
@@ -73,9 +75,10 @@ export function intoWasmScene() {
     //     `
     // );
     const shading = scene.createShading('test');
-    const data = new Float32Array([-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0]);
-    const positionbuffer = scene.createNewBuffer(data, 3);
-    const geometry = scene.createNewGeometry(positionbuffer)
+    const geom = new THREE.BoxBufferGeometry();
+    const positionbuffer = scene.createNewBuffer(geom.getAttribute('position').array as Float32Array, 3);
+    const index = scene.createNewIndexBuffer(geom.index.array as Uint16Array, 3)
+    const geometry = scene.createNewGeometry(index, positionbuffer)
     const renderable = scene.createRenderObject(shading, geometry)
 
     const arraySize = 5;
@@ -107,7 +110,10 @@ export function intoWasmScene() {
     var animate = function () {
         // requestAnimationFrame(animate);
 
-        scene.useProjection(new Float32Array(camera.projectionMatrix.elements));
+        scene.useProjection(
+            new Float32Array(camera.projectionMatrix.elements),
+            new Float32Array(camera.matrixWorldInverse.elements)
+        );
         o3d.rotation.y += 0.01;
         scene.root.setRotation(o3d.quaternion.x, o3d.quaternion.y, o3d.quaternion.z, o3d.quaternion.w);
 

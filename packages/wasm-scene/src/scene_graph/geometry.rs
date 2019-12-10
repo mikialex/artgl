@@ -106,14 +106,15 @@ pub struct Geometry {
   pub bounding_sphere: Sphere,
   pub id: usize,
 
-  pub index: Option<Rc<BufferData<usize>>>,
+  pub index: Option<Rc<BufferData<u16>>>,
 
   pub attributes: HashMap<String, Rc<BufferData<f32>>>
 
 }
 
 impl Geometry {
-  pub fn new(index: usize, position: Rc<BufferData<f32>>) -> Result<Geometry, String>{
+  pub fn new(id: usize, index: Option<Rc<BufferData<u16>>>, position: Rc<BufferData<f32>>)
+   -> Result<Geometry, String>{
     if position.stride != 3 {
       Err(String::from("postion buffer is not stride of 3"))
     }else{
@@ -122,8 +123,8 @@ impl Geometry {
       let mut geo = Geometry{
         bounding_box: Box3::new(Vec3::new(1.,1.,1.), Vec3::new(1.,1.,1.)),
         bounding_sphere: Sphere::new(Vec3::new(1.,1.,1.), 1.),
-        id: index, 
-        index: None,
+        id, 
+        index,
         attributes
       };
       geo.update_bounding();

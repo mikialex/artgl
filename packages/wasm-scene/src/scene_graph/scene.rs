@@ -12,6 +12,7 @@ pub struct SceneGraph {
   pub(crate) camera: Camera,
   pub(crate) nodes: ArrayContainer<RefCell<SceneNode>>,
   pub(crate) buffers: ArrayContainer<Rc<BufferData<f32>>>,
+  pub(crate) index_buffers: ArrayContainer<Rc<BufferData<u16>>>,
   pub(crate) geometries: ArrayContainer<Rc<Geometry>>,
   pub(crate) shadings: ArrayContainer<Rc<Shading>>,
   pub(crate) render_objects: ArrayContainer<Rc<RenderObject>>,
@@ -65,7 +66,9 @@ impl SceneGraph {
 
         self_node.matrix_local =
           compose(&self_node.position, &self_node.rotation, &self_node.scale);
-        self_node.matrix_world = self_node.matrix_world * parent_node.matrix_world;
+
+        self_node.matrix_world = self_node.matrix_local * parent_node.matrix_world;
+
         if let Some(render_object) = &self_node.render_data {
           render_list.add_renderable(render_object, &self_node);
         }
@@ -126,6 +129,7 @@ impl SceneGraph {
       camera: Camera::new(),
       nodes: ArrayContainer::new(),
       buffers: ArrayContainer::new(),
+      index_buffers: ArrayContainer::new(),
       geometries: ArrayContainer::new(),
       shadings: ArrayContainer::new(),
       render_objects: ArrayContainer::new(),

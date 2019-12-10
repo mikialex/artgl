@@ -4,8 +4,9 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 impl SceneGraph {
-  pub fn update_camera_projection(&mut self, mat: &[f32]) {
-    self.camera.update_projection(mat);
+  pub fn update_camera(&mut self, proj: &[f32], inverse: &[f32]) {
+    self.camera.update_projection(proj);
+    self.camera.update_inverse(inverse);
   }
 
   // pub fn create_new_shading(&mut self, vertex_str: String, frag_str: String) -> usize {
@@ -24,9 +25,10 @@ impl SceneGraph {
           r#"           
             attribute vec4 position;
             uniform mat4 model_matrix;
+            uniform mat4 camera_inverse;
             uniform mat4 projection_matrix;
             void main() {
-                gl_Position = projection_matrix * model_matrix * position;
+                gl_Position = projection_matrix * camera_inverse * model_matrix * position;
             }
             "#,
         ),
@@ -38,7 +40,7 @@ impl SceneGraph {
         "#,
         ),
         vec![String::from("position")],
-        vec![String::from("model_matrix"), String::from("projection_matrix")],
+        vec![String::from("model_matrix"), String::from("projection_matrix"), String::from("camera_inverse")],
       ));
       self.shadings.set_item(shading, free_index);
       free_index
@@ -54,10 +56,23 @@ impl SceneGraph {
     free_index
   }
 
-  pub fn create_geometry(&mut self, position_index: usize) -> Result<usize, JsValue> {
+  pub fn create_new_index_buffer_data(&mut self, data: Vec<u16>, stride: usize) -> usize {
+    let free_index = self.index_buffers.get_free_index();
+    let buffer_data = Rc::new(BufferData::new(free_index, data, stride));
+    self.index_buffers.set_item(buffer_data, free_index);
+    free_index
+  }
+
+
+  pub fn create_geometry(&mut self, index_index: Option<usize>, position_index: usize) -> Result<usize, JsValue> {
     let free_index = self.geometries.get_free_index();
     let position = self.buffers.get(position_index);
-    let geometry = Rc::new(Geometry::new(free_index, position.clone())?);
+    let index = if let Some(i) = index_index {
+      Some(self.index_buffers.get(i).clone())
+    } else {
+      None
+    };
+    let geometry = Rc::new(Geometry::new(free_index, index, position.clone())?);
     self.geometries.set_item(geometry, free_index);
     Ok(free_index)
   }

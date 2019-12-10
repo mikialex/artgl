@@ -16,6 +16,7 @@ pub struct WebGLRenderer {
 
   model_transform: [f32; 16],
   camera_projection: [f32; 16],
+  camera_inverse:[f32; 16],
 
 
   pub(crate) active_program: Option<Rc<Program>>,
@@ -32,12 +33,15 @@ impl WebGLRenderer {
       .unwrap()
       .dyn_into::<WebGlRenderingContext>()?;
 
+    context.get_extension("OES_element_index_uint")?;
+
     let gl = Rc::new(context);
     let glc= gl.clone();
     Ok(WebGLRenderer {
       gl,
       model_transform: [0.0; 16],
       camera_projection: [0.0; 16],
+      camera_inverse:[0.0; 16],
       active_program: None,
       programs: HashMap::new(),
       buffer_manager: BufferManager::new(glc),
@@ -51,7 +55,8 @@ impl WebGLRenderer {
     let list = scene.batch_drawcalls().borrow();
     log_usize(list.get_len());
 
-    self.model_transform = scene.camera.projection_matrix.to_array();
+    self.camera_projection = scene.camera.projection_matrix.to_array();
+    self.camera_inverse = scene.camera.inverse_world_matrix.to_array();
     
     list.foreach(|(object_id, scene_id)| {
       let object = scene.render_objects.get(*object_id);
@@ -68,28 +73,32 @@ impl WebGLRenderer {
 impl WebGLRenderer {
   pub fn draw(&mut self, geometry: Rc<Geometry>) {
     let length = geometry.attributes.get("position").unwrap().data.len() / 3;
-    self.gl.draw_arrays(WebGlRenderingContext::TRIANGLES, 0, length as i32);
+    if let Some(_) = &geometry.index {
+      self.gl.draw_elements_with_i32(WebGlRenderingContext::TRIANGLES, 0, WebGlRenderingContext::UNSIGNED_INT,length as i32);
+    }else{
+      self.gl.draw_arrays(WebGlRenderingContext::TRIANGLES, 0, length as i32);
+    }
   }
 
   pub fn use_shading(&mut self, shading: Rc<Shading>){
     let program = self.get_program(shading).unwrap();
     if let Some(current_program) = &self.active_program {
-      if current_program as *const Rc<Program> != &program as *const Rc<Program>  { // maybe is ok?
+      if current_program.program != program.program {
         let p = program.clone();
         self.active_program = Some(program.clone());
         self.gl.use_program(Some(p.get_program()));
-
-      log_usize(self.programs.len());
       }
     } else {
       let p = program.clone();
         self.active_program = Some(program.clone());
         self.gl.use_program(Some(p.get_program()));
-        log_usize(0);
     }
 
     let model_matrix_location = program.uniforms.get("model_matrix").unwrap();
     self.gl.uniform_matrix4fv_with_f32_array(Some(model_matrix_location), false, &self.model_transform);
+
+    let projection_matrix_location = program.uniforms.get("camera_inverse").unwrap();
+    self.gl.uniform_matrix4fv_with_f32_array(Some(projection_matrix_location), false, &self.camera_inverse);
 
     let projection_matrix_location = program.uniforms.get("projection_matrix").unwrap();
     self.gl.uniform_matrix4fv_with_f32_array(Some(projection_matrix_location), false, &self.camera_projection);
@@ -104,6 +113,13 @@ impl WebGLRenderer {
 
   pub fn use_geometry(&mut self, geometry: Rc<Geometry>) {
     if let Some(program) = &self.active_program {
+      if let Some(index) = &geometry.index {
+        let buffer = self.buffer_manager.get_index_buffer(index.clone()).unwrap();
+        self.gl.bind_buffer(WebGlRenderingContext::ELEMENT_ARRAY_BUFFER, Some(buffer));
+      }else{
+        self.gl.bind_buffer(WebGlRenderingContext::ELEMENT_ARRAY_BUFFER, None);
+      }
+
       for (name, location) in  program.attributes.iter() {
         let buffer_data = geometry.attributes.get(name).unwrap();
         let buffer = self.buffer_manager.get_buffer(buffer_data.clone()).unwrap();
