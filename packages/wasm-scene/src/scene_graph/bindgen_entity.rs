@@ -23,12 +23,13 @@ impl SceneGraph {
         free_index,
         String::from(
           r#"           
-            attribute vec4 position;
+            attribute vec3 position;
             uniform mat4 model_matrix;
             uniform mat4 camera_inverse;
             uniform mat4 projection_matrix;
             void main() {
-                gl_Position = projection_matrix * camera_inverse * model_matrix * position;
+              gl_Position = projection_matrix * camera_inverse * model_matrix * vec4(position, 1.0);
+              // gl_Position = vec4(position, 1.0) * model_matrix * camera_inverse * projection_matrix;
             }
             "#,
         ),

@@ -76,9 +76,11 @@ export function intoWasmScene() {
     // );
     const shading = scene.createShading('test');
     const geom = new THREE.BoxBufferGeometry();
+
     const positionbuffer = scene.createNewBuffer(geom.getAttribute('position').array as Float32Array, 3);
     const index = scene.createNewIndexBuffer(geom.index.array as Uint16Array, 3)
-    const geometry = scene.createNewGeometry(index, positionbuffer)
+
+    const geometry = scene.createNewGeometry(null, positionbuffer)
     const renderable = scene.createRenderObject(shading, geometry)
 
     const arraySize = 5;
@@ -104,6 +106,7 @@ export function intoWasmScene() {
     const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
     camera.position.z = 50;
     camera.updateMatrix();
+    camera.updateMatrixWorld(true);
 
     const o3d = new Object3D();
 

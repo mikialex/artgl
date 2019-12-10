@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::*;
 
-use crate::{log, log_usize};
+use crate::{log, log_usize,log_f32};
 
 #[wasm_bindgen]
 pub struct WebGLRenderer {
@@ -57,6 +57,8 @@ impl WebGLRenderer {
 
     self.camera_projection = scene.camera.projection_matrix.to_array();
     self.camera_inverse = scene.camera.inverse_world_matrix.to_array();
+
+    log_f32(self.camera_inverse[14]);
     
     list.foreach(|(object_id, scene_id)| {
       let object = scene.render_objects.get(*object_id);
@@ -72,10 +74,11 @@ impl WebGLRenderer {
 
 impl WebGLRenderer {
   pub fn draw(&mut self, geometry: Rc<Geometry>) {
-    let length = geometry.attributes.get("position").unwrap().data.len() / 3;
-    if let Some(_) = &geometry.index {
+    if let Some(index) = &geometry.index {
+      let length = index.data.len();
       self.gl.draw_elements_with_i32(WebGlRenderingContext::TRIANGLES, 0, WebGlRenderingContext::UNSIGNED_INT,length as i32);
     }else{
+      let length = geometry.attributes.get("position").unwrap().data.len() / 3;
       self.gl.draw_arrays(WebGlRenderingContext::TRIANGLES, 0, length as i32);
     }
   }
@@ -97,11 +100,12 @@ impl WebGLRenderer {
     let model_matrix_location = program.uniforms.get("model_matrix").unwrap();
     self.gl.uniform_matrix4fv_with_f32_array(Some(model_matrix_location), false, &self.model_transform);
 
-    let projection_matrix_location = program.uniforms.get("camera_inverse").unwrap();
-    self.gl.uniform_matrix4fv_with_f32_array(Some(projection_matrix_location), false, &self.camera_inverse);
+    let camera_inverse_location = program.uniforms.get("camera_inverse").unwrap();
+    self.gl.uniform_matrix4fv_with_f32_array(Some(camera_inverse_location), false, &self.camera_inverse);
 
     let projection_matrix_location = program.uniforms.get("projection_matrix").unwrap();
     self.gl.uniform_matrix4fv_with_f32_array(Some(projection_matrix_location), false, &self.camera_projection);
+    log_usize(1)
     // for (name, location) in program.uniforms.iter() {
     //   // if name == "model_matrix" {
 
