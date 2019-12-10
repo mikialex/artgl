@@ -29,7 +29,7 @@ impl SceneGraph {
             uniform mat4 projection_matrix;
             void main() {
               gl_Position = projection_matrix * camera_inverse * model_matrix * vec4(position, 1.0);
-              // gl_Position = vec4(position, 1.0) * model_matrix * camera_inverse * projection_matrix;
+              // gl_Position = model_matrix * camera_inverse * projection_matrix *  vec4(position, 1.0);
             }
             "#,
         ),

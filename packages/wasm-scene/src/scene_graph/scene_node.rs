@@ -24,9 +24,9 @@ pub struct SceneNode {
     pub fn new(index: usize) -> SceneNode {
       SceneNode {
         index,
-        position: Vec3::zero(),
-        scale: Vec3::one(),
-        rotation: Quat::one(),
+        position: Vec3::new(1.0, 0.0, 0.0),
+        scale: Vec3::new(1.0, 1.0, 1.0),
+        rotation: Quat::new(0.0,0.0,0.0,1.0),
         matrix_local: Mat4::one(),
         matrix_world: Mat4::one(),
         render_data: None,

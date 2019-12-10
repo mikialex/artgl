@@ -53,12 +53,9 @@ impl WebGLRenderer {
     self.gl.clear(WebGlRenderingContext::COLOR_BUFFER_BIT);
 
     let list = scene.batch_drawcalls().borrow();
-    log_usize(list.get_len());
 
     self.camera_projection = scene.camera.projection_matrix.to_array();
     self.camera_inverse = scene.camera.inverse_world_matrix.to_array();
-
-    log_f32(self.camera_inverse[14]);
     
     list.foreach(|(object_id, scene_id)| {
       let object = scene.render_objects.get(*object_id);
@@ -105,7 +102,6 @@ impl WebGLRenderer {
 
     let projection_matrix_location = program.uniforms.get("projection_matrix").unwrap();
     self.gl.uniform_matrix4fv_with_f32_array(Some(projection_matrix_location), false, &self.camera_projection);
-    log_usize(1)
     // for (name, location) in program.uniforms.iter() {
     //   // if name == "model_matrix" {
 
