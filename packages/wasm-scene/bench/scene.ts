@@ -101,13 +101,13 @@ export function intoWasmScene() {
     const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
     camera.position.z = 50;
     camera.updateMatrix();
-    scene.useProjection(new Float32Array(camera.projectionMatrix.elements));
 
     const o3d = new Object3D();
 
     var animate = function () {
-        requestAnimationFrame(animate);
+        // requestAnimationFrame(animate);
 
+        scene.useProjection(new Float32Array(camera.projectionMatrix.elements));
         o3d.rotation.y += 0.01;
         scene.root.setRotation(o3d.quaternion.x, o3d.quaternion.y, o3d.quaternion.z, o3d.quaternion.w);
 

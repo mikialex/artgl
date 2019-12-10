@@ -11,6 +11,10 @@ impl RenderList {
     }
   }
 
+  pub fn get_len(&self)-> usize{
+    self.renderables.len()
+  }
+
   pub fn reset(&mut self) -> &mut Self{
     self.renderables.clear();
     self

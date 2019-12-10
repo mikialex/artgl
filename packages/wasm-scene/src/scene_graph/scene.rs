@@ -1,6 +1,6 @@
-use crate::utils::set_panic_hook;
 use crate::math::*;
 use crate::scene_graph::*;
+use crate::utils::set_panic_hook;
 use crate::utils::ArrayContainer;
 use crate::{log, log_usize};
 use core::cell::RefCell;
@@ -16,11 +16,11 @@ pub struct SceneGraph {
   pub(crate) shadings: ArrayContainer<Rc<Shading>>,
   pub(crate) render_objects: ArrayContainer<Rc<RenderObject>>,
 
-  render_list: RenderList
+  render_list: RefCell<RenderList>,
 }
 
 impl SceneGraph {
-  pub fn set_camera(&mut self, camera: Camera){
+  pub fn set_camera(&mut self, camera: Camera) {
     self.camera = camera;
   }
 
@@ -28,9 +28,9 @@ impl SceneGraph {
     self.nodes.get(index)
   }
 
-  pub fn traverse<T>(&self, node: &RefCell<SceneNode>, visitor: T)
+  pub fn traverse<T>(&self, node: &RefCell<SceneNode>, mut visitor: T)
   where
-    T: Fn(&RefCell<SceneNode>, &SceneGraph) -> (),
+    T: FnMut(&RefCell<SceneNode>, &SceneGraph) -> (),
   {
     let mut traverse_stack: Vec<&RefCell<SceneNode>> = Vec::new();
     traverse_stack.push(node);
@@ -52,19 +52,70 @@ impl SceneGraph {
     }
   }
 
-  pub fn batch_drawcalls(&self) -> &RenderList{
+  pub fn batch_drawcalls(&self) -> &RefCell<RenderList> {
     let root = self.get_scene_node(0);
+    let mut render_list = self.render_list.borrow_mut();
+    render_list.reset();
 
     self.traverse(root, |node: &RefCell<SceneNode>, scene: &SceneGraph| {
       let mut self_node = node.borrow_mut();
+
       if let Some(parent_index) = self_node.parent {
         let parent_node = scene.get_scene_node(parent_index).borrow_mut();
+
+        self_node.matrix_local =
+          compose(&self_node.position, &self_node.rotation, &self_node.scale);
         self_node.matrix_world = self_node.matrix_world * parent_node.matrix_world;
+        if let Some(render_object) = &self_node.render_data {
+          render_list.add_renderable(render_object, &self_node);
+        }
       }
     });
 
     &self.render_list
   }
+}
+
+fn compose(position: &Vec3<f32>, quaternion: &Quat<f32>, scale: &Vec3<f32>) -> Mat4<f32> {
+  let x = quaternion.x;
+  let y = quaternion.y;
+  let z = quaternion.z;
+  let w = quaternion.w;
+  let x2 = x + x;
+  let y2 = y + y;
+  let z2 = z + z;
+  let xx = x * x2;
+  let xy = x * y2;
+  let xz = x * z2;
+  let yy = y * y2;
+  let yz = y * z2;
+  let zz = z * z2;
+  let wx = w * x2;
+  let wy = w * y2;
+  let wz = w * z2;
+
+  let sx = scale.x;
+  let sy = scale.y;
+  let sz = scale.z;
+
+  Mat4::new(
+    (1. - (yy + zz)) * sx,
+    (xy + wz) * sx,
+    (xz - wy) * sx,
+    0.,
+    (xy - wz) * sy,
+    (1. - (xx + zz)) * sy,
+    (yz + wx) * sy,
+    0.,
+    (xz + wy) * sz,
+    (yz - wx) * sz,
+    (1. - (xx + yy)) * sz,
+    0.,
+    position.x,
+    position.y,
+    position.z,
+    1.,
+  )
 }
 
 #[wasm_bindgen]
@@ -78,13 +129,13 @@ impl SceneGraph {
       geometries: ArrayContainer::new(),
       shadings: ArrayContainer::new(),
       render_objects: ArrayContainer::new(),
-      render_list: RenderList::new()
+      render_list: RefCell::new(RenderList::new()),
     };
     graph.create_new_node(); // as root
     graph
   }
 
-  pub fn update_all_world_matrix(&mut self){
+  pub fn update_all_world_matrix(&mut self) {
     let root = self.get_scene_node(0);
     self.traverse(root, |node: &RefCell<SceneNode>, scene: &SceneGraph| {
       let mut self_node = node.borrow_mut();
@@ -94,7 +145,6 @@ impl SceneGraph {
       }
     })
   }
-
 }
 
 // #[wasm_bindgen(inline_js = "export function doNothing(a, b) { return a + b }")]

@@ -23,8 +23,10 @@ impl SceneGraph {
         String::from(
           r#"           
             attribute vec4 position;
+            uniform mat4 model_matrix;
+            uniform mat4 projection_matrix;
             void main() {
-                gl_Position = position;
+                gl_Position = projection_matrix * model_matrix * position;
             }
             "#,
         ),
@@ -36,7 +38,7 @@ impl SceneGraph {
         "#,
         ),
         vec![String::from("position")],
-        vec![],
+        vec![String::from("model_matrix"), String::from("projection_matrix")],
       ));
       self.shadings.set_item(shading, free_index);
       free_index

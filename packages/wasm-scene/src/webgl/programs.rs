@@ -14,8 +14,8 @@ impl WebGLRenderer {
           self.gl.clone(),
           &shading.vertex_str,
           &shading.frag_str,
-          &shading.uniforms, 
-          &shading.attributes,
+          &shading.attributes, 
+          &shading.uniforms,
         )?))
         .clone(),
     )
