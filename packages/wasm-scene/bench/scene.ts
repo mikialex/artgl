@@ -19,7 +19,7 @@ export function intoThree() {
     const geom = new THREE.BoxBufferGeometry();
     const mat = new THREE.MeshBasicMaterial();
 
-    const arraySize = 20;
+    const arraySize = 30;
     console.log(arraySize * arraySize * arraySize);
     const grid = 2;
     for (let i = 0; i < arraySize; i++) {
@@ -100,7 +100,7 @@ export function intoWasmScene() {
     const geometry = scene.createNewGeometry(null, positionbuffer)
     const renderable = scene.createRenderObject(shading, geometry)
 
-    const arraySize = 20;
+    const arraySize = 30;
     console.log(arraySize * arraySize * arraySize);
     const grid = 2;
     for (let i = 0; i < arraySize; i++) {

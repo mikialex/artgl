@@ -13,7 +13,7 @@ use crate::{log, log_usize,log_f32};
 #[wasm_bindgen(raw_module = "../src/webgl/array_pool")]
 extern "C" {
     fn makeBuffer(size: usize) -> JsValue;
-    fn copyBuffer(buffer: &JsValue, start: *const Mat4<f32>, offset: usize);
+    fn copyBuffer(buffer: &JsValue, start: *const f32, offset: usize);
     fn uploadMatrix4f(gl: &WebGlRenderingContext, location: &WebGlUniformLocation, buffer: &JsValue);
 }
 
@@ -65,17 +65,15 @@ impl WebGLRenderer {
 
     let list = scene.batch_drawcalls().borrow();
 
-    // self.camera_projection = scene.camera.projection_matrix.to_array();
-    // self.camera_inverse = scene.camera.inverse_world_matrix.to_array();
-    copyBuffer(&self.camera_projection, &scene.camera.projection_matrix, 16);
-    copyBuffer(&self.camera_inverse, &scene.camera.inverse_world_matrix, 16);
+    copyBuffer(&self.camera_projection, scene.camera.projection_matrix.as_ptr(), 16);
+    copyBuffer(&self.camera_inverse, scene.camera.inverse_world_matrix.as_ptr(), 16);
     
-    list.foreach(|(object_id, scene_id)| {
-      let object = scene.render_objects.get(*object_id);
-      let scene_node = scene.nodes.get(*scene_id).borrow();
+    list.foreach(|render_item| {
+      
+      let object = scene.render_objects.get(render_item.render_object_index);
+      let scene_node = scene.nodes.get(render_item.scene_node_index).borrow();
 
-      // self.model_transform = scene_node.matrix_world.to_array();
-      copyBuffer(&self.model_transform, &scene_node.matrix_world, 16);
+      copyBuffer(&self.model_transform, scene_node.matrix_world.as_ptr(), 16);
 
       self.use_shading(object.shading.clone());
       self.use_geometry(object.geometry.clone());
@@ -110,15 +108,12 @@ impl WebGLRenderer {
     }
 
     let model_matrix_location = program.uniforms.get("model_matrix").unwrap();
-    // self.gl.uniform_matrix4fv_with_f32_array(Some(model_matrix_location), false, &self.model_transform);
     uploadMatrix4f(&self.gl, model_matrix_location, &self.model_transform);
 
     let camera_inverse_location = program.uniforms.get("camera_inverse").unwrap();
-    // self.gl.uniform_matrix4fv_with_f32_array(Some(camera_inverse_location), false, &self.camera_inverse);
     uploadMatrix4f(&self.gl, camera_inverse_location, &self.camera_inverse);
 
     let projection_matrix_location = program.uniforms.get("projection_matrix").unwrap();
-    // self.gl.uniform_matrix4fv_with_f32_array(Some(projection_matrix_location), false, &self.camera_projection);
     uploadMatrix4f(&self.gl, projection_matrix_location, &self.camera_projection);
 
 

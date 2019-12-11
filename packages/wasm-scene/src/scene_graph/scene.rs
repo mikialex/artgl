@@ -56,6 +56,7 @@ impl SceneGraph {
     let root = self.get_scene_node(0);
     let mut render_list = self.render_list.borrow_mut();
     render_list.reset();
+    let project_screen_matrix = self.camera.projection_matrix * self.camera.inverse_world_matrix;
 
     self.traverse(root, |node: &RefCell<SceneNode>, scene: &SceneGraph| {
       let mut self_node = node.borrow_mut();
@@ -69,7 +70,8 @@ impl SceneGraph {
         self_node.matrix_world = parent_node.matrix_world * self_node.matrix_local;
 
         if let Some(render_object) = &self_node.render_data {
-          render_list.add_renderable(render_object, &self_node);
+          let z =  (self_node.matrix_world.position() * project_screen_matrix).z;
+          render_list.add_renderable(render_object, &self_node, z);
         }
       } else {
         self_node.matrix_local =
@@ -78,6 +80,7 @@ impl SceneGraph {
       }
     });
 
+    render_list.sort();
     &self.render_list
   }
 }

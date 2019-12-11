@@ -2,10 +2,11 @@
 
 import * as wasm from '../../pkg/wasm_scene_bg.wasm';
 
+let memory = wasm.memory;
 let cachegetFloat32Memory = null;
 function getFloat32Memory() {
-    if (cachegetFloat32Memory === null || cachegetFloat32Memory.buffer !== wasm.memory.buffer) {
-        cachegetFloat32Memory = new Float32Array(wasm.memory.buffer);
+    if (cachegetFloat32Memory === null || cachegetFloat32Memory.buffer !== memory.buffer) {
+        cachegetFloat32Memory = new Float32Array(memory.buffer);
     }
     return cachegetFloat32Memory;
 }
