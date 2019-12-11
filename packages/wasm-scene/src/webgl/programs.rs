@@ -1,8 +1,11 @@
 use std::collections::HashMap;
+use std::hash::BuildHasherDefault;
 use crate::scene_graph::*;
 use crate::webgl::*;
 use std::rc::Rc;
 use web_sys::*;
+
+use fnv::FnvHasher;
 
 impl WebGLRenderer {
   pub fn get_program(&mut self, shading: Rc<Shading>) -> Result<Rc<Program>, String> {
@@ -34,8 +37,8 @@ impl WebGLRenderer {
 pub struct Program {
   context: Rc<WebGlRenderingContext>,
   pub program: WebGlProgram,
-  pub uniforms: HashMap<String, WebGlUniformLocation>,
-  pub attributes: HashMap<String, i32>,
+  pub uniforms: HashMap<String, WebGlUniformLocation, BuildHasherDefault<FnvHasher>>,
+  pub attributes: HashMap<String, i32, BuildHasherDefault<FnvHasher>>,
 }
 
 impl Program {
@@ -64,12 +67,12 @@ impl Program {
 
     // let activeUniform = context.get_program_parameter(&program, WebGlRenderingContext::ACTIVE_UNIFORMS);
 
-    let mut uniforms: HashMap<String, WebGlUniformLocation> = HashMap::new();
+    let mut uniforms = HashMap::with_hasher(BuildHasherDefault::<FnvHasher>::default());
     uniforms_vec.iter().for_each(|name| {
       uniforms.insert(name.clone(), context.get_uniform_location(&program, name).unwrap());
     });
 
-    let mut attributes = HashMap::new();
+    let mut attributes = HashMap::with_hasher(BuildHasherDefault::<FnvHasher>::default());
     attributes_vec.iter().for_each(|name| {
       attributes.insert(name.clone(), context.get_attrib_location(&program, name));
     });

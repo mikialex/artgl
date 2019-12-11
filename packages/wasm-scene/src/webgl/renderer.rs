@@ -7,6 +7,8 @@ use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::*;
+use std::hash::BuildHasherDefault;
+use fnv::FnvHasher;
 
 use crate::{log, log_usize,log_f32};
 
@@ -29,7 +31,7 @@ pub struct WebGLRenderer {
 
   pub(crate) active_program: Option<Rc<Program>>,
 
-  pub(crate) programs: HashMap<Rc<Shading>, Rc<Program>>,
+  pub(crate) programs: HashMap<Rc<Shading>, Rc<Program>, BuildHasherDefault<FnvHasher>>,
   pub(crate) buffer_manager: BufferManager,
 }
 
@@ -54,7 +56,7 @@ impl WebGLRenderer {
       camera_projection: makeBuffer(16),
       camera_inverse: makeBuffer(16),
       active_program: None,
-      programs: HashMap::new(),
+      programs: HashMap::with_hasher(BuildHasherDefault::<FnvHasher>::default()),
       buffer_manager: BufferManager::new(glc),
     })
   }

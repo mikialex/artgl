@@ -1,13 +1,16 @@
 use crate::log_usize;
 use crate::scene_graph::*;
 use std::collections::HashMap;
+use std::hash::BuildHasherDefault;
 use std::rc::Rc;
 use web_sys::*;
 
+use fnv::FnvHasher;
+
 pub struct BufferManager {
   gl: Rc<WebGlRenderingContext>,
-  buffers: HashMap<Rc<BufferData<f32>>, WebGlBuffer>,
-  index_buffers: HashMap<Rc<BufferData<u16>>, WebGlBuffer>,
+  buffers: HashMap<Rc<BufferData<f32>>, WebGlBuffer, BuildHasherDefault<FnvHasher>>,
+  index_buffers: HashMap<Rc<BufferData<u16>>, WebGlBuffer, BuildHasherDefault<FnvHasher>>,
 }
 
 impl BufferManager {
@@ -15,8 +18,8 @@ impl BufferManager {
   pub fn new(gl: Rc<WebGlRenderingContext>) -> BufferManager{
     BufferManager{
       gl,
-      buffers: HashMap::new(),
-      index_buffers: HashMap::new(),
+      buffers: HashMap::with_hasher(BuildHasherDefault::<FnvHasher>::default()),
+      index_buffers: HashMap::with_hasher(BuildHasherDefault::<FnvHasher>::default()),
     }
   }
 

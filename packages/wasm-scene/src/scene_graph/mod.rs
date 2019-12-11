@@ -6,7 +6,7 @@ pub mod frustum;
 pub mod shading;
 pub mod camera;
 pub mod render_list;
-
+pub mod buffer_data;
 
 pub mod bindgen_entity;
 pub mod bindgen_scene_node;
@@ -19,3 +19,4 @@ pub use frustum::*;
 pub use shading::*;
 pub use camera::*;
 pub use render_list::*;
+pub use buffer_data::*;
