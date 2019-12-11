@@ -625,6 +625,26 @@ impl<T> Mat4<T> where T:Vec + Math + PiByC180
 			self.d1, self.d2, self.d3, self.d4,
 		]
 	}
+
+	pub fn to_array_transpose(&self) -> [T; 16]
+	{
+		[
+			self.a1, self.b1, self.c1, self.d1,
+			self.a2, self.b2, self.c2, self.d2,
+			self.a3, self.b3, self.c3, self.d3,
+			self.a4, self.b4, self.c4, self.d4,
+		]
+	}
+
+	pub fn transpose(&self) -> Mat4<T>
+	{
+		Mat4::new(
+			self.a1, self.b1, self.c1, self.d1,
+			self.a2, self.b2, self.c2, self.d2,
+			self.a3, self.b3, self.c3, self.d3,
+			self.a4, self.b4, self.c4, self.d4,
+		)
+	}
 }
 
 impl<T> Zero for Mat4<T> where T:Zero

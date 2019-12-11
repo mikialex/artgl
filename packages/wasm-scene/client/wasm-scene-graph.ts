@@ -9,8 +9,8 @@ export class WasmSceneGraph{
         this.wasmScene.free();
     }
 
-    useProjection(data: Float32Array) {
-        this.wasmScene.update_camera_projection(data);
+    useProjection(p: Float32Array, inv: Float32Array) {
+        this.wasmScene.update_camera(p, inv);
     }
 
     private wasmScene: SceneGraph;
@@ -28,14 +28,24 @@ export class WasmSceneGraph{
         return buffer;
     }
 
-    createNewGeometry(positionBuffer: BufferData) {
-        const index = this.wasmScene.create_geometry(positionBuffer.index);
+    createNewIndexBuffer(data: Uint16Array, stride: number) {
+        const index = this.wasmScene.create_new_index_buffer_data(data, stride);
+        const buffer = new BufferData(this, index);
+        return buffer;
+    }
+
+    createNewGeometry(indexBuffer: BufferData | null, positionBuffer: BufferData) {
+        let indexID = null;
+        if (indexBuffer !== null) {
+            indexID = indexBuffer.index
+        }
+        const index = this.wasmScene.create_geometry(indexID, positionBuffer.index);
         const geometry = new Geometry(this, index);
         return geometry;
     }
 
-    createShading(vertexStr: string, fragStr: string){
-        const index = this.wasmScene.create_new_shading(vertexStr, fragStr);
+    createShading(keyName: string){
+        const index = this.wasmScene.create_new_shading(keyName);
         const shading = new Shading(this, index);
         return shading;
     }
@@ -87,7 +97,7 @@ export class WasmSceneNode extends WASMIndexedObject{
     readonly index: number;
     readonly scene: WasmSceneGraph
     private parent: WasmSceneNode | null = null;
-    private children: WasmSceneNode[] = [];
+    children: WasmSceneNode[] = [];
 
     setPosition(x: number, y: number, z: number) {
         this.scene.getWasm().set_node_position(this.index, x, y, z);

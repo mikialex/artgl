@@ -1,7 +1,7 @@
 import * as THREE from './node_modules/three/src/Three'
 import { Renderer } from '../client/renderer';
 import { WasmSceneGraph } from '../client/wasm-scene-graph';
-import { Quaternion, Euler, Object3D } from './node_modules/three/src/Three';
+import { Object3D, Vector3, Matrix4 } from './node_modules/three/src/Three';
 
 export function intoThree() {
 
@@ -11,16 +11,17 @@ export function intoThree() {
     camera.position.z = 50;
 
     var renderer = new THREE.WebGLRenderer({
-        canvas
+        canvas,
+        antialias: true
     });
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 
     const geom = new THREE.BoxBufferGeometry();
     const mat = new THREE.MeshBasicMaterial();
 
-    const arraySize = 5;
+    const arraySize = 30;
     console.log(arraySize * arraySize * arraySize);
-    const grid = 1;
+    const grid = 2;
     for (let i = 0; i < arraySize; i++) {
         const node = new THREE.Object3D();
         node.position.x = i * grid;
@@ -33,7 +34,6 @@ export function intoThree() {
 
                 const testMesh = new THREE.Mesh(geom, mat);
                 testMesh.position.z = k * grid;
-                testMesh.scale.set(0.3, 0.3, 0.3);
                 testMesh.frustumCulled = false;
                 node2.add(testMesh);
             }
@@ -42,11 +42,10 @@ export function intoThree() {
 
     var animate = function () {
         requestAnimationFrame(animate);
-
-        scene.rotation.x += 0.01;
-        scene.rotation.y += 0.01;
-
-        renderer.render(scene, camera);
+        if ((window as any).threeEnable) {
+            scene.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
     };
 
     animate();
@@ -55,31 +54,55 @@ export function intoThree() {
 
 export function intoWasmScene() {
     const canvas = document.querySelector('#wasm')! as HTMLCanvasElement
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
     const renderer = new Renderer(canvas);
     console.log(renderer)
     const scene = new WasmSceneGraph();
 
-    const shading = scene.createShading(
-        `            
-            attribute vec4 position;
-            void main() {
-                gl_Position = position;
-            }
-            `,
-        `
-            void main() {
-                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-            }
-        `
-    );
-    const data = new Float32Array([-0.7, -0.7, 0.0, 0.7, -0.7, 0.0, 0.0, 0.7, 0.0]);
-    const positionbuffer = scene.createNewBuffer(data, 3);
-    const geometry = scene.createNewGeometry(positionbuffer)
+    // const shading = scene.createShading(
+    //     `            
+    //         attribute vec4 position;
+    //         void main() {
+    //             gl_Position = position;
+    //         }
+    //         `,
+    //     `
+    //         void main() {
+    //             gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    //         }
+    //     `
+    // );
+    const shading = scene.createShading('test');
+    const geo = new THREE.BoxBufferGeometry();
+
+    // const positionbuffer = scene.createNewBuffer(geom.getAttribute('position').array as Float32Array, 3);
+    const data = [];
+    for (let i = 0; i < geo.index.array.length / 3; i++) {
+            const index1 = geo.index.array[i * 3];
+            const index2 = geo.index.array[i * 3 + 1];
+            const index3 = geo.index.array[i * 3 + 2];
+            data.push(
+                geo.attributes.position.array[index1 * 3],
+                geo.attributes.position.array[index1 * 3 + 1],
+                geo.attributes.position.array[index1 * 3 + 2],
+                geo.attributes.position.array[index2 * 3],
+                geo.attributes.position.array[index2 * 3 + 1],
+                geo.attributes.position.array[index2 * 3 + 2],
+                geo.attributes.position.array[index3 * 3],
+                geo.attributes.position.array[index3 * 3 + 1],
+                geo.attributes.position.array[index3 * 3 + 2],
+            );
+    }
+    const positionbuffer = scene.createNewBuffer(new Float32Array(data), 3);
+    // const index = scene.createNewIndexBuffer(geom.index.array as Uint16Array, 3)
+
+    const geometry = scene.createNewGeometry(null, positionbuffer)
     const renderable = scene.createRenderObject(shading, geometry)
 
-    const arraySize = 5;
+    const arraySize = 30;
     console.log(arraySize * arraySize * arraySize);
-    const grid = 1;
+    const grid = 2;
     for (let i = 0; i < arraySize; i++) {
         const node = scene.createNewNode();
         node.setPosition(i * grid, 0, 0);
@@ -100,17 +123,27 @@ export function intoWasmScene() {
     const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
     camera.position.z = 50;
     camera.updateMatrix();
-    scene.useProjection(new Float32Array(camera.projectionMatrix.elements));
+    camera.updateMatrixWorld(true);
 
     const o3d = new Object3D();
 
     var animate = function () {
         requestAnimationFrame(animate);
 
-        o3d.rotation.y += 0.01;
-        scene.root.setRotation(o3d.quaternion.x, o3d.quaternion.y, o3d.quaternion.z, o3d.quaternion.w);
 
-        renderer.render(scene);
+        if ((window as any).wasmEnable) {
+            scene.useProjection(
+                new Float32Array(camera.projectionMatrix.elements),
+                new Float32Array(camera.matrixWorldInverse.elements)
+            );
+    
+            o3d.rotation.y += 0.01;
+            // scene.root.setPosition(o3d.position.x, o3d.position.y, o3d.position.z);
+            scene.root.setRotation(o3d.quaternion.x, o3d.quaternion.y, o3d.quaternion.z, o3d.quaternion.w);
+    
+            renderer.render(scene);
+        }
+
     };
 
     animate();

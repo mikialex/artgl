@@ -1,21 +1,38 @@
 use crate::math::*;
 use crate::scene_graph::*;
 use crate::webgl::programs::*;
+use crate::webgl::buffer_attribute::*;
 use std::collections::HashMap;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::*;
+use std::hash::BuildHasherDefault;
+use fnv::FnvHasher;
+
+use crate::{log, log_usize,log_f32};
+
+#[wasm_bindgen(raw_module = "../src/webgl/array_pool")]
+extern "C" {
+    fn makeBuffer(size: usize) -> JsValue;
+    fn copyBuffer(buffer: &JsValue, start: *const f32, offset: usize);
+    fn uploadMatrix4f(gl: &WebGlRenderingContext, location: &WebGlUniformLocation, buffer: &JsValue);
+}
+
 
 #[wasm_bindgen]
 pub struct WebGLRenderer {
   pub(crate) gl: Rc<WebGlRenderingContext>,
 
+  model_transform: JsValue,
+  camera_projection: JsValue,
+  camera_inverse: JsValue,
+
+
   pub(crate) active_program: Option<Rc<Program>>,
 
-  pub(crate) programs: HashMap<Rc<Shading>, Rc<Program>>,
-  pub(crate) buffers: HashMap<Rc<BufferData<f32>>, WebGlBuffer>,
-  pub(crate) index_buffers: HashMap<Rc<BufferData<u16>>, WebGlBuffer>,
+  pub(crate) programs: HashMap<Rc<Shading>, Rc<Program>, BuildHasherDefault<FnvHasher>>,
+  pub(crate) buffer_manager: BufferManager,
 }
 
 #[wasm_bindgen]
@@ -26,59 +43,107 @@ impl WebGLRenderer {
       .unwrap()
       .dyn_into::<WebGlRenderingContext>()?;
 
+      
+    context.enable(WebGlRenderingContext::DEPTH_TEST);
+    context.clear_color(0.0, 0.0, 0.0, 1.0);
+    context.get_extension("OES_element_index_uint")?;
+
+    let gl = Rc::new(context);
+    let glc= gl.clone();
     Ok(WebGLRenderer {
-      gl: Rc::new(context),
+      gl,
+      model_transform: makeBuffer(16),
+      camera_projection: makeBuffer(16),
+      camera_inverse: makeBuffer(16),
       active_program: None,
-      programs: HashMap::new(),
-      buffers: HashMap::new(),
-      index_buffers: HashMap::new(),
+      programs: HashMap::with_hasher(BuildHasherDefault::<FnvHasher>::default()),
+      buffer_manager: BufferManager::new(glc),
     })
   }
 
   pub fn render(&mut self, scene: &SceneGraph) {
-    self.gl.clear_color(0.0, 0.0, 0.0, 1.0);
     self.gl.clear(WebGlRenderingContext::COLOR_BUFFER_BIT);
+    self.gl.clear(WebGlRenderingContext::DEPTH_BUFFER_BIT);
 
-    let list = scene.batch_drawcalls();
+    let list = scene.batch_drawcalls().borrow();
 
-    list.foreach(|(object_id, scene_id)| {
-      let object = scene.render_objects.get(*object_id);
-      let scene_node = scene.nodes.get(*scene_id).borrow();
+    copyBuffer(&self.camera_projection, scene.camera.projection_matrix.as_ptr(), 16);
+    copyBuffer(&self.camera_inverse, scene.camera.inverse_world_matrix.as_ptr(), 16);
+    
+    list.foreach(|render_item| {
+      
+      let object = scene.render_objects.get(render_item.render_object_index);
+      let scene_node = scene.nodes.get(render_item.scene_node_index).borrow();
 
-      self.use_transform(scene_node.matrix_world);
-      let program = self.use_shading(object.shading.clone());
-      self.use_geometry(object.geometry.clone(), program);
+      copyBuffer(&self.model_transform, scene_node.matrix_world.as_ptr(), 16);
+
+      self.use_shading(object.shading.clone());
+      self.use_geometry(object.geometry.clone());
       self.draw(object.geometry.clone());
     })
-    // let buffer = &self.buffers[0];
-    // self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(buffer));
-    // self.gl.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
-    // self.gl.enable_vertex_attrib_array(0);
-
-    // self.gl.use_program(Some(&self.programs.get(0).program));
-    // self.gl.draw_arrays(
-    //     WebGlRenderingContext::TRIANGLES,
-    //     0,
-    //     (9 / 3) as i32,
-    // );
   }
 }
 
 impl WebGLRenderer {
   pub fn draw(&mut self, geometry: Rc<Geometry>) {
-    self.gl.draw_arrays(WebGlRenderingContext::TRIANGLES, 0, (9 / 3) as i32);
+    if let Some(index) = &geometry.index {
+      let length = index.data.len();
+      self.gl.draw_elements_with_i32(WebGlRenderingContext::TRIANGLES, 0, WebGlRenderingContext::UNSIGNED_INT,length as i32);
+    }else{
+      let length = geometry.attributes.get("position").unwrap().data.len() / 3;
+      self.gl.draw_arrays(WebGlRenderingContext::TRIANGLES, 0, length as i32);
+    }
   }
 
-  pub fn use_transform(&mut self, mat: Mat4<f32>) {}
+  pub fn use_shading(&mut self, shading: Rc<Shading>){
+    let program = self.get_program(shading).unwrap();
+    if let Some(current_program) = &self.active_program {
+      if current_program.program != program.program {
+        let p = program.clone();
+        self.active_program = Some(program.clone());
+        self.gl.use_program(Some(p.get_program()));
+      }
+    } else {
+      let p = program.clone();
+        self.active_program = Some(program.clone());
+        self.gl.use_program(Some(p.get_program()));
+    }
 
-  pub fn use_shading(&mut self, shading: Rc<Shading>) -> &Program {
-    unimplemented!()
+    let model_matrix_location = program.uniforms.get("model_matrix").unwrap();
+    uploadMatrix4f(&self.gl, model_matrix_location, &self.model_transform);
+
+    let camera_inverse_location = program.uniforms.get("camera_inverse").unwrap();
+    uploadMatrix4f(&self.gl, camera_inverse_location, &self.camera_inverse);
+
+    let projection_matrix_location = program.uniforms.get("projection_matrix").unwrap();
+    uploadMatrix4f(&self.gl, projection_matrix_location, &self.camera_projection);
+
+
+    // for (name, location) in program.uniforms.iter() {
+    //   // if name == "model_matrix" {
+
+    //   // } else if name == "projection_matrix" {
+        
+    //   // }
+    // }
   }
 
-  pub fn use_geometry(&mut self, geometry: Rc<Geometry>, program: &Program) {
+  pub fn use_geometry(&mut self, geometry: Rc<Geometry>) {
+    if let Some(program) = &self.active_program {
+      if let Some(index) = &geometry.index {
+        let buffer = self.buffer_manager.get_index_buffer(index.clone()).unwrap();
+        self.gl.bind_buffer(WebGlRenderingContext::ELEMENT_ARRAY_BUFFER, Some(buffer));
+      }else{
+        self.gl.bind_buffer(WebGlRenderingContext::ELEMENT_ARRAY_BUFFER, None);
+      }
 
-    // self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(buffer));
-    // self.gl.vertex_attrib_pointer_with_i32(0, 3, WebGlRenderingContext::FLOAT, false, 0, 0);
-    // self.gl.enable_vertex_attrib_array(0);
+      for (name, location) in  program.attributes.iter() {
+        let buffer_data = geometry.attributes.get(name).unwrap();
+        let buffer = self.buffer_manager.get_buffer(buffer_data.clone()).unwrap();
+        self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(buffer));
+        self.gl.vertex_attrib_pointer_with_i32(*location as u32, buffer_data.stride as i32, WebGlRenderingContext::FLOAT, false, 0, 0);
+        self.gl.enable_vertex_attrib_array(*location as u32);
+      }
+    }
   }
 }
