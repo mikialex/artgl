@@ -42,10 +42,10 @@ export function intoThree() {
 
     var animate = function () {
         requestAnimationFrame(animate);
-
-        scene.rotation.y += 0.01;
-
-        renderer.render(scene, camera);
+        if ((window as any).threeEnable) {
+            scene.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
     };
 
     animate();
@@ -130,17 +130,21 @@ export function intoWasmScene() {
     var animate = function () {
         requestAnimationFrame(animate);
 
-        scene.useProjection(
-            new Float32Array(camera.projectionMatrix.elements),
-            new Float32Array(camera.matrixWorldInverse.elements)
-        );
 
-        o3d.rotation.y += 0.01;
-        // scene.root.setPosition(o3d.position.x, o3d.position.y, o3d.position.z);
-        scene.root.setRotation(o3d.quaternion.x, o3d.quaternion.y, o3d.quaternion.z, o3d.quaternion.w);
+        if ((window as any).wasmEnable) {
+            scene.useProjection(
+                new Float32Array(camera.projectionMatrix.elements),
+                new Float32Array(camera.matrixWorldInverse.elements)
+            );
+    
+            o3d.rotation.y += 0.01;
+            // scene.root.setPosition(o3d.position.x, o3d.position.y, o3d.position.z);
+            scene.root.setRotation(o3d.quaternion.x, o3d.quaternion.y, o3d.quaternion.z, o3d.quaternion.w);
+    
+            renderer.render(scene);
+        }
 
-        renderer.render(scene);
     };
 
-    // animate();
+    animate();
 }

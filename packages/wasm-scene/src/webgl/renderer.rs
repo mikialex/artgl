@@ -99,18 +99,14 @@ impl WebGLRenderer {
         self.gl.use_program(Some(p.get_program()));
     }
 
-    let location = program.uniforms.get("transform").unwrap();
-    self.gl.uniform_matrix4fv_with_f32_array(Some(location), false, mat);
+    let model_matrix_location = program.uniforms.get("model_matrix").unwrap();
+    self.gl.uniform_matrix4fv_with_f32_array(Some(model_matrix_location), false, &self.model_transform);
 
+    let camera_inverse_location = program.uniforms.get("camera_inverse").unwrap();
+    self.gl.uniform_matrix4fv_with_f32_array(Some(camera_inverse_location), false, &self.camera_inverse);
 
-    // let model_matrix_location = program.uniforms.get("model_matrix").unwrap();
-    // self.gl.uniform_matrix4fv_with_f32_array(Some(model_matrix_location), false, &self.model_transform);
-
-    // let camera_inverse_location = program.uniforms.get("camera_inverse").unwrap();
-    // self.gl.uniform_matrix4fv_with_f32_array(Some(camera_inverse_location), false, &self.camera_inverse);
-
-    // let projection_matrix_location = program.uniforms.get("projection_matrix").unwrap();
-    // self.gl.uniform_matrix4fv_with_f32_array(Some(projection_matrix_location), false, &self.camera_projection);
+    let projection_matrix_location = program.uniforms.get("projection_matrix").unwrap();
+    self.gl.uniform_matrix4fv_with_f32_array(Some(projection_matrix_location), false, &self.camera_projection);
 
 
     // for (name, location) in program.uniforms.iter() {

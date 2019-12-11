@@ -24,13 +24,11 @@ impl SceneGraph {
         String::from(
           r#"           
             attribute vec3 position;
-            // uniform mat4 model_matrix;
-            // uniform mat4 camera_inverse;
-            // uniform mat4 projection_matrix;
-            uniform mat4 transform;
+            uniform mat4 model_matrix;
+            uniform mat4 camera_inverse;
+            uniform mat4 projection_matrix;
             void main() {
-              gl_Position = transform * vec4(position, 1.0);
-              // gl_Position = projection_matrix * camera_inverse * model_matrix * vec4(position, 1.0);
+              gl_Position = projection_matrix * camera_inverse * model_matrix * vec4(position, 1.0);
             }
             "#,
         ),
@@ -42,8 +40,7 @@ impl SceneGraph {
         "#,
         ),
         vec![String::from("position")],
-        vec![String::from("transform")],
-        // vec![String::from("model_matrix"), String::from("projection_matrix"), String::from("camera_inverse")],
+        vec![String::from("model_matrix"), String::from("projection_matrix"), String::from("camera_inverse")],
       ));
       self.shadings.set_item(shading, free_index);
       free_index
