@@ -28,10 +28,41 @@ pub struct PureColorShading {
   vertex: String,
   frag: String,
 
-  // uniforms
-  projection_matrix: Mat4<f32>,
-  world_matrix: Mat4<f32>,
-  camera_inverse_matrix: Mat4<f32>,
+  // // uniforms
+  // projection_matrix: Mat4<f32>,
+  // world_matrix: Mat4<f32>,
+  // camera_inverse_matrix: Mat4<f32>,
+}
+
+impl PureColorShading {
+  pub fn new(index: usize) -> Self{
+    PureColorShading {
+      index,
+      vertex: String::from (
+        r#"
+        attribute vec3 position;
+            uniform mat4 model_matrix;
+            uniform mat4 camera_inverse;
+            uniform mat4 projection_matrix;
+            void main() {
+              gl_Position = projection_matrix * camera_inverse * model_matrix * vec4(position, 1.0);
+            }
+        "#
+      ),
+      frag: String::from (
+        r#"
+            void main() {
+                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            }
+        "#
+      ),
+    
+      // projection_matrix: Mat4::one(),
+      // world_matrix: Mat4::one(),
+      // camera_inverse_matrix:Mat4::one(),
+    }
+    
+  }
 }
 
 impl Shading for PureColorShading {
@@ -54,8 +85,8 @@ impl Shading for PureColorShading {
     });
 
     let projection_matrix = gl.get_uniform_location(&program, "projection_matrix").unwrap();
-    let world_matrix = gl.get_uniform_location(&program, "world_matrix").unwrap();
-    let camera_inverse_matrix = gl.get_uniform_location(&program, "camera_inverse_matrix").unwrap();
+    let world_matrix = gl.get_uniform_location(&program, "model_matrix").unwrap();
+    let camera_inverse_matrix = gl.get_uniform_location(&program, "camera_inverse").unwrap();
 
     let p = PureColorProgram {
       program,
@@ -83,9 +114,7 @@ impl ProgramWrap for PureColorProgram {
 
   fn upload_uniforms(&self, renderer: &WebGLRenderer){
     uploadMatrix4f(&renderer.gl, &self.world_matrix, &renderer.model_transform);
-
     uploadMatrix4f(&renderer.gl, &self.camera_inverse_matrix, &renderer.camera_inverse);
-
     uploadMatrix4f(&renderer.gl, &self.projection_matrix, &renderer.camera_projection);
   }
 
