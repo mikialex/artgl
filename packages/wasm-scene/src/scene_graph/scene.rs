@@ -13,7 +13,7 @@ pub struct SceneGraph {
   pub(crate) buffers: ArrayContainer<Rc<BufferData<f32>>>,
   pub(crate) index_buffers: ArrayContainer<Rc<BufferData<u16>>>,
   pub(crate) geometries: ArrayContainer<Rc<Geometry>>,
-  pub(crate) shadings: ArrayContainer<Rc<Shading>>,
+  pub(crate) shadings: ArrayContainer<Rc<dyn Shading>>,
   pub(crate) render_objects: ArrayContainer<Rc<RenderObject>>,
 
   render_list: RefCell<RenderList>,
@@ -156,9 +156,3 @@ impl SceneGraph {
     })
   }
 }
-
-// #[wasm_bindgen(inline_js = "export function doNothing(a, b) { return a + b }")]
-// extern "C" {
-//     fn doNothing(a: usize, b: usize);
-
-// }

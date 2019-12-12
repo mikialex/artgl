@@ -14,9 +14,9 @@ use crate::{log, log_usize,log_f32};
 
 #[wasm_bindgen(raw_module = "../src/webgl/array_pool")]
 extern "C" {
-    fn makeBuffer(size: usize) -> JsValue;
-    fn copyBuffer(buffer: &JsValue, start: *const f32, offset: usize);
-    fn uploadMatrix4f(gl: &WebGlRenderingContext, location: &WebGlUniformLocation, buffer: &JsValue);
+    pub fn makeBuffer(size: usize) -> JsValue;
+    pub fn copyBuffer(buffer: &JsValue, start: *const f32, offset: usize);
+    pub fn uploadMatrix4f(gl: &WebGlRenderingContext, location: &WebGlUniformLocation, buffer: &JsValue);
 }
 
 
@@ -24,14 +24,14 @@ extern "C" {
 pub struct WebGLRenderer {
   pub(crate) gl: Rc<WebGlRenderingContext>,
 
-  model_transform: JsValue,
-  camera_projection: JsValue,
-  camera_inverse: JsValue,
+  pub(crate) model_transform: JsValue,
+  pub(crate) camera_projection: JsValue,
+  pub(crate) camera_inverse: JsValue,
 
 
-  pub(crate) active_program: Option<Rc<Program>>,
+  pub(crate) active_program: Option<Rc<dyn ProgramWrap>>,
 
-  pub(crate) programs: HashMap<Rc<Shading>, Rc<Program>, BuildHasherDefault<FnvHasher>>,
+  pub(crate) programs: HashMap<Rc<dyn Shading>, Rc<dyn ProgramWrap>, BuildHasherDefault<FnvHasher>>,
   pub(crate) buffer_manager: BufferManager,
 }
 
@@ -95,10 +95,10 @@ impl WebGLRenderer {
     }
   }
 
-  pub fn use_shading(&mut self, shading: Rc<Shading>){
+  pub fn use_shading(&mut self, shading: Rc<dyn Shading>){
     let program = self.get_program(shading).unwrap();
     if let Some(current_program) = &self.active_program {
-      if current_program.program != program.program {
+      if current_program.get_program() != program.get_program() {
         let p = program.clone();
         self.active_program = Some(program.clone());
         self.gl.use_program(Some(p.get_program()));
@@ -109,14 +109,7 @@ impl WebGLRenderer {
         self.gl.use_program(Some(p.get_program()));
     }
 
-    let model_matrix_location = program.uniforms.get("model_matrix").unwrap();
-    uploadMatrix4f(&self.gl, model_matrix_location, &self.model_transform);
-
-    let camera_inverse_location = program.uniforms.get("camera_inverse").unwrap();
-    uploadMatrix4f(&self.gl, camera_inverse_location, &self.camera_inverse);
-
-    let projection_matrix_location = program.uniforms.get("projection_matrix").unwrap();
-    uploadMatrix4f(&self.gl, projection_matrix_location, &self.camera_projection);
+    program.upload_uniforms(&self);
 
 
     // for (name, location) in program.uniforms.iter() {
@@ -130,6 +123,7 @@ impl WebGLRenderer {
 
   pub fn use_geometry(&mut self, geometry: Rc<Geometry>) {
     if let Some(program) = &self.active_program {
+
       if let Some(index) = &geometry.index {
         let buffer = self.buffer_manager.get_index_buffer(index.clone()).unwrap();
         self.gl.bind_buffer(WebGlRenderingContext::ELEMENT_ARRAY_BUFFER, Some(buffer));
@@ -137,7 +131,7 @@ impl WebGLRenderer {
         self.gl.bind_buffer(WebGlRenderingContext::ELEMENT_ARRAY_BUFFER, None);
       }
 
-      for (name, location) in  program.attributes.iter() {
+      for (name, location) in  program.get_attributes().iter() {
         let buffer_data = geometry.attributes.get(name).unwrap();
         let buffer = self.buffer_manager.get_buffer(buffer_data.clone()).unwrap();
         self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(buffer));

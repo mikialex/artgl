@@ -1,3 +1,4 @@
+use crate::webgl::renderer::uploadMatrix4f;
 use std::collections::HashMap;
 use std::hash::BuildHasherDefault;
 use crate::scene_graph::*;
@@ -8,43 +9,57 @@ use web_sys::*;
 use fnv::FnvHasher;
 
 impl WebGLRenderer {
-  pub fn get_program(&mut self, shading: Rc<Shading>) -> Result<Rc<Program>, String> {
+  pub fn get_program(&mut self, shading: Rc<dyn Shading>) -> Result<Rc<dyn ProgramWrap>, String> {
     let gl = self.gl.clone();
     Ok(
       self
         .programs
         .entry(shading.clone())
-        .or_insert_with(||{Rc::new(Program::new(
-          gl.clone(),
-          &shading.vertex_str,
-          &shading.frag_str,
-          &shading.attributes, 
-          &shading.uniforms,
-        ).unwrap())})
+        .or_insert_with(||{
+          shading.make_program(gl)
+      })
         .clone(),
     )
   }
 }
 
-// pub struct Attribute {
-//   location: i32,
-// }
+pub trait ProgramWrap {
+  fn get_program(&self) -> &WebGlProgram;
+  fn upload_uniforms(&self, renderer: &WebGLRenderer);
+  fn get_attributes(&self) -> &HashMap<String, i32, BuildHasherDefault<FnvHasher>>;
+}
 
-// pub struct Uniform {
-//   location: WebGlUniformLocation,
-// }
 
-pub struct Program {
+pub struct DynamicProgram {
   context: Rc<WebGlRenderingContext>,
   pub program: WebGlProgram,
   pub uniforms: HashMap<String, WebGlUniformLocation, BuildHasherDefault<FnvHasher>>,
   pub attributes: HashMap<String, i32, BuildHasherDefault<FnvHasher>>,
 }
 
-impl Program {
-  pub fn get_program(&self) -> &WebGlProgram {
+impl ProgramWrap for DynamicProgram {
+  fn get_program(&self) -> &WebGlProgram{
     &self.program
   }
+
+  fn upload_uniforms(&self, renderer: &WebGLRenderer){
+    let model_matrix_location = self.uniforms.get("model_matrix").unwrap();
+    uploadMatrix4f(&renderer.gl, model_matrix_location, &renderer.model_transform);
+
+    let camera_inverse_location = self.uniforms.get("camera_inverse").unwrap();
+    uploadMatrix4f(&renderer.gl, camera_inverse_location, &renderer.camera_inverse);
+
+    let projection_matrix_location = self.uniforms.get("projection_matrix").unwrap();
+    uploadMatrix4f(&renderer.gl, projection_matrix_location, &renderer.camera_projection);
+  }
+
+  fn get_attributes(&self) -> &HashMap<String, i32, BuildHasherDefault<FnvHasher>>{
+    &self.attributes
+  }
+
+}
+
+impl DynamicProgram {
 
   pub fn new(
     context: Rc<WebGlRenderingContext>,
@@ -52,7 +67,7 @@ impl Program {
     frag_shader_str: &str,
     attributes_vec: &Vec<String>, 
     uniforms_vec: &Vec<String>
-  ) -> Result<Program, String> {
+  ) -> Result<DynamicProgram, String> {
     let vertex_shader = compile_shader(
       &context,
       WebGlRenderingContext::VERTEX_SHADER,
@@ -77,7 +92,7 @@ impl Program {
       attributes.insert(name.clone(), context.get_attrib_location(&program, name));
     });
 
-    Ok(Program { 
+    Ok(DynamicProgram { 
       context, 
       program,
       uniforms,
