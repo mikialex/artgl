@@ -1,6 +1,7 @@
 use crate::math::*;
 // use crate::scene_graph::*;
 
+#[derive(Default)]
 pub struct Camera {
     pub projection_matrix: Mat4<f32>, 
     pub inverse_world_matrix: Mat4<f32>, 

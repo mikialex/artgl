@@ -1,8 +1,6 @@
 use web_sys::WebGlRenderingContext;
 use std::rc::Rc;
 use crate::webgl::programs::{ProgramWrap, DynamicProgram};
-use web_sys::WebGlUniformLocation;
-use crate::math::*;
 use std::hash::Hash;
 use std::hash::Hasher;
 
@@ -40,7 +38,7 @@ pub struct DynamicShading {
 impl Shading for DynamicShading {
 
   fn get_index(&self)-> usize {
-    self.get_index()
+    self.index
   }
   fn get_vertex_str(&self) -> &str{
     &self.vertex_str
@@ -78,35 +76,3 @@ impl DynamicShading {
     }
   }
 }
-
-// pub struct Shading
-
-// pub struct PureColorShading {
-
-//   vertex: String,
-//   frag: String,
-
-//   // uniforms
-
-//   projection_matrix: Mat4<f32>,
-
-//   world_matrix: Mat4<f32>,
-// }
-
-// pub struct ShadingProgram {
-//   vertex: String,
-//   frag: String,
-  
-//   projection_matrix_location: WebGlUniformLocation,
-//   world_matrix: WebGlUniformLocation,
-// }
-
-// impl ShadingProgram{
-//   pub fn new(){
-
-//   }
-
-//   pub fn upload_uniforms(&self){
-    
-//   }
-// }
