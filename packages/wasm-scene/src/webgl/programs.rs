@@ -68,17 +68,7 @@ impl DynamicProgram {
     attributes_vec: &Vec<String>, 
     uniforms_vec: &Vec<String>
   ) -> Result<DynamicProgram, String> {
-    let vertex_shader = compile_shader(
-      &context,
-      WebGlRenderingContext::VERTEX_SHADER,
-      vertex_shader_str,
-    )?;
-    let frag_shader = compile_shader(
-      &context,
-      WebGlRenderingContext::FRAGMENT_SHADER,
-      frag_shader_str,
-    )?;
-    let program = link_program(&context, &vertex_shader, &frag_shader)?;
+    let program = make_webgl_program(&context, vertex_shader_str, frag_shader_str)?;
 
     // let activeUniform = context.get_program_parameter(&program, WebGlRenderingContext::ACTIVE_UNIFORMS);
 
@@ -99,6 +89,22 @@ impl DynamicProgram {
       attributes
       })
   }
+}
+
+pub fn make_webgl_program(context: &WebGlRenderingContext, vertex_shader_str: &str, frag_shader_str: &str)
+ -> Result<WebGlProgram, String>
+{
+  let vertex_shader = compile_shader(
+    &context,
+    WebGlRenderingContext::VERTEX_SHADER,
+    vertex_shader_str,
+  )?;
+  let frag_shader = compile_shader(
+    &context,
+    WebGlRenderingContext::FRAGMENT_SHADER,
+    frag_shader_str,
+  )?;
+  link_program(&context, &vertex_shader, &frag_shader)
 }
 
 fn compile_shader(
