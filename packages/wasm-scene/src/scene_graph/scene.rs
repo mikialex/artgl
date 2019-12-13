@@ -9,6 +9,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 pub struct SceneGraph {
   pub(crate) camera: Camera,
+  camera_frustum: Frustum,
   pub(crate) nodes: ArrayContainer<RefCell<SceneNode>>,
   pub(crate) buffers: ArrayContainer<Rc<BufferData<f32>>>,
   pub(crate) index_buffers: ArrayContainer<Rc<BufferData<u16>>>,
@@ -22,6 +23,9 @@ pub struct SceneGraph {
 impl SceneGraph {
   pub fn set_camera(&mut self, camera: Camera) {
     self.camera = camera;
+    self.camera_frustum.set_from_matrix(
+      self.camera.projection_matrix * self.camera.inverse_world_matrix
+    );
   }
 
   pub fn get_scene_node(&self, index: usize) -> &RefCell<SceneNode> {
@@ -70,8 +74,13 @@ impl SceneGraph {
         self_node.matrix_world = parent_node.matrix_world * self_node.matrix_local;
 
         if let Some(render_object) = &self_node.render_data {
-          let z =  (self_node.matrix_world.position() * project_screen_matrix).z;
-          render_list.add_renderable(render_object, &self_node, z);
+
+          render_object.update_world_bounding(&self_node.matrix_world);
+          if self.camera_frustum.intersects_sphere(&render_object.world_bounding_sphere) {
+            // calculate distance to camera for sorting;
+            let z =  (self_node.matrix_world.position() * project_screen_matrix).z;
+            render_list.add_renderable(render_object, &self_node, z);
+          }
         }
       } else {
         self_node.matrix_local =
@@ -133,6 +142,7 @@ impl SceneGraph {
     set_panic_hook();
     let mut graph = SceneGraph {
       camera: Camera::new(),
+      camera_frustum: Frustum::new(),
       nodes: ArrayContainer::new(),
       buffers: ArrayContainer::new(),
       index_buffers: ArrayContainer::new(),

@@ -217,6 +217,17 @@ impl<T> Mat4<T> where T: Copy
 	}
 }
 
+impl Mat4<f32> {
+	pub fn max_scale_on_axis(&self) -> f32
+	{
+		let scale_x_sq = self.a1 * self.a1 + self.a2 * self.a2 + self.a3 * self.a3;
+		let scale_y_sq = self.b1 * self.b1 + self.b2 * self.b2 + self.b3 * self.b3;
+		let scale_z_sq = self.c1 * self.c1 + self.c2 * self.c2 + self.c3 * self.c3;
+
+		scale_x_sq.max(scale_y_sq).max(scale_z_sq).sqrt()
+	}
+}
+
 impl<T> Mat4<T> where T:Vec + Math + PiByC180
 {
 	pub fn rotate_x(theta:T) -> Self
