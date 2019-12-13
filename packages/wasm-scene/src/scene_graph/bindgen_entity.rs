@@ -82,13 +82,12 @@ impl SceneGraph {
     let geometry = self.geometries.get(geometry_id).clone();
     let shading = self.shadings.get(shading_id).clone();
     let free_index = self.render_objects.get_free_index();
-    let obj = Rc::new(RenderObject::new(free_index, shading, geometry));
+    let obj = RenderObject::new(free_index, shading, geometry);
     self.render_objects.set_item(obj, free_index);
     free_index
   }
 
   pub fn set_render_descriptor(&mut self, render_object_id: usize, node_index: usize) {
-    let obj = self.render_objects.get(render_object_id);
-    self.get_scene_node(node_index).borrow_mut().render_data = Some(obj.clone());
+    self.get_scene_node(node_index).borrow_mut().render_data = Some(render_object_id);
   }
 }

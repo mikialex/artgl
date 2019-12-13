@@ -1,5 +1,6 @@
 
 mod math;
+mod math_entity;
 mod scene_graph;
 mod webgl;
 mod utils;

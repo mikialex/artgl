@@ -1,3 +1,4 @@
+use crate::math_entity::frustum::Frustum;
 use crate::math::*;
 use crate::scene_graph::*;
 use crate::utils::set_panic_hook;
@@ -15,7 +16,7 @@ pub struct SceneGraph {
   pub(crate) index_buffers: ArrayContainer<Rc<BufferData<u16>>>,
   pub(crate) geometries: ArrayContainer<Rc<Geometry>>,
   pub(crate) shadings: ArrayContainer<Rc<dyn Shading>>,
-  pub(crate) render_objects: ArrayContainer<Rc<RenderObject>>,
+  pub(crate) render_objects: ArrayContainer<RenderObject>,
 
   render_list: RefCell<RenderList>,
 }
@@ -68,20 +69,26 @@ impl SceneGraph {
       if let Some(parent_index) = self_node.parent {
         let parent_node = scene.get_scene_node(parent_index).borrow_mut();
 
-        self_node.matrix_local =
-          compose(&self_node.position, &self_node.rotation, &self_node.scale);
+        self_node.matrix_local = compose(&self_node.position, &self_node.rotation, &self_node.scale);
         
         self_node.matrix_world = parent_node.matrix_world * self_node.matrix_local;
 
-        if let Some(render_object) = &self_node.render_data {
+        // if let Some(render_object_index) = self_node.render_data {
+        //   let render_object = self.render_objects.get(render_object_index);
+        //   render_object.update_world_bounding(&self_node.matrix_world);
+        //   if self.camera_frustum.intersects_sphere(&render_object.world_bounding_sphere) {
+        //     // calculate distance to camera for sorting;
+        //     let z =  (self_node.matrix_world.position() * project_screen_matrix).z;
+        //     render_list.add_renderable(render_object, &self_node, z);
+        //   }
+        // }
 
-          render_object.update_world_bounding(&self_node.matrix_world);
-          if self.camera_frustum.intersects_sphere(&render_object.world_bounding_sphere) {
-            // calculate distance to camera for sorting;
-            let z =  (self_node.matrix_world.position() * project_screen_matrix).z;
-            render_list.add_renderable(render_object, &self_node, z);
-          }
+        if let Some(render_object_index) = self_node.render_data {
+          let render_object = self.render_objects.get(render_object_index);
+          let z =  (self_node.matrix_world.position() * project_screen_matrix).z;
+          render_list.add_renderable(render_object, &self_node, z);
         }
+
       } else {
         self_node.matrix_local =
           compose(&self_node.position, &self_node.rotation, &self_node.scale);

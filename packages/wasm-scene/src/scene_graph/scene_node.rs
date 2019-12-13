@@ -12,7 +12,7 @@ pub struct SceneNode {
   pub matrix_local: Mat4<f32>,
   pub matrix_world: Mat4<f32>,
 
-  pub render_data: Option<Rc<RenderObject>>,
+  pub render_data: Option<usize>,
 
   pub(crate) parent: Option<usize>,
   pub(crate) left_brother: Option<usize>,

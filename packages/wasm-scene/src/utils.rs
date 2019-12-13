@@ -22,9 +22,18 @@ impl<T> ArrayContainer<T>{
     }
   }
 
+  pub fn get_mut(&mut self, index: usize) -> &mut T {
+    if let Some(data) = &mut self.data[index] {
+      data
+    }else{
+      panic!("try get a deleted item in array container")
+    }
+  }
+
+
   pub fn get(&self, index: usize) -> &T {
     if let Some(data) = &self.data[index] {
-      &data
+      data
     }else{
       panic!("try get a deleted item in array container")
     }
