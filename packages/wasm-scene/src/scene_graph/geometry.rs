@@ -1,3 +1,4 @@
+use crate::math::mat4::Mat4;
 use crate::scene_graph::*;
 use crate::math::vec::Math;
 use crate::math::vec3::Vec3;
@@ -39,6 +40,10 @@ impl Box3 {
     }
     b
   }
+
+  pub fn apply_matrix(&mut self, mat: &Mat4<f32>) -> Self{
+    unimplemented!()
+  }
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -62,6 +67,12 @@ impl Sphere {
       max_distance2 = max_distance2.max(d);
     }
     Sphere::new(center, max_distance2.sqrt())
+  }
+
+  pub fn apply_matrix(mut self, mat: &Mat4<f32>) -> Self {
+    self.center = self.center.apply_mat4(mat);
+    self.radius = self.radius * mat.max_scale_on_axis();
+    self
   }
 }
 

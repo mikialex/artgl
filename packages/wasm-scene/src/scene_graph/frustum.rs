@@ -1,6 +1,7 @@
 use crate::scene_graph::*;
 use crate::math::*;
 
+#[derive(Debug, Copy, Clone)]
 pub struct Plane{
     pub normal: Vec3<f32>,
     pub constant: f32,
@@ -36,6 +37,12 @@ pub struct Frustum {
 }
 
 impl Frustum{
+    pub fn new() -> Self {
+        Self {
+            planes: [Plane::new(Vec3::new(1.0, 1., 1.), 1.);6]
+        }
+    }
+
     pub fn intersects_sphere(&self, sphere: &Sphere) -> bool {
         let neg_radius = - sphere.radius;
         
