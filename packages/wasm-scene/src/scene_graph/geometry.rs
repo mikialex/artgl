@@ -1,8 +1,14 @@
+use crate::math::vec3::Vec3;
 use crate::math_entity::*;
 use crate::scene_graph::*;
-use crate::math::vec3::Vec3;
 use std::collections::HashMap;
 use std::rc::Rc;
+
+pub trait Boundary3D {
+  fn get_bounding_box(&self) -> &Box3;
+  fn get_bounding_sphere(&self) -> &Sphere;
+  fn update_bounding(&mut self);
+}
 
 pub struct Geometry {
   pub bounding_box: Box3,
@@ -44,4 +50,27 @@ impl Geometry {
         Sphere::make_from_position_buffer_with_box(&position.data, &self.bounding_box);
     }
   }
+}
+
+impl Boundary3D for Geometry {
+  fn get_bounding_box(&self) -> &Box3 {
+    &self.bounding_box
+  }
+  fn get_bounding_sphere(&self) -> &Sphere {
+    &self.bounding_sphere
+  }
+  fn update_bounding(&mut self) {
+    if let Some(position) = self.attributes.get("position") {
+      self.bounding_box = Box3::make_from_position_buffer(&position.data);
+      self.bounding_sphere =
+        Sphere::make_from_position_buffer_with_box(&position.data, &self.bounding_box);
+    }
+  }
+}
+
+pub struct StandardGeometry {
+  pub index: Rc<BufferData<u16>>,
+  pub position: BufferData<f32>,
+  pub normal: BufferData<f32>,
+  pub uv: BufferData<f32>,
 }

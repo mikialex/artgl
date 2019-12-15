@@ -1,7 +1,7 @@
 use crate::math::mat4::Mat4;
+use crate::math_entity::*;
 use crate::scene_graph::*;
 use std::rc::Rc;
-use crate::math_entity::*;
 
 pub struct RenderObject {
   pub index: usize,
