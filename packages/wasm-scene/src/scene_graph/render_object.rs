@@ -13,8 +13,8 @@ pub struct RenderObject {
 
 impl RenderObject {
   pub fn new(index: usize, shading: Rc<dyn Shading>, geometry: Rc<dyn Geometry>) -> Self {
-    let world_bounding_box = geometry.get_bounding_box().clone();
-    let world_bounding_sphere = geometry.get_bounding_sphere().clone();
+    let world_bounding_box = *geometry.get_bounding_box();
+    let world_bounding_sphere = *geometry.get_bounding_sphere();
     RenderObject {
       index,
       shading,

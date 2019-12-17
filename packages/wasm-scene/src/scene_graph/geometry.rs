@@ -14,13 +14,3 @@ pub trait Geometry: Boundary3D {
   fn get_index_attribute(&self) -> Option<&Rc<BufferData<u16>>>;
   fn get_attribute_by_name(&self, name: &str) -> Option<&Rc<BufferData<f32>>>;
 }
-
-pub struct StandardGeometry {
-  pub bounding_box: Box3,
-  pub bounding_sphere: Sphere,
-
-  pub index: Rc<BufferData<u16>>,
-  pub position: BufferData<f32>,
-  // pub normal: BufferData<f32>,
-  // pub uv: BufferData<f32>,
-}

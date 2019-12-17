@@ -25,7 +25,7 @@ impl Plane{
 
     pub fn normalize(&mut self) -> &mut Self {
         let inverse_normal_length = 1.0 / self.normal.length();
-		self.normal = self.normal * inverse_normal_length;
+		self.normal *= inverse_normal_length;
 		self.constant *= inverse_normal_length;
         self
     }
