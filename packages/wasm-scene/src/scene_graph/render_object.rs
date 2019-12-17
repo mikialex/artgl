@@ -3,16 +3,16 @@ use crate::math_entity::*;
 use crate::scene_graph::*;
 use std::rc::Rc;
 
-pub struct RenderObject {
+pub struct RenderObject<Renderer> {
   pub index: usize,
-  pub shading: Rc<dyn Shading>,
+  pub shading: Rc<dyn Shading<Renderer>>,
   pub geometry: Rc<dyn Geometry>,
   pub world_bounding_box: Box3,
   pub world_bounding_sphere: Sphere,
 }
 
-impl RenderObject {
-  pub fn new(index: usize, shading: Rc<dyn Shading>, geometry: Rc<dyn Geometry>) -> Self {
+impl<Renderer> RenderObject<Renderer> {
+  pub fn new(index: usize, shading: Rc<dyn Shading<Renderer>>, geometry: Rc<dyn Geometry>) -> Self {
     let world_bounding_box = *geometry.get_bounding_box();
     let world_bounding_sphere = *geometry.get_bounding_sphere();
     RenderObject {

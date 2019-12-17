@@ -1,12 +1,11 @@
-use fnv::FnvHasher;
+use crate::scene_graph::*;
 use crate::webgl::renderer::uploadMatrix4f;
+use crate::webgl::*;
+use fnv::FnvHasher;
 use std::collections::HashMap;
 use std::hash::BuildHasherDefault;
-use crate::scene_graph::*;
-use crate::webgl::*;
 use std::rc::Rc;
 use web_sys::*;
-
 
 pub struct DynamicShading {
   index: usize,
@@ -16,7 +15,7 @@ pub struct DynamicShading {
   pub uniforms: Vec<String>,
 }
 
-impl Shading for DynamicShading {
+impl Shading<WebGLRenderer> for DynamicShading {
   fn get_index(&self) -> usize {
     self.index
   }
@@ -27,14 +26,15 @@ impl Shading for DynamicShading {
     &self.frag_str
   }
 
-  fn make_program(&self, gl: Rc<WebGlRenderingContext>) -> Rc<dyn ProgramWrap> {
+  fn make_gpu_port(&self, backend: &WebGLRenderer) -> Rc<dyn ShadingGPUPort<WebGLRenderer>> {
     Rc::new(
       DynamicProgram::new(
-        gl.clone(),
+        backend.gl.clone(),
         self.get_vertex_str(),
         self.get_fragment_str(),
         &self.attributes,
         &self.uniforms,
+        backend.step_id.get()
       )
       .unwrap(),
     )
@@ -60,42 +60,81 @@ impl DynamicShading {
 }
 
 pub struct DynamicProgram {
+  index: usize,
   context: Rc<WebGlRenderingContext>,
   pub program: WebGlProgram,
   pub uniforms: HashMap<String, WebGlUniformLocation, BuildHasherDefault<FnvHasher>>,
   pub attributes: HashMap<String, i32, BuildHasherDefault<FnvHasher>>,
 }
 
-impl ProgramWrap for DynamicProgram {
-  fn get_program(&self) -> &WebGlProgram{
-    &self.program
+impl ShadingGPUPort<WebGLRenderer> for DynamicProgram {
+  fn get_index(&self) -> usize { self.index } 
+
+  fn use_self(&self, renderer: &WebGLRenderer) {
+    renderer.gl.use_program(Some(&self.program));
   }
 
-  fn upload_uniforms(&self, renderer: &WebGLRenderer){
+  fn use_uniforms(&self, renderer: &WebGLRenderer) {
     let model_matrix_location = self.uniforms.get("model_matrix").unwrap();
-    uploadMatrix4f(&renderer.gl, model_matrix_location, &renderer.model_transform);
+    uploadMatrix4f(
+      &renderer.gl,
+      model_matrix_location,
+      &renderer.model_transform,
+    );
 
     let camera_inverse_location = self.uniforms.get("camera_inverse").unwrap();
-    uploadMatrix4f(&renderer.gl, camera_inverse_location, &renderer.camera_inverse);
+    uploadMatrix4f(
+      &renderer.gl,
+      camera_inverse_location,
+      &renderer.camera_inverse,
+    );
 
     let projection_matrix_location = self.uniforms.get("projection_matrix").unwrap();
-    uploadMatrix4f(&renderer.gl, projection_matrix_location, &renderer.camera_projection);
+    uploadMatrix4f(
+      &renderer.gl,
+      projection_matrix_location,
+      &renderer.camera_projection,
+    );
   }
 
-  fn get_attributes(&self) -> &HashMap<String, i32, BuildHasherDefault<FnvHasher>>{
-    &self.attributes
-  }
+  fn use_geometry(&self, renderer: &mut WebGLRenderer, geometry: Rc<dyn Geometry>) {
+    let gl = renderer.gl.clone();
+      if let Some(index) = &geometry.get_index_attribute() {
+        let buffer = renderer
+          .buffer_manager
+          .get_index_buffer((*index).clone())
+          .unwrap();
+        
+        gl.bind_buffer(WebGlRenderingContext::ELEMENT_ARRAY_BUFFER, Some(buffer));
+      } else {
+        gl.bind_buffer(WebGlRenderingContext::ELEMENT_ARRAY_BUFFER, None);
+      }
 
+      for (name, location) in self.attributes.iter() {
+        let buffer_data = geometry.get_attribute_by_name(name).unwrap();
+        let buffer = renderer.buffer_manager.get_buffer(buffer_data.clone()).unwrap();
+        gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(buffer));
+        gl.vertex_attrib_pointer_with_i32(
+          *location as u32,
+          buffer_data.stride as i32,
+          WebGlRenderingContext::FLOAT,
+          false,
+          0,
+          0,
+        );
+        gl.enable_vertex_attrib_array(*location as u32);
+      }
+  }
 }
 
 impl DynamicProgram {
-
   pub fn new(
     context: Rc<WebGlRenderingContext>,
     vertex_shader_str: &str,
     frag_shader_str: &str,
-    attributes_vec: &[String], 
-    uniforms_vec: &[String]
+    attributes_vec: &[String],
+    uniforms_vec: &[String],
+    index: usize,
   ) -> Result<DynamicProgram, String> {
     let program = make_webgl_program(&context, vertex_shader_str, frag_shader_str)?;
 
@@ -103,7 +142,10 @@ impl DynamicProgram {
 
     let mut uniforms = HashMap::with_hasher(BuildHasherDefault::<FnvHasher>::default());
     uniforms_vec.iter().for_each(|name| {
-      uniforms.insert(name.clone(), context.get_uniform_location(&program, name).unwrap());
+      uniforms.insert(
+        name.clone(),
+        context.get_uniform_location(&program, name).unwrap(),
+      );
     });
 
     let mut attributes = HashMap::with_hasher(BuildHasherDefault::<FnvHasher>::default());
@@ -111,11 +153,12 @@ impl DynamicProgram {
       attributes.insert(name.clone(), context.get_attrib_location(&program, name));
     });
 
-    Ok(DynamicProgram { 
-      context, 
+    Ok(DynamicProgram {
+      index,
+      context,
       program,
       uniforms,
-      attributes
-      })
+      attributes,
+    })
   }
 }

@@ -1,3 +1,4 @@
+use crate::webgl::renderer::WebGLRenderer;
 use crate::math_entity::frustum::Frustum;
 use crate::math::*;
 use crate::scene_graph::*;
@@ -12,11 +13,12 @@ pub struct SceneGraph {
   pub(crate) camera: Camera,
   camera_frustum: Frustum,
   pub(crate) nodes: ArrayContainer<RefCell<SceneNode>>,
+
   pub(crate) buffers: ArrayContainer<Rc<BufferData<f32>>>,
   pub(crate) index_buffers: ArrayContainer<Rc<BufferData<u16>>>,
   pub(crate) geometries: ArrayContainer<Rc<dyn Geometry>>,
-  pub(crate) shadings: ArrayContainer<Rc<dyn Shading>>,
-  pub(crate) render_objects: ArrayContainer<RenderObject>,
+  pub(crate) shadings: ArrayContainer<Rc<dyn Shading<WebGLRenderer>>>,
+  pub(crate) render_objects: ArrayContainer<RenderObject<WebGLRenderer>>,
 
   render_list: RefCell<RenderList>,
 }

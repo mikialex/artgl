@@ -9,24 +9,19 @@ use web_sys::*;
 use fnv::FnvHasher;
 
 impl WebGLRenderer {
-  pub fn get_program(&mut self, shading: Rc<dyn Shading>) -> Result<Rc<dyn ProgramWrap>, String> {
-    let gl = self.gl.clone();
+  pub fn get_port(&self, shading: Rc<dyn Shading<Self>>) -> Result<Rc<dyn ShadingGPUPort<Self>>, String> {
     Ok(
       self
         .programs
+        .borrow_mut()
         .entry(shading.clone())
         .or_insert_with(||{
-          shading.make_program(gl)
+          self.step_id.set(self.step_id.get() + 1);
+          shading.make_gpu_port(self)
       })
         .clone(),
     )
   }
-}
-
-pub trait ProgramWrap {
-  fn get_program(&self) -> &WebGlProgram;
-  fn upload_uniforms(&self, renderer: &WebGLRenderer);
-  fn get_attributes(&self) -> &HashMap<String, i32, BuildHasherDefault<FnvHasher>>;
 }
 
 pub fn make_webgl_program(context: &WebGlRenderingContext, vertex_shader_str: &str, frag_shader_str: &str)

@@ -27,9 +27,9 @@ impl RenderList {
     self
   }
 
-  pub fn add_renderable(
+  pub fn add_renderable<Renderer>(
     &mut self,
-    obj: &RenderObject,
+    obj: &RenderObject<Renderer>,
     scene_node: &SceneNode,
     camera_distance: f32,
   ) -> &mut Self {
