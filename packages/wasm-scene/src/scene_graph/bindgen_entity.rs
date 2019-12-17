@@ -73,7 +73,7 @@ impl SceneGraph {
     } else {
       None
     };
-    let geometry = Rc::new(Geometry::new(free_index, index, position.clone())?);
+    let geometry = Rc::new(DynamicGeometry::new(free_index, index, position.clone())?);
     self.geometries.set_item(geometry, free_index);
     Ok(free_index)
   }

@@ -11,6 +11,8 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
+# rendiation = {version ="0.1.0", path="../../../rendiation/"}
+
 wasm-bindgen = "0.2.55"
 js-sys = "0.3.27"
 fnv = "1.0.3"
