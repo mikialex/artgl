@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use std::hash::Hash;
 use std::hash::Hasher;
-use crate::scene_graph::*;
+use crate::render_entity::*;
 
 pub trait Shading<Renderer> {
   fn get_index(&self) -> usize;

@@ -1,4 +1,4 @@
-use crate::scene_graph::*;
+use crate::render_entity::*;
 use crate::webgl::renderer::uploadMatrix4f;
 use crate::webgl::*;
 use fnv::FnvHasher;
@@ -6,14 +6,6 @@ use std::collections::HashMap;
 use std::hash::BuildHasherDefault;
 use std::rc::Rc;
 use web_sys::*;
-
-pub struct DynamicShading {
-  index: usize,
-  pub vertex_str: String,
-  pub frag_str: String,
-  pub attributes: Vec<String>,
-  pub uniforms: Vec<String>,
-}
 
 impl Shading<WebGLRenderer> for DynamicShading {
   fn get_index(&self) -> usize {
@@ -38,24 +30,6 @@ impl Shading<WebGLRenderer> for DynamicShading {
       )
       .unwrap(),
     )
-  }
-}
-
-impl DynamicShading {
-  pub fn new(
-    index: usize,
-    vertex_str: String,
-    frag_str: String,
-    attributes: Vec<String>,
-    uniforms: Vec<String>,
-  ) -> DynamicShading {
-    DynamicShading {
-      index,
-      vertex_str,
-      frag_str,
-      attributes,
-      uniforms,
-    }
   }
 }
 

@@ -1,12 +1,8 @@
-use crate::webgl::renderer::uploadMatrix4f;
-use std::collections::HashMap;
-use std::hash::BuildHasherDefault;
-use crate::scene_graph::*;
+use crate::render_entity::*;
 use crate::webgl::*;
 use std::rc::Rc;
 use web_sys::*;
 
-use fnv::FnvHasher;
 
 impl WebGLRenderer {
   pub fn get_port(&self, shading: Rc<dyn Shading<Self>>) -> Result<Rc<dyn ShadingGPUPort<Self>>, String> {

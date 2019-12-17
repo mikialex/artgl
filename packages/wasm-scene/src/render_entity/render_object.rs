@@ -1,6 +1,6 @@
 use crate::math::mat4::Mat4;
 use crate::math_entity::*;
-use crate::scene_graph::*;
+use crate::render_entity::*;
 use std::rc::Rc;
 
 pub struct RenderObject<Renderer> {

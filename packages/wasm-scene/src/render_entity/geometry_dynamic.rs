@@ -1,6 +1,6 @@
 use crate::math::vec3::Vec3;
 use crate::math_entity::*;
-use crate::scene_graph::*;
+use crate::render_entity::*;
 use std::collections::HashMap;
 use std::rc::Rc;
 

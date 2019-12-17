@@ -1,5 +1,6 @@
 use crate::webgl::renderer::WebGLRenderer;
 use crate::math_entity::frustum::Frustum;
+use crate::render_entity::*;
 use crate::math::*;
 use crate::scene_graph::*;
 use crate::utils::set_panic_hook;
@@ -8,17 +9,33 @@ use core::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 
+pub struct RenderEntityStore<Renderer>{
+  pub(crate) buffers: ArrayContainer<Rc<BufferData<f32>>>,
+  pub(crate) index_buffers: ArrayContainer<Rc<BufferData<u16>>>,
+  pub(crate) geometries: ArrayContainer<Rc<dyn Geometry>>,
+  pub(crate) shadings: ArrayContainer<Rc<dyn Shading<Renderer>>>,
+  pub(crate) render_objects: ArrayContainer<RenderObject<Renderer>>,
+}
+
+impl<Renderer> RenderEntityStore<Renderer>{
+  fn new() -> Self {
+    RenderEntityStore {
+      buffers: ArrayContainer::new(),
+      index_buffers: ArrayContainer::new(),
+      geometries: ArrayContainer::new(),
+      shadings: ArrayContainer::new(),
+      render_objects: ArrayContainer::new(),
+    }
+  }
+}
+
 #[wasm_bindgen]
 pub struct SceneGraph {
   pub(crate) camera: Camera,
   camera_frustum: Frustum,
   pub(crate) nodes: ArrayContainer<RefCell<SceneNode>>,
 
-  pub(crate) buffers: ArrayContainer<Rc<BufferData<f32>>>,
-  pub(crate) index_buffers: ArrayContainer<Rc<BufferData<u16>>>,
-  pub(crate) geometries: ArrayContainer<Rc<dyn Geometry>>,
-  pub(crate) shadings: ArrayContainer<Rc<dyn Shading<WebGLRenderer>>>,
-  pub(crate) render_objects: ArrayContainer<RenderObject<WebGLRenderer>>,
+  pub(crate) store: RenderEntityStore<WebGLRenderer>,
 
   render_list: RefCell<RenderList>,
 }
@@ -86,7 +103,7 @@ impl SceneGraph {
         // }
 
         if let Some(render_object_index) = self_node.render_data {
-          let render_object = self.render_objects.get(render_object_index);
+          let render_object = self.store.render_objects.get(render_object_index);
           let z =  (self_node.matrix_world.position() * project_screen_matrix).z;
           render_list.add_renderable(render_object, &self_node, z);
         }
@@ -153,11 +170,7 @@ impl SceneGraph {
       camera: Camera::new(),
       camera_frustum: Frustum::new(),
       nodes: ArrayContainer::new(),
-      buffers: ArrayContainer::new(),
-      index_buffers: ArrayContainer::new(),
-      geometries: ArrayContainer::new(),
-      shadings: ArrayContainer::new(),
-      render_objects: ArrayContainer::new(),
+      store: RenderEntityStore::new(),
       render_list: RefCell::new(RenderList::new()),
     };
     graph.create_new_node(); // as root

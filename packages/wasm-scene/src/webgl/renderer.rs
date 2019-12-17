@@ -1,8 +1,8 @@
 use crate::math::*;
 use crate::scene_graph::*;
 use crate::webgl::buffer_attribute::*;
-use crate::webgl::programs::*;
-use core::cell::{RefCell, Cell};
+use crate::render_entity::*;
+use core::cell::{Cell, RefCell};
 use fnv::FnvHasher;
 use std::collections::HashMap;
 use std::hash::BuildHasherDefault;
@@ -24,6 +24,14 @@ extern "C" {
   );
 }
 
+type ProgramMap = RefCell<
+  HashMap<
+    Rc<dyn Shading<WebGLRenderer>>,
+    Rc<dyn ShadingGPUPort<WebGLRenderer>>,
+    BuildHasherDefault<FnvHasher>,
+  >,
+>;
+
 #[wasm_bindgen]
 pub struct WebGLRenderer {
   pub(crate) step_id: Cell<usize>,
@@ -35,7 +43,7 @@ pub struct WebGLRenderer {
 
   pub(crate) active_port: Option<Rc<dyn ShadingGPUPort<Self>>>,
 
-  pub(crate) programs: RefCell<HashMap<Rc<dyn Shading<Self>>, Rc<dyn ShadingGPUPort<Self>>, BuildHasherDefault<FnvHasher>>,>,
+  pub(crate) programs: ProgramMap,
   pub(crate) buffer_manager: BufferManager,
 }
 
@@ -84,7 +92,10 @@ impl WebGLRenderer {
       16,
     );
     list.foreach(|render_item| {
-      let object = scene.render_objects.get(render_item.render_object_index);
+      let object = scene
+        .store
+        .render_objects
+        .get(render_item.render_object_index);
       let scene_node = scene.nodes.get(render_item.scene_node_index).borrow();
 
       copyBuffer(&self.model_transform, scene_node.matrix_world.as_ptr(), 16);

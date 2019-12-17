@@ -1,4 +1,5 @@
 use crate::scene_graph::*;
+use crate::render_entity::*;
 
 pub struct RenderItem {
   pub render_object_index: usize,

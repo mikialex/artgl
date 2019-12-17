@@ -1,5 +1,5 @@
+use crate::render_entity::*;
 use crate::math_entity::*;
-use crate::scene_graph::*;
 use std::rc::Rc;
 
 pub trait Boundary3D {

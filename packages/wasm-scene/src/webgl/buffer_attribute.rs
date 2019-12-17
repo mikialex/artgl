@@ -1,5 +1,4 @@
-use crate::log_usize;
-use crate::scene_graph::*;
+use crate::render_entity::*;
 use std::collections::HashMap;
 use std::hash::BuildHasherDefault;
 use std::rc::Rc;

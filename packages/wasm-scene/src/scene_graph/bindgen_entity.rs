@@ -1,4 +1,5 @@
 use crate::scene_graph::*;
+use crate::render_entity::*;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 
@@ -18,7 +19,7 @@ impl SceneGraph {
 
   pub fn create_new_shading(&mut self, shading_key: String) -> usize {
     if shading_key == "test" {
-      let free_index = self.shadings.get_free_index();
+      let free_index = self.store.shadings.get_free_index();
       // let shading = Rc::new(DynamicShading::new(
       //   free_index,
       //   String::from(
@@ -43,7 +44,7 @@ impl SceneGraph {
       //   vec![String::from("model_matrix"), String::from("projection_matrix"), String::from("camera_inverse")],
       // ));
       let shading = Rc::new(PureColorShading::new(free_index));
-      self.shadings.set_item(shading, free_index);
+      self.store.shadings.set_item(shading, free_index);
       free_index
     } else {
       panic!("not supported shading")
@@ -51,39 +52,39 @@ impl SceneGraph {
   }
 
   pub fn create_new_buffer_data(&mut self, data: Vec<f32>, stride: usize) -> usize {
-    let free_index = self.buffers.get_free_index();
+    let free_index = self.store.buffers.get_free_index();
     let buffer_data = Rc::new(BufferData::new(free_index, data, stride));
-    self.buffers.set_item(buffer_data, free_index);
+    self.store.buffers.set_item(buffer_data, free_index);
     free_index
   }
 
   pub fn create_new_index_buffer_data(&mut self, data: Vec<u16>, stride: usize) -> usize {
-    let free_index = self.index_buffers.get_free_index();
+    let free_index = self.store.index_buffers.get_free_index();
     let buffer_data = Rc::new(BufferData::new(free_index, data, stride));
-    self.index_buffers.set_item(buffer_data, free_index);
+    self.store.index_buffers.set_item(buffer_data, free_index);
     free_index
   }
 
 
   pub fn create_geometry(&mut self, index_index: Option<usize>, position_index: usize) -> Result<usize, JsValue> {
-    let free_index = self.geometries.get_free_index();
-    let position = self.buffers.get(position_index);
+    let free_index = self.store.geometries.get_free_index();
+    let position = self.store.buffers.get(position_index);
     let index = if let Some(i) = index_index {
-      Some(self.index_buffers.get(i).clone())
+      Some(self.store.index_buffers.get(i).clone())
     } else {
       None
     };
     let geometry = Rc::new(DynamicGeometry::new(free_index, index, position.clone())?);
-    self.geometries.set_item(geometry, free_index);
+    self.store.geometries.set_item(geometry, free_index);
     Ok(free_index)
   }
 
   pub fn create_render_data(&mut self, geometry_id: usize, shading_id: usize) -> usize {
-    let geometry = self.geometries.get(geometry_id).clone();
-    let shading = self.shadings.get(shading_id).clone();
-    let free_index = self.render_objects.get_free_index();
+    let geometry = self.store.geometries.get(geometry_id).clone();
+    let shading = self.store.shadings.get(shading_id).clone();
+    let free_index = self.store.render_objects.get_free_index();
     let obj = RenderObject::new(free_index, shading, geometry);
-    self.render_objects.set_item(obj, free_index);
+    self.store.render_objects.set_item(obj, free_index);
     free_index
   }
 
