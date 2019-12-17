@@ -1,6 +1,4 @@
 use crate::math::*;
-use crate::scene_graph::*;
-use std::rc::Rc;
 
 pub struct SceneNode {
   index: usize,

@@ -14,7 +14,7 @@ pub struct SceneGraph {
   pub(crate) nodes: ArrayContainer<RefCell<SceneNode>>,
   pub(crate) buffers: ArrayContainer<Rc<BufferData<f32>>>,
   pub(crate) index_buffers: ArrayContainer<Rc<BufferData<u16>>>,
-  pub(crate) geometries: ArrayContainer<Rc<DynamicGeometry>>,
+  pub(crate) geometries: ArrayContainer<Rc<dyn Geometry>>,
   pub(crate) shadings: ArrayContainer<Rc<dyn Shading>>,
   pub(crate) render_objects: ArrayContainer<RenderObject>,
 

@@ -1,22 +1,21 @@
+use crate::math::mat4::Mat4;
+use crate::scene_graph::*;
 use crate::webgl::programs::make_webgl_program;
-use fnv::FnvHasher;
-use core::hash::BuildHasherDefault;
-use std::collections::HashMap;
+use crate::webgl::programs::ProgramWrap;
 use crate::webgl::renderer::uploadMatrix4f;
 use crate::webgl::renderer::WebGLRenderer;
-use web_sys::WebGlProgram;
-use web_sys::WebGlUniformLocation;
-use crate::webgl::programs::ProgramWrap;
+use core::hash::BuildHasherDefault;
+use fnv::FnvHasher;
+use std::collections::HashMap;
 use std::rc::Rc;
+use web_sys::WebGlProgram;
 use web_sys::WebGlRenderingContext;
-use crate::scene_graph::*;
-use crate::math::mat4::Mat4;
+use web_sys::WebGlUniformLocation;
 
 pub struct PureColorShading {
   index: usize,
   vertex: String,
   frag: String,
-
   // // uniforms
   // projection_matrix: Mat4<f32>,
   // world_matrix: Mat4<f32>,
@@ -24,10 +23,10 @@ pub struct PureColorShading {
 }
 
 impl PureColorShading {
-  pub fn new(index: usize) -> Self{
+  pub fn new(index: usize) -> Self {
     PureColorShading {
       index,
-      vertex: String::from (
+      vertex: String::from(
         r#"
         attribute vec3 position;
             uniform mat4 model_matrix;
@@ -36,36 +35,33 @@ impl PureColorShading {
             void main() {
               gl_Position = projection_matrix * camera_inverse * model_matrix * vec4(position, 1.0);
             }
-        "#
+        "#,
       ),
-      frag: String::from (
+      frag: String::from(
         r#"
             void main() {
                 gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
             }
-        "#
+        "#,
       ),
-    
       // projection_matrix: Mat4::one(),
       // world_matrix: Mat4::one(),
       // camera_inverse_matrix:Mat4::one(),
     }
-    
   }
 }
 
 impl Shading for PureColorShading {
-  fn get_index(&self)-> usize{
+  fn get_index(&self) -> usize {
     self.index
   }
-  fn get_vertex_str(&self) -> &str{
+  fn get_vertex_str(&self) -> &str {
     &self.vertex
   }
-  fn get_fragment_str(&self) -> &str{
+  fn get_fragment_str(&self) -> &str {
     &self.frag
   }
-  fn make_program(&self, gl: Rc<WebGlRenderingContext>) -> Rc<dyn ProgramWrap>{
-
+  fn make_program(&self, gl: Rc<WebGlRenderingContext>) -> Rc<dyn ProgramWrap> {
     let program = make_webgl_program(&gl, &self.vertex, &self.frag).unwrap();
 
     let mut attributes = HashMap::with_hasher(BuildHasherDefault::<FnvHasher>::default());
@@ -73,7 +69,9 @@ impl Shading for PureColorShading {
       attributes.insert(name.clone(), gl.get_attrib_location(&program, name));
     });
 
-    let projection_matrix = gl.get_uniform_location(&program, "projection_matrix").unwrap();
+    let projection_matrix = gl
+      .get_uniform_location(&program, "projection_matrix")
+      .unwrap();
     let world_matrix = gl.get_uniform_location(&program, "model_matrix").unwrap();
     let camera_inverse_matrix = gl.get_uniform_location(&program, "camera_inverse").unwrap();
 
@@ -97,35 +95,43 @@ pub struct PureColorProgram {
 }
 
 impl ProgramWrap for PureColorProgram {
-  fn get_program(&self) -> &WebGlProgram{
+  fn get_program(&self) -> &WebGlProgram {
     &self.program
   }
 
-  fn upload_uniforms(&self, renderer: &WebGLRenderer){
+  fn upload_uniforms(&self, renderer: &WebGLRenderer) {
     uploadMatrix4f(&renderer.gl, &self.world_matrix, &renderer.model_transform);
-    uploadMatrix4f(&renderer.gl, &self.camera_inverse_matrix, &renderer.camera_inverse);
-    uploadMatrix4f(&renderer.gl, &self.projection_matrix, &renderer.camera_projection);
+    uploadMatrix4f(
+      &renderer.gl,
+      &self.camera_inverse_matrix,
+      &renderer.camera_inverse,
+    );
+    uploadMatrix4f(
+      &renderer.gl,
+      &self.projection_matrix,
+      &renderer.camera_projection,
+    );
   }
 
-  fn get_attributes(&self) -> &HashMap<String, i32, BuildHasherDefault<FnvHasher>>{
+  fn get_attributes(&self) -> &HashMap<String, i32, BuildHasherDefault<FnvHasher>> {
     &self.attributes
   }
 }
-  
-  // pub struct ShadingProgram {
-  //   vertex: String,
-  //   frag: String,
-    
-  //   projection_matrix_location: WebGlUniformLocation,
-  //   world_matrix: WebGlUniformLocation,
-  // }
-  
-  // impl ShadingProgram{
-  //   pub fn new(){
-  
-  //   }
-  
-  //   pub fn upload_uniforms(&self){
-      
-  //   }
-  // }
+
+// pub struct ShadingProgram {
+//   vertex: String,
+//   frag: String,
+
+//   projection_matrix_location: WebGlUniformLocation,
+//   world_matrix: WebGlUniformLocation,
+// }
+
+// impl ShadingProgram{
+//   pub fn new(){
+
+//   }
+
+//   pub fn upload_uniforms(&self){
+
+//   }
+// }
